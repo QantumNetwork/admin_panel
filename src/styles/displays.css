@@ -1,0 +1,226 @@
+/*nav buttons*/
+.card-not-inserted-btn {
+    position: absolute;
+    top: 123px;
+    left: 16.6%;
+    padding: 15px 20px;
+    /* height: 4%; */
+    background: #002977;
+    border: none;
+    border-radius: 27px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.card-inserted-btn {
+    position: absolute;
+    top: 123px;
+    left: 26.9%;
+    padding: 15px 24px;
+    /* height: 4%; */
+    background: #C3C3C3;
+    border: none;
+    border-radius: 27px;
+    color: #000;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.displaysbtn {
+    position: absolute;
+    top: 28px;
+    left: 84%;
+    width: 8%;
+    height: 46px;
+    border: 2px solid #999999;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    /* color: #999999; */
+    background-color: #5396D1;
+    color: white;
+    border-color: #5396D1;
+    transition: all 0.3s ease;
+}
+
+/* ========== CURRENT POSTS SECTION ========== */
+.current-posts-display {
+    position: absolute;
+    top: 185px;
+    left: 16.6%;
+    width: 27%;
+    height: 500px;
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.current-posts-display h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.post-card-displays {
+    width: 70%;
+    height: 120px;
+    background: #ddd;
+    margin-top: 20px;
+    margin-left: 60px;
+    border-radius: 5px;
+    max-width: calc(100% - 60px);
+}
+
+.post-details-displays {
+    margin-top: 50px;
+    margin-left: 60px;
+    font-size: 12px;
+}
+
+.content-wrapper-displays {
+    position: relative;
+    width: 100%; /* or whatever width you need */   
+}
+
+.display-options-panel {
+    position: absolute;
+  top: 185px;            /* same vertical level as .current-posts-display */
+  left: 45%;             /* adjust so it sits to the right of .current-posts-display */
+  width: 27%;            /* or whatever width you want for the panel */
+  height: 500px;
+  background: #F2F2F2;   /* match style of current posts (optional) */
+  padding: 15px;
+  box-sizing: border-box;
+  overflow: auto;        /* if you want scrolling inside */
+}
+
+.display-options-panel {
+    h2 {
+        margin: 0 0 20px 0;
+        font-size: 14px;
+        text-align: center;
+    }
+}
+
+.expiry-row-displays {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.expiry-options input[type="radio"] {
+    margin: 0;
+    vertical-align: middle;
+  }
+  .expiry-options label {
+    margin: 0;
+    margin-left: 3px;
+    vertical-align: middle;
+  }
+
+.days-selector-displays {
+    display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.form-group-displays {
+    margin-bottom: 5px;
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.time-options {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.content-body {
+    position: relative;
+    right: 15px;
+}
+
+/* preview section */
+.preview-section-displays {
+    position: absolute;
+    top: 185px;
+    left: 73.4%;
+    width: 26%;
+    height: 500px;
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* control buttons */
+.publish-displays-btn {
+    position: absolute;
+    top: 121px;
+    left: 91%;
+    padding: 15px 24px;
+    background: #5396D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.upload-displays-btn {
+    position: absolute;
+    top: 600px; /* shifted down */
+    left: 18.5%;
+    padding: 15px 22px;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.delete-displays-btn {
+    position: absolute;
+    top: 599px; /* shifted down */
+    left: 32%;
+    padding: 16px 22px;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.update-displays-btn {
+    position: absolute;
+    top: 417px; /* shifted down */
+    left: 40%;
+    padding: 15px 24px;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.play-displays-btn {
+    position: absolute;
+    top: 417px; /* shifted down */
+    left: 40%;
+    padding: 15px 30px;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+

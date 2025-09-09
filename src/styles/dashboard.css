@@ -1,0 +1,138 @@
+/* Overall Container */
+.dashboard-container {
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+/* Header with White Background */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 0 2%;
+  box-sizing: border-box;
+}
+
+/* S2W Logo */
+.s2w-logo {
+  width: 12.8%;
+  height: 96px;
+  margin-left: 0.8%;
+}
+.s2w-logo img {
+  width: 100%;
+  height: auto;
+}
+
+/* User Avatar and Dropdown (Right side) */
+.user-section {
+  position: relative;
+  margin-left: auto; /* Pushes the user section to the right */
+  margin-right: 50px;
+  display: flex;
+  align-items: center; /* Aligns the avatar vertically in the center */
+  height: 100%; /* Ensures it takes full height of the header */
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  background: #002977;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 60px; /* Adjusted to shift the dropdown upward */
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+.logout-btn {
+  background: #5296D1;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Main Content */
+.dashboard-content {
+  width: 100%;
+  height: calc(100vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 30px;
+}
+
+.dashboard-content.user-access {
+  width: 100%;
+  height: calc(100vh - 100px);
+  display: flex;
+  justify-content:flex-start;
+  align-items: flex-start;
+  padding-top: 40px;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  grid-template-rows: repeat(2, 220px);
+  gap: 100px;
+  grid-template-areas:
+    "digital-app market-members ai-reporting";
+}
+
+/* Add this: for non-admin limited-access users */
+.card-container.user-access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px;
+  justify-content: flex-start;
+  padding-left: 16%;
+}
+
+/* Images that blend with the background, then become card-like on hover */
+.dashboard-card {
+  width: 100%;         /* let it fill its column */
+  max-width: 300px;    /* but never grow past 300px */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  cursor: pointer;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.dashboard-card img {
+  width: 100%;
+  height: auto;
+}
+
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+

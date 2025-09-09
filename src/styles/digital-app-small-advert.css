@@ -1,0 +1,745 @@
+/* Overall Container */
+.digital-app-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 950px;
+    margin: 0 auto;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* ============================
+   App Header & Header Elements
+   ============================ */
+.app-header {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    border-bottom: 1px solid #ccc;
+    z-index: 10;
+}
+.s2w-logo {
+    position: absolute;
+    top: 2px;
+    left: 0.8%;
+    width: 12.8%;
+    height: 96px;
+}
+.s2w-logo img {
+    width: 190px;
+    height: auto;
+}
+.digital-app-btn {
+    position: absolute;
+    top: 28px;
+    left: 35%;
+    width: 9.4%;
+    height: 46px;
+    border: 2px solid #002977;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+}
+.market-to-members-btn {
+    position: absolute;
+    top: 28px;
+    left: 45%;
+    width: 14.4%;
+    height: 46px;
+    border: 2px solid #999999;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #999999;
+    transition: all 0.3s ease;
+}
+
+.displays-btn {
+    position: absolute;
+    top: 28px;
+    left: 60%;
+    width: 8%;
+    height: 46px;
+    border: 2px solid #999999;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #999999;
+    transition: all 0.3s ease;
+}
+
+.displays-btn:hover {
+    background-color: #5396D1;
+    color: white;
+    border-color: #5396D1;
+}
+
+.market-to-members-btn:hover {
+    background-color: #5396D1;
+    color: white;
+    border-color: #5396D1;
+}
+.user-avatar {
+    position: absolute;
+    top: 31px;
+    left: 94.5%;
+    width: 42px;
+    height: 42px;
+    background: #002977;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* ============================
+       Sidebar Section
+   ============================ */
+.sidebar {
+    position: absolute;
+    top: 123px;
+    left: 2.8%;
+    width: 10.1%;
+    height: 16.6%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sidebar-btn {
+    width: 100%;
+    padding: 7px;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    color: #000;
+}
+.sidebar-btn.active {
+    background: #5296D1;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+}
+.sidebar-icon {
+    font-size: 14px;
+}
+
+/* ============================
+      Current Posts Section
+   ============================ */
+.current-posts-small {
+    position: absolute;
+    top: 185px;
+    left: 16.6%;
+    width: 28.2%;
+    height: 60%; /* Adjusted for new layout */
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+}
+.current-posts-small h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Post Card */
+.post-card-small {
+    width: 40%;
+    height: 130px;
+    background: transparent;
+    margin-top: 20px;
+    margin-left: 50px;
+    border-radius: 5px;
+}
+.post-image-small {
+    width: 100%;
+    height: 100%;
+    margin-left: 70px;
+    /* background: #bbb; */
+    border-radius: 5px;
+}
+.post-image-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Post Details */
+.post-details {
+    margin-top: 15px;
+    margin-left: 60px;
+    font-size: 12px;
+}
+.field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+.field-label {
+    width: 60px;
+    font-weight: bold;
+    font-size: 11px;
+}
+.field-value {
+    font-size: 11px;
+}
+.field-select {
+    width: 140px;
+    font-size: 11px;
+    padding: 2px;
+}
+
+/* Display Row: Immediate and Schedule */
+/* First row: Display label with Immediate radio aligned inline */
+.display-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.display-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;  /* Decreased from 6px to 2px */
+}
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+/* Second row: Schedule with date fields */
+.schedule-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.schedule-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.date-fields {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.date-label {
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    font-weight: normal;
+}
+.date-input {
+    width: 80px;
+    font-size: 10px;
+    padding: 2px;
+    margin-top: 2px;
+    text-align: center;
+}
+
+/* ============================
+      More Information Section
+   ============================ */
+.more-info-small {
+    position: absolute;
+    top: 185px;
+    left: 46.6%;
+    width: 24.1%;
+    height: 60%;
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+}
+.more-info-small h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+.more-info-small p {
+    margin: 10px 0px;
+    line-height: 8px;
+    font-size: 11px;
+    text-align: center;
+}
+
+.more-info strong {
+    font-weight: bold;
+    /* font-size: 24px !important; */
+    /* text-align: center !important; */
+    line-height: 1.2 !important;
+    display: block;
+    margin: 1em 0;
+    /* width: 100%; */
+}
+
+/* ============================
+      Preview Section
+   ============================ */
+.preview-small {
+    position: absolute;
+    top: 185px;
+    left: 72.8%;
+    width: 25.2%;
+    /* height: 85%; */
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+.preview-small h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+.preview-image-small {
+    position: relative;
+    width: 79%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 100%;
+}
+.preview-image-small img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* The overlay where we show default or new images */
+.phone-screen-small {
+    position: absolute;
+    top: 47.3%;
+    /* height: 108px; */
+    left: auto;
+    right: auto;
+    margin-left: 36px;
+    width: 100%;
+    overflow: hidden;
+    min-width: 112px;
+    /* max-width: 106px; */
+  }
+  
+  /* For images inside the phone-screen overlay */
+  .phone-screen-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* .phone-screen-small-new {
+    position: absolute;
+    height: 131px;
+    top: 47.5%;
+    left: 11%;
+    right: auto;
+    width: 37.8%;
+    overflow: hidden;
+    max-width: 153px;
+  }
+
+  .phone-screen-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  } */
+  
+  /* The blue gradient background block */
+  .blue-background-small {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #203366 0%, #0758A7 100%);
+  }
+
+  .overlay-image-small {
+    position: relative;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+
+/* ============================
+         Control Buttons
+   ============================ */
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-weight: bold;
+}
+.button-icon {
+    font-size: 14px;
+    color: #fff;
+}
+.large-advert-btn {
+    position: absolute;
+    top: 123px;
+    left: 16.6%;
+    width: 9.1%;
+    height: 4.5%;
+    background:#C3C3C3;
+    border: none;
+    border-radius: 27px;
+    color: #191818;
+    cursor: pointer;
+    font-size: 11px;
+}
+.small-advert-btn {
+    position: absolute;
+    top: 123px;
+    left: 26.9%;
+    width: 9.1%;
+    height: 4.5%;
+    background: #002977;
+    border: none;
+    border-radius: 27px;
+    color: white;
+    cursor: pointer;
+    font-size: 11px;
+}
+.publish-btn {
+    position: absolute;
+    top: 121px;
+    left: 89.4%;
+    width: 8.6%;
+    height: 5%;
+    background: #5396D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+/* Shift UPLOAD and DELETE buttons down */
+.upload-btn {
+    position: absolute;
+    top: 600px; /* shifted down */
+    left: 17.5%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.delete-btn {
+    position: absolute;
+    top: 600px; /* shifted down */
+    left: 31.5%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+/* Add New Promotion (shifted further down so it's outside the current posts area) */
+.add-promotion-btn {
+    position: absolute;
+    top: 680px;
+    left: 23.7%;
+    width: 14.1%;
+    height: 4.5%;
+    background: #002977;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.edit-btn {
+    position: absolute;
+    top: 574px;
+    left: 52.8%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.navy-icon {
+    color: #5296D1;
+}
+
+/* Disabled Select Component Styles */
+.disabled-select {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.disabled-select .css-1s2u09g-control,
+.disabled-select .css-1pahdxg-control {
+    background-color: #f0f0f0 !important;
+    border-color: #cccccc !important;
+    box-shadow: none !important;
+}
+
+.disabled-select .css-1rhbuit-multiValue {
+    background-color: #e0e0e0 !important;
+}
+
+.disabled-select .css-12jo7m5 {
+    color: #888888 !important;
+}
+
+.audience-checkbox {
+    accent-color: #002977;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    border: 1px solid #002977;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.audience-checkbox:checked {
+    background-color: #002977;
+    border-color: #002977;
+}
+
+.disabled-field {
+    background-color: #f0f0f0 !important;
+    color: #888888 !important;
+    border-color: #cccccc !important;
+    pointer-events: none;
+}
+
+@media screen and (min-width: 1601px) {
+    .phone-screen-small {
+        margin-left: 33px;
+        width: 100%;
+        min-width: 120px;
+        max-width: 137px;
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 1600px) {
+    .phone-screen-small {
+       
+        left: 0;
+        width: 100%;
+        max-width: 106px;
+        height: auto;
+        top: 47.3%;
+        margin-left: 28px;
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .phone-screen-small {
+        width: 100%;
+        max-width: 99px;
+        top: 47.7%;
+        margin-left: 26px;
+        min-width: auto;
+    }
+    .schedule-row {
+        margin-left: 0px;
+    }
+    
+    .schedule-inline {
+        align-items: flex-start;
+        margin-left: 20px;
+    }
+
+    .post-details {
+        margin-left: 20px;
+    }
+    
+    /* .date-fields {
+        flex-wrap: wrap;
+        margin-top: -40px;
+        margin-left: 20px;
+    } */
+    .display-inline {
+        gap: 0px;
+    }
+}
+
+/* 
+  ========== SCALING FOR < 1280PX ==========
+*/
+@media screen and (max-width: 1280px) {
+    .post-details {
+        margin-left: 0px;
+    }
+
+    .schedule-inline {
+        align-items: flex-start;
+        margin-left: 20px;
+    }
+
+    .phone-screen-small {
+        max-width: 89px;
+        margin-left: 23px;
+    }
+
+    .post-card-small{
+        margin-left:0;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 0;
+    }
+
+    element.style {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+}
+@media screen and (max-width: 1199px) {
+    .schedule-row {
+        margin-left: 30px;
+    }
+
+    .post-details {
+        margin-left: 0px;
+    }
+
+    .schedule-inline {
+        align-items: flex-start;
+        margin-left: 0px;
+    }
+
+    .phone-screen-small {
+        max-width: 84px;
+        margin-left: 21px;
+    }
+    .post-details {
+        margin-left: 0px;
+    }
+}
+
+@media screen and (max-width: 1140px) {
+    .date-fields {
+        flex-wrap: wrap;
+    }
+    
+}
+
+@media screen and (max-width: 1080px) {
+    .phone-screen-small {
+        max-width: 77px;
+    }
+
+    .post-details {
+        margin-left: 0px;
+    }
+
+    .schedule-inline {
+        align-items: flex-start;
+        margin-left: 30px;
+    }
+}
+
+@media screen and (max-width: 1040px) {
+    .digital-app-btn {
+        position: absolute;
+        top: 28px;
+        left: 28%;
+        width: 9.4%;
+        height: 46px;
+        border: 2px solid #002977;
+        border-radius: 5px;
+        background: transparent;
+        cursor: pointer;
+        font-size: 11px;
+    }
+    .market-to-members-btn {
+        position: absolute;
+        top: 28px;
+        left: 38%;
+        width: 14.4%;
+        height: 46px;
+        border: 2px solid #999999;
+        border-radius: 5px;
+        background: transparent;
+        cursor: pointer;
+        font-size: 11px;
+        color: #999999;
+        transition: all 0.3s ease;
+    }
+    
+    .displays-btn {
+        position: absolute;
+        top: 28px;
+        left: 53%;
+        width: 8%;
+        height: 46px;
+        border: 2px solid #999999;
+        border-radius: 5px;
+        background: transparent;
+        cursor: pointer;
+        font-size: 11px;
+        color: #999999;
+        transition: all 0.3s ease;
+    }
+}
+    
+
+@media screen and (max-width: 1025px) {
+    .phone-screen-small {
+        margin-left: 18px;
+        max-width: 71px;
+    }
+
+    .post-details {
+        margin-left: 0px;
+    }
+
+    .schedule-inline {
+        align-items: flex-start;
+        margin-left: 20px;
+    }
+}
+@media screen and (max-width: 991px) {
+    
+    .phone-screen-small {
+        max-width: 68px;
+        margin-left: 18px;
+    }
+}
+@media screen and (max-width: 835px) {
+    .phone-screen-small {
+        max-width: 57px;
+        margin-left: 17px;
+    }
+}
+

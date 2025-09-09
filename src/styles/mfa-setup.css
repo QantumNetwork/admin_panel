@@ -1,0 +1,135 @@
+/* Container Styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+/* Logo */
+.logo {
+  width: 150px;
+  margin-bottom: 40px;  /* Increased spacing between logo and card */
+}
+
+/* Card */
+.card {
+  position: relative;
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-sizing: border-box; /* Include padding in width calculations */
+  min-width: 0;           /* Allow card to shrink properly */
+  
+  /* Ensures long text wraps instead of overflowing */
+  white-space: normal; 
+  overflow-wrap: break-word;
+}
+
+/* Icon Container (Circular Background) */
+.icon-container {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon (QR Code Icon) */
+.qr-icon {
+  font-size: 30px;
+  color: #333;
+}
+
+/* Title */
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 40px; /* Provides space for the icon above */
+}
+
+/* Instruction Text */
+.instruction {
+  font-size: 14px;
+  color: #888;
+  margin-top: 10px;
+}
+
+/* QR Code Image */
+.qr-code {
+  margin-top: 20px;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  max-width: 100%; /* Ensures QR code does not exceed card width */
+}
+
+/* Continue Button */
+.continue-button {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 25px; /* Fully rounded edges */
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.continue-button:hover {
+  background: #0056b3;
+}
+
+/* Responsive Media Query for Smaller Devices */
+@media (max-width: 480px) {
+  .logo {
+    width: 120px;
+    margin-bottom: 20px;
+  }
+  .card {
+    padding: 20px;
+    width: 100%;
+  }
+  .icon-container {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+  .qr-icon {
+    font-size: 24px;
+  }
+  .title {
+    font-size: 16px;
+    margin-top: 30px;
+  }
+  .instruction {
+    font-size: 12px;
+  }
+  .qr-code {
+    width: 120px;
+    height: 120px;
+    margin-top: 15px;
+    max-width: 100%; /* Ensures QR code does not exceed card width on small screens */
+  }
+  .continue-button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}

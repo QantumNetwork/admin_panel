@@ -1,0 +1,167 @@
+.exit-btn {
+    position: absolute;
+    top: 30px;
+    left: 66%;
+    width: 10%;
+    height: 46px;
+    border: 3px solid #002977;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #002977;
+    transition: all 0.3s ease;
+    opacity: 1;
+    font-weight: bold;
+}
+
+.exit-btn:hover {
+    border: 2px solid #558df7;
+    color: #558df7;
+}
+
+.viper-logo {
+    margin-left: 39%;
+}
+
+.app-header-ai {
+    height: 140px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* AI Content Styles */
+.ai-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.question-container {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question-title {
+    color: #15254B;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.input-container {
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+}
+
+/* .question-input {
+    width: 100%;
+    height: 58px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+} */
+
+.input-controls {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    margin-top: -35px;
+}
+
+.question-input {
+    width: 70%;
+    height: 108px;
+    padding: 15px;
+    border: 2px solid #0C285B;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-left: 102px;
+    color: #0C285B;
+}
+
+.mic-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #0C285B;
+    border: #0C285B solid 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 45px;
+    margin-left: 95px;
+  }
+
+.microphone-icon {
+    font-style: normal;
+}
+
+.go-button {
+    width: 100px;
+    height: 45px;
+    background: #15254B;
+    color: white;
+    border: none;
+    border-radius: 27px;
+    cursor: pointer;
+    margin-top: 52px;
+    margin-right: 105px;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.ai-loading {
+    font-style: italic;
+    color: #777;
+    margin-top: 10px;
+}
+
+.ai-response-box {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+@media screen and (max-width: 1420px) {
+    .exit-btn {
+        position: absolute;
+        top: 30px;
+        left: 56%;
+        width: 10%;
+        height: 46px;
+        border: 3px solid #002977;
+        border-radius: 5px;
+        background: transparent;
+        cursor: pointer;
+        font-size: 14px;
+        color: #002977;
+        transition: all 0.3s ease;
+        opacity: 1;
+        font-weight: bold;
+    }
+
+    .viper-logo {
+        margin-left: 26%;
+    }
+}
+
+
+

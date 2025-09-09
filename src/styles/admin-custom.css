@@ -1,0 +1,225 @@
+/* Admin Custom Page specific styles */
+
+.content-wrapper-cb {
+  position: absolute;
+  top: 190px;          /* sits below header */
+  left: 16.6%;         /* accounts for sidebar width */
+  width: 100%;
+  display: flex;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+.customer-button-section
+ {
+  width: 30%;
+  background: #F2F2F2;
+  padding: 20px;
+  box-sizing: border-box;
+  max-height: 500px;
+  /* overflow: auto; */
+}
+
+.preview-section {
+    position: relative; 
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    background: #F2F2F2;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 500px;
+    /* overflow: auto; */
+  }
+
+.customer-button-section h2,
+.preview-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.preview-section h2 {
+    margin: 0 0 0 0;
+    font-size: 14px;
+    text-align: center;
+  }
+
+/* ====== Form layout ====== */
+.cb-form .form-group {
+  display: block;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.cb-form .form-group label {
+  display: inline-block;
+  width: 30%;
+  font-size: 12px;
+  color: #333;
+}
+
+.cb-form .form-group input,
+.cb-form .form-group select {
+  width: 90%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.position-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.value-box {
+  min-width: 40px;
+  padding: 4px 0;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Keypad grid */
+.keypad-container {
+  width: 65%;
+  max-width: 350px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  background: #0B1B3C;
+  border: 2px solid #002977;
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin-top: 50px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.keypad-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-size: 22px;
+  height: 50px;
+  border: 2px solid #002977;
+  border-radius: 4px;
+  /* cursor: pointer; */
+  background: #000626;
+  transition: background 0.2s ease;
+}
+
+.keypad-cell.active {
+  background: #08477b;
+}
+
+/* .keypad-cell:hover {
+  background: #062b55;
+} */
+
+/* Preview image */
+.preview-image-wrapper {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.preview-overlay {
+  position: absolute;
+  left: 50%; 
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 3px;
+  bottom: 25%; 
+  height: 20%;  
+  width: 60%;
+  max-width: 180px;
+  pointer-events: none;
+  padding: 6px;
+  background: #0B1B3C;
+  border: 2px solid #002977;
+  border-radius: 6px;
+  box-sizing: border-box;
+  min-width: 100px;
+  min-height: 50px;
+}
+
+.preview-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-size: 6px;
+  line-height: 10px;
+  text-align: center;
+  padding: 2px;
+  border: 1px solid #0091ff;
+  border-radius: 4px;
+  background: #000626;
+}
+
+
+@media (max-width: 1024px) {
+  .content-wrapper-cb {
+    flex-direction: column;
+    left: 4%;
+    width: 92%;
+  }
+
+  .customer-button-section,
+  .preview-section {
+    width: 100%;
+  }
+}
+
+.delete-button-wrapper {
+  width: 65%;
+  max-width: 350px;
+  margin: 20px auto 0 auto; /* 10px gap from keypad */
+  display: flex;
+  justify-content: center;
+}
+
+.delete-button {
+  background-color: #5296D1;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #E80707;
+}
+
+
+

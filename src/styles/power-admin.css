@@ -1,0 +1,153 @@
+/* Connected To Section */
+.connected-to-section {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .connected-to-section h3 {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+  }
+  
+  .group-names-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Row: label + input-wrapper */
+  .group-name-input-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-right: 20px;
+  }
+  
+  /* Shrink the label text */
+  .group-name-input-container label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    line-height: 32px;        /* match the input height */
+    white-space: nowrap;
+  }
+  
+  /* Now column flex so + can sit under the input */
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  
+  /* Shorter input height */
+  .input-wrapper input {
+    width: 80%;
+    height: 25px;
+    padding: 0 10px 0 10px;   /* room on the right for the × */
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+
+  /* Add margin to subsequent rows to align with the first row's label */
+  .subsequent-row {
+    margin-left: 80px; /* Adjust this value to match the width of your label */
+  }
+  
+  .input-wrapper input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+  }
+  
+  /* “×” just outside the right edge of the input */
+  .remove-group-btn {
+    position: absolute;
+    right: -20px;             /* nudges it just outside */
+    top: 22%;
+    transform: translateY(-50%);
+    /* background: #fff; */
+    border: none;
+    /* border-radius: 50%; */
+    width: 24px;
+    height: 24px;
+    font-size: 1.4rem;
+    color: #777;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .remove-group-btn:hover {
+    background: #f8f8f8;
+    color: #e00;
+  }
+  
+  /* “+” centered under the input */
+  .add-group-btn {
+    margin-top: 6px;
+    /* background: #f0f8ff; */
+    border: none;
+    /* border-radius: 50%; */
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    color: #4a90e2;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  /* .add-group-btn:hover {
+    background: #e1f0ff;
+    transform: scale(1.1);
+  } */
+
+/* ============================
+       Sidebar Section
+   ============================ */
+   .sidebar-pa {
+    position: absolute;
+    top: 123px;
+    left: 2.8%;
+    width: 10.1%;
+    height: 16.6%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+  .sidebar-icon-pa {
+    font-size: 16px;
+  }
+
+/* wrap the input and icon together */
+.search-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 8px 32px 8px 8px;   /* room on the right for the icon */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;       /* ensure input itself is white */
+    font-size: 14px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+  }
+  

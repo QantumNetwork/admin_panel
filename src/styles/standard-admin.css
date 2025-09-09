@@ -1,0 +1,270 @@
+/*nav buttons*/
+.user-btn {
+    padding: 15px 38px;
+    background-color: #C3C3C3;
+    border: none;
+    border-radius: 27px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.user-btn.active {
+  background-color: #002977;
+  color: white;
+}
+
+.activate-btn {
+    position: absolute;
+    top: 121px;
+    left: 83%;
+    padding: 15px 24px;
+    background: #002977;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.sa-filter-buttons {
+  position: absolute;
+  top: 123px;
+  left: 16.6%;
+  display: flex;
+  gap: 20px;
+}
+
+/* new user setup */
+.content-wrapper-sa {
+    position: absolute;
+    top: 190px;
+    left: 16.6%;
+    width: 75%;
+    display: flex;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+.new-user-sa,
+.edit-user-sa,
+.access-sa,
+.connected-sa {
+    width: 40%;
+    height: 500px;
+    background: #F2F2F2;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.new-user-sa h2,
+.edit-user-sa h2,
+.access-sa h2,
+.connected-sa h2 {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* .form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+} */
+
+/* .access-item, */
+.connected-item {
+    display: flex;
+    align-items: center;
+    margin-left: 42px;
+    margin-bottom: 10px;
+}
+
+/* .access-item img {
+    width: 80px;
+    height: auto;
+    margin-right: 10px;
+} */
+
+.connected-item img {
+    width: 60px;
+    height: auto;
+    margin-right: 15px;
+}
+
+.access-item input {
+    margin-left: auto;
+}
+
+.connected-item span {
+    font-size: 12px;
+    color: #333;
+}
+
+/* ====== New User Setup: labels and inputs on same line ====== */
+.new-user-sa .form-group,
+.edit-user-sa .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px; /* add a bit more vertical breathing room */
+  }
+  
+  .new-user-sa .form-group label,
+  .edit-user-sa .form-group label {
+    display: inline-block;       /* switch from block to inline */
+    width: 30%;                  /* label takes 30% of row */
+    margin-bottom: 0;            /* remove the old bottom margin */
+    font-size: 12px;
+    color: #333;
+  }
+  
+  .new-user-sa .form-group input,
+  .edit-user-sa .form-group input {
+    display: inline-block;
+    width: 70%;                  /* input takes remaining 70% */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  /* ====== Access section: center items, larger images, checkbox on the right ====== */
+  .access-sa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;        /* center everything horizontally */
+  }
+  
+  .access-sa .access-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;    /* center row of image + checkbox */
+    margin-bottom: 16px;        /* space between cards */
+    width: 100%;                /* let flex centering work across full width */
+  }
+  
+  .access-sa .access-item img {
+    width: 110px;               /* bump up size */
+    height: auto;
+    margin-right: 16px;         /* small gap to checkbox */
+  }
+  
+  .access-sa .access-item input {
+    margin: 0;                  /* remove auto push so it sits next to image */
+    transform: scale(1.2);      /* optional: make checkbox a bit bigger */
+  }
+
+  /* Hide default checkbox */
+.access-sa .access-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+  }
+  
+  /* Blue background + white checkmark when checked */
+  .access-sa .access-item input[type="checkbox"]:checked {
+    background-color: #002977; /* Bootstrap blue */
+    border-color: #002977;
+  }
+  
+  /* Checkmark using a pseudo-element */
+  .access-sa .access-item input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 3px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Container for the Edit Users section */
+/* Style the table */
+.edit-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #F2F2F2;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+}
+
+/* Header row */
+.edit-users-table thead th {
+  background-color: #F2F2F2;
+  color: #1F2937;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+/* Data cells */
+.edit-users-table tbody td {
+  padding: 12px 16px;
+  color: #4B5563;
+  font-size: 14px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+/* Zebra‐striping */
+.edit-users-table tbody tr:nth-child(even) {
+  background-color: #F2F2F2;
+}
+
+/* Hover highlight */
+.edit-users-table tbody tr:hover {
+  background-color: #F3F4F6;
+}
+
+/* Action button */
+.edit-users-table tbody td button {
+  background: none;
+  border: none;
+  color: #002977;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-users-table tbody td button:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.sidebar-sa {
+  position: absolute;
+  top: 123px;
+  left: 2.8%;
+  width: 10.1%;
+  height: 16.6%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+  

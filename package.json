@@ -1,0 +1,53 @@
+{
+  "name": "s2w-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.749.0",
+    "@aws-sdk/s3-request-presigner": "^3.749.0",
+    "@tinymce/tinymce-react": "^5.1.1",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "country-list": "^2.3.0",
+    "cra-template": "1.2.0",
+    "react": "^18.3.1",
+    "react-clock": "^5.1.0",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.1.5",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.10.1",
+    "react-select-country-list": "^2.2.3",
+    "react-speech-recognition": "^4.0.1",
+    "react-time-picker": "^7.0.0",
+    "react-toastify": "^11.0.3",
+    "react-world-flags": "^1.6.0",
+    "sweetalert2": "^11.21.0",
+    "validator": "^13.12.0",
+    "web-vitals": "^4.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

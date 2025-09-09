@@ -1,0 +1,600 @@
+/* Overall Container */
+.digital-app-container {
+    position: relative;
+    width: 1280px;
+    height: 950px;
+    margin: 0 auto;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* ========== HEADER ========== */
+.app-header {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    border-bottom: 1px solid #ccc;
+    z-index: 10;
+}
+.s2w-logo {
+    position: absolute;
+    top: 2px;
+    left: 0.8%;
+    width: 12.8%;
+    height: 96px;
+    cursor: pointer;
+}
+.s2w-logo img {
+    width: 190px;
+    height: auto;
+}
+.digital-app-btn {
+    position: absolute;
+    top: 28px;
+    left: 57%;
+    width: 9.4%;
+    height: 46px;
+    border: 2px solid #002977;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+}
+.market-to-members-btn {
+    position: absolute;
+    top: 28px;
+    left: 68%;
+    width: 14.4%;
+    height: 46px;
+    border: 2px solid #999999;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #999999;
+    transition: all 0.3s ease;
+}
+
+.displays-btn {
+    position: absolute;
+    top: 28px;
+    left: 84%;
+    width: 8%;
+    height: 46px;
+    border: 2px solid #999999;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #999999;
+    transition: all 0.3s ease;
+}
+
+.displays-btn:hover {
+    background-color: #5396D1;
+    color: white;
+    border-color: #5396D1;
+}
+
+.market-to-members-btn:hover {
+    background-color: #5396D1;
+    color: white;
+    border-color: #5396D1;
+}
+.user-avatar {
+    position: absolute;
+    top: 31px;
+    left: 94.5%;
+    width: 42px;
+    height: 42px;
+    background: #002977;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+    position: absolute;
+    top: 123px;
+    left: 2.8%;
+    width: 10.1%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+.sidebar-btn {
+    width: 100%;
+    padding: 7px;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    color: #000;
+    margin-bottom: 5px;
+}
+.sidebar-btn.active {
+    background: #5296D1;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+}
+.sidebar-icon {
+    font-size: 14px;
+}
+.navy-icon {
+    color: #002977;
+}
+
+/* ========== CURRENT POSTS SECTION ========== */
+.current-posts {
+    position: absolute;
+    top: 185px;
+    left: 16.6%;
+    width: 28.2%;
+    height: 60%;
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+.current-posts h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+.post-card {
+    width: 70%;
+    min-width: 260px;
+    height: 170px;
+    background: #ddd;
+    margin-top: 20px;
+    margin-left: 60px;
+    border-radius: 5px;
+    max-width: none;
+    box-sizing: border-box; /* Ensure padding is included in width */
+
+}
+.post-image {
+    width: 100%;
+    height: 100%;
+    background: #bbb;
+    border-radius: 5px;
+}
+.post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.post-details {
+    margin-top: 15px;
+    margin-left: 40px;
+    font-size: 12px;
+    max-width: calc(100% - 60px);
+}
+.field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+.field-label {
+    width: 60px;
+    font-weight: bold;
+    font-size: 11px;
+}
+.field-select {
+    width: 140px;
+    font-size: 11px;
+    padding: 2px;
+}
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 0;
+}
+
+.display-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.schedule-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.schedule-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.date-fields {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.date-label {
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    font-weight: normal;
+}
+.date-input {
+    width: 80px;
+    font-size: 10px;
+    padding: 2px;
+    margin-top: 2px;
+    text-align: center;
+}
+
+/* Disabled field styling */
+.disabled-field {
+    background-color: #f0f0f0 !important;
+    color: #888888 !important;
+    border-color: #cccccc !important;
+    pointer-events: none;
+}
+
+/* ========== MORE INFO SECTION ========== */
+.more-info {
+    position: absolute;
+    top: 185px;
+    left: 46.6%;
+    width: 24.1%;
+    height: 60%;
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+}
+.more-info h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+.more-info p {
+    margin: 10px 0px;
+    line-height: 15px;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* ========== PREVIEW SECTION ========== */
+.digital-app-container .preview {
+    position: absolute;
+    top: 185px;
+    left: 72.8%;
+    width: 25.2%;
+    /* height: 85%; */
+    background: #F2F2F2;
+    padding: 13px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.digital-app-container .preview h2 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.digital-app-container .preview-image {
+    position: relative;
+    width: 79%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.digital-app-container .preview-image img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.digital-app-container .phone-screen {
+    position: absolute;
+    top: 19.4%;
+    left: auto;
+    right: auto;
+    width: 81%;
+    height: 27%;
+    overflow: hidden;
+    min-width: 190px;
+    max-width: 250px;
+}
+
+.digital-app-container .phone-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: auto;
+}
+
+.digital-app-container .overlay-image {
+    position: relative;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ========== CONTROL BUTTONS ========== */
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-weight: bold;
+}
+.button-icon {
+    font-size: 14px;
+    color: #fff;
+}
+.large-advert-btns {
+    position: absolute;
+    top: 123px;
+    left: 16.6%;
+    width: 9.1%;
+    height: 4.5%;
+    background: #002977;
+    border: none;
+    border-radius: 27px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.small-advert-btns {
+    position: absolute;
+    top: 123px;
+    left: 26.9%;
+    width: 9.1%;
+    height: 4.5%;
+    background: #C3C3C3;
+    border: none;
+    border-radius: 27px;
+    color: #000;
+    cursor: pointer;
+    font-size: 11px;
+}
+.publish-btn {
+    position: absolute;
+    top: 121px;
+    left: 89.4%;
+    width: 8.6%;
+    height: 5%;
+    background: #5396D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+.upload-btn {
+    position: absolute;
+    top: 600px;
+    left: 17.5%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.upload-btn-add-new {
+    position: absolute;
+    top: 600px;
+    left: 25%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.delete-btn {
+    position: absolute;
+    top: 600px;
+    left: 31.5%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.add-promotion-btn {
+    position: absolute;
+    top: 680px;
+    left: 23.7%;
+    width: 14.1%;
+    height: 4.5%;
+    background: #002977;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+.edit-btn {
+    position: absolute;
+    top: 574px;
+    left: 52.8%;
+    width: 12%;
+    height: 4.5%;
+    background: #5296D1;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+/* Disabled Select Component Styles */
+.disabled-select {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.disabled-select .css-1s2u09g-control,
+.disabled-select .css-1pahdxg-control {
+    background-color: #f0f0f0 !important;
+    border-color: #cccccc !important;
+    box-shadow: none !important;
+}
+
+.disabled-select .css-1rhbuit-multiValue {
+    background-color: #e0e0e0 !important;
+}
+
+.disabled-select .css-12jo7m5 {
+    color: #888888 !important;
+}
+
+.audience-checkbox {
+    accent-color: #002977;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    border: 1px solid #002977;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.audience-checkbox:checked {
+    background-color: #002977;
+    border-color: #002977;
+}
+
+/* 
+  ========== SCALING FOR < 1280PX ==========
+  Left as-is, but note that transform scaling can
+  interfere with a fully responsive layout.
+*/
+@media screen and (min-width: 1601px) {
+    .digital-app-container .phone-screen{
+        width: 79.8%;
+        max-width: 276px;
+    }
+}
+@media screen and (max-width: 1600px) {
+    .digital-app-container .phone-screen{
+        width: 79.8%;
+    }
+}
+
+@media screen and (min-width: 1281px) and (max-width: 1480px) {
+    .post-card{
+        margin-left: 40px;
+        width: 70%; /* Ensure width remains 70% on smaller screens */
+        min-width: 260px; /* Maintain minimum width */
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .post-details {
+        margin-left: 0px;
+    }
+
+    .post-card{
+        margin-left: 32px;
+        width: 70%; /* Ensure width remains 70% on smaller screens */
+        min-width: 260px; /* Maintain minimum width */
+    }
+
+    .checkbox-label {
+        display: flex
+    ;
+        align-items: center;
+        gap: 0;
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 0;
+    }
+
+    .digital-app-container .phone-screen {
+        
+        /* width: 100%;
+        height: 27%;  */
+        min-width: 180px;
+        
+    }
+
+    element.style {
+        display: flex
+    ;
+        align-items: center;
+        gap: 4px;
+    }
+}
+
+@media screen and (max-width: 1225px) {
+    .post-card{
+        margin-left: 40px;
+        width: 70%; /* Ensure width remains 70% on smaller screens */
+        min-width: 260px; /* Maintain minimum width */
+    }
+
+    .current-posts {
+        width: 32%;
+    }
+
+    .more-info {
+        left: 49.3%;
+    }
+
+    .digital-app-container .preview {
+        left: 74%;
+    }
+}
+
+@media screen and (max-width: 1208px) {
+    .digital-app-container .phone-screen {
+        position: absolute;
+        top: 19.4%;
+        min-width: 170px;
+    }
+}
+@media screen and (max-width: 1199px) {
+    .digital-app-container .phone-screen {
+        min-width: 145px;
+        
+    }
+}
+@media screen and (max-width: 991px) {
+    .digital-app-container .phone-screen {
+        min-width:126px;
+    }
+}
+@media screen and (max-width: 835px) {
+    .digital-app-container .phone-screen {
+        min-width:116px;
+    }
+}
