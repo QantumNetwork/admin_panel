@@ -266,5 +266,23 @@
   gap: 10px;
 }
 
+/* .activate-btn {
+  position: absolute;
+  top: 121px;
+  left: 83%;
+  padding: 15px 24px;
+  background: #002977;
+  border: none;
+  border-radius: 30px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
 
-  
+.sa-filter-buttons {
+position: absolute;
+top: 123px;
+left: 16.6%;
+display: flex;
+gap: 20px;
+} */

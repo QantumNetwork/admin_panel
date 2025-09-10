@@ -1523,10 +1523,10 @@ const DigitalSmall = () => {
                       {
                         method: 'POST',
                         body: formData,
-                        headers: {
-                          Authorization: token ? `Bearer ${token}` : '',
-                          'Content-Type': 'application/json',
-                        },
+                        // headers: {
+                        //   Authorization: token ? `Bearer ${token}` : '',
+                        //   'Content-Type': 'application/json',
+                        // },
                       }
                     )
                       .then((response) => {
