@@ -1584,20 +1584,3 @@ body.large-screen .navigation-buttons {
 }
 }
 
-/* .navigation-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6px;
-  margin-bottom: 20px;
-  position: relative;
-  width: 95%;
-  margin-top: 15px;
-  min-height: 34px;
-}
-
-.nav-tabs-so {
-  display: flex;
-  gap: 23px;
-  margin-left: 8px;
-} */
