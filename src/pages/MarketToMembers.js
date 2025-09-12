@@ -831,7 +831,7 @@ const MarketToMembers = () => {
   const calculateReachSendToAll = async () => {
 
       try {
-        const response = await fetch('https://betaapi.s2w.com.au/notification/countss', {
+        const response = await fetch(`${baseUrl}/notification/countss`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -857,7 +857,7 @@ const MarketToMembers = () => {
     setIsCalculating(true);
 
       try {
-        const response = await fetch('https://betaapi.s2w.com.au/notification/countss', {
+        const response = await fetch(`${baseUrl}/notification/countss`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

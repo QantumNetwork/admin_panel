@@ -1464,37 +1464,6 @@ flex: 0 0 270px;
     /* margin-left: 170px; */
     align-self: flex-end;
   }
-  
-  /* Ensure form elements don't overflow */
-  /* .form-row input, 
-  .form-row textarea,
-  .form-group input,
-  .select-wrapper select,
-  .time-input-fields input {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  } */
-  
-  /* Adjust time input fields to prevent overflow */
-  /* .time-input-fields {
-    flex-direction: column;
-    width: 100%;
-  } */
-  
-  /* .time-field {
-    width: 100%;
-    margin-bottom: 10px;
-  } */
-  
-  /* Make days selector wrap properly */
-  /* .days-selector {
-    flex-wrap: wrap;
-  }
-  
-  .day-item {
-    margin-bottom: 5px;
-  } */
 
   .target-market-panel .responsive-panel {
     padding-bottom: 60px;

@@ -15,7 +15,7 @@ import {
 import '../styles/art-gallery.css';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadFileToS3, uploadImageToS3 } from '../s3/config';
 
 const ArtGallery = () => {
   const location = useLocation();
@@ -32,6 +32,7 @@ const ArtGallery = () => {
   const isAddingNew = location.state?.isAddingNew || false;
   const access = localStorage.getItem('access');
   const userType = localStorage.getItem('userType');
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Default to 'A' if userInitial is not provided
   const userInitial = email.charAt(0).toUpperCase() || 'A';
@@ -81,6 +82,10 @@ const ArtGallery = () => {
   const [loading, setLoading] = useState(true);
   const [venues, setVenues] = useState([]);
   const [filesToUpload, setFilesToUpload] = useState([]);
+  const [canEdit, setCanEdit] = useState(true);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -192,6 +197,8 @@ const ArtGallery = () => {
         }
       );
       localStorage.setItem('ai', response.data.dalleprompt);
+      console.log(response.data.dalleprompt);
+
       setImage(response.data.image_url);
       return response.data.dalleprompt;
     } catch (error) {
@@ -281,16 +288,64 @@ const ArtGallery = () => {
 
   const handleUpdateImage = async () => {
     try {
-      setIsUploading(true);
-      const dalleprompt = localStorage.getItem('ai');
-      const context_prompt = prompt;
-      const imageData = await updateImage(dalleprompt, context_prompt, size);
-      console.log('Image Generated:', imageData);
+      if (!image || !prompt) {
+        toast.error('Image or prompt missing');
+        return;
+      }
+
+      setIsUpdating(true);
+
+      // 1️⃣ Prepare FormData
+      const formData = new FormData();
+      formData.append('prompt', prompt);
+
+      // Download current image (which is already PNG from Edit step)
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const file = new File([blob], 'image.png', { type: 'image/png' });
+
+      formData.append('image', file);
+      formData.append('username', 'Venkatasai'); // Replace with dynamic username if needed
+
+      // 2️⃣ Call Image Editing API
+      const editResponse = await axios.post(
+        'https://imageeditingapi.delightfulbay-e55c1ce2.australiaeast.azurecontainerapps.io/edit',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      if (editResponse.data.astatus !== 'Success') {
+        throw new Error('Image editing failed');
+      }
+
+      // 3️⃣ Convert Base64 → File
+      const base64Data = editResponse.data.image;
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const editedBlob = new Blob([byteArray], { type: 'image/png' });
+      const editedFile = new File([editedBlob], 'edited-image.png', {
+        type: 'image/png',
+      });
+
+      // 4️⃣ Upload to S3
+      const s3Url = await uploadImageToS3(editedFile);
+
+      // 5️⃣ Save new image in state
+      setImage(s3Url);
+      setUploadedImages((prev) => [...prev, s3Url]);
       setShowImage(true);
+      setIsEditMode(false);
+      setCanEdit(true);
+      toast.success('Image updated successfully!');
     } catch (error) {
-      console.error('Failed to generate image');
+      console.error('Error updating image:', error);
+      toast.error('Failed to update image');
     } finally {
-      setIsUploading(false); // Hide loader after generation is done
+      setIsUpdating(false);
     }
   };
 
@@ -298,24 +353,42 @@ const ArtGallery = () => {
     try {
       setIsUploading(true);
       const token = localStorage.getItem('token');
+
+      // Save last image
       const response = await uploadImage(token, image, imageSize);
 
       if (response && response.success) {
-        const message = response.message || 'Image uploaded successfully';
-        localStorage.removeItem('ai');
+        toast.success('Image saved to gallery');
+
+        // 🧹 Clear prompt & AI state
         setPromot('');
+        localStorage.removeItem('ai');
         setShowImage(false);
-        toast.success(message);
-      } else {
-        throw new Error(response.data.message || 'Failed to upload image');
+
+        // Delete all previous images except the last one
+        if (uploadedImages.length > 1) {
+          const oldImages = uploadedImages.slice(0, -1); // all except last
+          await axios.post(
+            `${baseUrl}/image/delete-from-s3`,
+            { urls: oldImages },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          console.log('Deleted old images:', oldImages);
+        }
+
+        // Reset array to keep only last one
+        setUploadedImages([image]);
+
+        // 🔄 Trigger gallery reload
+        setImageUploaded((prev) => !prev);
       }
     } catch (error) {
-      console.error('Failed to generate image');
+      console.error('Failed to save image', error);
+      toast.error('Failed to save image');
     } finally {
-      setIsUploading(false); // Hide loader
+      setIsUploading(false);
     }
   };
-
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // Trigger file input click
@@ -490,6 +563,41 @@ const ArtGallery = () => {
       fetchVenues();
     }
   }, [token]);
+
+  const handleEditImageUpload = async () => {
+    try {
+      if (!image) {
+        toast.error('No image selected');
+        return;
+      }
+
+      setIsEditing(true);
+      const response = await axios.post(
+        `${baseUrl}/image/move-to-s3`,
+        { imageUrl: image },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        const s3Url = response.data.s3Url;
+
+        setImage(s3Url);
+        setUploadedImages((prev) => [...prev, s3Url]);
+        setIsEditMode(true);
+        setShowImage(true);
+        setCanEdit(false); // 👈 Hide Edit, show Update
+
+        toast.success('Image moved to S3 and saved locally as PNG');
+      } else {
+        toast.error(response.data.message || 'Failed to move image');
+      }
+    } catch (err) {
+      console.error('Error during edit upload:', err);
+      toast.error('Error processing image');
+    } finally {
+      setIsEditing(false);
+    }
+  };
 
   return (
     <div className="digital-app-container-ag">
@@ -943,19 +1051,29 @@ const ArtGallery = () => {
               </div>
             </div>
 
-            {showImage && (
+            {showImage && !isEditMode && (
               <div className="d-flex align-items-end w-100 justify-content-center">
-              <button
-                className="sky-btn save-gallery-btn"
-                onClick={handleUploadImage}
-              >
-                SAVE IMAGE TO GALLERY
-              </button>
-            </div>
-
-              
+                <button
+                  className="sky-btn save-gallery-btn"
+                  onClick={handleUploadImage}
+                >
+                  SAVE IMAGE TO GALLERY
+                </button>
+              </div>
             )}
 
+            {showImage && isEditMode && (
+              <div className="d-flex align-items-end w-100 justify-content-center">
+                {showImage && !canEdit && (
+                  <button
+                    className="sky-border-btn"
+                    onClick={handleUpdateImage}
+                  >
+                    Update Image
+                  </button>
+                )}
+              </div>
+            )}
             {!showImage && (
               <div className="d-flex align-items-end w-100 justify-content-center">
                 <button className="sky-btn" onClick={handleCreateImage}>
@@ -965,20 +1083,31 @@ const ArtGallery = () => {
             )}
             {showImage && (
               <div className="d-flex align-items-end btn-gap">
-              <button className="sky-border-btn" onClick={handleStart}>
-                Start Over
-              </button>
-              {/* <button className="sky-border-btn" onClick={handleUpdateImage}>
-                Create Image
-              </button> */}
-            </div>
+                <button className="sky-border-btn" onClick={handleStart}>
+                  Start Over
+                </button>
+                {showImage && canEdit && (
+                  <button
+                    className="sky-border-btn"
+                    onClick={handleEditImageUpload}
+                  >
+                    Edit Image
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
-        {isUploading && (
+        {isUploading && !isEditing && (
           <div className="loaders-overlay-gallery">
             <div className="spinner"></div>
             <p className="uploading-text">Uploading...</p>
+          </div>
+        )}
+        {isUpdating && (
+          <div className="loaders-overlay-gallery">
+            <div className="spinner"></div>
+            <p className="uploading-text">Updating...</p>
           </div>
         )}
       </div>
