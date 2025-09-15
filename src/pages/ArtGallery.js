@@ -281,6 +281,7 @@ const ArtGallery = () => {
       localStorage.removeItem('ai');
       setPromot('');
       setShowImage(false);
+      setIsEditMode(false);
     } catch (error) {
       console.error('Failed to generate image');
     }
@@ -431,7 +432,7 @@ const ArtGallery = () => {
       setImageUploaded((prev) => !prev);
       setFilesToUpload([]); // Clear the files after upload
 
-      toast.success(`Successfully uploaded ${selectedFiles.length} image(s)`);
+      //toast.success(`Successfully uploaded ${selectedFiles.length} image(s)`);
     } catch (error) {
       console.error('Upload failed:', error);
       toast.error('Upload failed', {
@@ -587,7 +588,8 @@ const ArtGallery = () => {
         setShowImage(true);
         setCanEdit(false); // 👈 Hide Edit, show Update
 
-        toast.success('Image moved to S3 and saved locally as PNG');
+        setPromot(''); // 👈 Clear textarea so user starts fresh
+        //toast.success('Image moved to S3 and saved locally as PNG');
       } else {
         toast.error(response.data.message || 'Failed to move image');
       }
@@ -986,12 +988,12 @@ const ArtGallery = () => {
             <div className="w-100">
               <h2>AI Image Creation</h2>
               <h6
-                style={{
-                  paddingBottom:
-                    activeTab === 'Small' || activeTab === 'Special-Offers'
-                      ? '50px'
-                      : '30px', // Change padding conditionally
-                }}
+                // style={{
+                //   paddingBottom:
+                //     activeTab === 'Small' || activeTab === 'Special-Offers'
+                //       ? '50px'
+                //       : '30px', // Change padding conditionally
+                // }}
               >
                 Create an image in seconds
               </h6>
@@ -1043,9 +1045,14 @@ const ArtGallery = () => {
                   className="text-area-ai-text"
                   rows="4"
                   cols="50"
-                  style={{ paddingTop: '40px' }}
-                  placeholder="Type a description of the image here"
-                  value={prompt} // Controlled component
+                  style={{ paddingTop: '40px',
+                    marginBottom: activeTab === 'Small' || activeTab === 'Special-Offers' ? '60px' : '0px'}}
+                  placeholder={
+                    isEditMode
+                      ? 'Edit your changes here and select Update button'
+                      : 'Type a description of the image here'
+                  }
+                  value={prompt}
                   onChange={(e) => setPromot(e.target.value)}
                 ></textarea>
               </div>
@@ -1064,29 +1071,29 @@ const ArtGallery = () => {
 
             {showImage && isEditMode && (
               <div className="d-flex align-items-end w-100 justify-content-center">
-                {showImage && !canEdit && (
-                  <button
-                    className="sky-border-btn"
-                    onClick={handleUpdateImage}
-                  >
-                    Update Image
-                  </button>
-                )}
+                <button className="sky-border-btn" onClick={handleUpdateImage}>
+                  Update Image
+                </button>
               </div>
             )}
+
             {!showImage && (
-              <div className="d-flex align-items-end w-100 justify-content-center">
+              <div
+                className="d-flex w-100 justify-content-center"
+                style={{ marginTop: '-60px' }} // 👈 pushes button up relative to bottom
+              >
                 <button className="sky-btn" onClick={handleCreateImage}>
                   CREATE IMAGE
                 </button>
               </div>
             )}
+
             {showImage && (
               <div className="d-flex align-items-end btn-gap">
                 <button className="sky-border-btn" onClick={handleStart}>
                   Start Over
                 </button>
-                {showImage && canEdit && (
+                {showImage && canEdit && !isEditMode && (
                   <button
                     className="sky-border-btn"
                     onClick={handleEditImageUpload}

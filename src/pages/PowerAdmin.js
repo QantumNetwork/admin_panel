@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaRegCheckCircle, FaExclamationCircle, FaSearch } from 'react-icons/fa';
+import {
+  FaRegCheckCircle,
+  FaExclamationCircle,
+  FaSearch,
+} from 'react-icons/fa';
 import { MdGroups } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../utils/auth';
@@ -94,7 +98,7 @@ const PowerAdmin = () => {
   };
 
   const getIconVenue = (appType) => {
-    switch(appType) {
+    switch (appType) {
       case 'MaxGaming':
         return '/max_gaming.png';
       case 'Manly':
@@ -108,11 +112,11 @@ const PowerAdmin = () => {
       case 'Sense':
         return '/star.png';
       case 'Qantum':
-        return '/quantum.png';
+        return '/qantum.png';
       default:
         return appType;
     }
-  }
+  };
 
   const appNameList = [
     'Star Reward',
@@ -396,7 +400,9 @@ const PowerAdmin = () => {
           {showDropdown && (
             <div className="dropdown-menu">
               <p>{email}</p>
-              <button className="logout-btn" onClick={() => logout(navigate)}>Logout</button>
+              <button className="logout-btn" onClick={() => logout(navigate)}>
+                Logout
+              </button>
             </div>
           )}
         </div>
@@ -522,16 +528,15 @@ const PowerAdmin = () => {
                   <div className="selected-apps-list">
                     {selectedApps.map((app, index) => (
                       <p key={index} className="connected-item">
-                        
                         <img src={getIconVenue(app)} alt="Play Store" />
                         <span className="app-name">
                           {getAppNameSummary(app)}
                         </span>
                       </p>
-                    //   <div className="connected-item">
-                    //   <img src={getIconVenue(selectedVenue)} alt="Play Store" />
-                    //   <span>{selectedVenue ? getAppType(selectedVenue) : 'Select Venue'}</span>
-                    // </div>
+                      //   <div className="connected-item">
+                      //   <img src={getIconVenue(selectedVenue)} alt="Play Store" />
+                      //   <span>{selectedVenue ? getAppType(selectedVenue) : 'Select Venue'}</span>
+                      // </div>
                     ))}
                   </div>
                 ) : (
@@ -543,44 +548,44 @@ const PowerAdmin = () => {
         ) : (
           <div className="edit-groups-container">
             <div className="search-bar">
-            <div className="search-input-wrapper">
-              <input
-                type="text"
-                placeholder="Search group"
-                className="search-input"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-              <FaSearch className="search-icon" />
-            </div>
+              <div className="search-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="Search group"
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <FaSearch className="search-icon" />
+              </div>
             </div>
             <div className="groups-list">
               {loading1 ? (
                 <div className="loading">Loading groups...</div>
               ) : groups.length > 0 ? (
                 <ul className="group-list">
-                  <span className="group-item" style={{ fontWeight: 'bold' }}>Groups</span>
+                  <span className="group-item" style={{ fontWeight: 'bold' }}>
+                    Groups
+                  </span>
                   {groups
-                  .filter(g =>
-                    g.appType
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                  )
-                  .map((group, index) => (
-                    <li key={index} className="group-item">
-                      <span className="group-name">{group.appType}</span>
-                      <a
-                        href="#"
-                        className="edit-link"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleEditGroup(group._id);
-                        }}
-                      >
-                        <span className="check-icon">✓</span> Edit
-                      </a>
-                    </li>
-                  ))}
+                    .filter((g) =>
+                      g.appType.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((group, index) => (
+                      <li key={index} className="group-item">
+                        <span className="group-name">{group.appType}</span>
+                        <a
+                          href="#"
+                          className="edit-link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleEditGroup(group._id);
+                          }}
+                        >
+                          <span className="check-icon">✓</span> Edit
+                        </a>
+                      </li>
+                    ))}
                 </ul>
               ) : (
                 <div className="no-groups">No groups found</div>

@@ -17,6 +17,7 @@
 }
 .w-100 {
   width: 100%;
+  margin-bottom: 10px;
 }
 
 /* Add styles for selected images and trash icon */
@@ -161,7 +162,7 @@
 .ai-column {
   justify-content: center;
   width: 40%;
-  gap: 30px;
+  /* gap: 30px; */
   flex-wrap: wrap;
   padding: 10px 30px;
 }
