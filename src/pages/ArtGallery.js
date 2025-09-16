@@ -97,6 +97,8 @@ const ArtGallery = () => {
     setPromot('');
     setShowImage('');
     setSelectedImages([]); // Clear selected images on tab change
+    setIsEditMode(false);
+    setCanEdit(true);
     console.log(size);
     // Update size based on the selected tab
   };
@@ -282,6 +284,7 @@ const ArtGallery = () => {
       setPromot('');
       setShowImage(false);
       setIsEditMode(false);
+      setCanEdit(true);
     } catch (error) {
       console.error('Failed to generate image');
     }
@@ -965,7 +968,7 @@ const ArtGallery = () => {
               <svg
                 stroke="currentColor"
                 fill="currentColor"
-                stroke-width="0"
+                strokeWidth="0"
                 viewBox="0 0 640 512"
                 class="button-icon"
                 height="1em"
@@ -1046,7 +1049,7 @@ const ArtGallery = () => {
                   rows="4"
                   cols="50"
                   style={{ paddingTop: '40px',
-                    marginBottom: activeTab === 'Small' || activeTab === 'Special-Offers' ? '60px' : '0px'}}
+                    marginBottom: activeTab === 'Small' || activeTab === 'Special-Offers' ? '0px' : '0px'}}
                   placeholder={
                     isEditMode
                       ? 'Edit your changes here and select Update button'
@@ -1080,7 +1083,7 @@ const ArtGallery = () => {
             {!showImage && (
               <div
                 className="d-flex w-100 justify-content-center"
-                style={{ marginTop: '-60px' }} // 👈 pushes button up relative to bottom
+                style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
               >
                 <button className="sky-btn" onClick={handleCreateImage}>
                   CREATE IMAGE
