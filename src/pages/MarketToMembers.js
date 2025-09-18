@@ -698,10 +698,12 @@ const MarketToMembers = () => {
         console.log('body', requestBody);
         console.log('data', data);
 
-        if (data.data.totalUsers) {
+        if (data.data.usersWithDeviceToken) {
+          return data.data.usersWithDeviceToken;
+        } else if(data.data.totalUsers){
           return data.data.totalUsers;
         } else {
-          return '0';
+          return 0;
         }
       } catch (error) {
         console.error('Error calculating reach:', error);
@@ -810,7 +812,11 @@ const MarketToMembers = () => {
         console.log('body', requestBody);
         console.log('data', data);
 
-        if (data.data.totalUsers) {
+        if (data.data.usersWithDeviceToken) {
+          setMemberReach(data.data.usersWithDeviceToken.toString());
+          console.log('About to show success toast with message:', data.message);
+            toast.success(data.message); 
+        } else if(data.data.totalUsers){
           setMemberReach(data.data.totalUsers.toString());
           console.log('About to show success toast with message:', data.message);
             toast.success(data.message); 
@@ -1795,7 +1801,12 @@ const MarketToMembers = () => {
                 <span className="target-span">Target</span>
 
                 {/* First filter row (always visible) */}
-                <div className="filter-scroll-container">
+                <div className="filter-scroll-container"
+                style={{
+                  maxHeight: filterRows.length >= 6 ? '350px' : 'none',
+                  overflowY: filterRows.length >= 6 ? 'auto' : 'visible',
+                  paddingRight: filterRows.length >= 6 ? '8px' : '0'
+                }}>
                   <div className="filter-row-first">
                     <div className="filter-condition">
                       {/* No dropdown for first row */}
