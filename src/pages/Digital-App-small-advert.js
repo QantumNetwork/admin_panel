@@ -182,6 +182,14 @@ const DigitalSmall = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ];
+  } else if(selectedVenue === 'Hogan') {
+    audienceOptions = [
+      { value: 'Pearl', label: 'Pearl' },
+      { value: 'Opal', label: 'Opal' },
+      { value: 'Ruby', label: 'Ruby' },
+      { value: 'Sapphire', label: 'Sapphire' },
+      { value: 'Diamond', label: 'Diamond' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },

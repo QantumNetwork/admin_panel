@@ -200,6 +200,14 @@ const SpecialOffers = () => {
       { value: 'VIP', label: 'VIP' },
       { value: 'VVIP', label: 'VVIP' },
     ];
+  } else if (selectedVenue === 'Hogan') {
+    audienceOptions = [
+      { value: 'Pearl', label: 'Pearl' },
+      { value: 'Opal', label: 'Opal' },
+      { value: 'Ruby', label: 'Ruby' },
+      { value: 'Sapphire', label: 'Sapphire' },
+      { value: 'Diamond', label: 'Diamond' },
+    ];
   } else {
     // Default audience levels for other venues
     audienceOptions = [
@@ -2453,8 +2461,8 @@ const SpecialOffers = () => {
                         fontWeight: 'bold',
                         color: 'black',
                         fontSize: '10px',
-                        marginBottom: '4px',
-                        whiteSpace: 'nowrap',
+                        marginBottom: '0px',
+                        // whiteSpace: 'nowrap',
                       }}
                     >
                       {offer.header}
@@ -2464,11 +2472,12 @@ const SpecialOffers = () => {
                       style={{
                         color: 'black',
                         fontSize: '9px',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        marginBottom: '4px',
+                        // textOverflow: 'ellipsis',
+                        overflow: 'auto',
+                        // display: '-webkit-box',
+                        // WebkitLineClamp: 2,
+                        // WebkitBoxOrient: 'vertical',
+                        // marginBottom: '4px',
                         height: '30px',
                       }}
                     >

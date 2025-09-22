@@ -210,7 +210,8 @@ input:focus{
 
 .offer-info {
   flex: 1;
-  padding: 10px; /* Reduced padding */
+  padding: 6px; /* Reduced padding */
+  padding-bottom: 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -225,10 +226,10 @@ input:focus{
 }
 
 .offer-info p {
-  margin: 0;
+  /* margin: 2px; */
   font-size: 13px;
   color: #666;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .nav-arrow {
@@ -338,7 +339,7 @@ input:focus{
   display: block;
   font-size: 12px;
   color: #5396D1;
-  margin-top: 5px;
+  /* margin-top: 5px; */
   cursor: pointer;
 }
 
