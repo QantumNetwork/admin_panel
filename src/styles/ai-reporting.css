@@ -163,5 +163,21 @@
     }
 }
 
+/* .question-container {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question-title {
+    color: #15254B;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+} */
+
 
 
