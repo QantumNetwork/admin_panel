@@ -345,9 +345,9 @@ const ArtGallery = () => {
       setIsEditMode(false);
       setCanEdit(true);
       
-      if(!returnTo){
-        toast.success('Image updated successfully!');
-      }
+      // if(!returnTo){
+        // toast.success('Image updated successfully!');
+      // }
     } catch (error) {
       console.error('Error updating image:', error);
       toast.error('Failed to update image');
@@ -364,8 +364,10 @@ const ArtGallery = () => {
       // Save last image
       const response = await uploadImage(token, image, imageSize);
 
-      if (response && response.success && !returnTo) {
-        toast.success('Image saved to gallery');
+      if (response && response.success) {
+        // if(!returnTo){
+          // toast.success('Image saved to gallery');
+        // }
 
         // 🧹 Clear prompt & AI state
         setPromot('');
