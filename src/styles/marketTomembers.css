@@ -46,42 +46,6 @@
     position: relative;
 }
 
-/* .sidebar {
-    width: 200px;
-    background-color: #f5f5f5;
-    padding-top: 20px;
-    height: calc(100vh - 100px);
-    position: fixed;
-    top: 100px;
-    left: 0;
-}
-
-.sidebar-btn {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 14px;
-    text-align: left;
-    color: #003057;
-}
-
-.sidebar-btn.active {
-    background-color: #e0e0e0;
-}
-
-.sidebar-icon {
-    margin-right: 10px;
-    font-size: 18px;
-}
-
-.navy-icon {
-    color: #003057;
-} */
-
 .user-avatar {
     width: 40px;
     height: 40px;

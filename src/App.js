@@ -20,6 +20,8 @@ import StandardAdmin from "./pages/StandardAdmin";
 import PowerAdmin from "./pages/PowerAdmin";
 import AdminCustom from "./pages/AdminCustom";
 import SmartIncentives from "./pages/SmartIncentives";
+import ClubDesk from "./pages/ClubDesk";
+import ManualReg from "./pages/ManualReg";
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -46,6 +48,8 @@ function App() {
         <Route path="/power-admin" element={<PowerAdmin />} />
         <Route path="/admin-custom" element={<AdminCustom />} />
         <Route path="/smart-incentives" element={<SmartIncentives />} />
+        <Route path="/approvals" element={<ClubDesk />} />
+        <Route path="/manual-reg" element={<ManualReg />} />
       </Routes>
       <ToastContainer 
         position="top-center"

@@ -1,0 +1,50 @@
+/* Ensure all form inputs have consistent styling */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="date"] {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+/* Remove the inline style from the street address input */
+.form-group input[type="text"][name="street"] {
+  margin-bottom: 8px;
+}
+
+.address-grid {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+.city-zip {
+    display: grid;
+    grid-template-columns: 55% 42%; /* 60% for city, 40% for postcode */
+    gap: 10px;
+    width: 100%;
+  }
+
+  .blue-btn {
+    margin-bottom: 0;
+    margin-top: 20px;
+  align-items: flex-end;
+  display: block;
+  width: 150px;
+  height: 36px;
+  background: #002977;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  }
+
+  @media (max-width: 768px) {
+    .city-state-zip {
+      grid-template-columns: 1fr;
+    }
+  }
