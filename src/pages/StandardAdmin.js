@@ -68,6 +68,8 @@ const StandardAdmin = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }
@@ -89,6 +91,8 @@ const StandardAdmin = () => {
         return '/star.png';
       case 'Qantum':
         return '/qantum.png';
+      case 'North':
+        return '/north.png';
       default:
         return appType;
     }
@@ -135,6 +139,7 @@ const StandardAdmin = () => {
 
   // Fetch users when the edit tab is active
   useEffect(() => {
+    
     if (activeTab === 'edit-users' && currentUserId === null) {
       fetchUsers();
     }
@@ -148,19 +153,21 @@ const StandardAdmin = () => {
         company: '',
         access: [],
       });
+      setCurrentUserId(null);
     }
   }, [activeTab]);
 
   // Refetch users when selected venue changes and we're on the edit tab
-  useEffect(() => {
-    if (activeTab === 'edit-users' && currentUserId === null) {
-      // Use a small timeout to ensure the token update is complete
-      const timer = setTimeout(() => {
-        fetchUsers();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedVenue, activeTab]);
+  // useEffect(() => {
+
+  //   if (activeTab === 'edit-users' && currentUserId === null) {
+  //     // Use a small timeout to ensure the token update is complete
+  //     const timer = setTimeout(() => {
+  //       fetchUsers();
+  //     }, 100);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [selectedVenue, activeTab]);
 
   useEffect(() => {
     const fetchVenues = async () => {

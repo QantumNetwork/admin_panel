@@ -73,6 +73,8 @@ const PowerAdmin = () => {
         return 'Central';
       case 'Sense Of Taste':
         return 'Sense';
+      case 'North Shore Tavern':
+        return 'North';
       default:
         return appName;
     }
@@ -92,6 +94,8 @@ const PowerAdmin = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }
@@ -113,6 +117,8 @@ const PowerAdmin = () => {
         return '/star.png';
       case 'Qantum':
         return '/qantum.png';
+      case 'North':
+        return '/north.png';
       default:
         return appType;
     }
@@ -124,7 +130,8 @@ const PowerAdmin = () => {
     'Qantum',
     'Central Lane Hotel',
     'Manly Harbour Boat Club',
-    'Montauk Tavern',
+    'North Shore Tavern',
+    // 'Montauk Tavern',
     'Sense Of Taste',
   ];
 
@@ -266,9 +273,9 @@ const PowerAdmin = () => {
             case 'Manly':
               appDisplayNames.push('Manly Harbour Boat Club');
               break;
-            case 'Montauk':
-              appDisplayNames.push('Montauk Tavern');
-              break;
+            // case 'Montauk':
+            //   appDisplayNames.push('Montauk Tavern');
+            //   break;
             case 'StarReward':
               appDisplayNames.push('Star Reward');
               break;
@@ -277,6 +284,9 @@ const PowerAdmin = () => {
               break;
             case 'Sense':
               appDisplayNames.push('Sense Of Taste');
+              break;
+            case 'North':
+              appDisplayNames.push('North Shore Tavern');
               break;
             default:
               appDisplayNames.push(app);

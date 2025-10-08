@@ -47,6 +47,7 @@ const MyBenefits = () => {
     const savedVenue = localStorage.getItem('selectedVenue');
     if(savedVenue === 'Manly') return 'Commodore';
     if(savedVenue === 'Hogan') return 'Pearl';
+    if(savedVenue === 'North') return 'Gold';
     return 'Platinum Black';
   });
 
@@ -65,13 +66,15 @@ const MyBenefits = () => {
         return '#D4AF37'; // Gold color
       case 'Silver':
         return '#C0C0C0'; // Silver color
+      case 'Pre Staff':
+        return '#C0C0C0'; // Silver color
       case 'Valued':
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
         if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
+        if (selectedVenue === 'North') return '#29364a';
           return '#FF0000';
-        return '#4CAF50'; // Default green for other venues
       case 'Platinum':
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':
@@ -87,6 +90,8 @@ const MyBenefits = () => {
       case 'Commander':
         return '#C0C0C0';
       case 'Lieutenant':
+        return '#9D5F2D';
+      case 'Staff':
         return '#9D5F2D';
       case 'Crewmate':
         return '#344361';
@@ -150,6 +155,15 @@ const MyBenefits = () => {
       {value: 'Ruby', label: 'Ruby'},
       {value: 'Sapphire', label: 'Sapphire'},
       {value: 'Diamond', label: 'Diamond'},
+    ];
+  } else if (selectedVenue === 'North') {
+    audienceOptions = [
+      {value: 'Gold', label: 'Gold'},
+      {value: 'Platinum', label: 'Platinum'},
+      {value: 'Pre Staff', label: 'Pre Staff'},
+      {value: 'Silver', label: 'Silver'},
+      {value: 'Staff', label: 'Staff'},
+      {value: 'Valued', label: 'Valued'}
     ];
   }
 
@@ -331,6 +345,8 @@ const MyBenefits = () => {
         return 'Sense Of Taste';
       case 'Hogan':
         return 'Hogan';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }

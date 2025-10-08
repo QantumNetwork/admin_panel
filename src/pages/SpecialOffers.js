@@ -208,6 +208,15 @@ const SpecialOffers = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
     ];
+  } else if(selectedVenue === 'North') {
+    audienceOptions = [
+      {value: 'Gold', label: 'Gold'},
+      {value: 'Platinum', label: 'Platinum'},
+      {value: 'Pre Staff', label: 'Pre Staff'},
+      {value: 'Silver', label: 'Silver'},
+      {value: 'Staff', label: 'Staff'},
+      {value: 'Valued', label: 'Valued'}
+    ];
   } else {
     // Default audience levels for other venues
     audienceOptions = [
@@ -2103,6 +2112,8 @@ const SpecialOffers = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }

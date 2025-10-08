@@ -545,6 +545,8 @@ const ArtGallery = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }

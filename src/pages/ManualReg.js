@@ -36,6 +36,7 @@ const ManualReg = () => {
     zip: '',
     birthday: '',
     gender: '',
+    membershipLevel: '',
   });
 
   const handleInputChange = (e) => {
@@ -65,6 +66,8 @@ const ManualReg = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }
@@ -320,34 +323,36 @@ const ManualReg = () => {
           </div>
 
           <div className="form-group">
-            <label style={{ fontWeight: 'bold', marginBottom: '50px' }}>Address</label>
+            <label style={{ fontWeight: 'bold', marginBottom: '50px' }}>
+              Address
+            </label>
             <div className="address-grid">
               <div className="address-row">
-              <input
-                type="text"
-                placeholder="Street Address"
-                name="street"
-                value={formData.street || ''}
-                onChange={handleInputChange}
-              />
+                <input
+                  type="text"
+                  placeholder="Street Address"
+                  name="street"
+                  value={formData.street || ''}
+                  onChange={handleInputChange}
+                />
               </div>
-            <div className="city-zip">
-              <input
-                type="text"
-                placeholder='City'
-                name="city"
-                value={formData.city || ''}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                placeholder='Postcode'
-                name="zip"
-                value={formData.zip || ''}
-                onChange={handleInputChange}
-              />
+              <div className="city-zip">
+                <input
+                  type="text"
+                  placeholder="City"
+                  name="city"
+                  value={formData.city || ''}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Postcode"
+                  name="zip"
+                  value={formData.zip || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-          </div>
           </div>
 
           <div className="form-group">
@@ -362,12 +367,18 @@ const ManualReg = () => {
           </div>
 
           <div className="form-group">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', whiteSpace:'nowrap' }}>
-              <label style={{ fontWeight: 'bold', minWidth: '80px' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '5px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <label style={{ fontWeight: 'bold', minWidth: '62px' }}>
                 Gender
               </label>
               <label
-                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
               >
                 <input
                   type="radio"
@@ -379,7 +390,7 @@ const ManualReg = () => {
                 Male
               </label>
               <label
-                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
               >
                 <input
                   type="radio"
@@ -392,7 +403,7 @@ const ManualReg = () => {
               </label>
 
               <label
-                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
               >
                 <input
                   type="radio"
@@ -406,14 +417,26 @@ const ManualReg = () => {
             </div>
           </div>
           <div
-                className="d-flex w-100 justify-content-center"
-                style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
-              >
-                <button className="blue-btn">
-                  EDIT
-                </button>
-              </div>
-          
+            className="d-flex w-100 justify-content-center"
+            style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
+          >
+            <button className="blue-btn">EDIT</button>
+          </div>
+        </section>
+
+        <section className="new-user-sa">
+          <h2>Set Membership Level</h2>
+          <div className='form-group'>
+          <input
+            type="text"
+            name="membershipLevel"
+            value={formData.membershipLevel || ''}
+            onChange={handleInputChange}
+          />
+          </div>
+        </section>
+        <section className="connected-sa">
+          <h2>Payment Details</h2>
         </section>
       </div>
     </div>

@@ -45,10 +45,16 @@ const Dashboard = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
       default:
         return appType;
     }
   };
+
+  useEffect(() => {
+    console.log('Selected Venue:', selectedVenue, 'Type:', typeof selectedVenue, 'Length:', selectedVenue?.length);
+  }, [selectedVenue]);
 
   useEffect(() => {
     const fetchVenues = async () => {
