@@ -176,21 +176,15 @@ const SpecialOffers = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ];
-  } else if (selectedVenue === 'Montauk') {
-    // Montauk Tavern specific audience levels
+  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Bronze', label: 'Bronze' },
+      { value: 'Platinum Black', label: 'Platinum Black' },
+      { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-    ];
-  } else if (selectedVenue === 'Central') {
-    // Central Lane Hotel specific audience levels
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
+      { value: 'Premium', label: 'Premium' },
       { value: 'Member', label: 'Member' },
-      { value: 'VIP', label: 'VIP' },
     ];
   } else if (selectedVenue === 'Sense') {
     // Sense Of Taste specific audience levels

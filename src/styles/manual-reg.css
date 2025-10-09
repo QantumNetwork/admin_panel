@@ -43,6 +43,14 @@
   font-size: 11px;
   }
 
+  .payment-white-box {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+  }
+
   @media (max-width: 768px) {
     .city-state-zip {
       grid-template-columns: 1fr;

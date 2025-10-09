@@ -37,6 +37,13 @@ const ManualReg = () => {
     birthday: '',
     gender: '',
     membershipLevel: '',
+    paymentEmail: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    nameOnCard: '',
+    country: 'United States',
+    paymentZip: '',
   });
 
   const handleInputChange = (e) => {
@@ -279,8 +286,8 @@ const ManualReg = () => {
         </button>
       </aside>
 
-      <div className="content-wrapper-sa">
-        <section className="new-user-sa">
+      <div className="content-wrapper-sa" style={{top: '140px'}}>
+        <section className="new-user-sa" style={{height: '550px'}}>
           <h2>Register New Member</h2>
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>First name</label>
@@ -418,25 +425,212 @@ const ManualReg = () => {
           </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
+            style={{ marginTop: '40px' }}
           >
             <button className="blue-btn">EDIT</button>
           </div>
         </section>
 
-        <section className="new-user-sa">
+        <section className="new-user-sa" style={{height: '550px'}}>
           <h2>Set Membership Level</h2>
-          <div className='form-group'>
-          <input
-            type="text"
-            name="membershipLevel"
-            value={formData.membershipLevel || ''}
-            onChange={handleInputChange}
-          />
+          <div className="form-group">
+            <input
+              type="text"
+              name="membershipLevel"
+              value={formData.membershipLevel || ''}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div
+            className="d-flex w-100 justify-content-center"
+            style={{ marginTop: '345px' }}
+          >
+            <button className="blue-btn">EDIT</button>
           </div>
         </section>
-        <section className="connected-sa">
+        <section className="connected-sa" style={{height: '550px'}}>
           <h2>Payment Details</h2>
+          <div className="payment-white-box">
+            <div className="form-group">
+              <label
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  color: '#5a5a5a',
+                }}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="paymentEmail"
+                value={formData.paymentEmail}
+                onChange={handleInputChange}
+                placeholder="ella.williams@example.com"
+                style={{
+                  width: '100%',
+                  // padding: '10px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginTop: '10px' }}>
+              <label
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  color: '#5a5a5a',
+                }}
+              >
+                Card information
+              </label>
+              <input
+                type="text"
+                name="cardNumber"
+                value={formData.cardNumber}
+                onChange={handleInputChange}
+                placeholder="4242 4242 4242 4242"
+                style={{
+                  width: '100%',
+                  // padding: '10px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px 6px 0 0',
+                  borderBottom: 'none',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                }}
+              />
+
+              <div style={{ display: 'flex', gap: '0' }}>
+                <input
+                  type="text"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleInputChange}
+                  placeholder="12/24"
+                  style={{
+                    width: '50%',
+                    // padding: '10px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '0 0 0 6px',
+                    borderRight: 'none',
+                    fontSize: '14px',
+                  }}
+                />
+
+                <input
+                  type="text"
+                  name="cvv"
+                  value={formData.cvv}
+                  onChange={handleInputChange}
+                  placeholder="123"
+                  style={{
+                    width: '50%',
+                    // padding: '10px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '0 0 6px 0',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginTop: '10px' }}>
+              <label
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  color: '#5a5a5a',
+                }}
+              >
+                Name on card
+              </label>
+              <input
+                type="text"
+                name="nameOnCard"
+                value={formData.nameOnCard}
+                onChange={handleInputChange}
+                placeholder="Ella Williams"
+                style={{
+                  width: '100%',
+                  // padding: '10px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginTop: '10px' }}>
+              <label
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  color: '#5a5a5a',
+                }}
+              >
+                Country or region
+              </label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  padding: '5px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  backgroundColor: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Australia">Australia</option>
+              </select>
+              <input
+                type="text"
+                name="paymentZip"
+                value={formData.paymentZip}
+                onChange={handleInputChange}
+                placeholder="97702"
+                style={{
+                  width: '100%',
+                  // padding: '10px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  marginTop: '10px',
+                }}
+              />
+            </div>
+
+            <button
+              style={{
+                width: '100%',
+                padding: '10px',
+                backgroundColor: '#1a2b4a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '15px',
+                fontWeight: '600',
+                marginTop: '10px',
+                cursor: 'pointer',
+              }}
+            >
+              Pay US$65.00
+            </button>
+          </div>
         </section>
       </div>
     </div>

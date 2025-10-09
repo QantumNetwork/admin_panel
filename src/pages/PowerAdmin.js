@@ -119,6 +119,8 @@ const PowerAdmin = () => {
         return '/qantum.png';
       case 'North':
         return '/north.png';
+      case 'Hogan':
+        return '/hogan.png';
       default:
         return appType;
     }
@@ -133,6 +135,7 @@ const PowerAdmin = () => {
     'North Shore Tavern',
     // 'Montauk Tavern',
     'Sense Of Taste',
+    'Hogan'
   ];
 
   const handleAddGroup = (index) => {

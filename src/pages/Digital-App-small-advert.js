@@ -199,6 +199,16 @@ const DigitalSmall = () => {
       {value: 'Staff', label: 'Staff'},
       {value: 'Valued', label: 'Valued'}
     ];
+  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
+    audienceOptions = [
+      { value: 'Platinum Black', label: 'Platinum Black' },
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Premium', label: 'Premium' },
+      { value: 'Member', label: 'Member' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },

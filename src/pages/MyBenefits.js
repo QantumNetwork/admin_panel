@@ -72,9 +72,8 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
-          return '#FF0000';
       case 'Platinum':
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':

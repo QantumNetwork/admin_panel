@@ -93,6 +93,8 @@ const StandardAdmin = () => {
         return '/qantum.png';
       case 'North':
         return '/north.png';
+      case 'Hogan':
+        return '/hogan.png';
       default:
         return appType;
     }
