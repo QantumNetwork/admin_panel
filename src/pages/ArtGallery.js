@@ -1049,6 +1049,8 @@ const ArtGallery = () => {
               )}
             </div>
 
+            {(!showImage || isEditMode) && (
+
             <div className="d-flex w-100">
               <div className="w-100">
                 <textarea
@@ -1059,7 +1061,7 @@ const ArtGallery = () => {
                     marginBottom: activeTab === 'Small' || activeTab === 'Special-Offers' ? '0px' : '0px'}}
                   placeholder={
                     isEditMode
-                      ? 'Edit your changes here and select Update button'
+                      ? 'Edit your changes here and select Update Image'
                       : 'Type a description of the image here'
                   }
                   value={prompt}
@@ -1067,6 +1069,7 @@ const ArtGallery = () => {
                 ></textarea>
               </div>
             </div>
+            )}
 
             {showImage && !isEditMode && (
               <div className="d-flex align-items-end w-100 justify-content-center">
@@ -1081,7 +1084,7 @@ const ArtGallery = () => {
 
             {showImage && isEditMode && (
               <div className="d-flex align-items-end w-100 justify-content-center">
-                <button className="sky-border-btn" onClick={handleUpdateImage}>
+                <button className="sky-border-btn update-image-btn" onClick={handleUpdateImage} disabled={prompt.trim() === '' || isUpdating}>
                   Update Image
                 </button>
               </div>
@@ -1092,7 +1095,7 @@ const ArtGallery = () => {
                 className="d-flex w-100 justify-content-center"
                 style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
               >
-                <button className="sky-btn" onClick={handleCreateImage}>
+                <button className="sky-btn create-image-btn" onClick={handleCreateImage} disabled={prompt.trim() === '' || isLoading}>
                   CREATE IMAGE
                 </button>
               </div>

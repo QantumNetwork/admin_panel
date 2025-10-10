@@ -121,7 +121,7 @@ const DigitalApp = () => {
         { value: 'Silver', label: 'Silver' },
         { value: 'Gold', label: 'Gold' },
         { value: 'Platinum', label: 'Platinum' },
-        { value: 'Premium', label: 'Premium' },
+        { value: 'Premium Member', label: 'Premium' },
         { value: 'Member', label: 'Member' },
       ];
   } else {
@@ -153,7 +153,7 @@ const DigitalApp = () => {
 
     if (selectedOptions.length > 0) {
       displayText =
-        selectedOptions.length === 5
+        selectedOptions.length === audienceOptions.length
           ? 'All selected'
           : `${selectedOptions.length} selected`;
     }
@@ -1069,6 +1069,8 @@ const DigitalApp = () => {
                       setAdvertImages([]);
                       setActiveImageIndex(0);
                       setIsAddingNew(false);
+                      setAudience([]);
+                      setIsEveryone(false);
                       navigate('/dashboard');
                     }
                   } catch (error) {

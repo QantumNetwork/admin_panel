@@ -76,7 +76,7 @@ const DigitalSmall = () => {
 
     if (selectedOptions.length > 0) {
       displayText =
-        selectedOptions.length === 5
+        selectedOptions.length === audienceOptions.length
           ? 'All selected'
           : `${selectedOptions.length} selected`;
     }
@@ -206,7 +206,7 @@ const DigitalSmall = () => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Premium', label: 'Premium' },
+      { value: 'Premium Member', label: 'Premium' },
       { value: 'Member', label: 'Member' },
     ];
   } else {
@@ -1006,6 +1006,13 @@ const DigitalSmall = () => {
                       setSelectedVenue(selectedValue);
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
+
+                      // Reset any venue-specific state here
+                      setAdvertImages([]);
+                      setActiveImageIndex(0);
+                      setIsAddingNew(false);
+                      setAudience([]);
+                      setIsEveryone(false);
 
                       navigate('/dashboard');
                     }

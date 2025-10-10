@@ -223,6 +223,50 @@
   background: #002977;
 }
 
+/* --- Disabled style for CREATE IMAGE only (inside AI column) --- */
+
+/* Prevent any global .sky-btn:hover rules from changing the look */
+.ai-column .create-image-btn[disabled]:hover,
+.ai-column .create-image-btn[disabled]:focus {
+  margin-bottom: 0;
+  align-items: flex-end;
+  display: block;
+  width: 120px;
+  height: 36px;
+  background: #5396d1;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.update-image-btn[disabled]:hover,
+.update-image-btn[disabled]:focus {
+  margin: auto;
+  /* margin-top: 20px; */
+  width: 116px;
+  height: 36px;
+  border: 1px solid #5396d1;
+  background: transparent;
+  border-radius: 27px;
+  color: #5396d1;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+
+/* Show 🚫 icon on hover (no other hover visual change) */
+.ai-column .create-image-btn[disabled]:hover::after,
+.update-image-btn[disabled]:hover::after {
+  content: "🚫";
+  position: absolute;
+  font-size: 16px;
+  line-height: 1;
+  pointer-events: none;      /* icon won't intercept pointer events */
+  opacity: 1;
+}
+
 @media screen and (max-width: 1322px) {
   .column-image .gallery-item {
     margin: 10px;
