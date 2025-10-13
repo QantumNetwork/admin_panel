@@ -148,7 +148,7 @@ const SpecialOffers = () => {
   let audienceOptions = [];
 
   if (selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') {
-    // Options for audience selection - Match with venue's membership levels
+    // Options for audience selection
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
       { value: 'Valued', label: 'Valued' },
@@ -157,7 +157,7 @@ const SpecialOffers = () => {
       { value: 'Platinum', label: 'Platinum' },
     ];
   } else if (selectedVenue === 'StarReward') {
-    // Star Reward specific audience levels
+    // Options for audience selection
     audienceOptions = [
       { value: 'Pre 3 Month', label: 'Pre 3 Month' },
       { value: 'Staff', label: 'Staff' },
@@ -167,7 +167,8 @@ const SpecialOffers = () => {
       { value: 'Platinum', label: 'Platinum' },
     ];
   } else if (selectedVenue === 'Manly') {
-    // Manly Harbour Boat Club specific audience levels
+    // Options for audience selection
+
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
       { value: 'Crewmate', label: 'Crewmate' },
@@ -176,25 +177,7 @@ const SpecialOffers = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ];
-  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
-    audienceOptions = [
-      { value: 'Platinum Black', label: 'Platinum Black' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Premium', label: 'Premium' },
-      { value: 'Member', label: 'Member' },
-    ];
-  } else if (selectedVenue === 'Sense') {
-    // Sense Of Taste specific audience levels
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Regular', label: 'Regular' },
-      { value: 'VIP', label: 'VIP' },
-      { value: 'VVIP', label: 'VVIP' },
-    ];
-  } else if (selectedVenue === 'Hogan') {
+  } else if(selectedVenue === 'Hogan') {
     audienceOptions = [
       { value: 'Pearl', label: 'Pearl' },
       { value: 'Opal', label: 'Opal' },
@@ -202,17 +185,26 @@ const SpecialOffers = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
     ];
-  } else if (selectedVenue === 'North') {
+  } else if(selectedVenue === 'North') {
     audienceOptions = [
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Pre Staff', label: 'Pre Staff' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
+      {value: 'Gold', label: 'Gold'},
+      {value: 'Platinum', label: 'Platinum'},
+      {value: 'Pre Staff', label: 'Pre Staff'},
+      {value: 'Silver', label: 'Silver'},
+      {value: 'Staff', label: 'Staff'},
+      {value: 'Valued', label: 'Valued'}
     ];
+  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
+      audienceOptions = [
+        { value: 'Platinum Black', label: 'Platinum Black' },
+        { value: 'Valued', label: 'Valued' },
+        { value: 'Silver', label: 'Silver' },
+        { value: 'Gold', label: 'Gold' },
+        { value: 'Platinum', label: 'Platinum' },
+        { value: 'Premium Member', label: 'Premium' },
+        { value: 'Member', label: 'Member' },
+      ];
   } else {
-    // Default audience levels for other venues
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
       { value: 'Valued', label: 'Valued' },
@@ -304,6 +296,7 @@ const SpecialOffers = () => {
             setValidDaysFromAPI(offerToSelect.validDaysOfWeek);
             setValidTimeFromAPI(offerToSelect.validTime);
             setOneTimeUse(offerToSelect.oneTimeUse || false);
+            setAddMode(false);
 
             // Update trigger value in state only once
             // setTriggerValue(offerToSelect.triggerValue?.toString() || '');
@@ -320,6 +313,7 @@ const SpecialOffers = () => {
           setTriggerValue('');
           setSelectedAudiences([]);
           setIsEveryone(false);
+          setAddMode(false);
         }
       } catch (error) {
         console.error('Error fetching offers:', error);
@@ -376,7 +370,7 @@ const SpecialOffers = () => {
 
     // Map each returned LABEL (e.g. 'Staff', 'Gold') back to your value
     const mapLabelToValue = audienceOptions.reduce((m, o) => {
-      m[o.label] = o.value;
+      m[o.value] = o.value;
       return m;
     }, {});
 
@@ -1387,9 +1381,7 @@ const SpecialOffers = () => {
         ? // if “Everyone” is checked, send exactly ['everyone']
           ['everyone']
         : // otherwise, map whatever specific audiences were ticked to their labels
-          selectedAudiences
-            .map((val) => audienceOptions.find((o) => o.value === val)?.label)
-            .filter(Boolean);
+          selectedAudiences;
 
       // (optional) if you really want to guard against an empty array:
       if (ratingLevelArray.length === 0) {
@@ -1526,12 +1518,14 @@ const SpecialOffers = () => {
       toast.success('Offer submitted successfully!', {
         containerId: 'offerActions',
       });
-      setAddMode(false);
+
+      setAddMode(false);    
 
       // Add a delay before refreshing the page
       setTimeout(() => {
         navigate('/special-offers');
       }, 1500); // 1.5 seconds delay
+
     } catch (error) {
       console.error('Error submitting offer:', error);
       toast.error('Failed to submit offer. Please try again.');
@@ -1723,9 +1717,7 @@ const SpecialOffers = () => {
         ? // if “Everyone” is checked, send exactly ['everyone']
           ['everyone']
         : // otherwise, map whatever specific audiences were ticked to their labels
-          selectedAudiences
-            .map((val) => audienceOptions.find((o) => o.value === val)?.label)
-            .filter(Boolean);
+          selectedAudiences;
 
       // (optional) if you really want to guard against an empty array:
       if (ratingLevelArray.length === 0) {
@@ -1962,6 +1954,10 @@ const SpecialOffers = () => {
       setTriggerValue(selectedOffer.triggerValue?.toString() || '');
     }
   }, [selectedOffer?._id]); // Only run when selected offer ID changes
+
+  useEffect(() => {
+    console.log('addMode updated to:', addMode);
+  }, [addMode]);
 
   // Add effect to check for selected image from Art Gallery
   useEffect(() => {
@@ -2392,7 +2388,7 @@ const SpecialOffers = () => {
         </button>
       </aside>
 
-      {offers.length === 0 ? (
+      {offers.length === 0 && !addMode ? (
         <div className="btn-sp-offer" style={{marginTop: '400px'}}>
           <button className="add-offer-button" onClick={handleAddNewOffer} style={{width: '12%'}}>
             <FaPlus /> ADD YOUR FIRST OFFER

@@ -53,7 +53,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    console.log('Selected Venue:', selectedVenue, 'Type:', typeof selectedVenue, 'Length:', selectedVenue?.length);
+    console.log(
+      'Selected Venue:',
+      selectedVenue,
+      'Type:',
+      typeof selectedVenue,
+      'Length:',
+      selectedVenue?.length
+    );
   }, [selectedVenue]);
 
   useEffect(() => {
@@ -126,7 +133,7 @@ const Dashboard = () => {
               },
             }
           );
-  
+
           if (response.data?.data?.token) {
             localStorage.setItem('token', response.data.data.token);
           }
@@ -135,7 +142,7 @@ const Dashboard = () => {
         }
       }
     };
-  
+
     initializeVenueToken();
   }, []); // Empty dependency array to run only on mount
 
@@ -206,8 +213,6 @@ const Dashboard = () => {
                 const selectedValue = e.target.value;
                 if (!selectedValue) return;
 
-                
-
                 try {
                   const response = await axios.post(
                     `${baseUrl}/admin/token`,
@@ -229,9 +234,9 @@ const Dashboard = () => {
                     localStorage.removeItem('token');
                     localStorage.setItem('token', response.data.data.token);
                     setSelectedVenue(selectedValue);
-                          localStorage.removeItem('selectedVenue');
-                          localStorage.setItem('selectedVenue', selectedValue);
-                          setAppType(selectedValue);
+                    localStorage.removeItem('selectedVenue');
+                    localStorage.setItem('selectedVenue', selectedValue);
+                    setAppType(selectedValue);
                   }
                 } catch (error) {
                   console.error('Error updating venue:', error);
@@ -339,9 +344,7 @@ const Dashboard = () => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'club-desk' }}
-                onClick={() =>
-                  navigate('/approvals', { state: { email } })
-                }
+                onClick={() => navigate('/approvals', { state: { email } })}
               >
                 <img
                   src="/club-desk.png"
@@ -405,6 +408,20 @@ const Dashboard = () => {
                   <img
                     src="/ai-reporting.png"
                     alt="AI Reporting"
+                    className="card-image"
+                  />
+                </div>
+              )}
+
+              {access.includes('club-desk') && (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'club-desk' }}
+                  onClick={() => navigate('/approvals', { state: { email } })}
+                >
+                  <img
+                    src="/club-desk.png"
+                    alt="Club Desk"
                     className="card-image"
                   />
                 </div>

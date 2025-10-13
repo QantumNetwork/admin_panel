@@ -849,6 +849,16 @@ const StandardAdmin = () => {
                   onChange={handleAccessChange}
                 />
               </div>
+
+              <div className="access-item">
+                <img src="/club-desk.png" alt="Club Desk" />
+                <input
+                  type="checkbox"
+                  name="club-desk"
+                  checked={formData.access.includes('club-desk')}
+                  onChange={handleAccessChange}
+                />
+              </div>
             </section>
             <section className="connected-sa">
               <h2>Connected to</h2>
