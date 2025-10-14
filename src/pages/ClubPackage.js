@@ -7,7 +7,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/manual-reg.css';
+import '../styles/club-package.css';
 
 const ClubPackage = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -113,152 +113,183 @@ const ClubPackage = () => {
   };
 
   const userType = 'admin';
-  
-    const isActive = (path) => {
-      return location.pathname === path;
-    };
-  
-    return (
-      <div className="dashboard-container">
-        {/* Header */}
-        <header className="dashboard-header">
-          <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
-            <img src="/s2w-logo.png" alt="S2W Logo" />
-          </div>
-  
-          <div
-            style={{
-              position: 'relative',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {userType === 'admin' && (
-              <>
-                <p
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    fontWeight: 'bold',
-                    color: '#002977',
-                    fontSize: '20px',
-                    margin: 0,
-                  }}
-                >
-                  Admin
-                </p>
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontWeight: '500',
-                      color: '#002977',
-                      fontSize: '15px',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    Venue
-                  </span>
-                  <select
-                    style={{
-                      padding: '5px 10px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#F2F2F2',
-                      cursor: 'pointer',
-                      minWidth: '200px',
-                    }}
-                    className="form-select"
-                    value={selectedVenue}
-                    onChange={handleVenueChange}
-                    // disabled={loading}
-                    required
-                  >
-                    {venues.map(
-                      (venue) =>
-                        venue.appType === appGroup &&
-                        venue.appName &&
-                        venue.appName.map((app, index) => (
-                          <option key={`${venue._id}-${index}`} value={app}>
-                            {getAppType(app)}
-                          </option>
-                        ))
-                    )}
-                  </select>
-                </div>
-              </>
-            )}
-          </div>
-  
-          <div className="user-section">
-            <div
-              className="user-avatar"
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              {userInitial}
-            </div>
-            {showDropdown && (
-              <div className="dropdown-menu">
-                <p>{email}</p>
-                <button className="logout-btn" onClick={() => logout(navigate)}>
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </header>
-  
-        {/* sidebar */}
-        <aside className="sidebar-sa">
-          <button
-            style={{ fontSize: '12px' }}
-            className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
-            onClick={() => navigate('/approvals')}
-          >
-            <FaUsersRectangle
-              className={`sidebar-icon ${
-                isActive('/approvals') ? '' : 'navy-icon'
-              }`}
-            />{' '}
-            &nbsp; Approvals
-          </button>
-          <button
-            style={{ fontSize: '12px' }}
-            className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
-            onClick={() => navigate('/manual-reg')}
-          >
-            <HiOutlinePencilSquare
-              className={`sidebar-icon ${
-                isActive('/manual-reg') ? '' : 'navy-icon'
-              }`}
-            />{' '}
-            &nbsp; Manual Registration
-          </button>
-          <button
-            style={{ fontSize: '12px' }}
-            className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
-            onClick={() => navigate('/club-pkg')}
-          >
-            <PiListBulletsFill
-              className={`sidebar-icon ${
-                isActive('/club-pkg') ? '' : 'navy-icon'
-              }`}
-            />{' '}
-            &nbsp; Club Package
-          </button>
-        </aside>
 
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  return (
+    <div className="dashboard-container">
+      {/* Header */}
+      <header className="dashboard-header">
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+          <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
-    )};
 
-    export default ClubPackage;
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {userType === 'admin' && (
+            <>
+              <p
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontWeight: 'bold',
+                  color: '#002977',
+                  fontSize: '20px',
+                  margin: 0,
+                }}
+              >
+                Admin
+              </p>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: '500',
+                    color: '#002977',
+                    fontSize: '15px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Venue
+                </span>
+                <select
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor: '#F2F2F2',
+                    cursor: 'pointer',
+                    minWidth: '200px',
+                  }}
+                  className="form-select"
+                  value={selectedVenue}
+                  onChange={handleVenueChange}
+                  // disabled={loading}
+                  required
+                >
+                  {venues.map(
+                    (venue) =>
+                      venue.appType === appGroup &&
+                      venue.appName &&
+                      venue.appName.map((app, index) => (
+                        <option key={`${venue._id}-${index}`} value={app}>
+                          {getAppType(app)}
+                        </option>
+                      ))
+                  )}
+                </select>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="user-section">
+          <div
+            className="user-avatar"
+            onClick={() => setShowDropdown(!showDropdown)}
+          >
+            {userInitial}
+          </div>
+          {showDropdown && (
+            <div className="dropdown-menu">
+              <p>{email}</p>
+              <button className="logout-btn" onClick={() => logout(navigate)}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* sidebar */}
+      <aside className="sidebar-sa">
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
+          onClick={() => navigate('/approvals')}
+        >
+          <FaUsersRectangle
+            className={`sidebar-icon ${
+              isActive('/approvals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Approvals
+        </button>
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
+          onClick={() => navigate('/manual-reg')}
+        >
+          <HiOutlinePencilSquare
+            className={`sidebar-icon ${
+              isActive('/manual-reg') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Manual Registration
+        </button>
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
+          onClick={() => navigate('/club-pkg')}
+        >
+          <PiListBulletsFill
+            className={`sidebar-icon ${
+              isActive('/club-pkg') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Club Package
+        </button>
+      </aside>
+
+      <main className="club-package-main" role="main" aria-label="Club Package">
+        <div className="club-package-card">
+          <h1 className="cp-title">Do you wish to add a Club Package?</h1>
+          <p className="cp-subtitle">
+            By adding a Club Package will allow you to add memberships and
+            pricing.
+          </p>
+
+          <div className="cp-warning">
+            <span className="cp-warning-icon" aria-hidden>
+              !
+            </span>
+            <h2 className="cp-warning-text">
+              DO NOT PROCEED IF YOU ARE NOT SURE
+            </h2>
+            <span className="cp-warning-icon" aria-hidden>
+              !
+            </span>
+          </div>
+
+          <div className="cp-action">
+            <button
+              className="create-btn"
+              // onClick={() => navigate('/club-pkg/create')}
+            >
+              Create Club Package
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default ClubPackage;

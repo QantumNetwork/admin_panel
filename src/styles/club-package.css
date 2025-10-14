@@ -1,0 +1,92 @@
+.club-package-main {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px 40px;
+  background: #ffffff;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+}
+
+.club-package-card {
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+  padding: 20px 30px;
+}
+
+.cp-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #0b2347;
+  margin: 8px 0 30px;
+  font-family: 'Inter', 'Arial', sans-serif;
+}
+
+.cp-subtitle {
+  color: #7b7b7b;
+  margin: 0 0 40px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.cp-warning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0 50px;
+  flex-wrap: nowrap;
+  text-align: center;
+}
+
+.cp-warning-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e53935;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 22px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  line-height: 1;
+}
+
+.cp-warning-text {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0b2347;
+  letter-spacing: 0.5px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.create-btn {
+  background: #002977;
+  border: none;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 36px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 200px;
+  box-shadow: 0 6px 18px rgba(11,59,145,0.18);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.create-btn:hover {
+  background: #5396D1;
+}
+
+/* responsive */
+@media (max-width: 880px) {
+  .cp-title { font-size: 26px; }
+  .cp-warning-text { font-size: 20px; }
+  .cp-warning-icon { width: 40px; height: 40px; font-size: 20px; }
+  .club-package-main { padding: 60px 18px; }
+}
