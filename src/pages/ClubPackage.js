@@ -21,9 +21,10 @@ const ClubPackage = () => {
   // const [membersForApproval, setMembersForApproval] = useState([]);
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [confirmPage, setConfirmPage] = useState(false);
 
   // API functions
-  const [activeTab, setActiveTab] = useState('membersForApproval');
+  // const [activeTab, setActiveTab] = useState('confirm');
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
@@ -258,36 +259,67 @@ const ClubPackage = () => {
         </button>
       </aside>
 
-      <main className="club-package-main" role="main" aria-label="Club Package">
-        <div className="club-package-card">
-          <h1 className="cp-title">Do you wish to add a Club Package?</h1>
-          <p className="cp-subtitle">
-            By adding a Club Package will allow you to add memberships and
-            pricing.
-          </p>
+      {!confirmPage ? (
+        <main
+          className="club-package-main"
+          role="main"
+          aria-label="Club Package"
+        >
+          <div className="club-package-card">
+            <h1 className="cp-title">Do you wish to add a Club Package?</h1>
+            <p className="cp-subtitle">
+              By adding a Club Package will allow you to add memberships and
+              pricing.
+            </p>
 
-          <div className="cp-warning">
-            <span className="cp-warning-icon" aria-hidden>
-              !
-            </span>
-            <h2 className="cp-warning-text">
-              DO NOT PROCEED IF YOU ARE NOT SURE
-            </h2>
-            <span className="cp-warning-icon" aria-hidden>
-              !
-            </span>
-          </div>
+            <div className="cp-warning">
+              <span className="cp-warning-icon" aria-hidden>
+                !
+              </span>
+              <h2 className="cp-warning-text">
+                DO NOT PROCEED IF YOU ARE NOT SURE
+              </h2>
+              <span className="cp-warning-icon" aria-hidden>
+                !
+              </span>
+            </div>
 
-          <div className="cp-action">
-            <button
-              className="create-btn"
-              // onClick={() => navigate('/club-pkg/create')}
-            >
-              Create Club Package
-            </button>
+            <div className="cp-action">
+              <button
+                className="create-btn"
+                onClick={() => setConfirmPage(true)}
+              >
+                Create Club Package
+              </button>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      ) : (
+        <main
+          className="club-package-main"
+          role="main"
+          aria-label="Club Package"
+        >
+          <div className="club-package-card-confirm">
+            <h1 className="cp-title">You are creating a new club package</h1>
+
+            <div className="cp-filter-buttons-confirm">
+              <button
+                className="back-btn"
+                onClick={() => navigate('/dashboard')}
+              >
+                Back
+              </button>
+              <button
+                className="confirm-btn"
+                // onClick={() => setActiveTab('confirm')}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </main>
+      )}
     </div>
   );
 };

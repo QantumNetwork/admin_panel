@@ -83,6 +83,46 @@
   background: #5396D1;
 }
 
+.cp-filter-buttons-confirm {
+  position: absolute;
+  margin-left: 10%;
+  display: flex;
+  gap: 20px;
+}
+
+/*nav buttons*/
+.confirm-btn {
+    padding: 15px 55px;
+    background-color: #002977;
+    margin-top: 10px;
+    border: none;
+    border-radius: 27px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.confirm-btn:hover {
+  background-color: #5396D1;
+}
+
+.back-btn {
+    padding: 15px 55px;
+    background-color: #C3C3C3;
+    margin-top: 10px;
+    border: none;
+    border-radius: 27px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.back-btn:hover {
+  background-color: #5396D1;
+}
+
 /* responsive */
 @media (max-width: 880px) {
   .cp-title { font-size: 26px; }
