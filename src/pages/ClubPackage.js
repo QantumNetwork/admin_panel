@@ -48,6 +48,8 @@ const ClubPackage = () => {
         return 'Sense Of Taste';
       case 'North':
         return 'North Shore Tavern';
+      case 'Hogan':
+        return "Hogan's";
       default:
         return appType;
     }
@@ -312,7 +314,7 @@ const ClubPackage = () => {
               </button>
               <button
                 className="confirm-btn"
-                // onClick={() => setActiveTab('confirm')}
+                onClick={() => navigate('/membership')}
               >
                 Confirm
               </button>

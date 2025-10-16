@@ -892,6 +892,8 @@ const DigitalApp = () => {
         return 'Sense Of Taste';
       case 'North':
         return 'North Shore Tavern';
+      case 'Hogan':
+        return "Hogan's";
       default:
         return appType;
     }

@@ -1,0 +1,18 @@
+/* Navigation Buttons */
+.navigation-buttons-member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  margin-bottom: 20px;
+  position: relative;
+  width: 95%;
+  margin-top: 15px;
+  min-height: 34px;
+}
+
+.nav-tabs-member {
+  display: flex;
+  gap: 23px;
+  margin-left: 18%;
+}

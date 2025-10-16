@@ -75,6 +75,8 @@ const PowerAdmin = () => {
         return 'Sense';
       case 'North Shore Tavern':
         return 'North';
+      case "Hogan's":
+        return 'Hogan';
       default:
         return appName;
     }
@@ -96,6 +98,8 @@ const PowerAdmin = () => {
         return 'Sense Of Taste';
       case 'North':
         return 'North Shore Tavern';
+      case 'Hogan':
+        return "Hogan's";
       default:
         return appType;
     }
@@ -135,7 +139,7 @@ const PowerAdmin = () => {
     'North Shore Tavern',
     // 'Montauk Tavern',
     'Sense Of Taste',
-    'Hogan'
+    "Hogan's"
   ];
 
   const handleAddGroup = (index) => {
@@ -290,6 +294,9 @@ const PowerAdmin = () => {
               break;
             case 'North':
               appDisplayNames.push('North Shore Tavern');
+              break;
+            case 'Hogan':
+              appDisplayNames.push("Hogan's");
               break;
             default:
               appDisplayNames.push(app);

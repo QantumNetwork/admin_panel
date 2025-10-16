@@ -23,6 +23,7 @@ import SmartIncentives from "./pages/SmartIncentives";
 import ClubDesk from "./pages/ClubDesk";
 import ManualReg from "./pages/ManualReg";
 import ClubPackage from "./pages/ClubPackage";
+import MembershipPage from "./pages/MembershipPage";
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -52,6 +53,7 @@ function App() {
         <Route path="/approvals" element={<ClubDesk />} />
         <Route path="/manual-reg" element={<ManualReg />} />
         <Route path="/club-pkg" element={<ClubPackage />} />
+        <Route path="/membership" element={<MembershipPage />} />
       </Routes>
       <ToastContainer 
         position="top-center"

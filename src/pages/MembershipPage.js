@@ -6,10 +6,12 @@ import { toast } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
+import { FaUpload } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/club-desk.css';
 
-const ClubDesk = () => {
+import '../styles/membership-page.css';
+
+const MembershipPage = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const location = useLocation();
@@ -18,64 +20,13 @@ const ClubDesk = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
-  // const [membersForApproval, setMembersForApproval] = useState([]);
-  //   const [declinedMembers, setDeclinedMembers] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // API functions
-  const [activeTab, setActiveTab] = useState('membersForApproval');
   const [venues, setVenues] = useState([]);
+  const [activeTab, setActiveTab] = useState('setMemberLevels');
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
-
-  const [membersForApproval, setMembersForApproval] = useState([
-    {
-      _id: '1',
-      firstName: 'John',
-      lastName: 'Smith',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 412 345 678',
-      membership: 'Social',
-    },
-    {
-      _id: '2',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-    },
-    {
-      _id: '3',
-      firstName: 'Michael',
-      lastName: 'Brown',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 434 567 890',
-      membership: 'Full',
-    },
-  ]);
-
-  const [declinedMembers, setDeclinedMembers] = useState([
-    {
-      _id: '4',
-      firstName: 'Emma',
-      lastName: 'Davis',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-    },
-    {
-      _id: '5',
-      firstName: 'James',
-      lastName: 'Wilson',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-    },
-  ]);
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -294,110 +245,46 @@ const ClubDesk = () => {
         </button>
         <button
           style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
-          onClick={() => navigate('/club-pkg')}
+          className={`sidebar-btn ${isActive('/membership') ? 'active' : ''}`}
+          onClick={() => navigate('/membership')}
         >
           <PiListBulletsFill
             className={`sidebar-icon ${
-              isActive('/club-pkg') ? '' : 'navy-icon'
+              isActive('/membership') ? '' : 'navy-icon'
             }`}
           />{' '}
           &nbsp; Club Package
         </button>
       </aside>
 
-      <div className="sa-filter-buttons">
+      <div className="navigation-buttons-member">
+        <div className="nav-tabs-member">
+          <button
+            className={`user-btn ${
+              activeTab === 'setMemberLevels' ? 'active' : ''
+            }`}
+            onClick={() => setActiveTab('setMemberLevels')}
+          >
+            Set Member Levels
+          </button>
+          <button
+            className={`user-btn ${
+              activeTab === 'manualMembership' ? 'active' : ''
+            }`}
+            onClick={() => setActiveTab('manualMembership')}
+          >
+            Manual Membership
+          </button>
+        </div>
         <button
-          className={`user-btn ${
-            activeTab === 'membersForApproval' ? 'active' : ''
-          }`}
-          onClick={() => setActiveTab('membersForApproval')}
+          className="publish-button"
+          // onClick={addMode ? submitNewOffer : handleUpdateVoucher}
         >
-          Members For Approval
+          <FaUpload /> Publish
         </button>
-        <button
-          className={`user-btn ${
-            activeTab === 'declinedMembers' ? 'active' : ''
-          }`}
-          onClick={() => setActiveTab('declinedMembers')}
-        >
-          Declined Members
-        </button>
-      </div>
-
-      <div className="members-table-container">
-        {loading ? (
-          <div className="loading">Loading...</div>
-        ) : (
-          <table className="members-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Mobile</th>
-                <th>Membership</th>
-                <th>Licence Front</th>
-                <th>Licence Back</th>
-                <th>Payment</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeTab === 'membersForApproval' &&
-              membersForApproval.length > 0 ? (
-                membersForApproval.map((member, index) => (
-                  <tr key={member._id || index}>
-                    <td>
-                      {member.firstName} {member.lastName}
-                    </td>
-                    <td>{member.address}</td>
-                    <td>{member.phoneNumber}</td>
-                    <td>{member.membership}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>Approved</td>
-                    <td>
-                      <a href="#" style={{ marginRight: '5px' }}>
-                        Decline
-                      </a>
-                      <a href="#" style={{ marginRight: '20px' }}>
-                        Edit
-                      </a>
-                      <button className="action-btn approve">Approve</button>
-                    </td>
-                  </tr>
-                ))
-              ) : activeTab === 'declinedMembers' &&
-                declinedMembers.length > 0 ? (
-                declinedMembers.map((member, index) => (
-                  <tr key={member._id || index}>
-                    <td>
-                      {member.firstName} {member.lastName}
-                    </td>
-                    <td>{member.address}</td>
-                    <td>{member.phoneNumber}</td>
-                    <td>{member.membership}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>Approved</td>
-                    <td>
-                      <a href="#">Move to approval</a>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="8" className="no-data">
-                    No members found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
       </div>
     </div>
   );
 };
 
-export default ClubDesk;
+export default MembershipPage;
