@@ -283,91 +283,245 @@ const MembershipPage = () => {
           <FaUpload /> Activate
         </button>
 
-              <div className="content-wrapper-sa" style={{top: '80px', marginLeft: "20px"}}>
-        <section className="new-user-sa" style={{width: "50%", height: '500px'}}>
-          <h2>Enter Membership Levels & Pricing</h2>
+        {activeTab === 'setMemberLevels' ? (
+          <div
+            className="content-wrapper-sa"
+            style={{ top: '80px', marginLeft: '20px' }}
+          >
+            <section
+              className="new-user-sa"
+              style={{ width: '50%', height: '500px' }}
+            >
+              <h2>Enter Membership Levels & Pricing</h2>
 
-           <table style={{width: '100%', marginTop: '20px', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '12px'}}>
-            <thead>
-              <tr>
-                <th style={{textAlign: 'left', padding: '10px', borderBottom: '1px solid #ddd', width: '33.33%'}}>Enter Membership Name</th>
-                <th style={{textAlign: 'center', padding: '10px', borderBottom: '1px solid #ddd', width: '33.33%'}}>Price</th>
-                <th style={{textAlign: 'left', padding: '10px', borderBottom: '1px solid #ddd', width: '33.33%'}}>Pro Rata</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{padding: '10px'}}>
-                  <input 
-                    type="text" 
-                    defaultValue="Social Member 1 Year"
-                    style={{width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px'}}
-                  />
-                </td>
-                <td style={{padding: '10px', textAlign: 'center'}}>
-                  <input 
-                    type="text" 
-                    defaultValue="$5"
-                    style={{width: '50%', padding: '8px', textAlign: 'center', border: '1px solid #ddd', borderRadius: '4px'}}
-                  />
-                </td>
-                <td style={{padding: '10px'}}>
-                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft: '15px'}}>
-                    <input type="radio" name="prorata" style={{accentColor: '#002977'}} defaultChecked />
-                    <button style={{background: 'none', border: 'none', color: '#007bff', fontSize: '20px', cursor: 'pointer'}}>+</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td style={{padding: '10px'}}>
-                  <input 
-                    type="text" 
-                    defaultValue="Social Member 3 Years"
-                    style={{width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px'}}
-                  />
-                </td>
-                <td style={{padding: '10px', textAlign: 'center'}}>
-                  <input 
-                    type="text" 
-                    defaultValue="$10"
-                    style={{width: '50%', padding: '8px',textAlign: 'center', border: '1px solid #ddd', borderRadius: '4px'}}
-                  />
-                </td>
-                <td style={{padding: '10px'}}>
-                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft: '15px'}}>
-                    <input type="radio" name="prorata" style={{accentColor: '#002977'}} />
-                    <button style={{background: 'none', border: 'none', color: '#007bff', fontSize: '20px', cursor: 'pointer'}}>+</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+              <table
+                style={{
+                  width: '100%',
+                  marginTop: '20px',
+                  borderCollapse: 'collapse',
+                  tableLayout: 'fixed',
+                  fontSize: '12px',
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '10px',
+                        borderBottom: '1px solid #ddd',
+                        width: '33.33%',
+                      }}
+                    >
+                      Enter Membership Name
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '10px',
+                        borderBottom: '1px solid #ddd',
+                        width: '33.33%',
+                      }}
+                    >
+                      Price
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '10px',
+                        borderBottom: '1px solid #ddd',
+                        width: '33.33%',
+                      }}
+                    >
+                      Pro Rata
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ padding: '10px' }}>
+                      <input
+                        type="text"
+                        defaultValue="Social Member 1 Year"
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>
+                      <input
+                        type="text"
+                        defaultValue="$5"
+                        style={{
+                          width: '50%',
+                          padding: '8px',
+                          textAlign: 'center',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '10px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginLeft: '15px',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="prorata"
+                          style={{ accentColor: '#002977' }}
+                          defaultChecked
+                        />
+                        <button
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#007bff',
+                            fontSize: '20px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '10px' }}>
+                      <input
+                        type="text"
+                        defaultValue="Social Member 3 Years"
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '10px', textAlign: 'center' }}>
+                      <input
+                        type="text"
+                        defaultValue="$10"
+                        style={{
+                          width: '50%',
+                          padding: '8px',
+                          textAlign: 'center',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '10px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginLeft: '15px',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="prorata"
+                          style={{ accentColor: '#002977' }}
+                        />
+                        <button
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#007bff',
+                            fontSize: '20px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
 
-        <section className="new-user-sa" style={{height: '500px', width: '40%', fontSize: '12px'}}>
-          <div style={{marginTop: '20px', textAlign: 'center'}}>
-            <label style={{display: 'block', marginBottom: '10px', fontWeight: 'bold'}}>Set Renewal Date</label>
-            <input 
-              type="date" 
-              style={{width: '60%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', textAlign: 'center', marginBottom: '10px'}}
-            />
+            <section
+              className="new-user-sa"
+              style={{ height: '500px', width: '40%', fontSize: '12px' }}
+            >
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Set Renewal Date
+                </label>
+                <input
+                  type="date"
+                  style={{
+                    width: '60%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                    marginBottom: '10px',
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Grace Period
+                </label>
+                <input
+                  type="text"
+                  style={{
+                    width: '60%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    marginBottom: '10px',
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: '30px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Pro Rata (Months)
+                </label>
+                <input
+                  type="text"
+                  style={{
+                    width: '60%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    marginBottom: '10px',
+                  }}
+                />
+              </div>
+            </section>
           </div>
-          <div style={{marginTop: '20px', textAlign: 'center'}}>
-            <label style={{display: 'block', marginBottom: '10px', fontWeight: 'bold'}}>Grace Period</label>
-            <input 
-              type="text" 
-              style={{width: '60%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '10px'}}
-            />
-          </div>
-          <div style={{marginTop: '30px', textAlign: 'center'}}>
-            <label style={{display: 'block', marginBottom: '10px', fontWeight: 'bold'}}>Pro Rata (Months)</label>
-            <input 
-              type="text" 
-              style={{width: '60%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '10px'}}
-            />
-          </div>
-        </section>
-      </div>
+        ) : null}
       </div>
     </div>
   );
