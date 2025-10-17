@@ -164,8 +164,8 @@ const DigitalSmall = () => {
   } else if (selectedVenue === 'StarReward') {
     // Options for audience selection
     audienceOptions = [
-      { value: 'Pre 3 Month', label: 'Pre 3 Month' },
-      { value: 'Staff', label: 'Staff' },
+      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
+      { value: 'Star Staff', label: 'Star Staff' },
       { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
