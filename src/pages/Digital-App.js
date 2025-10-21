@@ -85,6 +85,7 @@ const DigitalApp = () => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
+      { value: 'Platinum Black', label: 'Platinum Black'}
     ];
   } else if (selectedVenue === 'Manly') {
     // Options for audience selection

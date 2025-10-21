@@ -33,6 +33,7 @@ const ArtGallery = () => {
   const access = localStorage.getItem('access');
   const userType = localStorage.getItem('userType');
   const [isEditMode, setIsEditMode] = useState(false);
+  const textareaRef = useRef(null);
 
   // Default to 'A' if userInitial is not provided
   const userInitial = email.charAt(0).toUpperCase() || 'A';
@@ -601,6 +602,12 @@ const ArtGallery = () => {
         setCanEdit(false); // 👈 Hide Edit, show Update
 
         setPromot(''); // 👈 Clear textarea so user starts fresh
+          // Focus the textarea after state updates
+        setTimeout(() => {
+          if (textareaRef.current) {
+            textareaRef.current.focus();
+          }
+        }, 0);
         //toast.success('Image moved to S3 and saved locally as PNG');
       } else {
         toast.error(response.data.message || 'Failed to move image');
@@ -1056,6 +1063,7 @@ const ArtGallery = () => {
             <div className="d-flex w-100">
               <div className="w-100">
                 <textarea
+                  ref={textareaRef}
                   className="text-area-ai-text"
                   rows="4"
                   cols="50"

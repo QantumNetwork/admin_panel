@@ -48,6 +48,7 @@ const MyBenefits = () => {
     if(savedVenue === 'Manly') return 'Commodore';
     if(savedVenue === 'Hogan') return 'Pearl';
     if(savedVenue === 'North') return 'Gold';
+    if(savedVenue === 'StarReward') return 'Valued';
     return 'Platinum Black';
   });
 
@@ -74,6 +75,10 @@ const MyBenefits = () => {
         if (selectedVenue === 'Qantum') return '#4CAF50';
         if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
+      case 'Staff Pre 3Mth':
+        return '#FF0000';
+      case 'Star Staff':
+        return '#FF0000';
       case 'Platinum':
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':
@@ -115,8 +120,7 @@ const MyBenefits = () => {
 
   if (
     selectedVenue === 'Qantum' ||
-    selectedVenue === 'MaxGaming' ||
-    selectedVenue === 'StarReward'
+    selectedVenue === 'MaxGaming' 
   ) {
     // Options for audience selection
     audienceOptions = [
@@ -163,6 +167,17 @@ const MyBenefits = () => {
       {value: 'Silver', label: 'Silver'},
       {value: 'Staff', label: 'Staff'},
       {value: 'Valued', label: 'Valued'}
+    ];
+  } else if (selectedVenue === 'StarReward') {
+    // Options for audience selection
+    audienceOptions = [
+      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
+      { value: 'Star Staff', label: 'Star Staff' },
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Platinum Black', label: 'Platinum Black'}
     ];
   }
 
