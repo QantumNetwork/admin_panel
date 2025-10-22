@@ -16,3 +16,8 @@
   gap: 23px;
   margin-left: 18%;
 }
+
+.page-container-member {
+  margin: auto;
+  width: 100%;
+}
