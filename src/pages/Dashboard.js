@@ -343,17 +343,19 @@ const Dashboard = () => {
                 />
               </div>
 
-              <div
-                className="dashboard-card"
-                style={{ gridArea: 'club-desk' }}
-                onClick={() => navigate('/approvals', { state: { email } })}
-              >
-                <img
-                  src="/club-desk.png"
-                  alt="Club Desk"
-                  className="card-image"
-                />
-              </div>
+              {(selectedVenue === 'Qantum' || selectedVenue === 'Manly') && (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'club-desk' }}
+                  onClick={() => navigate('/approvals', { state: { email } })}
+                >
+                  <img
+                    src="/club-desk.png"
+                    alt="Club Desk"
+                    className="card-image"
+                  />
+                </div>
+              )}
             </>
           ) : (
             // Show cards based on user access

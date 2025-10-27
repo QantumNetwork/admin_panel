@@ -22,6 +22,27 @@ const MembershipPage = () => {
   const appGroup = localStorage.getItem('appGroup');
   const [venues, setVenues] = useState([]);
   const [activeTab, setActiveTab] = useState('setMemberLevels');
+  const [renewalDate, setRenewalDate] = useState('');
+  const [daysRemaining, setDaysRemaining] = useState(null);
+  const [membershipData, setMembershipData] = useState(null);
+
+
+const [membershipRows, setMembershipRows] = useState(() => {
+  // If we have data and it's for the selected venue, use it
+  if (membershipData && membershipData.appType === selectedVenue) {
+    return membershipData.membershipLevels.map((level, index) => ({
+      id: index + 1,
+      name: level.membershipName,
+      price: `$${level.price}`,
+      proRata: level.proRata
+    }));
+  }
+  // Default rows if no data
+  return [
+    { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
+    { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false }
+  ];
+});
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
@@ -111,11 +132,125 @@ const MembershipPage = () => {
     }
   };
 
+//   useEffect(() => {
+//   const fetchMembershipData = async () => {
+//     if (!selectedVenue) return;
+    
+//     try {
+//       const response = await axios.get(`${baseUrl}/club-packages`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+
+//       if (response.data?.data?.length > 0) {
+//         setMembershipData(response.data.data[0]); // Take the first package if multiple exist
+//       }
+//     } catch (error) {
+//       console.error('Error fetching membership data:', error);
+//       toast.error('Failed to load membership data');
+//     }
+//   };
+
+//   fetchMembershipData();
+// }, [selectedVenue, token]);
+
+// useEffect(() => {
+//   if (membershipData && membershipData.appType === selectedVenue) {
+//     setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
+//     setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate));
+//   } else {
+//     setRenewalDate('');
+//     setDaysRemaining(null);
+//   }
+// }, [membershipData, selectedVenue]);
+
   const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;
   };
+
+  const calculateDaysRemaining = (dateString) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const renewal = new Date(dateString);
+  const diffTime = renewal - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 0 ? diffDays - 1 : 0; // Exclude renewal date
+};
+
+const handleDateChange = (e) => {
+  const selectedDate = e.target.value;
+  setRenewalDate(selectedDate);
+  setDaysRemaining(calculateDaysRemaining(selectedDate));
+};
+
+const addMembershipRow = () => {
+  const newId = membershipRows.length > 0 ? Math.max(...membershipRows.map(r => r.id)) + 1 : 1;
+  setMembershipRows([...membershipRows, { id: newId, name: '', price: '', proRata: false }]);
+};
+
+const removeMembershipRow = (id) => {
+  if (membershipRows.length > 1) { // Keep at least one row
+    setMembershipRows(membershipRows.filter(row => row.id !== id));
+  }
+};
+
+const updateMembershipRow = (id, field, value) => {
+  setMembershipRows(membershipRows.map(row => 
+    row.id === id ? { ...row, [field]: value } : row
+  ));
+};
+
+const handleActivate = async () => {
+  try {
+    // Prepare the request body
+    const requestBody = {
+      membershipLevels: membershipRows.map(row => ({
+        membershipName: row.name,
+        price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')), // Remove any non-numeric characters except decimal point
+        proRata: row.proRata
+      })),
+      renewalDate: renewalDate,
+      gracePeriod: 0, // Default grace period as per your requirements
+      proRataMonths: isAnyProRataChecked ? daysRemaining : 0
+    };
+
+    // Make the API call
+    const response = await axios.post(
+      `${baseUrl}/club-packages`,
+      requestBody,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if(response.data.message) {
+      console.log(response.data);
+      toast.success(response.data.message);
+
+      // Reset form data
+      setMembershipRows([
+        { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
+        { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false }
+      ]);
+      setRenewalDate('');
+      setDaysRemaining(null);
+    }
+    
+  } catch (error) {
+    console.error('Error creating club package:', error);
+    const errorMessage = error.response?.data?.message || 'Failed to create club package';
+    toast.error(errorMessage);
+  }
+};
+
+const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
+
 
   return (
     <div className="dashboard-container">
@@ -278,6 +413,7 @@ const MembershipPage = () => {
         </div>
         <button
           className="publish-button"
+          onClick={handleActivate}
           // onClick={addMode ? submitNewOffer : handleUpdateVoucher}
         >
           <FaUpload /> Activate
@@ -338,116 +474,84 @@ const MembershipPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td style={{ padding: '10px' }}>
-                      <input
-                        type="text"
-                        defaultValue="Social Member 1 Year"
-                        style={{
-                          width: '100%',
-                          padding: '8px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </td>
-                    <td style={{ padding: '10px', textAlign: 'center' }}>
-                      <input
-                        type="text"
-                        defaultValue="$5"
-                        style={{
-                          width: '50%',
-                          padding: '8px',
-                          textAlign: 'center',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </td>
-                    <td style={{ padding: '10px' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginLeft: '15px',
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="prorata"
-                          style={{ accentColor: '#002977' }}
-                          defaultChecked
-                        />
-                        <button
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#007bff',
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '10px' }}>
-                      <input
-                        type="text"
-                        defaultValue="Social Member 3 Years"
-                        style={{
-                          width: '100%',
-                          padding: '8px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </td>
-                    <td style={{ padding: '10px', textAlign: 'center' }}>
-                      <input
-                        type="text"
-                        defaultValue="$10"
-                        style={{
-                          width: '50%',
-                          padding: '8px',
-                          textAlign: 'center',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </td>
-                    <td style={{ padding: '10px' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginLeft: '15px',
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="prorata"
-                          style={{ accentColor: '#002977' }}
-                        />
-                        <button
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#007bff',
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+  {membershipRows.map((row) => (
+    <tr key={row.id}>
+      <td style={{ padding: '10px' }}>
+        <input
+          type="text"
+          value={row.name}
+          onChange={(e) => updateMembershipRow(row.id, 'name', e.target.value)}
+          style={{
+            width: '100%',
+            padding: '8px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+          }}
+        />
+      </td>
+      <td style={{ padding: '10px', textAlign: 'center' }}>
+        <input
+          type="text"
+          value={row.price}
+          onChange={(e) => updateMembershipRow(row.id, 'price', e.target.value)}
+          style={{
+            width: '50%',
+            padding: '8px',
+            textAlign: 'center',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+          }}
+        />
+      </td>
+      <td style={{ padding: '10px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginLeft: '15px',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={row.proRata}
+            onChange={(e) => updateMembershipRow(row.id, 'proRata', e.target.checked)}
+            style={{ accentColor: '#002977' }}
+          />
+          <div>
+            <button
+              onClick={addMembershipRow}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#007bff',
+                fontSize: '20px',
+                cursor: 'pointer',
+                marginRight: '10px',
+              }}
+            >
+              +
+            </button>
+            {membershipRows.length > 1 && (
+              <button
+                onClick={() => removeMembershipRow(row.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#ff4444',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
               </table>
             </section>
 
@@ -467,6 +571,9 @@ const MembershipPage = () => {
                 </label>
                 <input
                   type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={renewalDate}
+                  onChange={handleDateChange}
                   style={{
                     width: '60%',
                     padding: '8px',
@@ -494,11 +601,13 @@ const MembershipPage = () => {
                     padding: '8px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
+                    textAlign: 'center',
                     marginBottom: '10px',
                   }}
                 />
               </div>
-              <div style={{ marginTop: '30px', textAlign: 'center' }}>
+              {isAnyProRataChecked && (
+                <div style={{ marginTop: '30px', textAlign: 'center' }}>
                 <label
                   style={{
                     display: 'block',
@@ -506,19 +615,23 @@ const MembershipPage = () => {
                     fontWeight: 'bold',
                   }}
                 >
-                  Pro Rata (Months)
+                  Pro Rata
                 </label>
-                <input
-                  type="text"
+                <div
                   style={{
-                    width: '60%',
-                    padding: '8px',
+                    width: '57.5%',
+                    backgroundColor: 'white',
+                    padding: '15px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
-                    marginBottom: '10px',
+                    margin: '0 auto',
                   }}
-                />
+                >
+                    {daysRemaining !== null && daysRemaining}
+
+                </div>
               </div>
+              )}              
             </section>
           </div>
         ) : null}
