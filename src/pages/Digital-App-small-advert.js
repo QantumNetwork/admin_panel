@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { uploadFileToS3 } from '../s3/config';
 import { toast, ToastContainer } from 'react-toastify';
 import AppLayout from '../components/AppLayout';
+import { trackMenuAccess } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   FaRegStar,
@@ -891,6 +892,18 @@ const DigitalSmall = () => {
     }
   }, [token]);
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+    if (result.success && navigateTo) {
+      navigate(navigateTo, { state: { email } });
+    } else if (!result.success) {
+      // Optionally show an error message to the user
+      console.warn('Navigation prevented:', result.message);
+      // You might want to show a toast or alert here
+    }
+  };
+
   return (
     <div className="digital-app-container">
       <header className="app-header">
@@ -905,13 +918,13 @@ const DigitalSmall = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -927,7 +940,7 @@ const DigitalSmall = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -935,7 +948,7 @@ const DigitalSmall = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>

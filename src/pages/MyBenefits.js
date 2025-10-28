@@ -11,6 +11,7 @@ import {
   FaPaintBrush,
 } from 'react-icons/fa';
 import '../styles/my-benefits.css';
+import { trackMenuAccess } from '../utils/api';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { uploadFileToS3 } from '../s3/config';
@@ -391,6 +392,18 @@ const MyBenefits = () => {
     }
   }, [token]);
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+    if (result.success && navigateTo) {
+      navigate(navigateTo, { state: { email } });
+    } else if (!result.success) {
+      // Optionally show an error message to the user
+      console.warn('Navigation prevented:', result.message);
+      // You might want to show a toast or alert here
+    }
+  };
+
   return (
     // <div className="my-benefits-container">
     <div className="digital-app-container-so">
@@ -406,13 +419,13 @@ const MyBenefits = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -428,7 +441,7 @@ const MyBenefits = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -436,7 +449,7 @@ const MyBenefits = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>

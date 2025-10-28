@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
+import { trackMenuAccess } from '../utils/api';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
@@ -147,6 +148,18 @@ const Dashboard = () => {
 
     initializeVenueToken();
   }, []); // Empty dependency array to run only on mount
+
+const handleCardClick = async (accessItem, navigateTo) => {
+    const result = await trackMenuAccess(accessItem);
+    // Only navigate if the API call was successful
+  if (result.success && navigateTo) {
+    navigate(navigateTo, { state: { email } });
+  } else if (!result.success) {
+    // Optionally show an error message to the user
+    console.warn('Navigation prevented:', result.message);
+    // You might want to show a toast or alert here
+  }
+};
 
   return (
     <div className="dashboard-container">
@@ -299,7 +312,8 @@ const Dashboard = () => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'digital-app' }}
-                onClick={() => navigate('/digital-app', { state: { email } })}
+                onClick={() => handleCardClick('digital', '/digital-app')}
+
               >
                 <img
                   src="/digital-app.png"
@@ -310,9 +324,7 @@ const Dashboard = () => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'market-members' }}
-                onClick={() =>
-                  navigate('/market-to-members', { state: { email } })
-                }
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 <img
                   src="/m2m.png"
@@ -334,7 +346,8 @@ const Dashboard = () => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'ai-reporting' }}
-                onClick={() => navigate('/ai-reporting', { state: { email } })}
+                onClick={() => handleCardClick('ai-reporting', '/ai-reporting')}
+
               >
                 <img
                   src="/ai-reporting.png"
@@ -347,7 +360,8 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}
-                  onClick={() => navigate('/approvals', { state: { email } })}
+                  onClick={() => handleCardClick('club-desk', '/approvals')}
+
                 >
                   <img
                     src="/club-desk.png"
@@ -364,7 +378,8 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'digital-app' }}
-                  onClick={() => navigate('/digital-app', { state: { email } })}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
+
                 >
                   <img
                     src="/digital-app.png"
@@ -377,9 +392,8 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'market-members' }}
-                  onClick={() =>
-                    navigate('/market-to-members', { state: { email } })
-                  }
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
+
                 >
                   <img
                     src="/m2m.png"
@@ -405,9 +419,8 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'ai-reporting' }}
-                  onClick={() =>
-                    navigate('/ai-reporting', { state: { email } })
-                  }
+                  onClick={() => handleCardClick('ai-reporting', '/ai-reporting')}
+
                 >
                   <img
                     src="/ai-reporting.png"
@@ -421,7 +434,8 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}
-                  onClick={() => navigate('/approvals', { state: { email } })}
+                  onClick={() => handleCardClick('club-desk', '/approvals')}
+
                 >
                   <img
                     src="/club-desk.png"

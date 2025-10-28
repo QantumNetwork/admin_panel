@@ -24,10 +24,21 @@ import ClubDesk from "./pages/ClubDesk";
 import ManualReg from "./pages/ManualReg";
 import ClubPackage from "./pages/ClubPackage";
 import MembershipPage from "./pages/MembershipPage";
+import { useEffect } from 'react';
+import { setupRefreshLock, clearRefreshLock } from './utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
+  useEffect(() => {
+    // Set up the refresh lock when component mounts
+    setupRefreshLock();
+    
+    // Clean up on unmount
+    return () => {
+      clearRefreshLock();
+    };
+  }, []);
   return (
     <Router>
       <Routes>

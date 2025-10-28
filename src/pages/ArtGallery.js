@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import '../styles/art-gallery.css';
 import axios from 'axios';
+import {trackMenuAccess} from '../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { uploadFileToS3, uploadImageToS3 } from '../s3/config';
 
@@ -620,6 +621,18 @@ const ArtGallery = () => {
     }
   };
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+    if (result.success && navigateTo) {
+      navigate(navigateTo, { state: { email } });
+    } else if (!result.success) {
+      // Optionally show an error message to the user
+      console.warn('Navigation prevented:', result.message);
+      // You might want to show a toast or alert here
+    }
+  };
+
   return (
     <div className="digital-app-container-ag">
       <header className="app-header">
@@ -634,13 +647,13 @@ const ArtGallery = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -656,7 +669,7 @@ const ArtGallery = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -664,7 +677,7 @@ const ArtGallery = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>

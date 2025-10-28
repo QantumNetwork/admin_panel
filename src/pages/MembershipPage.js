@@ -82,11 +82,9 @@ const [membershipRows, setMembershipRows] = useState(() => {
         });
         if (response.data && response.data.data) {
           setVenues(response.data.data);
-          //   setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching venues:', error);
-        // setLoading(false);
       }
     };
 
@@ -132,38 +130,49 @@ const [membershipRows, setMembershipRows] = useState(() => {
     }
   };
 
-//   useEffect(() => {
-//   const fetchMembershipData = async () => {
-//     if (!selectedVenue) return;
+  useEffect(() => {
+  const fetchMembershipData = async () => {
+    if (!selectedVenue) return;
     
-//     try {
-//       const response = await axios.get(`${baseUrl}/club-packages`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
+    try {
+      const response = await axios.get(`${baseUrl}/club-packages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-//       if (response.data?.data?.length > 0) {
-//         setMembershipData(response.data.data[0]); // Take the first package if multiple exist
-//       }
-//     } catch (error) {
-//       console.error('Error fetching membership data:', error);
-//       toast.error('Failed to load membership data');
-//     }
-//   };
+      if (response.data?.data?.length > 0) {
+        console.log(response.data.data);
+        setMembershipData(response.data.data[0]); // Take the first package if multiple exist
 
-//   fetchMembershipData();
-// }, [selectedVenue, token]);
+        const rows=response.data.data[0].membershipLevels.map((level,index)=> ({
+          id: index+1,
+          name: level.membershipName,
+          price: `$${level.price}`,
+          proRata: level.proRata
+        }));
 
-// useEffect(() => {
-//   if (membershipData && membershipData.appType === selectedVenue) {
-//     setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
-//     setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate));
-//   } else {
-//     setRenewalDate('');
-//     setDaysRemaining(null);
-//   }
-// }, [membershipData, selectedVenue]);
+        setMembershipRows(rows);
+      }
+    } catch (error) {
+      console.error('Error fetching membership data:', error);
+      toast.error('Failed to load membership data');
+    }
+  };
+
+  fetchMembershipData();
+}, [selectedVenue, token]);
+
+useEffect(() => {
+  if (membershipData && membershipData.appType === selectedVenue) {
+    setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
+    {membershipData.proRataMonths!==0 ? setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate)) : setDaysRemaining(0)};
+    
+  } else {
+    setRenewalDate('');
+    setDaysRemaining(null);
+  }
+}, [membershipData, selectedVenue]);
 
   const userType = 'admin';
 
@@ -233,13 +242,7 @@ const handleActivate = async () => {
       console.log(response.data);
       toast.success(response.data.message);
 
-      // Reset form data
-      setMembershipRows([
-        { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
-        { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false }
-      ]);
-      setRenewalDate('');
-      setDaysRemaining(null);
+      navigate('/membership');
     }
     
   } catch (error) {
@@ -315,7 +318,6 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
                   className="form-select"
                   value={selectedVenue}
                   onChange={handleVenueChange}
-                  // disabled={loading}
                   required
                 >
                   {venues.map(
@@ -414,7 +416,6 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
         <button
           className="publish-button"
           onClick={handleActivate}
-          // onClick={addMode ? submitNewOffer : handleUpdateVoucher}
         >
           <FaUpload /> Activate
         </button>
