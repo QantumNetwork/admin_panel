@@ -892,17 +892,19 @@ const DigitalSmall = () => {
     }
   }, [token]);
 
-  const handleCardClick = async (accessItem, navigateTo) => {
-      const result = await trackMenuAccess(accessItem);
-      // Only navigate if the API call was successful
+const handleCardClick = async (accessItem, navigateTo) => {
+  try {
+    const result = await trackMenuAccess(accessItem);
+    // Only navigate if the API call was successful
     if (result.success && navigateTo) {
       navigate(navigateTo, { state: { email } });
-    } else if (!result.success) {
-      // Optionally show an error message to the user
-      console.warn('Navigation prevented:', result.message);
-      // You might want to show a toast or alert here
     }
-  };
+    // No need for else if here since trackMenuAccess already shows the error toast
+  } catch (error) {
+    console.error('Error in handleCardClick:', error);
+    // Error toast is already shown by trackMenuAccess
+  }
+};
 
   return (
     <div className="digital-app-container">

@@ -43,6 +43,21 @@
   font-size: 11px;
   }
 
+    .payment-btn {
+    margin-bottom: 0;
+    margin-top: 20px;
+  align-items: flex-end;
+  display: block;
+  width: 200px;
+  height: 36px;
+  background: #5296D1;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  }
+
   .payment-white-box {
     background: white;
     padding: 25px;

@@ -21,6 +21,8 @@ const ManualReg = () => {
   // const [membersForApproval, setMembersForApproval] = useState([]);
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showManualPayment, setShowManualPayment] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Cash');
 
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
@@ -148,6 +150,18 @@ const ManualReg = () => {
     return location.pathname === path;
   };
 
+  const handleManualPaymentClick = () => {
+    setShowManualPayment(true);
+  };
+
+  const handleCancelManualPayment = () => {
+    setShowManualPayment(false);
+  };
+
+  const handleConfirmManualPayment = () => {
+    console.log('Payment method selected:', selectedPaymentMethod);
+    // setShowManualPayment(false);
+  };
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -288,8 +302,8 @@ const ManualReg = () => {
         </button>
       </aside>
 
-      <div className="content-wrapper-sa" style={{top: '140px'}}>
-        <section className="new-user-sa" style={{height: '550px'}}>
+      <div className="content-wrapper-sa" style={{ top: '120px' }}>
+        <section className="new-user-sa" style={{ height: '600px' }}>
           <h2>Register New Member</h2>
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>First name</label>
@@ -395,6 +409,7 @@ const ManualReg = () => {
                   value="male"
                   checked={formData.gender === 'male'}
                   onChange={handleInputChange}
+                  style={{accentColor: '#002977'}}
                 />
                 Male
               </label>
@@ -407,6 +422,7 @@ const ManualReg = () => {
                   value="female"
                   checked={formData.gender === 'female'}
                   onChange={handleInputChange}
+                  style={{accentColor: '#002977'}}
                 />
                 Female
               </label>
@@ -420,6 +436,7 @@ const ManualReg = () => {
                   value="non-binary"
                   checked={formData.gender === 'non-binary'}
                   onChange={handleInputChange}
+                  style={{accentColor: '#002977'}}
                 />
                 Non-binary
               </label>
@@ -427,13 +444,13 @@ const ManualReg = () => {
           </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '40px' }}
+            style={{ marginTop: '120px' }}
           >
             <button className="blue-btn">EDIT</button>
           </div>
         </section>
 
-        <section className="new-user-sa" style={{height: '550px'}}>
+        <section className="new-user-sa" style={{ height: '600px' }}>
           <h2>Set Membership Level</h2>
           <div className="form-group">
             <input
@@ -446,193 +463,366 @@ const ManualReg = () => {
 
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '345px' }}
+            style={{ marginTop: '425px' }}
           >
             <button className="blue-btn">EDIT</button>
           </div>
         </section>
-        <section className="connected-sa" style={{height: '550px'}}>
-          <h2>Payment Details</h2>
-          <div className="payment-white-box">
-            <div className="form-group">
-              <label
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '13px',
-                  color: '#5a5a5a',
-                }}
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                name="paymentEmail"
-                value={formData.paymentEmail}
-                onChange={handleInputChange}
-                placeholder="ella.williams@example.com"
-                style={{
-                  width: '100%',
-                  // padding: '10px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  marginTop: '5px',
-                }}
-              />
-            </div>
+        <section className="connected-sa" style={{ height: '600px' }}>
+          {!showManualPayment ? (
+            <>
+              <h2>Payment Details</h2>
+              <div className="payment-white-box">
+                <div className="form-group">
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      color: '#5a5a5a',
+                    }}
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="paymentEmail"
+                    value={formData.paymentEmail}
+                    onChange={handleInputChange}
+                    placeholder="ella.williams@example.com"
+                    style={{
+                      width: '100%',
+                      // padding: '10px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginTop: '5px',
+                    }}
+                  />
+                </div>
 
-            <div className="form-group" style={{ marginTop: '10px' }}>
-              <label
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '13px',
-                  color: '#5a5a5a',
-                }}
-              >
-                Card information
-              </label>
-              <input
-                type="text"
-                name="cardNumber"
-                value={formData.cardNumber}
-                onChange={handleInputChange}
-                placeholder="4242 4242 4242 4242"
-                style={{
-                  width: '100%',
-                  // padding: '10px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px 6px 0 0',
-                  borderBottom: 'none',
-                  fontSize: '14px',
-                  marginTop: '5px',
-                }}
-              />
+                <div className="form-group" style={{ marginTop: '10px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      color: '#5a5a5a',
+                    }}
+                  >
+                    Card information
+                  </label>
+                  <input
+                    type="text"
+                    name="cardNumber"
+                    value={formData.cardNumber}
+                    onChange={handleInputChange}
+                    placeholder="4242 4242 4242 4242"
+                    style={{
+                      width: '100%',
+                      // padding: '10px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px 6px 0 0',
+                      borderBottom: 'none',
+                      fontSize: '14px',
+                      marginTop: '5px',
+                    }}
+                  />
 
-              <div style={{ display: 'flex', gap: '0' }}>
-                <input
-                  type="text"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleInputChange}
-                  placeholder="12/24"
+                  <div style={{ display: 'flex', gap: '0' }}>
+                    <input
+                      type="text"
+                      name="expiryDate"
+                      value={formData.expiryDate}
+                      onChange={handleInputChange}
+                      placeholder="12/24"
+                      style={{
+                        width: '50%',
+                        // padding: '10px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '0 0 0 6px',
+                        borderRight: 'none',
+                        fontSize: '14px',
+                      }}
+                    />
+
+                    <input
+                      type="text"
+                      name="cvv"
+                      value={formData.cvv}
+                      onChange={handleInputChange}
+                      placeholder="123"
+                      style={{
+                        width: '50%',
+                        // padding: '10px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '0 0 6px 0',
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginTop: '10px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      color: '#5a5a5a',
+                    }}
+                  >
+                    Name on card
+                  </label>
+                  <input
+                    type="text"
+                    name="nameOnCard"
+                    value={formData.nameOnCard}
+                    onChange={handleInputChange}
+                    placeholder="Ella Williams"
+                    style={{
+                      width: '100%',
+                      // padding: '10px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginTop: '5px',
+                    }}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginTop: '10px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: '13px',
+                      color: '#5a5a5a',
+                    }}
+                  >
+                    Country or region
+                  </label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '5px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginTop: '5px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Australia">Australia</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="paymentZip"
+                    value={formData.paymentZip}
+                    onChange={handleInputChange}
+                    placeholder="97702"
+                    style={{
+                      width: '100%',
+                      // padding: '10px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      marginTop: '10px',
+                    }}
+                  />
+                </div>
+
+                <button
                   style={{
-                    width: '50%',
-                    // padding: '10px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '0 0 0 6px',
-                    borderRight: 'none',
-                    fontSize: '14px',
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#1a2b4a',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    marginTop: '10px',
+                    cursor: 'pointer',
                   }}
-                />
-
-                <input
-                  type="text"
-                  name="cvv"
-                  value={formData.cvv}
-                  onChange={handleInputChange}
-                  placeholder="123"
-                  style={{
-                    width: '50%',
-                    // padding: '10px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '0 0 6px 0',
-                    fontSize: '14px',
-                  }}
-                />
+                >
+                  Pay US$65.00
+                </button>
               </div>
-            </div>
 
-            <div className="form-group" style={{ marginTop: '10px' }}>
-              <label
+              <div
+                className="d-flex w-100 justify-content-center"
+                style={{ marginTop: '2px' }}
+              >
+                <button className="payment-btn" onClick={handleManualPaymentClick}>
+                  Manually approve payment
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Manual Payment Details</h2>
+              <div style={{ marginTop: '30px' }}>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: '#5a5a5a',
+                    marginBottom: '15px',
+                  }}
+                >
+                  Choose payment method
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}
+                >
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Cash"
+                      checked={selectedPaymentMethod === 'Cash'}
+                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        cursor: 'pointer',
+                        accentColor: '#002977'
+                      }}
+                    />
+                    Cash
+                  </label>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Card by venue"
+                      checked={selectedPaymentMethod === 'Card by venue'}
+                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        cursor: 'pointer',
+                        accentColor: '#002977'
+                      }}
+                    />
+                    Card by venue
+                  </label>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Cheque"
+                      checked={selectedPaymentMethod === 'Cheque'}
+                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        cursor: 'pointer',
+                        accentColor: '#002977'
+                      }}
+                    />
+                    Cheque
+                  </label>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Management approved"
+                      checked={selectedPaymentMethod === 'Management approved'}
+                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        cursor: 'pointer',
+                        accentColor: '#002977'
+                      }}
+                    />
+                    Management approved
+                  </label>
+                </div>
+              </div>
+              <div
                 style={{
-                  fontWeight: 'bold',
-                  fontSize: '13px',
-                  color: '#5a5a5a',
+                  display: 'flex',
+                  gap: '15px',
+                  marginTop: '320px',
+                  justifyContent: 'center',
                 }}
               >
-                Name on card
-              </label>
-              <input
-                type="text"
-                name="nameOnCard"
-                value={formData.nameOnCard}
-                onChange={handleInputChange}
-                placeholder="Ella Williams"
-                style={{
-                  width: '100%',
-                  // padding: '10px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  marginTop: '5px',
-                }}
-              />
-            </div>
-
-            <div className="form-group" style={{ marginTop: '10px' }}>
-              <label
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '13px',
-                  color: '#5a5a5a',
-                }}
-              >
-                Country or region
-              </label>
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleInputChange}
-                style={{
-                  width: '100%',
-                  padding: '5px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  marginTop: '5px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="United States">United States</option>
-                <option value="Canada">Canada</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="Australia">Australia</option>
-              </select>
-              <input
-                type="text"
-                name="paymentZip"
-                value={formData.paymentZip}
-                onChange={handleInputChange}
-                placeholder="97702"
-                style={{
-                  width: '100%',
-                  // padding: '10px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  marginTop: '10px',
-                }}
-              />
-            </div>
-
-            <button
-              style={{
-                width: '100%',
-                padding: '10px',
-                backgroundColor: '#1a2b4a',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '15px',
-                fontWeight: '600',
-                marginTop: '10px',
-                cursor: 'pointer',
-              }}
-            >
-              Pay US$65.00
-            </button>
-          </div>
+                <button
+                  onClick={handleCancelManualPayment}
+                  style={{
+                    padding: '12px 40px',
+                    backgroundColor: '#d3d3d3',
+                    color: '#666',
+                    border: 'none',
+                    borderRadius: '25px',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    minWidth: '120px',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmManualPayment}
+                  style={{
+                    padding: '12px 40px',
+                    backgroundColor: '#4a90e2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '25px',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    minWidth: '120px',
+                  }}
+                >
+                  Confirm
+                </button>
+              </div>
+            </>
+          )}
         </section>
       </div>
     </div>

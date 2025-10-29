@@ -290,17 +290,19 @@ const ScheduledSent = () => {
     }
   }, [token]);
 
-    const handleCardClick = async (accessItem, navigateTo) => {
-        const result = await trackMenuAccess(accessItem);
-        // Only navigate if the API call was successful
-      if (result.success && navigateTo) {
-        navigate(navigateTo, { state: { email } });
-      } else if (!result.success) {
-        // Optionally show an error message to the user
-        console.warn('Navigation prevented:', result.message);
-        // You might want to show a toast or alert here
-      }
-    };
+const handleCardClick = async (accessItem, navigateTo) => {
+  try {
+    const result = await trackMenuAccess(accessItem);
+    // Only navigate if the API call was successful
+    if (result.success && navigateTo) {
+      navigate(navigateTo, { state: { email } });
+    }
+    // No need for else if here since trackMenuAccess already shows the error toast
+  } catch (error) {
+    console.error('Error in handleCardClick:', error);
+    // Error toast is already shown by trackMenuAccess
+  }
+};
 
   return (
     <div className="ssent-digital-app-container">
@@ -316,13 +318,13 @@ const ScheduledSent = () => {
           {userType === 'admin' ? (
             <>
               <button
-                className="digitalApp-btn"
+                className="digital-app-btn"
                 onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
-                className="marketTomembers-btn"
+                className="market-to-members-btn"
                 onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
@@ -338,7 +340,7 @@ const ScheduledSent = () => {
             <>
               {access.includes('digital') && (
                 <button
-                  className="digitalApp-btn"
+                  className="digital-app-btn"
                   onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
@@ -346,7 +348,7 @@ const ScheduledSent = () => {
               )}
               {access.includes('m2m') && (
                 <button
-                  className="marketTomembers-btn"
+                  className="market-to-members-btn"
                   onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members

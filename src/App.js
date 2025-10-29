@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ToastContainer, Slide } from 'react-toastify';
 import Login from "./pages/Login";
 import PasswordVerification from "./pages/PasswordVerification";
 import MFASetup from "./pages/MFASetup";
@@ -66,24 +65,7 @@ function App() {
         <Route path="/club-pkg" element={<ClubPackage />} />
         <Route path="/membership" element={<MembershipPage />} />
       </Routes>
-      <ToastContainer 
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-  closeOnClick
-  rtl={false}
-  pauseOnFocusLoss
-  draggable
-  pauseOnHover
-  theme="light"
-  transition={Slide}
-  style={{ zIndex: 9999, 
-    marginTop: '60px',
-    fontSize: '14px',
-    minWidth: '300px',
-    textAlign: 'center' }}
-      />
+      
     </Router>
   );
 }

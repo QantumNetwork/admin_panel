@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { resetMenuAccessErrors } from '../utils/api';
 import { logout } from '../utils/auth';
 import { trackMenuAccess } from '../utils/api';
 import '../styles/dashboard.css';
@@ -54,6 +55,11 @@ const Dashboard = () => {
         return appType;
     }
   };
+
+  useEffect(() => {
+    // Clear error cache every time this page is loaded
+    resetMenuAccessErrors();
+  }, [location.pathname]); // runs when re-entering Dashboard
 
   useEffect(() => {
     console.log(
@@ -150,14 +156,16 @@ const Dashboard = () => {
   }, []); // Empty dependency array to run only on mount
 
 const handleCardClick = async (accessItem, navigateTo) => {
+  try {
     const result = await trackMenuAccess(accessItem);
     // Only navigate if the API call was successful
-  if (result.success && navigateTo) {
-    navigate(navigateTo, { state: { email } });
-  } else if (!result.success) {
-    // Optionally show an error message to the user
-    console.warn('Navigation prevented:', result.message);
-    // You might want to show a toast or alert here
+    if (result.success && navigateTo) {
+      navigate(navigateTo, { state: { email } });
+    }
+    // No need for else if here since trackMenuAccess already shows the error toast
+  } catch (error) {
+    console.error('Error in handleCardClick:', error);
+    // Error toast is already shown by trackMenuAccess
   }
 };
 

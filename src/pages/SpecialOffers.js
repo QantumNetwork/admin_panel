@@ -5,6 +5,7 @@ import Select from 'react-select';
 import { Editor } from '@tinymce/tinymce-react';
 import { uploadFileToS3 } from '../s3/config';
 import { logout } from '../utils/auth';
+import { trackMenuAccess } from '../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 
@@ -2135,6 +2136,20 @@ const SpecialOffers = () => {
     }
   }, [token]);
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
+    }
+  };
+
   return (
     <div className="digital-app-container-so">
       <header className="app-header">
@@ -2149,13 +2164,13 @@ const SpecialOffers = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -2171,7 +2186,7 @@ const SpecialOffers = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -2179,7 +2194,7 @@ const SpecialOffers = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>
