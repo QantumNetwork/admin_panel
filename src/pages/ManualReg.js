@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
@@ -164,6 +164,25 @@ const ManualReg = () => {
   };
   return (
     <div className="dashboard-container">
+      <ToastContainer 
+                          position="top-center"
+                          autoClose={3000}
+                          hideProgressBar={false}
+                          newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Slide}
+                    style={{ zIndex: 9999, 
+                      marginTop: '60px',
+                      fontSize: '14px',
+                      minWidth: '300px',
+                      textAlign: 'center' }}
+                        />
+      
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => navigate('/dashboard')}>

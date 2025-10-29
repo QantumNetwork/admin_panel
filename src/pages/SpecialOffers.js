@@ -6,7 +6,8 @@ import { Editor } from '@tinymce/tinymce-react';
 import { uploadFileToS3 } from '../s3/config';
 import { logout } from '../utils/auth';
 import { trackMenuAccess } from '../utils/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
 import {
@@ -2152,6 +2153,7 @@ const SpecialOffers = () => {
 
   return (
     <div className="digital-app-container-so">
+      
       <header className="app-header">
         <div
           className="s2w-logo"

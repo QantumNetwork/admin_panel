@@ -23,6 +23,7 @@ import ClubDesk from "./pages/ClubDesk";
 import ManualReg from "./pages/ManualReg";
 import ClubPackage from "./pages/ClubPackage";
 import MembershipPage from "./pages/MembershipPage";
+import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -40,6 +41,24 @@ function App() {
   }, []);
   return (
     <Router>
+      {/* <ToastContainer 
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="light"
+  transition={Slide}
+  style={{ zIndex: 9999, 
+    marginTop: '60px',
+    fontSize: '14px',
+    minWidth: '300px',
+    textAlign: 'center' }}
+      /> */}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/password-verification" element={<PasswordVerification />} />

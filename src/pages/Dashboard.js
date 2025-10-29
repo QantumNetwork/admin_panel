@@ -4,6 +4,8 @@ import axios from 'axios';
 import { resetMenuAccessErrors } from '../utils/api';
 import { logout } from '../utils/auth';
 import { trackMenuAccess } from '../utils/api';
+import { ToastContainer, Slide, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
@@ -59,7 +61,8 @@ const Dashboard = () => {
   useEffect(() => {
     // Clear error cache every time this page is loaded
     resetMenuAccessErrors();
-  }, [location.pathname]); // runs when re-entering Dashboard
+    console.log('Error cache cleared on Dashboard load');
+  }, [location]); // runs when re-entering Dashboard
 
   useEffect(() => {
     console.log(
@@ -171,6 +174,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
   return (
     <div className="dashboard-container">
+      <ToastContainer 
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{ zIndex: 9999, 
+          marginTop: '60px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center' }}
+            />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo">

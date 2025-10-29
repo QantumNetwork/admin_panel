@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import axios from 'axios';
 import { logout } from '../utils/auth';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import AppLayout from '../components/AppLayout';
 import {trackMenuAccess} from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -964,6 +964,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
   return (
     <div className="digital-app-container">
+      <ToastContainer 
+                    position="top-center"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              transition={Slide}
+              style={{ zIndex: 9999, 
+                marginTop: '80px',
+                fontSize: '14px',
+                minWidth: '300px',
+                textAlign: 'center' }}
+                  />
       <header className="app-header">
         <div
           className="s2w-logo"
@@ -1897,18 +1915,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
           )}
         </>
       )}
-      <ToastContainer
-        position="top-center" // Moves toast to the upper center
-        autoClose={3000} // Toast disappears after 3 seconds
-        hideProgressBar={false} // Show progress bar
-        newestOnTop={true} // Latest notifications appear on top
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        //theme="colored" // Use a nice colored theme
-      />
+      
       <style>{`
         .bg-img {
           position: relative;

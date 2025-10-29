@@ -9,7 +9,7 @@ import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 import { FaCheck } from 'react-icons/fa';
 import { useEffect, useState, useCallback } from 'react';
 import { uploadFileToS3 } from '../s3/config';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import { trackMenuAccess } from '../utils/api';
 import '../styles/scheduledsent.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -306,6 +306,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
   return (
     <div className="ssent-digital-app-container">
+      <ToastContainer 
+                                      position="top-center"
+                                      autoClose={3000}
+                                      hideProgressBar={false}
+                                      newestOnTop
+                                closeOnClick
+                                rtl={false}
+                                pauseOnFocusLoss
+                                draggable
+                                pauseOnHover
+                                theme="light"
+                                transition={Slide}
+                                style={{ zIndex: 9999, 
+                                  marginTop: '60px',
+                                  fontSize: '14px',
+                                  minWidth: '300px',
+                                  textAlign: 'center' }}
+                                    />
       <header className="ssent-app-header">
         <div
           className="s2w-logo"

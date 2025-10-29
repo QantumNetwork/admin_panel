@@ -10,6 +10,7 @@ import Select from 'react-select';
 import { useState, useEffect, useRef } from 'react';
 import { uploadFileToS3 } from '../s3/config';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { trackMenuAccess } from '../utils/api';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
@@ -1293,6 +1294,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
   return (
     <div className="digital-app-container">
+      <ToastContainer 
+                          position="top-center"
+                          autoClose={3000}
+                          hideProgressBar={false}
+                          newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Slide}
+                    style={{ zIndex: 9999, 
+                      marginTop: '60px',
+                      fontSize: '14px',
+                      minWidth: '300px',
+                      textAlign: 'center' }}
+                        />
       <header className="app-header">
         <div
           className="s2w-logo"
@@ -2236,20 +2255,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
           </div>
         </div>
       </div>
-      <ToastContainer
-        position="top-center" // Moves toast to the upper center
-        autoClose={3000} // Toast disappears after 3 seconds
-        hideProgressBar={false} // Show progress bar
-        newestOnTop={true} // Latest notifications appear on top
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Slide}  // Add this line
-        closeButton={false}  // Optional: Remove close button for cleaner look
-      />
             {isCalculating && (
         <div
           style={{

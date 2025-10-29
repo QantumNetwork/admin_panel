@@ -11,7 +11,7 @@ import { TiCreditCard } from 'react-icons/ti';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer, toast, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/admin-custom.css';
 import Swal from 'sweetalert2';
@@ -390,6 +390,24 @@ const AdminCustom = () => {
 
   return (
     <div className="dashboard-container">
+      <ToastContainer 
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{ zIndex: 9999, 
+          marginTop: '60px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center' }}
+            />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
@@ -621,18 +639,6 @@ const AdminCustom = () => {
         PUBLISH
       </button>
 
-      <ToastContainer
-        position="top-center" // Moves toast to the upper center
-        autoClose={3000} // Toast disappears after 3 seconds
-        hideProgressBar={false} // Show progress bar
-        newestOnTop={true} // Latest notifications appear on top
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        //theme="colored" // Use a nice colored theme
-      />
     </div>
   );
 };

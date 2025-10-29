@@ -13,7 +13,8 @@ import {
 import '../styles/my-benefits.css';
 import { trackMenuAccess } from '../utils/api';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { uploadFileToS3 } from '../s3/config';
 
 const MyBenefits = () => {
@@ -409,6 +410,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
   return (
     // <div className="my-benefits-container">
     <div className="digital-app-container-so">
+      <ToastContainer 
+                          position="top-center"
+                          autoClose={3000}
+                          hideProgressBar={false}
+                          newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Slide}
+                    style={{ zIndex: 9999, 
+                      marginTop: '60px',
+                      fontSize: '14px',
+                      minWidth: '300px',
+                      textAlign: 'center' }}
+                        />
       <header className="app-header">
         <div
           className="s2w-logo"
@@ -779,7 +798,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
           </div>
         </div>
       </div>
-      = <ToastContainer position="top-center" autoClose={3000} />
+      
     </div>
     // </div>
   );

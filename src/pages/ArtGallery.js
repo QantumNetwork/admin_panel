@@ -15,7 +15,9 @@ import {
 import '../styles/art-gallery.css';
 import axios from 'axios';
 import {trackMenuAccess} from '../utils/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer,Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { uploadFileToS3, uploadImageToS3 } from '../s3/config';
 
 const ArtGallery = () => {
@@ -637,6 +639,24 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
   return (
     <div className="digital-app-container-ag">
+      <ToastContainer 
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{ zIndex: 9999, 
+          marginTop: '60px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center' }}
+            />
       <header className="app-header">
         <div
           className="s2w-logo"
@@ -859,17 +879,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
           Art Gallery
         </button>
       </aside>
-      {/* <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      /> */}
 
       <div
         className="page-container-ag"

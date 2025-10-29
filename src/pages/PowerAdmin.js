@@ -8,7 +8,7 @@ import { MdGroups } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../utils/auth';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/dashboard.css';
 import '../styles/standard-admin.css';
@@ -376,6 +376,24 @@ const PowerAdmin = () => {
 
   return (
     <div className="dashboard-container">
+      <ToastContainer 
+                                position="top-center"
+                                autoClose={3000}
+                                hideProgressBar={false}
+                                newestOnTop
+                          closeOnClick
+                          rtl={false}
+                          pauseOnFocusLoss
+                          draggable
+                          pauseOnHover
+                          theme="light"
+                          transition={Slide}
+                          style={{ zIndex: 9999, 
+                            marginTop: '60px',
+                            fontSize: '14px',
+                            minWidth: '300px',
+                            textAlign: 'center' }}
+                              />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => navigate('/dashboard')}>

@@ -72,11 +72,24 @@ if (response.data?.status === true || response.data?.success === true) {
    const errorMessage = error.response?.data?.message || error.response?.data?.response?.message || 'This resource is currently in use by another user. Please try again later.';
     const now = Date.now();
     const lastError = menuAccessErrors[accessItem];
-    console.log('Toast container found?', document.querySelector('.Toastify__toast-container'));
+     console.log('=== ERROR TRACKING DEBUG ===');
+  console.log('Access Item:', accessItem);
+  console.log('Error Message:', errorMessage);
+  console.log('Last Error:', lastError);
+  console.log('Current menuAccessErrors:', menuAccessErrors);
+  console.log('Toast container found?', document.querySelector('.Toastify__toast-container'));
+  console.log('Condition check:', {
+    noLastError: !lastError,
+    differentMessage: lastError?.message !== errorMessage,
+    timeElapsed: lastError ? (now - lastError.timestamp) : 'N/A',
+    shouldShow: !lastError || lastError.message !== errorMessage || (now - lastError.timestamp) > 1000
+  });
 
     
     // Only show error if it's a different message or if it's been more than 1 seconds since the last error for this specific menu item
     if (!lastError || lastError.message !== errorMessage || (now - lastError.timestamp) > 1000) {
+          console.error('✅ SHOWING TOAST - Error tracking menu access:', errorMessage);
+
       console.error('Error tracking menu access:', errorMessage);
   toast.error(errorMessage, {
     position: "top-center",
@@ -94,6 +107,9 @@ if (response.data?.status === true || response.data?.success === true) {
         message: errorMessage,
         timestamp: now
       };
+    } else {
+    console.error('❌ NOT SHOWING TOAST - Condition failed');
+
     }
     return { 
       success: false, 
