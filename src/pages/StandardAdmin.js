@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/dashboard.css';
 import '../styles/standard-admin.css';
@@ -580,6 +581,21 @@ const StandardAdmin = () => {
     return location.pathname === path;
   };
 
+    const handleLock = async () => {
+      try {
+        const result = await handleLogout();
+        if(result.success) {
+          navigate('/dashboard');
+        } else {
+          toast.error(result.message || 'Failed to remove lock. Please try again.');
+        }
+  
+      } catch (error) {
+        console.error('Error in handleLock:', error);
+        toast.error(error.message || 'Failed to remove lock. Please try again.');
+      }
+    }
+
   return (
     <div className="dashboard-container">
       <ToastContainer 
@@ -603,7 +619,7 @@ const StandardAdmin = () => {
       
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+        <div className="s2w-logo" onClick={() => handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 

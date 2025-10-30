@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fa';
 import '../styles/art-gallery.css';
 import axios from 'axios';
-import {trackMenuAccess} from '../utils/api';
+import {trackMenuAccess, handleLogout} from '../utils/api';
 import { toast, ToastContainer,Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -637,6 +637,21 @@ const handleCardClick = async (accessItem, navigateTo) => {
   }
 };
 
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if(result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(result.message || 'Failed to remove lock. Please try again.');
+      }
+
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  }
+
   return (
     <div className="digital-app-container-ag">
       <ToastContainer 
@@ -660,7 +675,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
       <header className="app-header">
         <div
           className="s2w-logo"
-          onClick={() => handleNavigation('/dashboard')}
+          onClick={() => handleLock()}
         >
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>

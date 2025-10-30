@@ -8,7 +8,7 @@ import { IoMdSend } from 'react-icons/io';
 import { GrMicrophone } from 'react-icons/gr';
 import { MdMicOff } from 'react-icons/md';
 import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
-
+import { handleLogout } from '../utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 let mediaRecorderRef = null;
@@ -381,13 +381,28 @@ const AIChatPage = () => {
     }
   }, [token, userType, baseUrl]);
 
+    const handleLock = async () => {
+      try {
+        const result = await handleLogout();
+        if(result.success) {
+          navigate('/dashboard');
+        } else {
+          toast.error(result.message || 'Failed to remove lock. Please try again.');
+        }
+  
+      } catch (error) {
+        console.error('Error in handleLock:', error);
+        toast.error(error.message || 'Failed to remove lock. Please try again.');
+      }
+    }
+
   return (
     <div className="digital-app-container">
       <ToastContainer />
       <header className="app-header-ai">
         <div
           className="s2w-logo"
-          onClick={() => handleNavigation('/dashboard')}
+          onClick={() => handleLock()}
         >
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>

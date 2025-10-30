@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout } from "../utils/auth";
 import { FaBullhorn, FaGift, FaUtensils, FaCalendarAlt, FaPaintBrush } from "react-icons/fa";
+import { handleLogout } from "../utils/api";
+import { toast } from "react-toastify";
 
 const AppLayout = ({ children }) => {
   const navigate = useNavigate();
@@ -29,10 +31,25 @@ const AppLayout = ({ children }) => {
     window.location.href = path;
   };
 
+    const handleLock = async () => {
+      try {
+        const result = await handleLogout();
+        if(result.success) {
+          navigate('/dashboard');
+        } else {
+          toast.error(result.message || 'Failed to remove lock. Please try again.');
+        }
+  
+      } catch (error) {
+        console.error('Error in handleLock:', error);
+        toast.error(error.message || 'Failed to remove lock. Please try again.');
+      }
+    }
+
   return (
     <div className="digital-app-container">
       <header className="app-header">
-        <div className="s2w-logo" onClick={() => handleNavigation('/dashboard')}>
+        <div className="s2w-logo" onClick={() => handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">

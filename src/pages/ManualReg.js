@@ -6,6 +6,7 @@ import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
+import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
 
@@ -162,6 +163,21 @@ const ManualReg = () => {
     console.log('Payment method selected:', selectedPaymentMethod);
     // setShowManualPayment(false);
   };
+
+    const handleLock = async () => {
+      try {
+        const result = await handleLogout();
+        if(result.success) {
+          navigate('/dashboard');
+        } else {
+          toast.error(result.message || 'Failed to remove lock. Please try again.');
+        }
+  
+      } catch (error) {
+        console.error('Error in handleLock:', error);
+        toast.error(error.message || 'Failed to remove lock. Please try again.');
+      }
+    }
   return (
     <div className="dashboard-container">
       <ToastContainer 
@@ -185,7 +201,7 @@ const ManualReg = () => {
       
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+        <div className="s2w-logo" onClick={() => handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 

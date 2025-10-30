@@ -7,6 +7,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/membership-page.css';
 
@@ -225,8 +226,24 @@ const handleActivate = async () => {
       proRataMonths: isAnyProRataChecked ? daysRemaining : 0
     };
 
+    let response;
+    if (membershipData && membershipData._id) {
+      //PUT req
+      // If ID exists, make a PUT request to update
+      response = await axios.put(
+    `${baseUrl}/club-packages?id=${membershipData._id}`,  // Added ID to the URL
+        requestBody,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    } else {
+      //POST req
     // Make the API call
-    const response = await axios.post(
+    response = await axios.post(
       `${baseUrl}/club-packages`,
       requestBody,
       {
@@ -236,11 +253,17 @@ const handleActivate = async () => {
         }
       }
     );
+  }
 
-    if(response.data.message) {
+    if(response.data.message || response.data.success) {
       console.log(response.data);
-      toast.success(response.data.message);
 
+      if (membershipData && membershipData._id) {
+        toast.success("Club Package Updated Successfully");
+      } else {
+        toast.success(response.data.message);
+      }
+      
       navigate('/membership');
     }
     
@@ -253,6 +276,20 @@ const handleActivate = async () => {
 
 const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
 
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if(result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(result.message || 'Failed to remove lock. Please try again.');
+      }
+
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  }
 
   return (
     <div className="dashboard-container">
@@ -276,7 +313,7 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
                         />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+        <div className="s2w-logo" onClick={() => handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 

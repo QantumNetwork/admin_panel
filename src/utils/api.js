@@ -4,6 +4,35 @@ import { toast } from 'react-toastify';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Logout function
+export const handleLogout = async () => {
+  try {
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
+    const token = localStorage.getItem('token');
+    const response = await axios.delete(`${baseUrl}/api/logout`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.data?.message==="Logged out & locks cleared") {
+      return { success: true };
+    } else {
+      return { 
+        success: false, 
+        message: response.data?.message || 'Logout failed' 
+      };
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    return { 
+      success: false, 
+      message: error.response?.data?.message || 'Failed to logout. Please try again.' 
+    };
+  }
+};
+
 // Store the last error message and timestamp for each menu item to prevent duplicate toasts
 const menuAccessErrors = {};
 
@@ -69,7 +98,7 @@ if (response.data?.status === true || response.data?.success === true) {
       };
     }
   } catch (error) {
-   const errorMessage = error.response?.data?.message || error.response?.data?.response?.message || 'This resource is currently in use by another user. Please try again later.';
+   const errorMessage = error.response?.data?.message || error.response?.data?.response?.message || 'Another User is currently using this Menu, please try later';
     const now = Date.now();
     const lastError = menuAccessErrors[accessItem];
      console.log('=== ERROR TRACKING DEBUG ===');
