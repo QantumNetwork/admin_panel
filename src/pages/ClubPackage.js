@@ -56,6 +56,31 @@ const ClubPackage = () => {
     }
   };
 
+    // Add this useEffect hook at the beginning of the ClubPackage component, after the state declarations
+useEffect(() => {
+  const checkExistingMember = async () => {
+    if (!selectedVenue) return;
+    
+    try {
+      const response = await axios.get(`${baseUrl}/club-packages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      // If member exists, navigate directly to MembershipPage
+      if (response.data?.data?.length > 0) {
+        navigate('/membership');
+      }
+    } catch (error) {
+      console.error('Error checking member status:', error);
+      // Continue showing the ClubPackage form if there's an error
+    }
+  };
+
+  checkExistingMember();
+}, [selectedVenue, token]);
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {

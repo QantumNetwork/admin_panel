@@ -2423,7 +2423,7 @@ const SpecialOffers = () => {
         </button>
       </aside>
 
-      {offers.length === 0 && !addMode ? (
+      {offers.length === 0 && !addMode && activeTab === 'live' ? (
         <div className="btn-sp-offer" style={{marginTop: '400px'}}>
           <button className="add-offer-button" onClick={handleAddNewOffer} style={{width: '12%'}}>
             <FaPlus /> ADD YOUR FIRST OFFER
