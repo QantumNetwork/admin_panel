@@ -48,7 +48,7 @@ const MyBenefits = () => {
   const [selectedLevel, setSelectedLevel] = useState(() => {
     const savedVenue = localStorage.getItem('selectedVenue');
     if(savedVenue === 'Manly') return 'Commodore';
-    if(savedVenue === 'Hogan') return 'Pearl';
+    if(savedVenue === 'Hogan') return 'Bronze';
     if(savedVenue === 'North') return 'Gold';
     if(savedVenue === 'StarReward') return 'Valued';
     return 'Platinum Black';
@@ -98,6 +98,7 @@ const MyBenefits = () => {
       case 'Lieutenant':
         return '#9D5F2D';
       case 'Staff':
+        if (selectedVenue === 'Hogan') return '#45d4e1ff';
         return '#9D5F2D';
       case 'Crewmate':
         return '#344361';
@@ -113,6 +114,14 @@ const MyBenefits = () => {
         return '#4d8be3';
       case 'Diamond':
         return '#22D7FF';
+      case 'Directors':
+        return '#040e0fff';
+      case 'Family':
+        return '#3783d4ff';
+      case 'Management':
+        return '#29610fff';
+      case 'Bronze':
+        return '#9D5F2D';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -155,11 +164,14 @@ const MyBenefits = () => {
     ];
   } else if (selectedVenue === 'Hogan') {
     audienceOptions = [
-      {value: 'Pearl', label: 'Pearl'},
-      {value: 'Opal', label: 'Opal'},
-      {value: 'Ruby', label: 'Ruby'},
-      {value: 'Sapphire', label: 'Sapphire'},
-      {value: 'Diamond', label: 'Diamond'},
+      {value: 'Bronze', label: 'Bronze'},
+      {value: 'Silver', label: 'Silver'},
+      {value: 'Gold', label: 'Gold'},
+      {value: 'Platinum', label: 'Platinum'},
+      {value: 'Staff', label: 'Staff'},
+      {value: 'Management', label: 'Management'},
+      {value: 'Family', label: 'Family'},
+      {value: 'Directors', label: 'Directors'},
     ];
   } else if (selectedVenue === 'North') {
     audienceOptions = [
@@ -359,8 +371,6 @@ const MyBenefits = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
-      case 'Hogan':
-        return 'Hogan';
       case 'North':
         return 'North Shore Tavern';
       case 'Hogan':
@@ -437,8 +447,8 @@ const handleCardClick = async (accessItem, navigateTo) => {
                     pauseOnHover
                     theme="light"
                     transition={Slide}
-                    style={{ zIndex: 9999, 
-                      marginTop: '60px',
+                    style={{  
+                      marginTop: '90px',
                       fontSize: '14px',
                       minWidth: '300px',
                       textAlign: 'center' }}

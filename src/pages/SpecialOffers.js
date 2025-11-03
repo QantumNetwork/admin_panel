@@ -182,11 +182,14 @@ const SpecialOffers = () => {
     ];
   } else if(selectedVenue === 'Hogan') {
     audienceOptions = [
-      { value: 'Pearl', label: 'Pearl' },
-      { value: 'Opal', label: 'Opal' },
-      { value: 'Ruby', label: 'Ruby' },
-      { value: 'Sapphire', label: 'Sapphire' },
-      { value: 'Diamond', label: 'Diamond' },
+      { value: 'Bronze', label: 'Bronze' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Management', label: 'Management' },
+      { value: 'Family', label: 'Family' },
+      { value: 'Directors', label: 'Directors' },
     ];
   } else if(selectedVenue === 'North') {
     audienceOptions = [

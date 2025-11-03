@@ -405,7 +405,7 @@ const PowerAdmin = () => {
                           theme="light"
                           transition={Slide}
                           style={{ zIndex: 9999, 
-                            marginTop: '60px',
+                            marginTop: '90px',
                             fontSize: '14px',
                             minWidth: '300px',
                             textAlign: 'center' }}

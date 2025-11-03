@@ -9,7 +9,7 @@ import { GrMicrophone } from 'react-icons/gr';
 import { MdMicOff } from 'react-icons/md';
 import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import { handleLogout } from '../utils/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 let mediaRecorderRef = null;
 let streamRef = null;
@@ -398,7 +398,24 @@ const AIChatPage = () => {
 
   return (
     <div className="digital-app-container">
-      <ToastContainer />
+     <ToastContainer 
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{ zIndex: 9999, 
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center' }}
+            />
       <header className="app-header-ai">
         <div
           className="s2w-logo"

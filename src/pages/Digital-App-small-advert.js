@@ -185,11 +185,14 @@ const DigitalSmall = () => {
     ];
   } else if(selectedVenue === 'Hogan') {
     audienceOptions = [
-      { value: 'Pearl', label: 'Pearl' },
-      { value: 'Opal', label: 'Opal' },
-      { value: 'Ruby', label: 'Ruby' },
-      { value: 'Sapphire', label: 'Sapphire' },
-      { value: 'Diamond', label: 'Diamond' },
+      { value: 'Bronze', label: 'Bronze' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Management', label: 'Management' },
+      { value: 'Family', label: 'Family' },
+      { value: 'Directors', label: 'Directors' },
     ];
   } else if(selectedVenue === 'North') {
     audienceOptions = [
@@ -935,7 +938,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
         theme="light"
         transition={Slide}
         style={{ zIndex: 9999, 
-          marginTop: '80px',
+          marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
           textAlign: 'center' }}
