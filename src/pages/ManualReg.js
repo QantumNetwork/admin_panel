@@ -80,6 +80,8 @@ const ManualReg = () => {
         return 'North Shore Tavern';
       case 'Hogan':
         return "Hogan's";
+      case 'Ace':
+        return 'Ace Rewards';
       default:
         return appType;
     }

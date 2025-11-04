@@ -129,6 +129,16 @@ const DigitalApp = () => {
         { value: 'Premium Member', label: 'Premium' },
         { value: 'Member', label: 'Member' },
       ];
+    } else if (selectedVenue === 'Ace') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Tens', label: 'Tens' },
+      { value: 'Jacks', label: 'Jacks' },
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Kings', label: 'Kings' },
+      { value: 'Ace', label: 'Ace' },
+      { value: 'Ace Plus', label: 'Ace Plus'}
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -899,6 +909,8 @@ const DigitalApp = () => {
         return 'North Shore Tavern';
       case 'Hogan':
         return "Hogan's";
+      case 'Ace':
+        return 'Ace Rewards';
       default:
         return appType;
     }

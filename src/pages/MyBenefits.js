@@ -51,6 +51,8 @@ const MyBenefits = () => {
     if(savedVenue === 'Hogan') return 'Bronze';
     if(savedVenue === 'North') return 'Gold';
     if(savedVenue === 'StarReward') return 'Valued';
+    if(savedVenue === 'Queens') return 'Queens';
+    if(savedVenue === 'Ace') return 'Staff';
     return 'Platinum Black';
   });
 
@@ -67,6 +69,7 @@ const MyBenefits = () => {
       case 'Gold':
       case 'Captain':
         return '#D4AF37'; // Gold color
+      case 'Queens':
       case 'Silver':
         return '#C0C0C0'; // Silver color
       case 'Pre Staff':
@@ -99,6 +102,7 @@ const MyBenefits = () => {
         return '#9D5F2D';
       case 'Staff':
         if (selectedVenue === 'Hogan') return '#45d4e1ff';
+        if (selectedVenue === 'Ace') return '#dedadabd';
         return '#9D5F2D';
       case 'Crewmate':
         return '#344361';
@@ -118,10 +122,19 @@ const MyBenefits = () => {
         return '#040e0fff';
       case 'Family':
         return '#3783d4ff';
+      case 'Emerald':
       case 'Management':
         return '#29610fff';
+      case 'Jacks':
       case 'Bronze':
         return '#9D5F2D';
+      case 'Diamond+':
+        return '#7ed9edff';
+      case 'Ace':
+      case 'Ace Plus':
+        return '#3d80a4ff';
+      case 'Tens':
+        return '#969393e4'
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -192,6 +205,25 @@ const MyBenefits = () => {
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Platinum Black', label: 'Platinum Black'}
+    ];
+  } else if (selectedVenue === 'Ace') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Tens', label: 'Tens' },
+      { value: 'Jacks', label: 'Jacks' },
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Kings', label: 'Kings' },
+      { value: 'Ace', label: 'Ace' },
+      { value: 'Ace Plus', label: 'Ace Plus'}
+    ];
+  } else if (selectedVenue === 'Queens') {
+    audienceOptions = [
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Ruby', label: 'Ruby' },
+      { value: 'Emerald', label: 'Emerald' },
+      { value: 'Sapphire', label: 'Sapphire' },
+      { value: 'Diamond', label: 'Diamond' },
+      { value: 'Diamond+', label: 'Diamond+' },
     ];
   }
 
@@ -375,6 +407,8 @@ const MyBenefits = () => {
         return 'North Shore Tavern';
       case 'Hogan':
         return "Hogan's";
+      case 'Ace':
+        return 'Ace Rewards';
       default:
         return appType;
     }
