@@ -261,6 +261,8 @@ const ScheduledSent = () => {
         return "Hogan's";
       case 'Ace':
         return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
       default:
         return appType;
     }

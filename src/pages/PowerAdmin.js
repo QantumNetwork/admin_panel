@@ -80,6 +80,8 @@ const PowerAdmin = () => {
         return 'Hogan';
       case 'Ace Rewards':
         return 'Ace';
+      case 'Queens Hotel':
+        return 'Queens';
       default:
         return appName;
     }
@@ -105,6 +107,8 @@ const PowerAdmin = () => {
         return "Hogan's";
       case 'Ace':
         return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
       default:
         return appType;
     }
@@ -132,6 +136,8 @@ const PowerAdmin = () => {
         return '/hogan.png';
       case 'Ace':
         return '/ace.png';
+      case 'Queens':
+        return '/queens.png';
       default:
         return appType;
     }
@@ -147,7 +153,8 @@ const PowerAdmin = () => {
     // 'Montauk Tavern',
     'Sense Of Taste',
     "Hogan's",
-    'Ace Rewards'
+    'Ace Rewards',
+    'Queens Hotel'
   ];
 
   const handleAddGroup = (index) => {
@@ -308,6 +315,9 @@ const PowerAdmin = () => {
               break;
             case 'Ace':
               appDisplayNames.push("Ace Rewards");
+              break;
+            case 'Queens':
+              appDisplayNames.push("Queens Hotel");
               break;
             default:
               appDisplayNames.push(app);

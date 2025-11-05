@@ -75,6 +75,8 @@ const StandardAdmin = () => {
         return "Hogan's";
       case 'Ace':
         return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
       default:
         return appType;
     }
@@ -102,6 +104,8 @@ const StandardAdmin = () => {
         return '/hogan.png';
       case 'Ace':
         return '/ace.png';
+      case 'Queens':
+        return '/queens.png';
       default:
         return appType;
     }

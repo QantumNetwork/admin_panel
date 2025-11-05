@@ -53,6 +53,7 @@ const MyBenefits = () => {
     if(savedVenue === 'StarReward') return 'Valued';
     if(savedVenue === 'Queens') return 'Queens';
     if(savedVenue === 'Ace') return 'Staff';
+    if(savedVenue === 'Montauk' || savedVenue === 'Central') return 'Premium Member';
     return 'Platinum Black';
   });
 
@@ -135,6 +136,8 @@ const MyBenefits = () => {
         return '#3d80a4ff';
       case 'Tens':
         return '#969393e4'
+      case 'Curtis Coast':
+        return '#c7e957ff';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -167,12 +170,7 @@ const MyBenefits = () => {
     ];
   } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
     audienceOptions = [
-      { value: 'Platinum Black', label: 'Platinum Black' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Premium', label: 'Premium' },
+      { value: 'Premium Member', label: 'Premium Member' },
       { value: 'Member', label: 'Member' },
     ];
   } else if (selectedVenue === 'Hogan') {
@@ -224,6 +222,7 @@ const MyBenefits = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
       { value: 'Diamond+', label: 'Diamond+' },
+      { value: 'Curtis Coast', label: 'Curtis Coast' }
     ];
   }
 
@@ -409,6 +408,8 @@ const MyBenefits = () => {
         return "Hogan's";
       case 'Ace':
         return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
       default:
         return appType;
     }

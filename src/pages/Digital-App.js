@@ -121,12 +121,7 @@ const DigitalApp = () => {
     ];
   } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
       audienceOptions = [
-        { value: 'Platinum Black', label: 'Platinum Black' },
-        { value: 'Valued', label: 'Valued' },
-        { value: 'Silver', label: 'Silver' },
-        { value: 'Gold', label: 'Gold' },
-        { value: 'Platinum', label: 'Platinum' },
-        { value: 'Premium Member', label: 'Premium' },
+        { value: 'Premium Member', label: 'Premium Member' },
         { value: 'Member', label: 'Member' },
       ];
     } else if (selectedVenue === 'Ace') {
@@ -138,6 +133,16 @@ const DigitalApp = () => {
       { value: 'Kings', label: 'Kings' },
       { value: 'Ace', label: 'Ace' },
       { value: 'Ace Plus', label: 'Ace Plus'}
+    ];
+  } else if (selectedVenue === 'Queens') {
+    audienceOptions = [
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Ruby', label: 'Ruby' },
+      { value: 'Emerald', label: 'Emerald' },
+      { value: 'Sapphire', label: 'Sapphire' },
+      { value: 'Diamond', label: 'Diamond' },
+      { value: 'Diamond+', label: 'Diamond+' },
+      { value: 'Curtis Coast', label: 'Curtis Coast' }
     ];
   } else {
     audienceOptions = [
@@ -911,6 +916,8 @@ const DigitalApp = () => {
         return "Hogan's";
       case 'Ace':
         return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
       default:
         return appType;
     }
