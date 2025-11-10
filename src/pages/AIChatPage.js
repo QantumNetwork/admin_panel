@@ -64,13 +64,18 @@ const AIChatPage = () => {
       selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming';
     const isManly = selectedVenue === 'Manly';
     const isStarReward = selectedVenue === 'StarReward';
-
+    const isQueens = selectedVenue === 'Queens';
+    const isHogan = selectedVenue === 'Hogan';
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
       : isManly
       ? 'https://mhbcviperaireportingapi.victoriouswater-d292e9e7.australiaeast.azurecontainerapps.io/api/airesponse'
       : isStarReward
       ? 'https://aireportingviperapi.wonderfulglacier-1e6957c7.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isQueens
+      ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isHogan
+      ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
       : null;
 
     return endpoint;
@@ -385,28 +390,29 @@ const AIChatPage = () => {
     }
   }, [token, userType, baseUrl]);
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
 
   return (
     <div className="digital-app-container">
-     <ToastContainer 
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
@@ -414,17 +420,16 @@ const AIChatPage = () => {
         pauseOnHover
         theme="light"
         transition={Slide}
-        style={{ zIndex: 9999, 
+        style={{
+          zIndex: 9999,
           marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
-          textAlign: 'center' }}
-            />
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header-ai">
-        <div
-          className="s2w-logo"
-          onClick={() => handleLock()}
-        >
+        <div className="s2w-logo" onClick={() => handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="viper-logo">
@@ -489,7 +494,8 @@ const AIChatPage = () => {
                       setSelectedVenue(selectedValue);
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
-                      navigate('/dashboard');                    }
+                      navigate('/dashboard');
+                    }
                   } catch (error) {
                     console.error('Error updating venue:', error);
                   }
