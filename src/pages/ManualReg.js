@@ -5,6 +5,7 @@ import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
+import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -168,41 +169,44 @@ const ManualReg = () => {
     // setShowManualPayment(false);
   };
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-                          position="top-center"
-                          autoClose={3000}
-                          hideProgressBar={false}
-                          newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                    transition={Slide}
-                    style={{ zIndex: 9999, 
-                      marginTop: '90px',
-                      fontSize: '14px',
-                      minWidth: '300px',
-                      textAlign: 'center' }}
-                        />
-      
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
+
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => handleLock()}>
@@ -339,6 +343,19 @@ const ManualReg = () => {
           />{' '}
           &nbsp; Club Package
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings')}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
+        </button>
       </aside>
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>
@@ -448,7 +465,7 @@ const ManualReg = () => {
                   value="male"
                   checked={formData.gender === 'male'}
                   onChange={handleInputChange}
-                  style={{accentColor: '#002977'}}
+                  style={{ accentColor: '#002977' }}
                 />
                 Male
               </label>
@@ -461,7 +478,7 @@ const ManualReg = () => {
                   value="female"
                   checked={formData.gender === 'female'}
                   onChange={handleInputChange}
-                  style={{accentColor: '#002977'}}
+                  style={{ accentColor: '#002977' }}
                 />
                 Female
               </label>
@@ -475,7 +492,7 @@ const ManualReg = () => {
                   value="non-binary"
                   checked={formData.gender === 'non-binary'}
                   onChange={handleInputChange}
-                  style={{accentColor: '#002977'}}
+                  style={{ accentColor: '#002977' }}
                 />
                 Non-binary
               </label>
@@ -696,7 +713,10 @@ const ManualReg = () => {
                 className="d-flex w-100 justify-content-center"
                 style={{ marginTop: '2px' }}
               >
-                <button className="payment-btn" onClick={handleManualPaymentClick}>
+                <button
+                  className="payment-btn"
+                  onClick={handleManualPaymentClick}
+                >
                   Manually approve payment
                 </button>
               </div>
@@ -740,7 +760,7 @@ const ManualReg = () => {
                         width: '16px',
                         height: '16px',
                         cursor: 'pointer',
-                        accentColor: '#002977'
+                        accentColor: '#002977',
                       }}
                     />
                     Cash
@@ -764,7 +784,7 @@ const ManualReg = () => {
                         width: '16px',
                         height: '16px',
                         cursor: 'pointer',
-                        accentColor: '#002977'
+                        accentColor: '#002977',
                       }}
                     />
                     Card by venue
@@ -788,7 +808,7 @@ const ManualReg = () => {
                         width: '16px',
                         height: '16px',
                         cursor: 'pointer',
-                        accentColor: '#002977'
+                        accentColor: '#002977',
                       }}
                     />
                     Cheque
@@ -812,7 +832,7 @@ const ManualReg = () => {
                         width: '16px',
                         height: '16px',
                         cursor: 'pointer',
-                        accentColor: '#002977'
+                        accentColor: '#002977',
                       }}
                     />
                     Management approved

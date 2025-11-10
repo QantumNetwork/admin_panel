@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
-import { toast, ToastContainer,Slide } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
+import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -171,41 +172,44 @@ const ClubDesk = () => {
     return location.pathname === path;
   };
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
 
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-                    position="top-center"
-                    autoClose={3000}
-                    hideProgressBar={false}
-                    newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-              transition={Slide}
-              style={{ zIndex: 9999, 
-                marginTop: '90px',
-                fontSize: '14px',
-                minWidth: '300px',
-                textAlign: 'center' }}
-                  />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => handleLock()}>
@@ -341,6 +345,19 @@ const ClubDesk = () => {
             }`}
           />{' '}
           &nbsp; Club Package
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings')}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
         </button>
       </aside>
 

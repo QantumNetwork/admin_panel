@@ -6,6 +6,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
+import { FaMobileScreenButton } from 'react-icons/fa6';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,23 +27,22 @@ const MembershipPage = () => {
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [membershipData, setMembershipData] = useState(null);
 
-
-const [membershipRows, setMembershipRows] = useState(() => {
-  // If we have data and it's for the selected venue, use it
-  if (membershipData && membershipData.appType === selectedVenue) {
-    return membershipData.membershipLevels.map((level, index) => ({
-      id: index + 1,
-      name: level.membershipName,
-      price: `$${level.price}`,
-      proRata: level.proRata
-    }));
-  }
-  // Default rows if no data
-  return [
-    { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
-    { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false }
-  ];
-});
+  const [membershipRows, setMembershipRows] = useState(() => {
+    // If we have data and it's for the selected venue, use it
+    if (membershipData && membershipData.appType === selectedVenue) {
+      return membershipData.membershipLevels.map((level, index) => ({
+        id: index + 1,
+        name: level.membershipName,
+        price: `$${level.price}`,
+        proRata: level.proRata,
+      }));
+    }
+    // Default rows if no data
+    return [
+      { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
+      { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false },
+    ];
+  });
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
@@ -135,48 +135,53 @@ const [membershipRows, setMembershipRows] = useState(() => {
   };
 
   useEffect(() => {
-  const fetchMembershipData = async () => {
-    if (!selectedVenue) return;
-    
-    try {
-      const response = await axios.get(`${baseUrl}/club-packages`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const fetchMembershipData = async () => {
+      if (!selectedVenue) return;
 
-      if (response.data?.data?.length > 0) {
-        console.log(response.data.data);
-        setMembershipData(response.data.data[0]); // Take the first package if multiple exist
+      try {
+        const response = await axios.get(`${baseUrl}/club-packages`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        const rows=response.data.data[0].membershipLevels.map((level,index)=> ({
-          id: index+1,
-          name: level.membershipName,
-          price: `$${level.price}`,
-          proRata: level.proRata
-        }));
+        if (response.data?.data?.length > 0) {
+          console.log(response.data.data);
+          setMembershipData(response.data.data[0]); // Take the first package if multiple exist
 
-        setMembershipRows(rows);
+          const rows = response.data.data[0].membershipLevels.map(
+            (level, index) => ({
+              id: index + 1,
+              name: level.membershipName,
+              price: `$${level.price}`,
+              proRata: level.proRata,
+            })
+          );
+
+          setMembershipRows(rows);
+        }
+      } catch (error) {
+        console.error('Error fetching membership data:', error);
+        toast.error('Failed to load membership data');
       }
-    } catch (error) {
-      console.error('Error fetching membership data:', error);
-      toast.error('Failed to load membership data');
+    };
+
+    fetchMembershipData();
+  }, [selectedVenue, token]);
+
+  useEffect(() => {
+    if (membershipData && membershipData.appType === selectedVenue) {
+      setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
+      {
+        membershipData.proRataMonths !== 0
+          ? setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate))
+          : setDaysRemaining(0);
+      }
+    } else {
+      setRenewalDate('');
+      setDaysRemaining(null);
     }
-  };
-
-  fetchMembershipData();
-}, [selectedVenue, token]);
-
-useEffect(() => {
-  if (membershipData && membershipData.appType === selectedVenue) {
-    setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
-    {membershipData.proRataMonths!==0 ? setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate)) : setDaysRemaining(0)};
-    
-  } else {
-    setRenewalDate('');
-    setDaysRemaining(null);
-  }
-}, [membershipData, selectedVenue]);
+  }, [membershipData, selectedVenue]);
 
   const userType = 'admin';
 
@@ -185,136 +190,146 @@ useEffect(() => {
   };
 
   const calculateDaysRemaining = (dateString) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const renewal = new Date(dateString);
-  const diffTime = renewal - today;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays > 0 ? diffDays - 1 : 0; // Exclude renewal date
-};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const renewal = new Date(dateString);
+    const diffTime = renewal - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays - 1 : 0; // Exclude renewal date
+  };
 
-const handleDateChange = (e) => {
-  const selectedDate = e.target.value;
-  setRenewalDate(selectedDate);
-  setDaysRemaining(calculateDaysRemaining(selectedDate));
-};
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setRenewalDate(selectedDate);
+    setDaysRemaining(calculateDaysRemaining(selectedDate));
+  };
 
-const addMembershipRow = () => {
-  const newId = membershipRows.length > 0 ? Math.max(...membershipRows.map(r => r.id)) + 1 : 1;
-  setMembershipRows([...membershipRows, { id: newId, name: '', price: '', proRata: false }]);
-};
+  const addMembershipRow = () => {
+    const newId =
+      membershipRows.length > 0
+        ? Math.max(...membershipRows.map((r) => r.id)) + 1
+        : 1;
+    setMembershipRows([
+      ...membershipRows,
+      { id: newId, name: '', price: '', proRata: false },
+    ]);
+  };
 
-const removeMembershipRow = (id) => {
-  if (membershipRows.length > 1) { // Keep at least one row
-    setMembershipRows(membershipRows.filter(row => row.id !== id));
-  }
-};
-
-const updateMembershipRow = (id, field, value) => {
-  setMembershipRows(membershipRows.map(row => 
-    row.id === id ? { ...row, [field]: value } : row
-  ));
-};
-
-const handleActivate = async () => {
-  try {
-    // Prepare the request body
-    const requestBody = {
-      membershipLevels: membershipRows.map(row => ({
-        membershipName: row.name,
-        price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')), // Remove any non-numeric characters except decimal point
-        proRata: row.proRata
-      })),
-      renewalDate: renewalDate,
-      gracePeriod: 0, // Default grace period as per your requirements
-      proRataMonths: isAnyProRataChecked ? daysRemaining : 0
-    };
-
-    let response;
-    if (membershipData && membershipData._id) {
-      //PUT req
-      // If ID exists, make a PUT request to update
-      response = await axios.put(
-    `${baseUrl}/club-packages?id=${membershipData._id}`,  // Added ID to the URL
-        requestBody,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    } else {
-      //POST req
-    // Make the API call
-    response = await axios.post(
-      `${baseUrl}/club-packages`,
-      requestBody,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-  }
-
-    if(response.data.message || response.data.success) {
-      console.log(response.data);
-
-      if (membershipData && membershipData._id) {
-        toast.success("Club Package Updated Successfully");
-      } else {
-        toast.success(response.data.message);
-      }
-      
-      navigate('/membership');
+  const removeMembershipRow = (id) => {
+    if (membershipRows.length > 1) {
+      // Keep at least one row
+      setMembershipRows(membershipRows.filter((row) => row.id !== id));
     }
-    
-  } catch (error) {
-    console.error('Error creating club package:', error);
-    const errorMessage = error.response?.data?.message || 'Failed to create club package';
-    toast.error(errorMessage);
-  }
-};
+  };
 
-const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
+  const updateMembershipRow = (id, field, value) => {
+    setMembershipRows(
+      membershipRows.map((row) =>
+        row.id === id ? { ...row, [field]: value } : row
+      )
+    );
+  };
+
+  const handleActivate = async () => {
+    try {
+      // Prepare the request body
+      const requestBody = {
+        membershipLevels: membershipRows.map((row) => ({
+          membershipName: row.name,
+          price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')), // Remove any non-numeric characters except decimal point
+          proRata: row.proRata,
+        })),
+        renewalDate: renewalDate,
+        gracePeriod: 0, // Default grace period as per your requirements
+        proRataMonths: isAnyProRataChecked ? daysRemaining : 0,
+      };
+
+      let response;
+      if (membershipData && membershipData._id) {
+        //PUT req
+        // If ID exists, make a PUT request to update
+        response = await axios.put(
+          `${baseUrl}/club-packages?id=${membershipData._id}`, // Added ID to the URL
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } else {
+        //POST req
+        // Make the API call
+        response = await axios.post(`${baseUrl}/club-packages`, requestBody, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      if (response.data.message || response.data.success) {
+        console.log(response.data);
+
+        if (membershipData && membershipData._id) {
+          toast.success('Club Package Updated Successfully');
+        } else {
+          toast.success(response.data.message);
+        }
+
+        navigate('/membership');
+      }
+    } catch (error) {
+      console.error('Error creating club package:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Failed to create club package';
+      toast.error(errorMessage);
+    }
+  };
+
+  const isAnyProRataChecked = membershipRows.some(
+    (row) => row.proRata === true
+  );
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-                          position="top-center"
-                          autoClose={3000}
-                          hideProgressBar={false}
-                          newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                    transition={Slide}
-                    style={{ zIndex: 9999, 
-                      marginTop: '90px',
-                      fontSize: '14px',
-                      minWidth: '300px',
-                      textAlign: 'center' }}
-                        />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={() => handleLock()}>
@@ -450,6 +465,19 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
           />{' '}
           &nbsp; Club Package
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings')}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
+        </button>
       </aside>
 
       <div className="navigation-buttons-member">
@@ -471,10 +499,7 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
             Manual Membership
           </button>
         </div>
-        <button
-          className="publish-button"
-          onClick={handleActivate}
-        >
+        <button className="publish-button" onClick={handleActivate}>
           <FaUpload /> Activate
         </button>
 
@@ -533,84 +558,94 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
                   </tr>
                 </thead>
                 <tbody>
-  {membershipRows.map((row) => (
-    <tr key={row.id}>
-      <td style={{ padding: '10px' }}>
-        <input
-          type="text"
-          value={row.name}
-          onChange={(e) => updateMembershipRow(row.id, 'name', e.target.value)}
-          style={{
-            width: '100%',
-            padding: '8px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-          }}
-        />
-      </td>
-      <td style={{ padding: '10px', textAlign: 'center' }}>
-        <input
-          type="text"
-          value={row.price}
-          onChange={(e) => updateMembershipRow(row.id, 'price', e.target.value)}
-          style={{
-            width: '50%',
-            padding: '8px',
-            textAlign: 'center',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-          }}
-        />
-      </td>
-      <td style={{ padding: '10px' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginLeft: '15px',
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={row.proRata}
-            onChange={(e) => updateMembershipRow(row.id, 'proRata', e.target.checked)}
-            style={{ accentColor: '#002977' }}
-          />
-          <div>
-            <button
-              onClick={addMembershipRow}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#007bff',
-                fontSize: '20px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              +
-            </button>
-            {membershipRows.length > 1 && (
-              <button
-                onClick={() => removeMembershipRow(row.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#ff4444',
-                  fontSize: '20px',
-                  cursor: 'pointer',
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
-        </div>
-      </td>
-    </tr>
-  ))}
-</tbody>
+                  {membershipRows.map((row) => (
+                    <tr key={row.id}>
+                      <td style={{ padding: '10px' }}>
+                        <input
+                          type="text"
+                          value={row.name}
+                          onChange={(e) =>
+                            updateMembershipRow(row.id, 'name', e.target.value)
+                          }
+                          style={{
+                            width: '100%',
+                            padding: '8px',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      </td>
+                      <td style={{ padding: '10px', textAlign: 'center' }}>
+                        <input
+                          type="text"
+                          value={row.price}
+                          onChange={(e) =>
+                            updateMembershipRow(row.id, 'price', e.target.value)
+                          }
+                          style={{
+                            width: '50%',
+                            padding: '8px',
+                            textAlign: 'center',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      </td>
+                      <td style={{ padding: '10px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginLeft: '15px',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={row.proRata}
+                            onChange={(e) =>
+                              updateMembershipRow(
+                                row.id,
+                                'proRata',
+                                e.target.checked
+                              )
+                            }
+                            style={{ accentColor: '#002977' }}
+                          />
+                          <div>
+                            <button
+                              onClick={addMembershipRow}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#007bff',
+                                fontSize: '20px',
+                                cursor: 'pointer',
+                                marginRight: '10px',
+                              }}
+                            >
+                              +
+                            </button>
+                            {membershipRows.length > 1 && (
+                              <button
+                                onClick={() => removeMembershipRow(row.id)}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#ff4444',
+                                  fontSize: '20px',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </section>
 
@@ -667,30 +702,29 @@ const isAnyProRataChecked = membershipRows.some(row => row.proRata === true);
               </div>
               {isAnyProRataChecked && (
                 <div style={{ marginTop: '30px', textAlign: 'center' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '10px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Pro Rata
-                </label>
-                <div
-                  style={{
-                    width: '57.5%',
-                    backgroundColor: 'white',
-                    padding: '15px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    margin: '0 auto',
-                  }}
-                >
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '10px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Pro Rata
+                  </label>
+                  <div
+                    style={{
+                      width: '57.5%',
+                      backgroundColor: 'white',
+                      padding: '15px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      margin: '0 auto',
+                    }}
+                  >
                     {daysRemaining !== null && daysRemaining}
-
+                  </div>
                 </div>
-              </div>
-              )}              
+              )}
             </section>
           </div>
         ) : null}
