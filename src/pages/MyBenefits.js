@@ -221,7 +221,7 @@ const MyBenefits = () => {
       { value: 'Emerald', label: 'Emerald' },
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
-      { value: 'Diamond+', label: 'Diamond+' },
+      { value: 'Diamond Plus', label: 'Diamond Plus' },
       { value: 'Curtis Coast', label: 'Curtis Coast' }
     ];
   }
