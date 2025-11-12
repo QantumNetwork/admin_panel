@@ -46,8 +46,8 @@ const ManualReg = () => {
     expiryDate: '',
     cvv: '',
     nameOnCard: '',
-    country: 'United States',
-    paymentZip: '',
+    country: 'Australia',
+    region: '',
   });
 
   const handleInputChange = (e) => {
@@ -509,12 +509,32 @@ const ManualReg = () => {
         <section className="new-user-sa" style={{ height: '600px' }}>
           <h2>Set Membership Level</h2>
           <div className="form-group">
-            <input
-              type="text"
-              name="membershipLevel"
-              value={formData.membershipLevel || ''}
-              onChange={handleInputChange}
-            />
+            <select
+    name="membershipLevel"
+    value={formData.membershipLevel || ''}
+    onChange={handleInputChange}
+    className='membershipLevel'
+    style={{
+      width: '100%',
+      padding: '10px 15px',
+      border: 'none',
+      borderRadius: '6px',
+      backgroundColor: 'white',
+      appearance: 'none',
+      backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23007bff' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'right 15px center',
+      fontSize: '14px',
+      cursor: 'pointer'
+    }}
+    >
+  {!formData.membershipLevel && <option value="" disabled style={{ display: 'none' }}>Select from list</option>}
+
+    <option value="Standard">Social Member 1 Year</option>
+    <option value="Premium">Social Member 3 Years</option>
+    <option value="Gold">Full Member 1 Year</option>
+    <option value="Platinum">Full Member 3 Years</option>
+  </select>
           </div>
 
           <div
@@ -669,17 +689,17 @@ const ManualReg = () => {
                       cursor: 'pointer',
                     }}
                   >
+                    <option value="Australia">Australia</option>
                     <option value="United States">United States</option>
                     <option value="Canada">Canada</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="Australia">Australia</option>
+                    <option value="United Kingdom">United Kingdom</option>                   
                   </select>
                   <input
                     type="text"
-                    name="paymentZip"
-                    value={formData.paymentZip}
+                    name="region"
+                    value={formData.region}
                     onChange={handleInputChange}
-                    placeholder="97702"
+                    placeholder="Queensland"
                     style={{
                       width: '100%',
                       // padding: '10px',
@@ -695,17 +715,17 @@ const ManualReg = () => {
                   style={{
                     width: '100%',
                     padding: '10px',
-                    backgroundColor: '#1a2b4a',
+                    backgroundColor: '#5296D1',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '20px',
                     fontSize: '15px',
                     fontWeight: '600',
                     marginTop: '10px',
                     cursor: 'pointer',
                   }}
                 >
-                  Pay US$65.00
+                  Pay AUD$65.00
                 </button>
               </div>
 

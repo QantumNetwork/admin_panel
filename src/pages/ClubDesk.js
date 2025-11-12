@@ -60,14 +60,15 @@ const ClubDesk = () => {
     },
   ]);
 
-  const [declinedMembers, setDeclinedMembers] = useState([
+  const [waitingPayment, setWaitingPayment] = useState([
     {
       _id: '4',
-      firstName: 'Emma',
-      lastName: 'Davis',
+      firstName: 'David',
+      lastName: 'Ohlson',
       address: '00 Barrabooka Dr. The Gap 0000',
       phoneNumber: '+61 423 456 789',
       membership: 'Social',
+      payment: 'Approved'
     },
     {
       _id: '5',
@@ -76,6 +77,16 @@ const ClubDesk = () => {
       address: '00 Barrabooka Dr. The Gap 0000',
       phoneNumber: '+61 423 456 789',
       membership: 'Social',
+      payment: 'Approved'
+    },
+    {
+      _id: '6',
+      firstName: 'Emma',
+      lastName: 'Davis',
+      address: '00 Barrabooka Dr. The Gap 0000',
+      phoneNumber: '+61 423 456 789',
+      membership: 'Social',
+      payment: 'Declined'
     },
   ]);
 
@@ -372,11 +383,11 @@ const ClubDesk = () => {
         </button>
         <button
           className={`user-btn ${
-            activeTab === 'declinedMembers' ? 'active' : ''
+            activeTab === 'waitingPayment' ? 'active' : ''
           }`}
-          onClick={() => setActiveTab('declinedMembers')}
+          onClick={() => setActiveTab('waitingPayment')}
         >
-          Declined Members
+          Waiting for Payment
         </button>
       </div>
 
@@ -394,7 +405,7 @@ const ClubDesk = () => {
                 <th>Licence Front</th>
                 <th>Licence Back</th>
                 <th>Payment</th>
-                <th>Actions</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -412,19 +423,19 @@ const ClubDesk = () => {
                     <td>-</td>
                     <td>Approved</td>
                     <td>
-                      <a href="#" style={{ marginRight: '5px' }}>
+                      <a href="#" style={{ marginRight: '25px' }}>
                         Decline
                       </a>
-                      <a href="#" style={{ marginRight: '20px' }}>
+                      {/* <a href="#" style={{ marginRight: '20px' }}>
                         Edit
-                      </a>
-                      <button className="action-btn approve">Approve</button>
+                      </a> */}
+                      <button className="action-btn approve">Verified</button>
                     </td>
                   </tr>
                 ))
-              ) : activeTab === 'declinedMembers' &&
-                declinedMembers.length > 0 ? (
-                declinedMembers.map((member, index) => (
+              ) : activeTab === 'waitingPayment' &&
+                waitingPayment.length > 0 ? (
+                waitingPayment.map((member, index) => (
                   <tr key={member._id || index}>
                     <td>
                       {member.firstName} {member.lastName}
@@ -434,9 +445,9 @@ const ClubDesk = () => {
                     <td>{member.membership}</td>
                     <td>-</td>
                     <td>-</td>
-                    <td>Approved</td>
+                    <td>{member.payment}</td>
                     <td>
-                      <a href="#">Move to approval</a>
+                      <button className="action-btn approve" onClick={() => navigate('/manual-reg')}>Make Payment</button>
                     </td>
                   </tr>
                 ))
