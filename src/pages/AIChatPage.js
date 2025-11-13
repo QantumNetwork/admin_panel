@@ -362,6 +362,8 @@ const AIChatPage = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -494,7 +496,8 @@ const AIChatPage = () => {
                       setSelectedVenue(selectedValue);
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
-                      navigate('/dashboard');
+                      
+                      handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

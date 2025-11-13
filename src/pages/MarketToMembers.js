@@ -1254,6 +1254,8 @@ const MarketToMembers = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -1448,7 +1450,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      navigate('/dashboard');
+                      handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

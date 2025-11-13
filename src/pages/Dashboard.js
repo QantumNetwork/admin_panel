@@ -57,6 +57,8 @@ const Dashboard = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -389,7 +391,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 />
               </div>
 
-              {(selectedVenue === 'Qantum' || selectedVenue === 'Manly') && (
+              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace') && (
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}

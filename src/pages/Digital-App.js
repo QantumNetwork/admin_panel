@@ -144,6 +144,14 @@ const DigitalApp = () => {
       { value: 'Diamond Plus', label: 'Diamond Plus' },
       { value: 'Curtis Coast', label: 'Curtis Coast' }
     ];
+  } else if (selectedVenue === 'Brisbane') {
+    audienceOptions = [
+      { value: 'Brew Crew', label: 'Brew Crew' },
+      { value: 'Member', label: 'Member' },
+      { value: 'Regular', label: 'Regular' },
+      { value: 'Champion', label: 'Champion' },
+      { value: 'Legend', label: 'Legend' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -920,6 +928,8 @@ const DigitalApp = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -1146,7 +1156,8 @@ const handleCardClick = async (accessItem, navigateTo) => {
                       setIsAddingNew(false);
                       setAudience([]);
                       setIsEveryone(false);
-                      navigate('/dashboard');
+                      
+                      handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

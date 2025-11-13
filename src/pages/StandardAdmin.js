@@ -77,6 +77,8 @@ const StandardAdmin = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -106,6 +108,8 @@ const StandardAdmin = () => {
         return '/ace.png';
       case 'Queens':
         return '/queens.png';
+      case 'Brisbane':
+        return '/brisbane.png';
       default:
         return appType;
     }
@@ -234,7 +238,7 @@ const StandardAdmin = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        navigate('/dashboard');
+        handleLock();
       }
     } catch (error) {
       console.error('Error updating token:', error);

@@ -167,6 +167,8 @@ const AdminCustom = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -231,7 +233,7 @@ const AdminCustom = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        navigate('/dashboard');
+        handleLock();
       }
     } catch (error) {
       console.error('Error updating token:', error);

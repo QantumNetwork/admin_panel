@@ -54,6 +54,7 @@ const MyBenefits = () => {
     if(savedVenue === 'Queens') return 'Queens';
     if(savedVenue === 'Ace') return 'Staff';
     if(savedVenue === 'Montauk' || savedVenue === 'Central') return 'Premium Member';
+    if(savedVenue === 'Brisbane') return 'Brew Crew';
     return 'Platinum Black';
   });
 
@@ -95,6 +96,7 @@ const MyBenefits = () => {
       case 'Member':
         if (selectedVenue === 'Montauk') return '#344361';
         if (selectedVenue === 'Central') return '#602373';
+        if (selectedVenue === 'Brisbane') return '#376cc3ff'
       case 'Commodore':
         return '#B0B0B0';
       case 'Commander':
@@ -138,6 +140,14 @@ const MyBenefits = () => {
         return '#969393e4'
       case 'Curtis Coast':
         return '#c7e957ff';
+      case 'Brew Crew':
+        return '#090606ff';
+      case 'Regular':
+        return '#9fd8e9ff';
+      case 'Champion':
+        return '#3313d5ff';
+      case 'Legend':
+        return '#f8f5f5c3';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -223,6 +233,14 @@ const MyBenefits = () => {
       { value: 'Diamond', label: 'Diamond' },
       { value: 'Diamond Plus', label: 'Diamond Plus' },
       { value: 'Curtis Coast', label: 'Curtis Coast' }
+    ];
+  } else if (selectedVenue === 'Brisbane') {
+    audienceOptions = [
+      { value: 'Brew Crew', label: 'Brew Crew' },
+      { value: 'Member', label: 'Member' },
+      { value: 'Regular', label: 'Regular' },
+      { value: 'Champion', label: 'Champion' },
+      { value: 'Legend', label: 'Legend' },
     ];
   }
 
@@ -410,6 +428,8 @@ const MyBenefits = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -610,7 +630,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      navigate('/dashboard');
+                      handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

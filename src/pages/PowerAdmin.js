@@ -82,6 +82,8 @@ const PowerAdmin = () => {
         return 'Ace';
       case 'Queens Hotel':
         return 'Queens';
+      case 'Brisbane Brewing Co':
+        return 'Brisbane';
       default:
         return appName;
     }
@@ -109,6 +111,8 @@ const PowerAdmin = () => {
         return 'Ace Rewards';
       case 'Queens':
         return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
       default:
         return appType;
     }
@@ -138,6 +142,8 @@ const PowerAdmin = () => {
         return '/ace.png';
       case 'Queens':
         return '/queens.png';
+      case 'Brisbane':
+        return '/brisbane.png';
       default:
         return appType;
     }
@@ -154,7 +160,8 @@ const PowerAdmin = () => {
     'Sense Of Taste',
     "Hogan's",
     'Ace Rewards',
-    'Queens Hotel'
+    'Queens Hotel',
+    'Brisbane Brewing Co'
   ];
 
   const handleAddGroup = (index) => {
@@ -318,6 +325,9 @@ const PowerAdmin = () => {
               break;
             case 'Queens':
               appDisplayNames.push("Queens Hotel");
+              break;
+            case 'Brisbane':
+              appDisplayNames.push("Brisbane Brewing Co");
               break;
             default:
               appDisplayNames.push(app);
