@@ -397,11 +397,13 @@ const DigitalApp = () => {
       }
       setMoreInfo(current.htmlContent || '');
       setSavedContent(current.htmlContent || '');
+      setEditorContent(current.htmlContent || '');
       setIsEditing(false);
     } else {
       // Reset values if no valid image is selected
       setMoreInfo('');
       setSavedContent('');
+      setEditorContent('');
       setPosition('');
       setAudience([]);
       setIsEveryone(false);
