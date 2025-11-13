@@ -2204,7 +2204,7 @@ const SpecialOffers = () => {
       <header className="app-header">
         <div
           className="s2w-logo"
-          onClick={() => handleLock()}
+          onClick={async () => await handleLock()}
         >
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
@@ -2349,7 +2349,7 @@ const SpecialOffers = () => {
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      handleLock();
+                      await handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

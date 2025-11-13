@@ -144,7 +144,7 @@ const ManualReg = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        handleLock();
+        await handleLock();
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -211,7 +211,7 @@ const ManualReg = () => {
 
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => handleLock()}>
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 

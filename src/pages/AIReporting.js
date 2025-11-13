@@ -262,7 +262,7 @@ const AIReporting = () => {
         }}
       />
       <header className="app-header-ai">
-        <div className="s2w-logo" onClick={() => handleLock()}>
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="viper-logo">
@@ -324,7 +324,7 @@ const AIReporting = () => {
                       setSelectedVenue(selectedValue);
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      handleLock();
+                      await handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

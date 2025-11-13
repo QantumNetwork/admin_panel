@@ -442,7 +442,7 @@ const PowerAdmin = () => {
                               />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => handleLock()}>
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
