@@ -33,62 +33,134 @@ const ClubDesk = () => {
     localStorage.getItem('selectedVenue') || ''
   );
 
-  const [membersForApproval, setMembersForApproval] = useState([
-    {
-      _id: '1',
-      firstName: 'John',
-      lastName: 'Smith',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 412 345 678',
-      membership: 'Social',
-    },
-    {
-      _id: '2',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-    },
-    {
-      _id: '3',
-      firstName: 'Michael',
-      lastName: 'Brown',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 434 567 890',
-      membership: 'Full',
-    },
-  ]);
+  // Members (Members for approval) state
+  const [members, setMembers] = useState([]);
+  const [membersPage, setMembersPage] = useState(1);
+  const [membersLimit, setMembersLimit] = useState(20);
+  const [membersSearch, setMembersSearch] = useState('');
+  const [membersTotalPages, setMembersTotalPages] = useState(1);
 
-  const [waitingPayment, setWaitingPayment] = useState([
-    {
-      _id: '4',
-      firstName: 'David',
-      lastName: 'Ohlson',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-      payment: 'Approved'
-    },
-    {
-      _id: '5',
-      firstName: 'James',
-      lastName: 'Wilson',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-      payment: 'Approved'
-    },
-    {
-      _id: '6',
-      firstName: 'Emma',
-      lastName: 'Davis',
-      address: '00 Barrabooka Dr. The Gap 0000',
-      phoneNumber: '+61 423 456 789',
-      membership: 'Social',
-      payment: 'Declined'
-    },
-  ]);
+  // Waiting for payment state
+  const [payments, setPayments] = useState([]);
+  const [paymentsPage, setPaymentsPage] = useState(1);
+  const [paymentsLimit, setPaymentsLimit] = useState(20);
+  const [paymentsSearch, setPaymentsSearch] = useState('');
+  const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
+  const [selectedLicense, setSelectedLicense] = useState(null);
+
+
+  // input shown in search bar (applies to active tab)
+  const [searchInput, setSearchInput] = useState('');
+
+  // Fetch members (for approvals)
+  const fetchMembers = async () => {
+    setLoading(true);
+    try {
+      let url = `${baseUrl}/user/user-details?page=${membersPage}&limit=${membersLimit}`;
+      if (membersSearch && membersSearch.trim() !== '')
+        url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data && Array.isArray(res.data.users)) {
+        setMembers(res.data.users);
+        setMembersTotalPages(res.data.totalPages || 1);
+      } else {
+        setMembers([]);
+        setMembersTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Error fetching members:', err);
+      toast.error('Failed to fetch members');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch payments (waiting payment)
+  const fetchPayments = async () => {
+    setLoading(true);
+    try {
+      let url = `${baseUrl}/user/user-waiting?page=${paymentsPage}&limit=${paymentsLimit}`;
+      if (paymentsSearch && paymentsSearch.trim() !== '')
+        url += `&search=${encodeURIComponent(paymentsSearch.trim())}`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data && Array.isArray(res.data.users)) {
+        setPayments(res.data.users);
+        // Note: server totalPages corresponds to full result set; keep it for navigation consistency
+        setPaymentsTotalPages(res.data.totalPages || 1);
+      } else {
+        setPayments([]);
+        setPaymentsTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Error fetching payments:', err);
+      toast.error('Failed to fetch payments');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const [membersForApproval, setMembersForApproval] = useState([
+  //   {
+  //     _id: '1',
+  //     firstName: 'John',
+  //     lastName: 'Smith',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 412 345 678',
+  //     membership: 'Social',
+  //   },
+  //   {
+  //     _id: '2',
+  //     firstName: 'Sarah',
+  //     lastName: 'Johnson',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 423 456 789',
+  //     membership: 'Social',
+  //   },
+  //   {
+  //     _id: '3',
+  //     firstName: 'Michael',
+  //     lastName: 'Brown',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 434 567 890',
+  //     membership: 'Full',
+  //   },
+  // ]);
+
+  // const [waitingPayment, setWaitingPayment] = useState([
+  //   {
+  //     _id: '4',
+  //     firstName: 'David',
+  //     lastName: 'Ohlson',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 423 456 789',
+  //     membership: 'Social',
+  //     payment: 'Approved',
+  //   },
+  //   {
+  //     _id: '5',
+  //     firstName: 'James',
+  //     lastName: 'Wilson',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 423 456 789',
+  //     membership: 'Social',
+  //     payment: 'Approved',
+  //   },
+  //   {
+  //     _id: '6',
+  //     firstName: 'Emma',
+  //     lastName: 'Davis',
+  //     address: '00 Barrabooka Dr. The Gap 0000',
+  //     phoneNumber: '+61 423 456 789',
+  //     membership: 'Social',
+  //     payment: 'Declined',
+  //   },
+  // ]);
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -141,6 +213,41 @@ const ClubDesk = () => {
       fetchVenues();
     }
   }, [token]);
+
+  // Fetch when pages/limits/search change for respective tabs
+useEffect(() => {
+  if (activeTab === 'membersForApproval') fetchMembers();
+}, [membersPage, membersLimit, membersSearch, token]);
+
+useEffect(() => {
+  if (activeTab === 'waitingPayment') fetchPayments();
+}, [paymentsPage, paymentsLimit, paymentsSearch, token]);
+
+  // When switching tabs, sync search input and fetch for that tab
+  useEffect(() => {
+    if (activeTab === 'membersForApproval') {
+      setSearchInput(membersSearch);
+      fetchMembers();
+    } else {
+      setSearchInput(paymentsSearch);
+      fetchPayments();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Trigger search on keystroke for members tab
+// useEffect(() => {
+//   if (activeTab === 'membersForApproval') {
+//     fetchMembers();
+//   }
+// }, [membersSearch]);
+
+// Trigger search on keystroke for payments tab
+// useEffect(() => {
+//   if (activeTab === 'waitingPayment') {
+//     fetchPayments();
+//   }
+// }, [paymentsSearch]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -198,6 +305,73 @@ const ClubDesk = () => {
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
+  const getFullName = (user) =>
+    `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
+  const renderLicence = (field) =>
+  !field ? (
+    <span style={{ color: '#999' }}>-</span>
+  ) : (
+    <img
+      src={field}
+      alt="License"
+      onClick={() => setSelectedLicense(field)}
+      style={{
+        width: '80px',
+        height: '50px',
+        objectFit: 'cover',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        border: '1px solid #ddd',
+        transition: 'transform 0.2s',
+      }}
+      onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+      onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+    />
+  );
+  const renderMemberPaymentStatus = (u) =>
+    u.paymentStatus === 'success' ? 'Approved' : 'Declined';
+
+  const renderWaitingPaymentStatus = (u) =>
+    u.paymentType === 'reception' ? 'Pay at counter' : 'Declined'
+
+  // Search button clicked: apply search to active tab
+  const onSearchClick = () => {
+  if (activeTab === 'membersForApproval') {
+    setMembersPage(1);
+    setMembersSearch(searchInput);
+  } else {
+    setPaymentsPage(1);
+    setPaymentsSearch(searchInput);
+  }
+};
+
+  // Pagination controls per tab
+  const onPrev = () => {
+    if (activeTab === 'membersForApproval') {
+      if (membersPage > 1) setMembersPage((p) => p - 1);
+    } else {
+      if (paymentsPage > 1) setPaymentsPage((p) => p - 1);
+    }
+  };
+  const onNext = () => {
+    if (activeTab === 'membersForApproval') {
+      if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
+    } else {
+      if (paymentsPage < paymentsTotalPages) setPaymentsPage((p) => p + 1);
+    }
+  };
+
+  const onLimitChange = (e) => {
+    const v = Number(e.target.value) || 20;
+    if (activeTab === 'membersForApproval') {
+      setMembersLimit(v);
+      setMembersPage(1);
+    } else {
+      setPaymentsLimit(v);
+      setPaymentsPage(1);
     }
   };
 
@@ -393,77 +567,287 @@ const ClubDesk = () => {
         </button>
       </div>
 
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '20px',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            right: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <input
+              type="text"
+              placeholder="Search for member"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyPress={(e) => {
+    if (e.key === 'Enter') {
+      onSearchClick();
+    }
+  }}
+              style={{
+                padding: '8px 12px',
+    borderRadius: '20px',
+    border: '2px solid #002977',
+    fontSize: '14px',
+    width: '250px',
+    outline: 'none',
+
+              }}
+            />
+            <button
+  onClick={onSearchClick}
+  style={{
+    padding: '10px 10px',
+    borderRadius: '20px',
+    backgroundColor: '#002977',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '14px',
+  }}
+>
+  GO
+</button>
+          </div>
+        </div>
+      </div>
+
       <div className="members-table-container">
         {loading ? (
           <div className="loading">Loading...</div>
         ) : (
-          <table className="members-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Mobile</th>
-                <th>Membership</th>
-                <th>Licence Front</th>
-                <th>Licence Back</th>
-                <th>Payment</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeTab === 'membersForApproval' &&
-              membersForApproval.length > 0 ? (
-                membersForApproval.map((member, index) => (
-                  <tr key={member._id || index}>
-                    <td>
-                      {member.firstName} {member.lastName}
-                    </td>
-                    <td>{member.address}</td>
-                    <td>{member.phoneNumber}</td>
-                    <td>{member.membership}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>Approved</td>
-                    <td>
-                      <a href="#" style={{ marginRight: '25px' }}>
-                        Decline
-                      </a>
-                      {/* <a href="#" style={{ marginRight: '20px' }}>
-                        Edit
-                      </a> */}
-                      <button className="action-btn approve">Verified</button>
-                    </td>
-                  </tr>
-                ))
-              ) : activeTab === 'waitingPayment' &&
-                waitingPayment.length > 0 ? (
-                waitingPayment.map((member, index) => (
-                  <tr key={member._id || index}>
-                    <td>
-                      {member.firstName} {member.lastName}
-                    </td>
-                    <td>{member.address}</td>
-                    <td>{member.phoneNumber}</td>
-                    <td>{member.membership}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>{member.payment}</td>
-                    <td>
-                      <button className="action-btn approve" onClick={() => navigate('/manual-reg')}>Make Payment</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+          <>
+            <table className="members-table">
+              <thead>
                 <tr>
-                  <td colSpan="8" className="no-data">
-                    No members found
-                  </td>
+                  <th>Name</th>
+                  <th>Address</th>
+                  <th>Mobile</th>
+                  <th>Membership</th>
+                  <th>Licence Front</th>
+                  <th>Licence Back</th>
+                  <th>Payment</th>
+                  <th></th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {activeTab === 'membersForApproval' &&
+                  members.map((member) => (
+                    <tr key={member._id}>
+                      <td>{getFullName(member)}</td>
+                      <td>{member.Address || member.address || '-'}</td>
+                      <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.packageName || '-'}</td>
+                      <td>{renderLicence(member.licence_front)}</td>
+                      <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderMemberPaymentStatus(member)}</td>
+                      <td>
+                        <button className="action-btn approve">Verified</button>
+                      </td>
+                    </tr>
+                  ))}
+
+                {activeTab === 'waitingPayment' &&
+                  payments.map((member) => (
+                    <tr key={member._id}>
+                      <td>{getFullName(member)}</td>
+                      <td>{member.Address || member.address || '-'}</td>
+                      <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.packageName || '-'}</td>
+                      <td>{renderLicence(member.licence_front)}</td>
+                      <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderWaitingPaymentStatus(member)}</td>
+                      <td>
+                        <button className="action-btn approve">
+                          Make Payment
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                {((activeTab === 'membersForApproval' &&
+                  members.length === 0) ||
+                  (activeTab === 'waitingPayment' &&
+                    payments.length === 0)) && (
+                  <tr>
+                    <td colSpan="8" className="no-data">
+                      No members found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                paddingRight: '20px',
+                paddingLeft: '20px',
+              }}
+            >
+              <button
+                onClick={onPrev}
+                disabled={
+                  activeTab === 'membersForApproval'
+                    ? membersPage === 1
+                    : paymentsPage === 1
+                }
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage === 1
+                      : paymentsPage === 1
+                  )
+                    ? '#e0e0e0'
+                    : '#002977',
+                  color: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage === 1
+                      : paymentsPage === 1
+                  )
+                    ? '#999'
+                    : 'white',
+                  cursor: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage === 1
+                      : paymentsPage === 1
+                  )
+                    ? 'not-allowed'
+                    : 'pointer',
+                  fontWeight: '500',
+                }}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontWeight: '500', color: '#002977' }}>
+                Page{' '}
+                {activeTab === 'membersForApproval'
+                  ? membersPage
+                  : paymentsPage}{' '}
+                of{' '}
+                {activeTab === 'membersForApproval'
+                  ? membersTotalPages
+                  : paymentsTotalPages}
+              </span>
+              <button
+                onClick={onNext}
+                disabled={
+                  activeTab === 'membersForApproval'
+                    ? membersPage >= membersTotalPages
+                    : paymentsPage >= paymentsTotalPages
+                }
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage >= membersTotalPages
+                      : paymentsPage >= paymentsTotalPages
+                  )
+                    ? '#e0e0e0'
+                    : '#002977',
+                  color: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage >= membersTotalPages
+                      : paymentsPage >= paymentsTotalPages
+                  )
+                    ? '#999'
+                    : 'white',
+                  cursor: (
+                    activeTab === 'membersForApproval'
+                      ? membersPage >= membersTotalPages
+                      : paymentsPage >= paymentsTotalPages
+                  )
+                    ? 'not-allowed'
+                    : 'pointer',
+                  fontWeight: '500',
+                }}
+              >
+                Next →
+              </button>
+            </div>
+          </>
         )}
       </div>
+      {selectedLicense && (
+  <div
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10000,
+    }}
+    onClick={() => setSelectedLicense(null)}
+  >
+    <div
+      style={{
+        position: 'relative',
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        overflow: 'auto',
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={() => setSelectedLicense(null)}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          backgroundColor: '#002977',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          fontSize: '20px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        ✕
+      </button>
+      <img
+        src={selectedLicense}
+        alt="Full License"
+        style={{
+          maxWidth: '100%',
+          maxHeight: '100%',
+          borderRadius: '4px',
+        }}
+      />
+    </div>
+  </div>
+)}
     </div>
   );
 };
