@@ -43,6 +43,37 @@
   font-size: 11px;
   }
 
+    .cancel-btn {
+    margin-bottom: 0;
+    margin-top: 20px;
+    margin-right: 10px;
+  align-items: flex-end;
+  display: block;
+  width: 150px;
+  height: 36px;
+  background: #999999;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  }
+
+    .next-btn {
+    margin-bottom: 0;
+    margin-top: 20px;
+  align-items: flex-end;
+  display: block;
+  width: 150px;
+  height: 36px;
+  background: #5296D1;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  }
+
     .payment-btn {
     margin-bottom: 0;
     margin-top: 20px;
@@ -65,6 +96,18 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-top: 15px;
   }
+
+  .cancel-btn:hover {
+    background-color: #ed2424 !important;
+  }
+
+  .cancel-s1:hover {
+  cursor: not-allowed !important;
+}
+
+.next-btn:hover {
+  background-color: #002977;
+}
 
   @media (max-width: 768px) {
     .city-state-zip {

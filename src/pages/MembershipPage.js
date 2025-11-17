@@ -26,6 +26,7 @@ const MembershipPage = () => {
   const [renewalDate, setRenewalDate] = useState('');
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [membershipData, setMembershipData] = useState(null);
+  const [userTimeZone, setUserTimeZone] = useState('');
 
   const [membershipRows, setMembershipRows] = useState(() => {
     // If we have data and it's for the selected venue, use it
@@ -191,6 +192,12 @@ const MembershipPage = () => {
     return location.pathname === path;
   };
 
+  useEffect(() => {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  setUserTimeZone(tz);
+  localStorage.setItem('userTimeZone', tz); // optional
+}, []);
+
   const calculateDaysRemaining = (dateString) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -257,6 +264,7 @@ const MembershipPage = () => {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
+              'X-User-Timezone': userTimeZone
             },
           }
         );
@@ -267,6 +275,7 @@ const MembershipPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
+            'X-User-Timezone': userTimeZone
           },
         });
       }

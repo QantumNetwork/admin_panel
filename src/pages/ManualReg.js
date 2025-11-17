@@ -30,6 +30,17 @@ const ManualReg = () => {
   const [activeTab, setActiveTab] = useState('membersForApproval');
   const [venues, setVenues] = useState([]);
 
+  // s1 = Register New Member, s2 = Set Membership Level, s3 = Payment Details
+const [s1Visible, setS1Visible] = useState(true); // only s1 shown at start
+const [s2Visible, setS2Visible] = useState(false);
+const [s3Visible, setS3Visible] = useState(false);
+
+
+// editing controls: when true -> show Cancel + Next; when false -> show Edit
+// requirement: at beginning register new member should show Cancel + Next
+const [editing1, setEditing1] = useState(true);
+const [editing2, setEditing2] = useState(false);
+
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -186,6 +197,53 @@ const ManualReg = () => {
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
   };
+
+  const handleNextS1 = () => {
+// Step forward from Register -> Membership Level
+setS2Visible(true);
+setEditing1(false); // show edit on s1
+setEditing2(true); // s2 should show cancel+next at beginning
+};
+
+
+const handleCancelS1 = () => {
+// Spec: clicking Cancel on section 1 should do nothing
+// no-op intentionally
+};
+
+
+const handleEditS1 = () => {
+// If edit clicked on s1: hide other sections & show cancel+next on s1
+setS2Visible(false);
+setS3Visible(false);
+setEditing1(true);
+setEditing2(false);
+};
+
+
+const handleNextS2 = () => {
+// From membership -> payment
+setS3Visible(true);
+setEditing2(false); // membership shows edit now
+};
+
+
+const handleCancelS2 = () => {
+// Hide membership level and payment, show only register section.
+setS2Visible(false);
+setS3Visible(false);
+// Requirement: when membership level cancelled, only register should appear.
+// When returning to register, it should show EDIT as described earlier (if user had progressed and returned)
+setEditing1(false);
+setEditing2(false);
+};
+
+
+const handleEditS2 = () => {
+// If edit clicked on s2: hide payment & show cancel+next on s2
+setS3Visible(false);
+setEditing2(true);
+};
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -504,11 +562,19 @@ const ManualReg = () => {
             className="d-flex w-100 justify-content-center"
             style={{ marginTop: '120px' }}
           >
-            <button className="blue-btn">EDIT</button>
+            {editing1 ? (
+    <>
+      <button className="cancel-btn cancel-s1" onClick={handleCancelS1}>Cancel</button>
+      <button className="next-btn" onClick={handleNextS1}>Next</button>
+    </>
+  ) : (
+    <button className="blue-btn" onClick={handleEditS1}>EDIT</button>
+  )}
           </div>
         </section>
 
-        <section className="new-user-sa" style={{ height: '600px' }}>
+        {s2Visible && (
+<section className="new-user-sa" style={{ height: '600px' }}>
           <h2>Set Membership Level</h2>
           <div className="form-group">
             <select
@@ -543,10 +609,20 @@ const ManualReg = () => {
             className="d-flex w-100 justify-content-center"
             style={{ marginTop: '425px' }}
           >
-            <button className="blue-btn">EDIT</button>
+            {editing2 ? (
+    <>
+      <button className="cancel-btn" onClick={handleCancelS2}>Cancel</button>
+      <button className="next-btn" onClick={handleNextS2}>Next</button>
+    </>
+  ) : (
+    <button className="blue-btn" onClick={handleEditS2}>EDIT</button>
+  )}
           </div>
         </section>
-        <section className="connected-sa" style={{ height: '600px' }}>
+        )}
+
+        {s3Visible && (
+<section className="connected-sa" style={{ height: '600px' }}>
           {!showManualPayment ? (
             <>
               <h2>Payment Details</h2>
@@ -905,6 +981,8 @@ const ManualReg = () => {
             </>
           )}
         </section>
+        )}
+        
       </div>
     </div>
   );
