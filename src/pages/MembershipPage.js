@@ -253,6 +253,7 @@ const MembershipPage = () => {
         renewalDate: renewalDate,
         gracePeriod: 0, // Default grace period as per your requirements
         proRataMonths: isAnyProRataChecked ? daysRemaining : 0,
+        timezone: userTimeZone
       };
 
       let response;
