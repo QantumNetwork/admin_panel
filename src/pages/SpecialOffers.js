@@ -233,6 +233,14 @@ const SpecialOffers = () => {
       { value: 'Champion', label: 'Champion' },
       { value: 'Legend', label: 'Legend' },
     ];
+  } else if (selectedVenue === 'Bluewater') {
+    audienceOptions = [  
+      { value: 'Deckhand', label: 'Deckhand' },
+      { value: 'Firstmate', label: 'Firstmate' },
+      { value: 'Captain', label: 'Captain' },
+      { value: 'Commodore', label: 'Commodore' },
+      { value: 'Admiral', label: 'Admiral' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -2141,6 +2149,8 @@ const SpecialOffers = () => {
         return 'Queens Hotel';
       case 'Brisbane':
         return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
       default:
         return appType;
     }

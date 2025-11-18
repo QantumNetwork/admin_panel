@@ -186,6 +186,8 @@ const ClubDesk = () => {
         return 'Queens Hotel';
       case 'Brisbane':
         return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
       default:
         return appType;
     }
@@ -337,17 +339,6 @@ useEffect(() => {
   const renderWaitingPaymentStatus = (u) =>
     u.paymentType === 'reception' ? 'Pay at counter' : 'Declined'
 
-  // Search button clicked: apply search to active tab
-  const onSearchClick = () => {
-  if (activeTab === 'membersForApproval') {
-    setMembersPage(1);
-    setMembersSearch(searchInput);
-  } else {
-    setPaymentsPage(1);
-    setPaymentsSearch(searchInput);
-  }
-};
-
   // Pagination controls per tab
   const onPrev = () => {
     if (activeTab === 'membersForApproval') {
@@ -364,16 +355,16 @@ useEffect(() => {
     }
   };
 
-  const onLimitChange = (e) => {
-    const v = Number(e.target.value) || 20;
-    if (activeTab === 'membersForApproval') {
-      setMembersLimit(v);
-      setMembersPage(1);
-    } else {
-      setPaymentsLimit(v);
-      setPaymentsPage(1);
-    }
-  };
+  // const onLimitChange = (e) => {
+  //   const v = Number(e.target.value) || 20;
+  //   if (activeTab === 'membersForApproval') {
+  //     setMembersLimit(v);
+  //     setMembersPage(1);
+  //   } else {
+  //     setPaymentsLimit(v);
+  //     setPaymentsPage(1);
+  //   }
+  // };
 
   return (
     <div className="dashboard-container">
@@ -589,12 +580,18 @@ useEffect(() => {
               type="text"
               placeholder="Search for member"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={(e) => {
-    if (e.key === 'Enter') {
-      onSearchClick();
-    }
-  }}
+              onChange={(e) => {
+      const value = e.target.value;
+      setSearchInput(value);
+      if (activeTab === 'membersForApproval') {
+        setMembersPage(1);
+        setMembersSearch(value);
+      } else {
+        setPaymentsPage(1);
+        setPaymentsSearch(value);
+      }
+    }}
+              
               style={{
                 padding: '8px 12px',
     borderRadius: '20px',
@@ -605,21 +602,7 @@ useEffect(() => {
 
               }}
             />
-            <button
-  onClick={onSearchClick}
-  style={{
-    padding: '10px 10px',
-    borderRadius: '20px',
-    backgroundColor: '#002977',
-    color: 'white',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: '14px',
-  }}
->
-  GO
-</button>
+            
           </div>
         </div>
       </div>

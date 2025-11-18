@@ -79,6 +79,8 @@ const StandardAdmin = () => {
         return 'Queens Hotel';
       case 'Brisbane':
         return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
       default:
         return appType;
     }
@@ -110,6 +112,8 @@ const StandardAdmin = () => {
         return '/queens.png';
       case 'Brisbane':
         return '/brisbane.png';
+      case 'Bluewater':
+        return '/bluewater.png';
       default:
         return appType;
     }

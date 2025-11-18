@@ -98,6 +98,8 @@ const [editing2, setEditing2] = useState(false);
         return 'Queens Hotel';
       case 'Brisbane':
         return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
       default:
         return appType;
     }

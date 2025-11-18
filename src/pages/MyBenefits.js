@@ -55,6 +55,7 @@ const MyBenefits = () => {
     if(savedVenue === 'Ace') return 'Staff';
     if(savedVenue === 'Montauk' || savedVenue === 'Central') return 'Premium Member';
     if(savedVenue === 'Brisbane') return 'Brew Crew';
+    if(savedVenue === 'Bluewater') return 'Deckhand';
     return 'Platinum Black';
   });
 
@@ -70,7 +71,8 @@ const MyBenefits = () => {
     switch (level) {
       case 'Gold':
       case 'Captain':
-        return '#D4AF37'; // Gold color
+        if(selectedVenue === 'Manly') return '#D4AF37'; // Gold color
+        if(selectedVenue === 'Bluewater') return '#26AEB1';        
       case 'Queens':
       case 'Silver':
         return '#C0C0C0'; // Silver color
@@ -98,7 +100,8 @@ const MyBenefits = () => {
         if (selectedVenue === 'Central') return '#602373';
         if (selectedVenue === 'Brisbane') return '#376cc3ff'
       case 'Commodore':
-        return '#B0B0B0';
+        if(selectedVenue === 'Manly') return '#B0B0B0';
+        if(selectedVenue === 'Bluewater') return '#333333';
       case 'Commander':
         return '#C0C0C0';
       case 'Lieutenant':
@@ -124,6 +127,7 @@ const MyBenefits = () => {
       case 'Directors':
         return '#040e0fff';
       case 'Family':
+      case 'Deckhand':
         return '#3783d4ff';
       case 'Emerald':
       case 'Management':
@@ -148,6 +152,10 @@ const MyBenefits = () => {
         return '#3313d5ff';
       case 'Legend':
         return '#f8f5f5c3';
+      case 'Firstmate':
+        return '#c14810ff'
+      case 'Admiral':
+        return '#23a5ec';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -241,6 +249,14 @@ const MyBenefits = () => {
       { value: 'Regular', label: 'Regular' },
       { value: 'Champion', label: 'Champion' },
       { value: 'Legend', label: 'Legend' },
+    ];
+  } else if (selectedVenue === 'Bluewater') {
+    audienceOptions = [  
+      { value: 'Deckhand', label: 'Deckhand' },
+      { value: 'Firstmate', label: 'Firstmate' },
+      { value: 'Captain', label: 'Captain' },
+      { value: 'Commodore', label: 'Commodore' },
+      { value: 'Admiral', label: 'Admiral' },
     ];
   }
 
@@ -430,6 +446,8 @@ const MyBenefits = () => {
         return 'Queens Hotel';
       case 'Brisbane':
         return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
       default:
         return appType;
     }
