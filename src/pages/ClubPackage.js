@@ -71,7 +71,7 @@ const ClubPackage = () => {
       if (!selectedVenue) return;
 
       try {
-        const response = await axios.get(`${baseUrl}/club-packages`, {
+        const response = await axios.get(`${baseUrl}/club-package`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

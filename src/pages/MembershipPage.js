@@ -27,6 +27,8 @@ const MembershipPage = () => {
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [membershipData, setMembershipData] = useState(null);
   const [userTimeZone, setUserTimeZone] = useState('');
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const [showRowModal, setShowRowModal] = useState(false);
 
   const [membershipRows, setMembershipRows] = useState(() => {
     // If we have data and it's for the selected venue, use it
@@ -36,12 +38,13 @@ const MembershipPage = () => {
         name: level.membershipName,
         price: `$${level.price}`,
         proRata: level.proRata,
+        renewalDate: level.renewalDate?.split('T')[0] || '',
       }));
     }
     // Default rows if no data
     return [
-      { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false },
-      { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false },
+      { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false, renewalDate: '' },
+      { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false, renewalDate: '' },
     ];
   });
 
@@ -144,7 +147,7 @@ const MembershipPage = () => {
       if (!selectedVenue) return;
 
       try {
-        const response = await axios.get(`${baseUrl}/club-packages`, {
+        const response = await axios.get(`${baseUrl}/club-package`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -160,6 +163,7 @@ const MembershipPage = () => {
               name: level.membershipName,
               price: `$${level.price}`,
               proRata: level.proRata,
+              renewalDate: level.renewalDate?.split('T')[0] || '',
             })
           );
 
@@ -174,19 +178,19 @@ const MembershipPage = () => {
     fetchMembershipData();
   }, [selectedVenue, token]);
 
-  useEffect(() => {
-    if (membershipData && membershipData.appType === selectedVenue) {
-      setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
-      {
-        membershipData.proRataMonths !== 0
-          ? setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate))
-          : setDaysRemaining(0);
-      }
-    } else {
-      setRenewalDate('');
-      setDaysRemaining(null);
-    }
-  }, [membershipData, selectedVenue]);
+  // useEffect(() => {
+  //   if (membershipData && membershipData.appType === selectedVenue) {
+  //     setRenewalDate(membershipData.renewalDate.split('T')[0]); // Format date for input
+  //     {
+  //       membershipData.proRataMonths !== 0
+  //         ? setDaysRemaining(calculateDaysRemaining(membershipData.renewalDate))
+  //         : setDaysRemaining(0);
+  //     }
+  //   } else {
+  //     setRenewalDate('');
+  //     setDaysRemaining(null);
+  //   }
+  // }, [membershipData, selectedVenue]);
 
   const userType = 'admin';
 
@@ -209,11 +213,21 @@ const MembershipPage = () => {
     return diffDays > 0 ? diffDays - 1 : 0; // Exclude renewal date
   };
 
+  const getSelectedRow = () => {
+  return membershipRows.find((row) => row.id === selectedRowId);
+};
+
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     setRenewalDate(selectedDate);
     setDaysRemaining(calculateDaysRemaining(selectedDate));
   };
+
+    useEffect(() => {
+    if (membershipRows.length > 0 && !selectedRowId) {
+      setSelectedRowId(membershipRows[0].id);
+    }
+  }, [membershipRows]);
 
   const addMembershipRow = () => {
     const newId =
@@ -222,7 +236,7 @@ const MembershipPage = () => {
         : 1;
     setMembershipRows([
       ...membershipRows,
-      { id: newId, name: '', price: '', proRata: false },
+      { id: newId, name: '', price: '', proRata: false, renewalDate: '' },
     ]);
   };
 
@@ -246,14 +260,14 @@ const MembershipPage = () => {
       // Prepare the request body
       const requestBody = {
         membershipLevels: membershipRows.map((row) => ({
-          membershipName: row.name,
-          price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')), // Remove any non-numeric characters except decimal point
-          proRata: row.proRata,
-        })),
-        renewalDate: renewalDate,
-        gracePeriod: 0, // Default grace period as per your requirements
-        proRataMonths: isAnyProRataChecked ? daysRemaining : 0,
-        timezone: userTimeZone
+    membershipName: row.name,
+    price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')),
+    proRata: row.proRata,
+    renewalDate: row.renewalDate,
+    gracePeriod: 0,
+    proRataDays: row.proRata ? calculateDaysRemaining(row.renewalDate) : 0,
+  })),
+  timezone: userTimeZone
       };
 
       let response;
@@ -261,7 +275,7 @@ const MembershipPage = () => {
         //PUT req
         // If ID exists, make a PUT request to update
         response = await axios.put(
-          `${baseUrl}/club-packages?id=${membershipData._id}`, // Added ID to the URL
+          `${baseUrl}/club-package?id=${membershipData._id}`, // Added ID to the URL
           requestBody,
           {
             headers: {
@@ -274,7 +288,7 @@ const MembershipPage = () => {
       } else {
         //POST req
         // Make the API call
-        response = await axios.post(`${baseUrl}/club-packages`, requestBody, {
+        response = await axios.post(`${baseUrl}/club-package`, requestBody, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -581,6 +595,9 @@ const MembershipPage = () => {
                           onChange={(e) =>
                             updateMembershipRow(row.id, 'name', e.target.value)
                           }
+                          onFocus={() => {
+                            setSelectedRowId(row.id);
+                          }}
                           style={{
                             width: '100%',
                             padding: '8px',
@@ -596,6 +613,9 @@ const MembershipPage = () => {
                           onChange={(e) =>
                             updateMembershipRow(row.id, 'price', e.target.value)
                           }
+                          onFocus={() => {
+    setSelectedRowId(row.id);
+  }}
                           style={{
                             width: '50%',
                             padding: '8px',
@@ -624,6 +644,9 @@ const MembershipPage = () => {
                                 e.target.checked
                               )
                             }
+                             onFocus={() => {
+    setSelectedRowId(row.id);
+  }}
                             style={{ accentColor: '#002977' }}
                           />
                           <div>
@@ -680,8 +703,8 @@ const MembershipPage = () => {
                 <input
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
-                  value={renewalDate}
-                  onChange={handleDateChange}
+                  value={getSelectedRow()?.renewalDate || ''}
+                  onChange={(e) => updateMembershipRow(selectedRowId, 'renewalDate', e.target.value)}
                   style={{
                     width: '60%',
                     padding: '8px',
@@ -714,7 +737,7 @@ const MembershipPage = () => {
                   }}
                 />
               </div>
-              {isAnyProRataChecked && (
+              {getSelectedRow()?.proRata && getSelectedRow()?.renewalDate && (
                 <div style={{ marginTop: '30px', textAlign: 'center' }}>
                   <label
                     style={{
@@ -735,7 +758,7 @@ const MembershipPage = () => {
                       margin: '0 auto',
                     }}
                   >
-                    {daysRemaining !== null && daysRemaining}
+                    {calculateDaysRemaining(getSelectedRow()?.renewalDate)}
                   </div>
                 </div>
               )}
