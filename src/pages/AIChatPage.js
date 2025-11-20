@@ -66,6 +66,12 @@ const AIChatPage = () => {
     const isStarReward = selectedVenue === 'StarReward';
     const isQueens = selectedVenue === 'Queens';
     const isHogan = selectedVenue === 'Hogan';
+    const isBrisbane = selectedVenue === 'Brisbane';
+    const isCentral = selectedVenue === 'Central';
+    const isMontauk = selectedVenue === 'Montauk';
+    const isNorth = selectedVenue === 'North';
+    const isBluewater = selectedVenue === 'Bluewater';
+
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
       : isManly
@@ -76,6 +82,16 @@ const AIChatPage = () => {
       ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
       : isHogan
       ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isBrisbane
+      ? 'https://brisbanebrewingviperapi.graymushroom-2c8b9797.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isCentral
+      ? 'https://centrallanehotelviperapi.grayflower-1f643a2b.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isMontauk
+      ? 'https://montauktavernviperapi.happyhill-26c14243.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isNorth
+      ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isBluewater
+      ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
       : null;
 
     return endpoint;
@@ -394,21 +410,21 @@ const AIChatPage = () => {
     }
   }, [token, userType, baseUrl]);
 
-  const handleLock = async () => {
-    try {
-      const result = await handleLogout();
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        toast.error(
-          result.message || 'Failed to remove lock. Please try again.'
-        );
-      }
-    } catch (error) {
-      console.error('Error in handleLock:', error);
-      toast.error(error.message || 'Failed to remove lock. Please try again.');
-    }
-  };
+  // const handleLock = async () => {
+  //   try {
+  //     const result = await handleLogout();
+  //     if (result.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       toast.error(
+  //         result.message || 'Failed to remove lock. Please try again.'
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handleLock:', error);
+  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
+  //   }
+  // };
 
   return (
     <div className="digital-app-container">
@@ -433,7 +449,7 @@ const AIChatPage = () => {
         }}
       />
       <header className="app-header-ai">
-        <div className="s2w-logo" onClick={async () => await handleLock()}>
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="viper-logo">
@@ -498,8 +514,8 @@ const AIChatPage = () => {
                       setSelectedVenue(selectedValue);
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
-                      
-                      await handleLock();
+
+                      navigate('/dashboard');
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);

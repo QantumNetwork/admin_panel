@@ -383,7 +383,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'ai-reporting' }}
-                onClick={() => handleCardClick('ai-reporting', '/ai-reporting')}
+                onClick={() => navigate('/ai-reporting', { state: { email } })}
 
               >
                 <img
@@ -456,7 +456,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'ai-reporting' }}
-                  onClick={() => handleCardClick('ai-reporting', '/ai-reporting')}
+                  onClick={() => navigate('/ai-reporting', { state: { email } })}
 
                 >
                   <img

@@ -160,6 +160,7 @@ const MembershipPage = () => {
           const rows = response.data.data[0].membershipLevels.map(
             (level, index) => ({
               id: index + 1,
+              _id: level._id,
               name: level.membershipName,
               price: `$${level.price}`,
               proRata: level.proRata,
@@ -236,7 +237,7 @@ const MembershipPage = () => {
         : 1;
     setMembershipRows([
       ...membershipRows,
-      { id: newId, name: '', price: '', proRata: false, renewalDate: '' },
+      { id: newId, _id: null, name: '', price: '', proRata: false, renewalDate: '' },
     ]);
   };
 
@@ -259,14 +260,24 @@ const MembershipPage = () => {
     try {
       // Prepare the request body
       const requestBody = {
-        membershipLevels: membershipRows.map((row) => ({
+        membershipLevels: membershipRows.map((row) => {
+  const levelObject = {
     membershipName: row.name,
-    price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')),
+    price: parseFloat(row.price.replace(/[^0-9.-]+/g, "")),
     proRata: row.proRata,
     renewalDate: row.renewalDate,
     gracePeriod: 0,
     proRataDays: row.proRata ? calculateDaysRemaining(row.renewalDate) : 0,
-  })),
+  };
+
+  if (row._id) {
+    levelObject._id = row._id;   // <-- Attach only if exists
+  }
+
+  return levelObject;
+}),
+
+
   timezone: userTimeZone
       };
 

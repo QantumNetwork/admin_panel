@@ -29,17 +29,17 @@ const ManualReg = () => {
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
   const [venues, setVenues] = useState([]);
+  const [userTimeZone, setUserTimeZone] = useState('');
 
   // s1 = Register New Member, s2 = Set Membership Level, s3 = Payment Details
-const [s1Visible, setS1Visible] = useState(true); // only s1 shown at start
-const [s2Visible, setS2Visible] = useState(false);
-const [s3Visible, setS3Visible] = useState(false);
+  const [s1Visible, setS1Visible] = useState(true); // only s1 shown at start
+  const [s2Visible, setS2Visible] = useState(false);
+  const [s3Visible, setS3Visible] = useState(false);
 
-
-// editing controls: when true -> show Cancel + Next; when false -> show Edit
-// requirement: at beginning register new member should show Cancel + Next
-const [editing1, setEditing1] = useState(true);
-const [editing2, setEditing2] = useState(false);
+  // editing controls: when true -> show Cancel + Next; when false -> show Edit
+  // requirement: at beginning register new member should show Cancel + Next
+  const [editing1, setEditing1] = useState(true);
+  const [editing2, setEditing2] = useState(false);
 
   const [formData, setFormData] = useState({
     firstname: '',
@@ -73,6 +73,8 @@ const [editing2, setEditing2] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
+
+  const [membershipPackages, setMembershipPackages] = useState([]);
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -201,51 +203,86 @@ const [editing2, setEditing2] = useState(false);
   };
 
   const handleNextS1 = () => {
-// Step forward from Register -> Membership Level
-setS2Visible(true);
-setEditing1(false); // show edit on s1
-setEditing2(true); // s2 should show cancel+next at beginning
-};
+    // Step forward from Register -> Membership Level
+    setS2Visible(true);
+    setEditing1(false); // show edit on s1
+    setEditing2(true); // s2 should show cancel+next at beginning
+  };
 
+  const handleCancelS1 = () => {
+    // Spec: clicking Cancel on section 1 should do nothing
+    // no-op intentionally
+  };
 
-const handleCancelS1 = () => {
-// Spec: clicking Cancel on section 1 should do nothing
-// no-op intentionally
-};
+  const handleEditS1 = () => {
+    // If edit clicked on s1: hide other sections & show cancel+next on s1
+    setS2Visible(false);
+    setS3Visible(false);
+    setEditing1(true);
+    setEditing2(false);
+  };
 
+  const handleNextS2 = () => {
+    // From membership -> payment
+    setS3Visible(true);
+    setEditing2(false); // membership shows edit now
+  };
 
-const handleEditS1 = () => {
-// If edit clicked on s1: hide other sections & show cancel+next on s1
-setS2Visible(false);
-setS3Visible(false);
-setEditing1(true);
-setEditing2(false);
-};
+  const handleCancelS2 = () => {
+    // Hide membership level and payment, show only register section.
+    setS2Visible(false);
+    setS3Visible(false);
+    // Requirement: when membership level cancelled, only register should appear.
+    // When returning to register, it should show EDIT as described earlier (if user had progressed and returned)
+    setEditing1(false);
+    setEditing2(false);
+  };
 
+  const handleEditS2 = () => {
+    // If edit clicked on s2: hide payment & show cancel+next on s2
+    setS3Visible(false);
+    setEditing2(true);
+  };
 
-const handleNextS2 = () => {
-// From membership -> payment
-setS3Visible(true);
-setEditing2(false); // membership shows edit now
-};
+  useEffect(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimeZone(tz);
+    localStorage.setItem('userTimeZone', tz); // optional
+  }, []);
 
+  useEffect(() => {
+    const fetchMembershipPackages = async () => {
 
-const handleCancelS2 = () => {
-// Hide membership level and payment, show only register section.
-setS2Visible(false);
-setS3Visible(false);
-// Requirement: when membership level cancelled, only register should appear.
-// When returning to register, it should show EDIT as described earlier (if user had progressed and returned)
-setEditing1(false);
-setEditing2(false);
-};
+      if (!selectedVenue || !userTimeZone) return;
 
+      try {
+        const response = await axios.get(
+          `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(userTimeZone)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.data?.data) {
+          setMembershipPackages(response.data.data);
+          // Set default membership level if not set
+          // if (response.data.data.length > 0 && !formData.membershipLevel) {
+          //   setFormData(prev => ({
+          //     ...prev,
+          //     membershipLevel: response.data.data[0]._id
+          //   }));
+          // }
+        }
+      } catch (error) {
+        console.error('Error fetching membership packages:', error);
+        toast.error('Failed to load membership packages');
+      }
+    };
 
-const handleEditS2 = () => {
-// If edit clicked on s2: hide payment & show cancel+next on s2
-setS3Visible(false);
-setEditing2(true);
-};
+    fetchMembershipPackages();
+  }, [token, selectedVenue, userTimeZone]);
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -565,426 +602,459 @@ setEditing2(true);
             style={{ marginTop: '120px' }}
           >
             {editing1 ? (
-    <>
-      <button className="cancel-btn cancel-s1" onClick={handleCancelS1}>Cancel</button>
-      <button className="next-btn" onClick={handleNextS1}>Next</button>
-    </>
-  ) : (
-    <button className="blue-btn" onClick={handleEditS1}>EDIT</button>
-  )}
+              <>
+                <button
+                  className="cancel-btn cancel-s1"
+                  onClick={handleCancelS1}
+                >
+                  Cancel
+                </button>
+                <button className="next-btn" onClick={handleNextS1}>
+                  Next
+                </button>
+              </>
+            ) : (
+              <button className="blue-btn" onClick={handleEditS1}>
+                EDIT
+              </button>
+            )}
           </div>
         </section>
 
         {s2Visible && (
-<section className="new-user-sa" style={{ height: '600px' }}>
-          <h2>Set Membership Level</h2>
-          <div className="form-group">
-            <select
-    name="membershipLevel"
-    value={formData.membershipLevel || ''}
-    onChange={handleInputChange}
-    className='membershipLevel'
-    style={{
-      width: '100%',
-      padding: '10px 15px',
-      border: 'none',
-      borderRadius: '6px',
-      backgroundColor: 'white',
-      appearance: 'none',
-      backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23007bff' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'right 15px center',
-      fontSize: '14px',
-      cursor: 'pointer'
-    }}
-    >
-  {!formData.membershipLevel && <option value="" disabled style={{ display: 'none' }}>Select from list</option>}
+          <section className="new-user-sa" style={{ height: '600px' }}>
+            <h2>Set Membership Level</h2>
+            <div className="form-group">
+              <select
+                name="membershipLevel"
+                value={formData.membershipLevel || ''}
+                onChange={handleInputChange}
+                className="membershipLevel"
+                style={{
+                  width: '100%',
+                  padding: '10px 15px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: 'white',
+                  appearance: 'none',
+                  backgroundImage:
+                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23007bff' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 15px center',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                {!formData.membershipLevel && (
+                  <option value="" disabled style={{ display: 'none' }}>
+                    Select from list
+                  </option>
+                )}
 
-    <option value="Standard">Social Member 1 Year</option>
-    <option value="Premium">Social Member 3 Years</option>
-    <option value="Gold">Full Member 1 Year</option>
-    <option value="Platinum">Full Member 3 Years</option>
-  </select>
-          </div>
+                {membershipPackages.map((pkg) => (
+                  <option key={pkg._id} value={pkg._id}>
+                    {pkg.membershipName}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div
-            className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '425px' }}
-          >
-            {editing2 ? (
-    <>
-      <button className="cancel-btn" onClick={handleCancelS2}>Cancel</button>
-      <button className="next-btn" onClick={handleNextS2}>Next</button>
-    </>
-  ) : (
-    <button className="blue-btn" onClick={handleEditS2}>EDIT</button>
-  )}
-          </div>
-        </section>
+            <div
+              className="d-flex w-100 justify-content-center"
+              style={{ marginTop: '425px' }}
+            >
+              {editing2 ? (
+                <>
+                  <button className="cancel-btn" onClick={handleCancelS2}>
+                    Cancel
+                  </button>
+                  <button className="next-btn" onClick={handleNextS2}>
+                    Next
+                  </button>
+                </>
+              ) : (
+                <button className="blue-btn" onClick={handleEditS2}>
+                  EDIT
+                </button>
+              )}
+            </div>
+          </section>
         )}
 
         {s3Visible && (
-<section className="connected-sa" style={{ height: '600px' }}>
-          {!showManualPayment ? (
-            <>
-              <h2>Payment Details</h2>
-              <div className="payment-white-box">
-                <div className="form-group">
-                  <label
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#5a5a5a',
-                    }}
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="paymentEmail"
-                    value={formData.paymentEmail}
-                    onChange={handleInputChange}
-                    placeholder="ella.williams@example.com"
-                    style={{
-                      width: '100%',
-                      // padding: '10px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      marginTop: '5px',
-                    }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginTop: '10px' }}>
-                  <label
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#5a5a5a',
-                    }}
-                  >
-                    Card information
-                  </label>
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    value={formData.cardNumber}
-                    onChange={handleInputChange}
-                    placeholder="4242 4242 4242 4242"
-                    style={{
-                      width: '100%',
-                      // padding: '10px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '6px 6px 0 0',
-                      borderBottom: 'none',
-                      fontSize: '14px',
-                      marginTop: '5px',
-                    }}
-                  />
-
-                  <div style={{ display: 'flex', gap: '0' }}>
-                    <input
-                      type="text"
-                      name="expiryDate"
-                      value={formData.expiryDate}
-                      onChange={handleInputChange}
-                      placeholder="12/24"
+          <section className="connected-sa" style={{ height: '600px' }}>
+            {!showManualPayment ? (
+              <>
+                <h2>Payment Details</h2>
+                <div className="payment-white-box">
+                  <div className="form-group">
+                    <label
                       style={{
-                        width: '50%',
-                        // padding: '10px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '0 0 0 6px',
-                        borderRight: 'none',
-                        fontSize: '14px',
+                        fontWeight: 'bold',
+                        fontSize: '13px',
+                        color: '#5a5a5a',
                       }}
-                    />
-
+                    >
+                      Email
+                    </label>
                     <input
-                      type="text"
-                      name="cvv"
-                      value={formData.cvv}
+                      type="email"
+                      name="paymentEmail"
+                      value={formData.paymentEmail}
                       onChange={handleInputChange}
-                      placeholder="123"
+                      placeholder="ella.williams@example.com"
                       style={{
-                        width: '50%',
+                        width: '100%',
                         // padding: '10px',
                         border: '1px solid #e0e0e0',
-                        borderRadius: '0 0 6px 0',
+                        borderRadius: '6px',
                         fontSize: '14px',
+                        marginTop: '5px',
                       }}
                     />
                   </div>
-                </div>
 
-                <div className="form-group" style={{ marginTop: '10px' }}>
-                  <label
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#5a5a5a',
-                    }}
-                  >
-                    Name on card
-                  </label>
-                  <input
-                    type="text"
-                    name="nameOnCard"
-                    value={formData.nameOnCard}
-                    onChange={handleInputChange}
-                    placeholder="Ella Williams"
+                  <div className="form-group" style={{ marginTop: '10px' }}>
+                    <label
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '13px',
+                        color: '#5a5a5a',
+                      }}
+                    >
+                      Card information
+                    </label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      value={formData.cardNumber}
+                      onChange={handleInputChange}
+                      placeholder="4242 4242 4242 4242"
+                      style={{
+                        width: '100%',
+                        // padding: '10px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '6px 6px 0 0',
+                        borderBottom: 'none',
+                        fontSize: '14px',
+                        marginTop: '5px',
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '0' }}>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        value={formData.expiryDate}
+                        onChange={handleInputChange}
+                        placeholder="12/24"
+                        style={{
+                          width: '50%',
+                          // padding: '10px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '0 0 0 6px',
+                          borderRight: 'none',
+                          fontSize: '14px',
+                        }}
+                      />
+
+                      <input
+                        type="text"
+                        name="cvv"
+                        value={formData.cvv}
+                        onChange={handleInputChange}
+                        placeholder="123"
+                        style={{
+                          width: '50%',
+                          // padding: '10px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '0 0 6px 0',
+                          fontSize: '14px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '10px' }}>
+                    <label
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '13px',
+                        color: '#5a5a5a',
+                      }}
+                    >
+                      Name on card
+                    </label>
+                    <input
+                      type="text"
+                      name="nameOnCard"
+                      value={formData.nameOnCard}
+                      onChange={handleInputChange}
+                      placeholder="Ella Williams"
+                      style={{
+                        width: '100%',
+                        // padding: '10px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        marginTop: '5px',
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '10px' }}>
+                    <label
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '13px',
+                        color: '#5a5a5a',
+                      }}
+                    >
+                      Country or region
+                    </label>
+                    <select
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      style={{
+                        width: '100%',
+                        padding: '5px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        marginTop: '5px',
+                        backgroundColor: 'white',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="Australia">Australia</option>
+                      <option value="United States">United States</option>
+                      <option value="Canada">Canada</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="region"
+                      value={formData.region}
+                      onChange={handleInputChange}
+                      placeholder="Queensland"
+                      style={{
+                        width: '100%',
+                        // padding: '10px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        marginTop: '10px',
+                      }}
+                    />
+                  </div>
+
+                  <button
                     style={{
                       width: '100%',
-                      // padding: '10px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      marginTop: '5px',
-                    }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginTop: '10px' }}>
-                  <label
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#5a5a5a',
-                    }}
-                  >
-                    Country or region
-                  </label>
-                  <select
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    style={{
-                      width: '100%',
-                      padding: '5px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      marginTop: '5px',
-                      backgroundColor: 'white',
+                      padding: '10px',
+                      backgroundColor: '#5296D1',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '20px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      marginTop: '10px',
                       cursor: 'pointer',
                     }}
                   >
-                    <option value="Australia">Australia</option>
-                    <option value="United States">United States</option>
-                    <option value="Canada">Canada</option>
-                    <option value="United Kingdom">United Kingdom</option>                   
-                  </select>
-                  <input
-                    type="text"
-                    name="region"
-                    value={formData.region}
-                    onChange={handleInputChange}
-                    placeholder="Queensland"
-                    style={{
-                      width: '100%',
-                      // padding: '10px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      marginTop: '10px',
-                    }}
-                  />
+                    Pay AUD$
+                    {membershipPackages
+                      .find((pkg) => pkg._id === formData.membershipLevel)
+                      ?.calculatedPrice?.toFixed(2) || '0.00'}
+                  </button>
                 </div>
 
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#5296D1',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '20px',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    marginTop: '10px',
-                    cursor: 'pointer',
-                  }}
+                <div
+                  className="d-flex w-100 justify-content-center"
+                  style={{ marginTop: '2px' }}
                 >
-                  Pay AUD$65.00
-                </button>
-              </div>
-
-              <div
-                className="d-flex w-100 justify-content-center"
-                style={{ marginTop: '2px' }}
-              >
-                <button
-                  className="payment-btn"
-                  onClick={handleManualPaymentClick}
-                >
-                  Manually approve payment
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>Manual Payment Details</h2>
-              <div style={{ marginTop: '30px' }}>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: '#5a5a5a',
-                    marginBottom: '15px',
-                  }}
-                >
-                  Choose payment method
-                </p>
+                  <button
+                    className="payment-btn"
+                    onClick={handleManualPaymentClick}
+                  >
+                    Manually approve payment
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2>Manual Payment Details</h2>
+                <div style={{ marginTop: '30px' }}>
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#5a5a5a',
+                      marginBottom: '15px',
+                    }}
+                  >
+                    Choose payment method
+                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Cash"
+                        checked={selectedPaymentMethod === 'Cash'}
+                        onChange={(e) =>
+                          setSelectedPaymentMethod(e.target.value)
+                        }
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                          accentColor: '#002977',
+                        }}
+                      />
+                      Cash
+                    </label>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Card by venue"
+                        checked={selectedPaymentMethod === 'Card by venue'}
+                        onChange={(e) =>
+                          setSelectedPaymentMethod(e.target.value)
+                        }
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                          accentColor: '#002977',
+                        }}
+                      />
+                      Card by venue
+                    </label>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Cheque"
+                        checked={selectedPaymentMethod === 'Cheque'}
+                        onChange={(e) =>
+                          setSelectedPaymentMethod(e.target.value)
+                        }
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                          accentColor: '#002977',
+                        }}
+                      />
+                      Cheque
+                    </label>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Management approved"
+                        checked={
+                          selectedPaymentMethod === 'Management approved'
+                        }
+                        onChange={(e) =>
+                          setSelectedPaymentMethod(e.target.value)
+                        }
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                          accentColor: '#002977',
+                        }}
+                      />
+                      Management approved
+                    </label>
+                  </div>
+                </div>
                 <div
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
+                    gap: '15px',
+                    marginTop: '320px',
+                    justifyContent: 'center',
                   }}
                 >
-                  <label
+                  <button
+                    onClick={handleCancelManualPayment}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '14px',
+                      padding: '12px 40px',
+                      backgroundColor: '#d3d3d3',
+                      color: '#666',
+                      border: 'none',
+                      borderRadius: '25px',
+                      fontSize: '15px',
+                      fontWeight: '500',
                       cursor: 'pointer',
+                      minWidth: '120px',
                     }}
                   >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="Cash"
-                      checked={selectedPaymentMethod === 'Cash'}
-                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        cursor: 'pointer',
-                        accentColor: '#002977',
-                      }}
-                    />
-                    Cash
-                  </label>
-                  <label
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmManualPayment}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '14px',
+                      padding: '12px 40px',
+                      backgroundColor: '#4a90e2',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '25px',
+                      fontSize: '15px',
+                      fontWeight: '500',
                       cursor: 'pointer',
+                      minWidth: '120px',
                     }}
                   >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="Card by venue"
-                      checked={selectedPaymentMethod === 'Card by venue'}
-                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        cursor: 'pointer',
-                        accentColor: '#002977',
-                      }}
-                    />
-                    Card by venue
-                  </label>
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="Cheque"
-                      checked={selectedPaymentMethod === 'Cheque'}
-                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        cursor: 'pointer',
-                        accentColor: '#002977',
-                      }}
-                    />
-                    Cheque
-                  </label>
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="Management approved"
-                      checked={selectedPaymentMethod === 'Management approved'}
-                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        cursor: 'pointer',
-                        accentColor: '#002977',
-                      }}
-                    />
-                    Management approved
-                  </label>
+                    Confirm
+                  </button>
                 </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '15px',
-                  marginTop: '320px',
-                  justifyContent: 'center',
-                }}
-              >
-                <button
-                  onClick={handleCancelManualPayment}
-                  style={{
-                    padding: '12px 40px',
-                    backgroundColor: '#d3d3d3',
-                    color: '#666',
-                    border: 'none',
-                    borderRadius: '25px',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    minWidth: '120px',
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmManualPayment}
-                  style={{
-                    padding: '12px 40px',
-                    backgroundColor: '#4a90e2',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '25px',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    minWidth: '120px',
-                  }}
-                >
-                  Confirm
-                </button>
-              </div>
-            </>
-          )}
-        </section>
+              </>
+            )}
+          </section>
         )}
-        
       </div>
     </div>
   );
