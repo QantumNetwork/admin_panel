@@ -31,6 +31,7 @@ function MFAVerification() {
             localStorage.setItem("userEmail", email);
             localStorage.setItem("userType", response.data.data.type); //can be user/admin/power admin
             localStorage.setItem("appGroup", response.data.data.appType);
+            localStorage.setItem("name", response.data.data.name);
             const userAccess = response.data.data.access || [];
 
             localStorage.setItem("access", userAccess);

@@ -8,6 +8,8 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { handleLogout } from '../utils/api';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
 
@@ -46,6 +48,7 @@ const ManualReg = () => {
     lastname: '',
     email: '',
     mobile: '',
+    mobileFull: '',
     street: '',
     city: '',
     zip: '',
@@ -252,12 +255,13 @@ const ManualReg = () => {
 
   useEffect(() => {
     const fetchMembershipPackages = async () => {
-
       if (!selectedVenue || !userTimeZone) return;
 
       try {
         const response = await axios.get(
-          `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(userTimeZone)}`,
+          `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+            userTimeZone
+          )}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -482,11 +486,19 @@ const ManualReg = () => {
 
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>Mobile</label>
-            <input
-              type="text"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleInputChange}
+            <PhoneInput
+              defaultCountry="AU" // Australia → +61
+              value={formData.mobileFull}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, mobileFull: value }))
+              }
+              placeholder="Enter mobile number"
+              international
+              countryCallingCodeEditable={false}
+              style={{
+                width: '100%',
+                backgroundColor: 'white',
+              }}
             />
           </div>
 

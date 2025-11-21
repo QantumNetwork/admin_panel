@@ -47,7 +47,8 @@ const AIChatPage = () => {
   };
 
   const userInitial = userEmail.charAt(0).toUpperCase();
-  const username = userEmail.split('@')[0];
+  const name = localStorage.getItem('name') || 'user';
+  const username = name;
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(

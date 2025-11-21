@@ -24,7 +24,8 @@ const AIReporting = () => {
   const [isListening, setIsListening] = useState(false);
 
   const email = localStorage.getItem('userEmail') || 'user@example.com';
-  const username = email.split('@')[0];
+  const name = localStorage.getItem('name') || 'user';
+  const username = name;
   const userInitial = email.charAt(0).toUpperCase();
   const userType = localStorage.getItem('userType');
   const token = localStorage.getItem('token');
