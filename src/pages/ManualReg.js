@@ -318,7 +318,7 @@ const ManualReg = () => {
         Address: formData.Address,
         Suburb: formData.Suburb,
         State: formData.region,
-        amountPaid: selectedPkg?.calculatedPrice*1000 || 0,
+        amountPaid: selectedPkg?.calculatedPrice*100 || 0,
         currency: 'aud',
         packageId: selectedPkg?._id,
         packageName: selectedPkg?.membershipName,
