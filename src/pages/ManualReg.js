@@ -77,6 +77,8 @@ const ManualReg = () => {
 
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripe, setShowStripe] = useState(false);
+  const [verifyPayload, setVerifyPayload] = useState(null);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -346,6 +348,12 @@ const ManualReg = () => {
       // store clientSecret and open Stripe card input
       setClientSecret(secret);
       setShowStripe(true);
+      setVerifyPayload({
+        paymentIntentId: res.data?.payment?.paymentIntentId,
+        userId: res.data?.userId,
+        appType: selectedVenue,
+        selectedPkg: selectedPkg,
+      });
     } catch (err) {
       console.error(err);
       toast.error(`Registration failed - ${err.response?.data?.Message || err.response?.data}`);
@@ -365,16 +373,31 @@ const ManualReg = () => {
 
       setLoading(true);
 
-      try {
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-          billing_details: {
-            name: formData.nameOnCard || undefined,
-            email: formData.paymentEmail || undefined,
-          },
+       const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+        billing_details: {
+          name: formData.nameOnCard || undefined,
+          email: formData.paymentEmail || undefined,
         },
-      });
+      },
+    });
+
+        try {
+    const verifyBody = {
+      paymentIntentId: verifyPayload.paymentIntentId,
+      userId: verifyPayload.userId,
+      appType: verifyPayload.appType,
+      packageId: verifyPayload.selectedPkg?._id,
+      packageName: verifyPayload.selectedPkg?.membershipName,
+      paymentType: "card"
+    };
+
+    await axios.post(`${baseUrl}/payment/verify-payment`, verifyBody, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
       setLoading(false);
 
@@ -985,6 +1008,7 @@ const ManualReg = () => {
                         setShowStripe(false);
                         setClientSecret(null);
                       }}
+                      verifyPayload={verifyPayload}
                     />
                   )}
                 </div>
