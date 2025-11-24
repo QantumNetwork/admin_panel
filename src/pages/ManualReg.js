@@ -8,10 +8,21 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { handleLogout } from '../utils/api';
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
+
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
 
 const ManualReg = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -44,16 +55,16 @@ const ManualReg = () => {
   const [editing2, setEditing2] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    mobile: '',
-    mobileFull: '',
-    street: '',
-    city: '',
-    zip: '',
-    birthday: '',
-    gender: '',
+    GivenNames: '',
+    Surname: '',
+    Email: '',
+    Mobile: '',
+    // mobileFull: '',
+    Address: '',
+    Suburb: '',
+    PostCode: '',
+    DateOfBirth: '',
+    Gender: '',
     membershipLevel: '',
     paymentEmail: '',
     cardNumber: '',
@@ -61,8 +72,11 @@ const ManualReg = () => {
     cvv: '',
     nameOnCard: '',
     country: 'Australia',
-    region: '',
+    region: null,
   });
+
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showStripe, setShowStripe] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -287,6 +301,124 @@ const ManualReg = () => {
     fetchMembershipPackages();
   }, [token, selectedVenue, userTimeZone]);
 
+  const handlePay = async () => {
+    try {
+      const selectedPkg = membershipPackages.find(
+        (pkg) => pkg._id === formData.membershipLevel
+      );
+
+      const payload = {
+        GivenNames: formData.GivenNames,
+        Surname: formData.Surname,
+        DateOfBirth: formData.DateOfBirth,
+        PostCode: formData.PostCode,
+        Mobile: formData.Mobile,
+        Email: formData.Email,
+        Gender: formData.Gender,
+        Address: formData.Address,
+        Suburb: formData.Suburb,
+        State: formData.region,
+        amountPaid: selectedPkg?.calculatedPrice*1000 || 0,
+        currency: 'aud',
+        packageId: selectedPkg?._id,
+        packageName: selectedPkg?.membershipName,
+        paymentType: 'card',
+      };
+
+      // 1) Create user + paymentIntent via your backend
+      const res = await axios.post(
+        `${baseUrl}/user/user-register?appType=${selectedVenue}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const secret = res.data?.payment?.clientSecret;
+
+      if (!secret) {
+        toast.error('Could not initialize payment');
+        return;
+      }
+
+      // store clientSecret and open Stripe card input
+      setClientSecret(secret);
+      setShowStripe(true);
+    } catch (err) {
+      console.error(err);
+      toast.error(`Registration failed - ${err.response?.data?.Message || err.response?.data}`);
+    }
+  };
+
+  function CardPaymentUI({ clientSecret, onSuccess }) {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [loading, setLoading] = useState(false);
+
+    const handleConfirm = async () => {
+      if (!stripe || !elements) {
+        toast.error("Stripe is not loaded yet");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: formData.nameOnCard || undefined,
+            email: formData.paymentEmail || undefined,
+          },
+        },
+      });
+
+      setLoading(false);
+
+       if (result.error) {
+        toast.error(result.error.message);
+      } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+        toast.success('Payment successful');
+        onSuccess();
+      } else {
+        toast.error('Payment failed or cancelled');
+      }
+    } catch (err) {
+      setLoading(false);
+      console.error(err);
+      toast.error('Payment failed');
+    }
+  };
+
+    return (
+      <div style={{ marginTop: '20px' }}>
+        {/* <CardElement
+          options={{ hidePostalCode: true }}
+          style={{ base: { fontSize: '16px' } }}
+        /> */}
+        <button
+          onClick={handleConfirm}
+          disabled={!stripe || !elements || loading}
+          style={{
+            marginTop: '20px',
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#4a90e2',
+            color: 'white',
+            fontWeight: '600',
+            borderRadius: '20px',
+            cursor: 'pointer',
+          }}
+        >
+          {loading ? 'Processing...' : 'Confirm Payment'}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -468,8 +600,8 @@ const ManualReg = () => {
             <label style={{ fontWeight: 'bold' }}>First name</label>
             <input
               type="text"
-              name="firstname"
-              value={formData.firstname}
+              name="GivenNames"
+              value={formData.GivenNames}
               onChange={handleInputChange}
             />
           </div>
@@ -478,8 +610,8 @@ const ManualReg = () => {
             <label style={{ fontWeight: 'bold' }}>Last name</label>
             <input
               type="text"
-              name="lastname"
-              value={formData.lastname}
+              name="Surname"
+              value={formData.Surname}
               onChange={handleInputChange}
             />
           </div>
@@ -488,9 +620,9 @@ const ManualReg = () => {
             <label style={{ fontWeight: 'bold' }}>Mobile</label>
             <PhoneInput
               defaultCountry="AU" // Australia → +61
-              value={formData.mobileFull}
+              value={formData.Mobile}
               onChange={(value) =>
-                setFormData((prev) => ({ ...prev, mobileFull: value }))
+                setFormData((prev) => ({ ...prev, Mobile: value }))
               }
               placeholder="Enter mobile number"
               international
@@ -506,8 +638,8 @@ const ManualReg = () => {
             <label style={{ fontWeight: 'bold' }}>Email</label>
             <input
               type="email"
-              name="email"
-              value={formData.email}
+              name="Email"
+              value={formData.Email}
               onChange={handleInputChange}
             />
           </div>
@@ -521,8 +653,8 @@ const ManualReg = () => {
                 <input
                   type="text"
                   placeholder="Street Address"
-                  name="street"
-                  value={formData.street || ''}
+                  name="Address"
+                  value={formData.Address || ''}
                   onChange={handleInputChange}
                 />
               </div>
@@ -530,15 +662,15 @@ const ManualReg = () => {
                 <input
                   type="text"
                   placeholder="City"
-                  name="city"
-                  value={formData.city || ''}
+                  name="Suburb"
+                  value={formData.Suburb || ''}
                   onChange={handleInputChange}
                 />
                 <input
                   type="text"
                   placeholder="Postcode"
-                  name="zip"
-                  value={formData.zip || ''}
+                  name="PostCode"
+                  value={formData.PostCode || ''}
                   onChange={handleInputChange}
                 />
               </div>
@@ -549,8 +681,8 @@ const ManualReg = () => {
             <label style={{ fontWeight: 'bold' }}>Birthday</label>
             <input
               type="date"
-              name="birthday"
-              value={formData.birthday}
+              name="DateOfBirth"
+              value={formData.DateOfBirth}
               onChange={handleInputChange}
               style={{ padding: '8px' }}
             />
@@ -572,9 +704,9 @@ const ManualReg = () => {
               >
                 <input
                   type="radio"
-                  name="gender"
-                  value="male"
-                  checked={formData.gender === 'male'}
+                  name="Gender"
+                  value="M"
+                  checked={formData.Gender === 'M'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
                 />
@@ -585,9 +717,9 @@ const ManualReg = () => {
               >
                 <input
                   type="radio"
-                  name="gender"
-                  value="female"
-                  checked={formData.gender === 'female'}
+                  name="Gender"
+                  value="F"
+                  checked={formData.Gender === 'F'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
                 />
@@ -599,9 +731,9 @@ const ManualReg = () => {
               >
                 <input
                   type="radio"
-                  name="gender"
-                  value="non-binary"
-                  checked={formData.gender === 'non-binary'}
+                  name="Gender"
+                  value="U"
+                  checked={formData.Gender === 'U'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
                 />
@@ -694,6 +826,7 @@ const ManualReg = () => {
         )}
 
         {s3Visible && (
+          <Elements stripe={stripePromise}>
           <section className="connected-sa" style={{ height: '600px' }}>
             {!showManualPayment ? (
               <>
@@ -736,54 +869,17 @@ const ManualReg = () => {
                     >
                       Card information
                     </label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      value={formData.cardNumber}
-                      onChange={handleInputChange}
-                      placeholder="4242 4242 4242 4242"
+                    {/* Stripe CardElement replaces Card Number + Expiry + CVC */}
+                    <div
                       style={{
-                        width: '100%',
-                        // padding: '10px',
                         border: '1px solid #e0e0e0',
-                        borderRadius: '6px 6px 0 0',
-                        borderBottom: 'none',
-                        fontSize: '14px',
-                        marginTop: '5px',
+                        padding: '12px',
+                        borderRadius: '6px',
+                        background: 'white',
+                        marginTop: '8px',
                       }}
-                    />
-
-                    <div style={{ display: 'flex', gap: '0' }}>
-                      <input
-                        type="text"
-                        name="expiryDate"
-                        value={formData.expiryDate}
-                        onChange={handleInputChange}
-                        placeholder="12/24"
-                        style={{
-                          width: '50%',
-                          // padding: '10px',
-                          border: '1px solid #e0e0e0',
-                          borderRadius: '0 0 0 6px',
-                          borderRight: 'none',
-                          fontSize: '14px',
-                        }}
-                      />
-
-                      <input
-                        type="text"
-                        name="cvv"
-                        value={formData.cvv}
-                        onChange={handleInputChange}
-                        placeholder="123"
-                        style={{
-                          width: '50%',
-                          // padding: '10px',
-                          border: '1px solid #e0e0e0',
-                          borderRadius: '0 0 6px 0',
-                          fontSize: '14px',
-                        }}
-                      />
+                    >
+                      <CardElement options={{ hidePostalCode: true }} />
                     </div>
                   </div>
 
@@ -862,6 +958,7 @@ const ManualReg = () => {
                   </div>
 
                   <button
+                    onClick={handlePay}
                     style={{
                       width: '100%',
                       padding: '10px',
@@ -880,6 +977,16 @@ const ManualReg = () => {
                       .find((pkg) => pkg._id === formData.membershipLevel)
                       ?.calculatedPrice?.toFixed(2) || '0.00'}
                   </button>
+
+                  {showStripe && clientSecret && (
+                    <CardPaymentUI
+                      clientSecret={clientSecret}
+                      onSuccess={() => {
+                        setShowStripe(false);
+                        setClientSecret(null);
+                      }}
+                    />
+                  )}
                 </div>
 
                 <div
@@ -1066,6 +1173,7 @@ const ManualReg = () => {
               </>
             )}
           </section>
+          </Elements>
         )}
       </div>
     </div>
