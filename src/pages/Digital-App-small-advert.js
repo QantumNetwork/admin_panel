@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { uploadFileToS3 } from '../s3/config';
 import { ToastContainer, Slide, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';import AppLayout from '../components/AppLayout';
+import 'react-toastify/dist/ReactToastify.css';
+import AppLayout from '../components/AppLayout';
 import { trackMenuAccess, handleLogout } from '../utils/api';
 import {
   FaRegStar,
@@ -170,7 +171,7 @@ const DigitalSmall = () => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Platinum Black', label: 'Platinum Black'}
+      { value: 'Platinum Black', label: 'Platinum Black' },
     ];
   } else if (selectedVenue === 'Manly') {
     // Options for audience selection
@@ -183,7 +184,7 @@ const DigitalSmall = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ];
-  } else if(selectedVenue === 'Hogan') {
+  } else if (selectedVenue === 'Hogan') {
     audienceOptions = [
       { value: 'Bronze', label: 'Bronze' },
       { value: 'Silver', label: 'Silver' },
@@ -194,20 +195,20 @@ const DigitalSmall = () => {
       { value: 'Family', label: 'Family' },
       { value: 'Directors', label: 'Directors' },
     ];
-  } else if(selectedVenue === 'North') {
+  } else if (selectedVenue === 'North') {
     audienceOptions = [
-      {value: 'Gold', label: 'Gold'},
-      {value: 'Platinum', label: 'Platinum'},
-      {value: 'Pre Staff', label: 'Pre Staff'},
-      {value: 'Silver', label: 'Silver'},
-      {value: 'Staff', label: 'Staff'},
-      {value: 'Valued', label: 'Valued'}
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Pre Staff', label: 'Pre Staff' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Valued', label: 'Valued' },
     ];
   } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
     audienceOptions = [
-        { value: 'Premium Member', label: 'Premium Member' },
-        { value: 'Member', label: 'Member' },
-      ];
+      { value: 'Premium Member', label: 'Premium Member' },
+      { value: 'Member', label: 'Member' },
+    ];
   } else if (selectedVenue === 'Ace') {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -216,7 +217,7 @@ const DigitalSmall = () => {
       { value: 'Queens', label: 'Queens' },
       { value: 'Kings', label: 'Kings' },
       { value: 'Ace', label: 'Ace' },
-      { value: 'Ace Plus', label: 'Ace Plus'}
+      { value: 'Ace Plus', label: 'Ace Plus' },
     ];
   } else if (selectedVenue === 'Queens') {
     audienceOptions = [
@@ -226,7 +227,7 @@ const DigitalSmall = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
       { value: 'Diamond Plus', label: 'Diamond Plus' },
-      { value: 'Curtis Coast', label: 'Curtis Coast' }
+      { value: 'Curtis Coast', label: 'Curtis Coast' },
     ];
   } else if (selectedVenue === 'Brisbane') {
     audienceOptions = [
@@ -237,7 +238,7 @@ const DigitalSmall = () => {
       { value: 'Legend', label: 'Legend' },
     ];
   } else if (selectedVenue === 'Bluewater') {
-    audienceOptions = [  
+    audienceOptions = [
       { value: 'Deckhand', label: 'Deckhand' },
       { value: 'Firstmate', label: 'Firstmate' },
       { value: 'Captain', label: 'Captain' },
@@ -890,10 +891,10 @@ const DigitalSmall = () => {
   const parsePromotionText = (rawText) => {
     if (!rawText) return '';
 
-        // If the text contains HTML tags, return it as is
-        if (/<[a-z][\s\S]*>/i.test(rawText)) {
-          return rawText;
-        }
+    // If the text contains HTML tags, return it as is
+    if (/<[a-z][\s\S]*>/i.test(rawText)) {
+      return rawText;
+    }
 
     try {
       // Decode Unicode and keep all special characters safe
@@ -935,42 +936,43 @@ const DigitalSmall = () => {
     }
   }, [token]);
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="digital-app-container">
-      <ToastContainer 
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
@@ -978,17 +980,16 @@ const handleCardClick = async (accessItem, navigateTo) => {
         pauseOnHover
         theme="light"
         transition={Slide}
-        style={{ zIndex: 9999, 
+        style={{
+          zIndex: 9999,
           marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
-          textAlign: 'center' }}
-            />
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -1176,19 +1177,21 @@ const handleCardClick = async (accessItem, navigateTo) => {
           />
           Special Offers
         </button>
-        {/* <button
-          className={`sidebar-btn ${
-            isActive('/smart-incentives') ? 'active' : ''
-          }`}
-          onClick={() => handleNavigation('/smart-incentives')}
-        >
-          <FaRegStar
-            className={`sidebar-icon ${
-              isActive('/smart-incentives') ? '' : 'navy-icon'
+        {selectedVenue === 'Ace' && (
+          <button
+            className={`sidebar-btn ${
+              isActive('/smart-incentives') ? 'active' : ''
             }`}
-          />
-          Smart Incentives
-        </button> */}
+            onClick={() => handleNavigation('/smart-incentives')}
+          >
+            <FaRegStar
+              className={`sidebar-icon ${
+                isActive('/smart-incentives') ? '' : 'navy-icon'
+              }`}
+            />
+            Smart Incentives
+          </button>
+        )}
         <button
           className={`sidebar-btn ${isActive('/my-benefits') ? 'active' : ''}`}
           onClick={() => handleNavigation('/my-benefits')}
@@ -2001,7 +2004,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
           )}
         </>
       )}
-      
+
       <style>{`
         .bg-img-small {
           position: relative;

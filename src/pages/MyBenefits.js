@@ -47,15 +47,16 @@ const MyBenefits = () => {
   // Change the initial state for selectedLevel to:
   const [selectedLevel, setSelectedLevel] = useState(() => {
     const savedVenue = localStorage.getItem('selectedVenue');
-    if(savedVenue === 'Manly') return 'Commodore';
-    if(savedVenue === 'Hogan') return 'Bronze';
-    if(savedVenue === 'North') return 'Gold';
-    if(savedVenue === 'StarReward') return 'Valued';
-    if(savedVenue === 'Queens') return 'Queens';
-    if(savedVenue === 'Ace') return 'Staff';
-    if(savedVenue === 'Montauk' || savedVenue === 'Central') return 'Premium Member';
-    if(savedVenue === 'Brisbane') return 'Brew Crew';
-    if(savedVenue === 'Bluewater') return 'Deckhand';
+    if (savedVenue === 'Manly') return 'Commodore';
+    if (savedVenue === 'Hogan') return 'Bronze';
+    if (savedVenue === 'North') return 'Gold';
+    if (savedVenue === 'StarReward') return 'Valued';
+    if (savedVenue === 'Queens') return 'Queens';
+    if (savedVenue === 'Ace') return 'Staff';
+    if (savedVenue === 'Montauk' || savedVenue === 'Central')
+      return 'Premium Member';
+    if (savedVenue === 'Brisbane') return 'Brew Crew';
+    if (savedVenue === 'Bluewater') return 'Deckhand';
     return 'Platinum Black';
   });
 
@@ -71,8 +72,8 @@ const MyBenefits = () => {
     switch (level) {
       case 'Gold':
       case 'Captain':
-        if(selectedVenue === 'Manly') return '#D4AF37'; // Gold color
-        if(selectedVenue === 'Bluewater') return '#26AEB1';        
+        if (selectedVenue === 'Manly') return '#D4AF37'; // Gold color
+        if (selectedVenue === 'Bluewater') return '#26AEB1';
       case 'Queens':
       case 'Silver':
         return '#C0C0C0'; // Silver color
@@ -82,7 +83,8 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
+          return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
       case 'Staff Pre 3Mth':
         return '#FF0000';
@@ -98,10 +100,10 @@ const MyBenefits = () => {
       case 'Member':
         if (selectedVenue === 'Montauk') return '#344361';
         if (selectedVenue === 'Central') return '#602373';
-        if (selectedVenue === 'Brisbane') return '#376cc3ff'
+        if (selectedVenue === 'Brisbane') return '#376cc3ff';
       case 'Commodore':
-        if(selectedVenue === 'Manly') return '#B0B0B0';
-        if(selectedVenue === 'Bluewater') return '#333333';
+        if (selectedVenue === 'Manly') return '#B0B0B0';
+        if (selectedVenue === 'Bluewater') return '#333333';
       case 'Commander':
         return '#C0C0C0';
       case 'Lieutenant':
@@ -141,7 +143,7 @@ const MyBenefits = () => {
       case 'Ace Plus':
         return '#3d80a4ff';
       case 'Tens':
-        return '#969393e4'
+        return '#969393e4';
       case 'Curtis Coast':
         return '#c7e957ff';
       case 'Brew Crew':
@@ -153,7 +155,7 @@ const MyBenefits = () => {
       case 'Legend':
         return '#f8f5f5c3';
       case 'Firstmate':
-        return '#c14810ff'
+        return '#c14810ff';
       case 'Admiral':
         return '#23a5ec';
       default:
@@ -163,10 +165,7 @@ const MyBenefits = () => {
 
   let audienceOptions = [];
 
-  if (
-    selectedVenue === 'Qantum' ||
-    selectedVenue === 'MaxGaming' 
-  ) {
+  if (selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') {
     // Options for audience selection
     audienceOptions = [
       { value: 'Platinum Black', label: 'Platinum Black' },
@@ -193,23 +192,23 @@ const MyBenefits = () => {
     ];
   } else if (selectedVenue === 'Hogan') {
     audienceOptions = [
-      {value: 'Bronze', label: 'Bronze'},
-      {value: 'Silver', label: 'Silver'},
-      {value: 'Gold', label: 'Gold'},
-      {value: 'Platinum', label: 'Platinum'},
-      {value: 'Staff', label: 'Staff'},
-      {value: 'Management', label: 'Management'},
-      {value: 'Family', label: 'Family'},
-      {value: 'Directors', label: 'Directors'},
+      { value: 'Bronze', label: 'Bronze' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Management', label: 'Management' },
+      { value: 'Family', label: 'Family' },
+      { value: 'Directors', label: 'Directors' },
     ];
   } else if (selectedVenue === 'North') {
     audienceOptions = [
-      {value: 'Gold', label: 'Gold'},
-      {value: 'Platinum', label: 'Platinum'},
-      {value: 'Pre Staff', label: 'Pre Staff'},
-      {value: 'Silver', label: 'Silver'},
-      {value: 'Staff', label: 'Staff'},
-      {value: 'Valued', label: 'Valued'}
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Pre Staff', label: 'Pre Staff' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Valued', label: 'Valued' },
     ];
   } else if (selectedVenue === 'StarReward') {
     // Options for audience selection
@@ -220,7 +219,7 @@ const MyBenefits = () => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Platinum Black', label: 'Platinum Black'}
+      { value: 'Platinum Black', label: 'Platinum Black' },
     ];
   } else if (selectedVenue === 'Ace') {
     audienceOptions = [
@@ -230,7 +229,7 @@ const MyBenefits = () => {
       { value: 'Queens', label: 'Queens' },
       { value: 'Kings', label: 'Kings' },
       { value: 'Ace', label: 'Ace' },
-      { value: 'Ace Plus', label: 'Ace Plus'}
+      { value: 'Ace Plus', label: 'Ace Plus' },
     ];
   } else if (selectedVenue === 'Queens') {
     audienceOptions = [
@@ -240,7 +239,7 @@ const MyBenefits = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
       { value: 'Diamond Plus', label: 'Diamond Plus' },
-      { value: 'Curtis Coast', label: 'Curtis Coast' }
+      { value: 'Curtis Coast', label: 'Curtis Coast' },
     ];
   } else if (selectedVenue === 'Brisbane') {
     audienceOptions = [
@@ -251,7 +250,7 @@ const MyBenefits = () => {
       { value: 'Legend', label: 'Legend' },
     ];
   } else if (selectedVenue === 'Bluewater') {
-    audienceOptions = [  
+    audienceOptions = [
       { value: 'Deckhand', label: 'Deckhand' },
       { value: 'Firstmate', label: 'Firstmate' },
       { value: 'Captain', label: 'Captain' },
@@ -476,61 +475,60 @@ const MyBenefits = () => {
     }
   }, [token]);
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     // <div className="my-benefits-container">
     <div className="digital-app-container-so">
-      <ToastContainer 
-                          position="top-center"
-                          autoClose={3000}
-                          hideProgressBar={false}
-                          newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                    transition={Slide}
-                    style={{  
-                      marginTop: '90px',
-                      fontSize: '14px',
-                      minWidth: '300px',
-                      textAlign: 'center' }}
-                        />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -718,19 +716,21 @@ const handleCardClick = async (accessItem, navigateTo) => {
           />
           Special Offers
         </button>
-        {/* <button
-          className={`sidebar-btn ${
-            isActive('/smart-incentives') ? 'active' : ''
-          }`}
-          onClick={() => handleNavigation('/smart-incentives')}
-        >
-          <FaRegStar
-            className={`sidebar-icon ${
-              isActive('/smart-incentives') ? '' : 'navy-icon'
+        {selectedVenue === 'Ace' && (
+          <button
+            className={`sidebar-btn ${
+              isActive('/smart-incentives') ? 'active' : ''
             }`}
-          />
-          Smart Incentives
-        </button> */}
+            onClick={() => handleNavigation('/smart-incentives')}
+          >
+            <FaRegStar
+              className={`sidebar-icon ${
+                isActive('/smart-incentives') ? '' : 'navy-icon'
+              }`}
+            />
+            Smart Incentives
+          </button>
+        )}
         <button
           className={`sidebar-btn ${isActive('/my-benefits') ? 'active' : ''}`}
           onClick={() => handleNavigation('/my-benefits')}
@@ -896,7 +896,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
           </div>
         </div>
       </div>
-      
     </div>
     // </div>
   );

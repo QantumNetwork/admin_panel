@@ -23,7 +23,6 @@ import '../styles/manual-reg.css';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-
 const ManualReg = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -78,7 +77,7 @@ const ManualReg = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripe, setShowStripe] = useState(false);
   const [verifyPayload, setVerifyPayload] = useState(null);
-
+  const [showConfirmMembership, setShowConfirmMembership] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -221,11 +220,70 @@ const ManualReg = () => {
     }
   };
 
-  const handleNextS1 = () => {
+  const handleNextS1 = async () => {
     // Step forward from Register -> Membership Level
-    setS2Visible(true);
-    setEditing1(false); // show edit on s1
-    setEditing2(true); // s2 should show cancel+next at beginning
+
+    if (
+      !formData.GivenNames ||
+      !formData.Surname ||
+      !formData.Address ||
+      !formData.Suburb ||
+      !formData.PostCode ||
+      !formData.DateOfBirth ||
+      !formData.Gender
+    ) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    if (!formData.Mobile || !formData.Email || formData.Mobile.length < 13) {
+      toast.error('Please enter valid mobile number and email');
+      return;
+    }
+
+    try {
+      const body = {
+        Mobile: formData.Mobile,
+        Email: formData.Email,
+      };
+
+      const res = await axios.post(
+        `${baseUrl}/user/check-user?appType=Ace`,
+        body,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const mobileReg = res.data?.mobile?.registered;
+      const emailReg = res.data?.email?.registered;
+
+      // CASE: both registered
+      if (mobileReg && emailReg) {
+        toast.error('Mobile number and Email are already registered');
+        return;
+      }
+
+      // CASE: mobile registered
+      if (mobileReg) {
+        toast.error('Mobile number is already registered');
+        return;
+      }
+
+      // CASE: email registered
+      if (emailReg) {
+        toast.error('Email is already registered');
+        return;
+      }
+
+      // BOTH FALSE → proceed to section 2
+      setS2Visible(true);
+      setEditing1(false);
+      setEditing2(true);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to validate user');
+    }
   };
 
   const handleCancelS1 = () => {
@@ -243,8 +301,16 @@ const ManualReg = () => {
 
   const handleNextS2 = () => {
     // From membership -> payment
-    setS3Visible(true);
-    setEditing2(false); // membership shows edit now
+    if (!formData.membershipLevel) {
+      toast.error('Please select a membership level.');
+      return;
+    }
+
+    // show edit button immediately
+    setEditing2(false);
+
+    // Show confirmation box
+    setShowConfirmMembership(true);
   };
 
   const handleCancelS2 = () => {
@@ -320,7 +386,7 @@ const ManualReg = () => {
         Address: formData.Address,
         Suburb: formData.Suburb,
         State: formData.region,
-        amountPaid: selectedPkg?.calculatedPrice*100 || 0,
+        amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
         currency: 'aud',
         packageId: selectedPkg?._id,
         packageName: selectedPkg?.membershipName,
@@ -356,7 +422,11 @@ const ManualReg = () => {
       });
     } catch (err) {
       console.error(err);
-      toast.error(`Registration failed - ${err.response?.data?.Message || err.response?.data}`);
+      toast.error(
+        `Registration failed - ${
+          err.response?.data?.Message || err.response?.data
+        }`
+      );
     }
   };
 
@@ -367,54 +437,57 @@ const ManualReg = () => {
 
     const handleConfirm = async () => {
       if (!stripe || !elements) {
-        toast.error("Stripe is not loaded yet");
+        toast.error('Stripe is not loaded yet');
         return;
       }
 
       setLoading(true);
 
-       const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement),
-        billing_details: {
-          name: formData.nameOnCard || undefined,
-          email: formData.paymentEmail || undefined,
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: formData.nameOnCard || undefined,
+            email: formData.paymentEmail || undefined,
+          },
         },
-      },
-    });
+      });
 
-        try {
-    const verifyBody = {
-      paymentIntentId: verifyPayload.paymentIntentId,
-      userId: verifyPayload.userId,
-      appType: verifyPayload.appType,
-      packageId: verifyPayload.selectedPkg?._id,
-      packageName: verifyPayload.selectedPkg?.membershipName,
-      paymentType: "card"
-    };
+      try {
+        const verifyBody = {
+          paymentIntentId: verifyPayload.paymentIntentId,
+          userId: verifyPayload.userId,
+          appType: verifyPayload.appType,
+          packageId: verifyPayload.selectedPkg?._id,
+          packageName: verifyPayload.selectedPkg?.membershipName,
+          paymentType: 'card',
+        };
 
-    await axios.post(`${baseUrl}/payment/verify-payment`, verifyBody, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+        await axios.post(`${baseUrl}/payment/verify-payment`, verifyBody, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      setLoading(false);
+        setLoading(false);
 
-       if (result.error) {
-        toast.error(result.error.message);
-      } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-        toast.success('Payment successful');
-        onSuccess();
-      } else {
-        toast.error('Payment failed or cancelled');
+        if (result.error) {
+          toast.error(result.error.message);
+        } else if (
+          result.paymentIntent &&
+          result.paymentIntent.status === 'succeeded'
+        ) {
+          toast.success('Payment successful');
+          onSuccess();
+        } else {
+          toast.error('Payment failed or cancelled');
+        }
+      } catch (err) {
+        setLoading(false);
+        console.error(err);
+        toast.error('Payment failed');
       }
-    } catch (err) {
-      setLoading(false);
-      console.error(err);
-      toast.error('Payment failed');
-    }
-  };
+    };
 
     return (
       <div style={{ marginTop: '20px' }}>
@@ -441,6 +514,22 @@ const ManualReg = () => {
       </div>
     );
   }
+
+  useEffect(() => {
+    // Auto set paymentEmail from registration email
+    setFormData((prev) => ({
+      ...prev,
+      paymentEmail: prev.Email,
+    }));
+  }, [formData.Email]);
+
+  // Disable all inputs in a section when editing = false
+  const disableIf = (condition) => ({
+    disabled: !condition,
+    style: !condition
+      ? { backgroundColor: '#f2f2f2', cursor: 'not-allowed' }
+      : {},
+  });
 
   return (
     <div className="dashboard-container">
@@ -626,6 +715,7 @@ const ManualReg = () => {
               name="GivenNames"
               value={formData.GivenNames}
               onChange={handleInputChange}
+              {...disableIf(editing1)}
             />
           </div>
 
@@ -636,6 +726,7 @@ const ManualReg = () => {
               name="Surname"
               value={formData.Surname}
               onChange={handleInputChange}
+              {...disableIf(editing1)}
             />
           </div>
 
@@ -650,6 +741,7 @@ const ManualReg = () => {
               placeholder="Enter mobile number"
               international
               countryCallingCodeEditable={false}
+              {...disableIf(editing1)}
               style={{
                 width: '100%',
                 backgroundColor: 'white',
@@ -664,6 +756,7 @@ const ManualReg = () => {
               name="Email"
               value={formData.Email}
               onChange={handleInputChange}
+              {...disableIf(editing1)}
             />
           </div>
 
@@ -679,6 +772,7 @@ const ManualReg = () => {
                   name="Address"
                   value={formData.Address || ''}
                   onChange={handleInputChange}
+                  {...disableIf(editing1)}
                 />
               </div>
               <div className="city-zip">
@@ -688,6 +782,7 @@ const ManualReg = () => {
                   name="Suburb"
                   value={formData.Suburb || ''}
                   onChange={handleInputChange}
+                  {...disableIf(editing1)}
                 />
                 <input
                   type="text"
@@ -695,6 +790,7 @@ const ManualReg = () => {
                   name="PostCode"
                   value={formData.PostCode || ''}
                   onChange={handleInputChange}
+                  {...disableIf(editing1)}
                 />
               </div>
             </div>
@@ -708,6 +804,7 @@ const ManualReg = () => {
               value={formData.DateOfBirth}
               onChange={handleInputChange}
               style={{ padding: '8px' }}
+              {...disableIf(editing1)}
             />
           </div>
 
@@ -723,7 +820,12 @@ const ManualReg = () => {
                 Gender
               </label>
               <label
-                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                  marginLeft: '28px',
+                }}
               >
                 <input
                   type="radio"
@@ -732,6 +834,7 @@ const ManualReg = () => {
                   checked={formData.Gender === 'M'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
+                  {...disableIf(editing1)}
                 />
                 Male
               </label>
@@ -745,6 +848,7 @@ const ManualReg = () => {
                   checked={formData.Gender === 'F'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
+                  {...disableIf(editing1)}
                 />
                 Female
               </label>
@@ -759,6 +863,7 @@ const ManualReg = () => {
                   checked={formData.Gender === 'U'}
                   onChange={handleInputChange}
                   style={{ accentColor: '#002977' }}
+                  {...disableIf(editing1)}
                 />
                 Non-binary
               </label>
@@ -797,6 +902,7 @@ const ManualReg = () => {
                 value={formData.membershipLevel || ''}
                 onChange={handleInputChange}
                 className="membershipLevel"
+                {...disableIf(editing2)}
                 style={{
                   width: '100%',
                   padding: '10px 15px',
@@ -826,9 +932,84 @@ const ManualReg = () => {
               </select>
             </div>
 
+            {showConfirmMembership && (
+              <div
+                style={{
+                  width: '86%',
+                  background: 'white',
+                  padding: '25px',
+                  borderRadius: '10px',
+                  marginTop: '160px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  textAlign: 'center',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '15px',
+                    marginBottom: '25px',
+                    color: '#555',
+                    lineHeight: '20px',
+                  }}
+                >
+                  Have you sighted the person’s
+                  <br />
+                  identification and checked it is valid
+                  <br />
+                  and they’re over 18?
+                </p>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '20px',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      // user clicked cancel
+                      setShowConfirmMembership(false);
+                      setEditing2(true); // restore Cancel + Next buttons
+                    }}
+                    style={{
+                      padding: '10px 35px',
+                      backgroundColor: '#D3D3D3',
+                      color: '#555',
+                      border: 'none',
+                      borderRadius: '20px',
+                      fontSize: '15px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      // user clicked yes → open payment
+                      setShowConfirmMembership(false);
+                      setS3Visible(true);
+                    }}
+                    style={{
+                      padding: '10px 35px',
+                      backgroundColor: '#4A90E2',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '20px',
+                      fontSize: '15px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div
               className="d-flex w-100 justify-content-center"
-              style={{ marginTop: '425px' }}
+              style={{ marginTop: !showConfirmMembership ? '430px' : '70px' }}
             >
               {editing2 ? (
                 <>
@@ -850,353 +1031,354 @@ const ManualReg = () => {
 
         {s3Visible && (
           <Elements stripe={stripePromise}>
-          <section className="connected-sa" style={{ height: '600px' }}>
-            {!showManualPayment ? (
-              <>
-                <h2>Payment Details</h2>
-                <div className="payment-white-box">
-                  <div className="form-group">
-                    <label
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '13px',
-                        color: '#5a5a5a',
-                      }}
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="paymentEmail"
-                      value={formData.paymentEmail}
-                      onChange={handleInputChange}
-                      placeholder="ella.williams@example.com"
-                      style={{
-                        width: '100%',
-                        // padding: '10px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        marginTop: '5px',
-                      }}
-                    />
-                  </div>
-
-                  <div className="form-group" style={{ marginTop: '10px' }}>
-                    <label
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '13px',
-                        color: '#5a5a5a',
-                      }}
-                    >
-                      Card information
-                    </label>
-                    {/* Stripe CardElement replaces Card Number + Expiry + CVC */}
-                    <div
-                      style={{
-                        border: '1px solid #e0e0e0',
-                        padding: '12px',
-                        borderRadius: '6px',
-                        background: 'white',
-                        marginTop: '8px',
-                      }}
-                    >
-                      <CardElement options={{ hidePostalCode: true }} />
+            <section className="connected-sa" style={{ height: '600px' }}>
+              {!showManualPayment ? (
+                <>
+                  <h2>Payment Details</h2>
+                  <div className="payment-white-box">
+                    <div className="form-group">
+                      <label
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '13px',
+                          color: '#5a5a5a',
+                        }}
+                      >
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="paymentEmail"
+                        value={formData.paymentEmail}
+                        disabled
+                        onChange={handleInputChange}
+                        placeholder="ella.williams@example.com"
+                        style={{
+                          width: '100%',
+                          // padding: '10px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          marginTop: '5px',
+                        }}
+                      />
                     </div>
-                  </div>
 
-                  <div className="form-group" style={{ marginTop: '10px' }}>
-                    <label
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '13px',
-                        color: '#5a5a5a',
-                      }}
-                    >
-                      Name on card
-                    </label>
-                    <input
-                      type="text"
-                      name="nameOnCard"
-                      value={formData.nameOnCard}
-                      onChange={handleInputChange}
-                      placeholder="Ella Williams"
+                    <div className="form-group" style={{ marginTop: '10px' }}>
+                      <label
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '13px',
+                          color: '#5a5a5a',
+                        }}
+                      >
+                        Card information
+                      </label>
+                      {/* Stripe CardElement replaces Card Number + Expiry + CVC */}
+                      <div
+                        style={{
+                          border: '1px solid #e0e0e0',
+                          padding: '12px',
+                          borderRadius: '6px',
+                          background: 'white',
+                          marginTop: '8px',
+                        }}
+                      >
+                        <CardElement options={{ hidePostalCode: true }} />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginTop: '10px' }}>
+                      <label
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '13px',
+                          color: '#5a5a5a',
+                        }}
+                      >
+                        Name on card
+                      </label>
+                      <input
+                        type="text"
+                        name="nameOnCard"
+                        value={formData.nameOnCard}
+                        onChange={handleInputChange}
+                        placeholder="Ella Williams"
+                        style={{
+                          width: '100%',
+                          // padding: '10px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          marginTop: '5px',
+                        }}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginTop: '10px' }}>
+                      <label
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '13px',
+                          color: '#5a5a5a',
+                        }}
+                      >
+                        Country or region
+                      </label>
+                      <select
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        style={{
+                          width: '100%',
+                          padding: '5px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          marginTop: '5px',
+                          backgroundColor: 'white',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <option value="Australia">Australia</option>
+                        <option value="United States">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                      </select>
+                      <input
+                        type="text"
+                        name="region"
+                        value={formData.region}
+                        onChange={handleInputChange}
+                        placeholder="Queensland"
+                        style={{
+                          width: '100%',
+                          // padding: '10px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          marginTop: '10px',
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      onClick={handlePay}
                       style={{
                         width: '100%',
-                        // padding: '10px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        marginTop: '5px',
-                      }}
-                    />
-                  </div>
-
-                  <div className="form-group" style={{ marginTop: '10px' }}>
-                    <label
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '13px',
-                        color: '#5a5a5a',
-                      }}
-                    >
-                      Country or region
-                    </label>
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      style={{
-                        width: '100%',
-                        padding: '5px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        marginTop: '5px',
-                        backgroundColor: 'white',
+                        padding: '10px',
+                        backgroundColor: '#5296D1',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '20px',
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        marginTop: '10px',
                         cursor: 'pointer',
                       }}
                     >
-                      <option value="Australia">Australia</option>
-                      <option value="United States">United States</option>
-                      <option value="Canada">Canada</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                    </select>
-                    <input
-                      type="text"
-                      name="region"
-                      value={formData.region}
-                      onChange={handleInputChange}
-                      placeholder="Queensland"
-                      style={{
-                        width: '100%',
-                        // padding: '10px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        marginTop: '10px',
-                      }}
-                    />
+                      Pay AUD$
+                      {membershipPackages
+                        .find((pkg) => pkg._id === formData.membershipLevel)
+                        ?.calculatedPrice?.toFixed(2) || '0.00'}
+                    </button>
+
+                    {showStripe && clientSecret && (
+                      <CardPaymentUI
+                        clientSecret={clientSecret}
+                        onSuccess={() => {
+                          setShowStripe(false);
+                          setClientSecret(null);
+                        }}
+                        verifyPayload={verifyPayload}
+                      />
+                    )}
                   </div>
 
-                  <button
-                    onClick={handlePay}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      backgroundColor: '#5296D1',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '20px',
-                      fontSize: '15px',
-                      fontWeight: '600',
-                      marginTop: '10px',
-                      cursor: 'pointer',
-                    }}
+                  <div
+                    className="d-flex w-100 justify-content-center"
+                    style={{ marginTop: '2px' }}
                   >
-                    Pay AUD$
-                    {membershipPackages
-                      .find((pkg) => pkg._id === formData.membershipLevel)
-                      ?.calculatedPrice?.toFixed(2) || '0.00'}
-                  </button>
-
-                  {showStripe && clientSecret && (
-                    <CardPaymentUI
-                      clientSecret={clientSecret}
-                      onSuccess={() => {
-                        setShowStripe(false);
-                        setClientSecret(null);
+                    <button
+                      className="payment-btn"
+                      onClick={handleManualPaymentClick}
+                    >
+                      Manually approve payment
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2>Manual Payment Details</h2>
+                  <div style={{ marginTop: '30px' }}>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        color: '#5a5a5a',
+                        marginBottom: '15px',
                       }}
-                      verifyPayload={verifyPayload}
-                    />
-                  )}
-                </div>
-
-                <div
-                  className="d-flex w-100 justify-content-center"
-                  style={{ marginTop: '2px' }}
-                >
-                  <button
-                    className="payment-btn"
-                    onClick={handleManualPaymentClick}
-                  >
-                    Manually approve payment
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2>Manual Payment Details</h2>
-                <div style={{ marginTop: '30px' }}>
-                  <p
-                    style={{
-                      fontSize: '14px',
-                      color: '#5a5a5a',
-                      marginBottom: '15px',
-                    }}
-                  >
-                    Choose payment method
-                  </p>
+                    >
+                      Choose payment method
+                    </p>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                      }}
+                    >
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="Cash"
+                          checked={selectedPaymentMethod === 'Cash'}
+                          onChange={(e) =>
+                            setSelectedPaymentMethod(e.target.value)
+                          }
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer',
+                            accentColor: '#002977',
+                          }}
+                        />
+                        Cash
+                      </label>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="Card by venue"
+                          checked={selectedPaymentMethod === 'Card by venue'}
+                          onChange={(e) =>
+                            setSelectedPaymentMethod(e.target.value)
+                          }
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer',
+                            accentColor: '#002977',
+                          }}
+                        />
+                        Card by venue
+                      </label>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="Cheque"
+                          checked={selectedPaymentMethod === 'Cheque'}
+                          onChange={(e) =>
+                            setSelectedPaymentMethod(e.target.value)
+                          }
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer',
+                            accentColor: '#002977',
+                          }}
+                        />
+                        Cheque
+                      </label>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="Management approved"
+                          checked={
+                            selectedPaymentMethod === 'Management approved'
+                          }
+                          onChange={(e) =>
+                            setSelectedPaymentMethod(e.target.value)
+                          }
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer',
+                            accentColor: '#002977',
+                          }}
+                        />
+                        Management approved
+                      </label>
+                    </div>
+                  </div>
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px',
+                      gap: '15px',
+                      marginTop: '320px',
+                      justifyContent: 'center',
                     }}
                   >
-                    <label
+                    <button
+                      onClick={handleCancelManualPayment}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '14px',
+                        padding: '12px 40px',
+                        backgroundColor: '#d3d3d3',
+                        color: '#666',
+                        border: 'none',
+                        borderRadius: '25px',
+                        fontSize: '15px',
+                        fontWeight: '500',
                         cursor: 'pointer',
+                        minWidth: '120px',
                       }}
                     >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="Cash"
-                        checked={selectedPaymentMethod === 'Cash'}
-                        onChange={(e) =>
-                          setSelectedPaymentMethod(e.target.value)
-                        }
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          accentColor: '#002977',
-                        }}
-                      />
-                      Cash
-                    </label>
-                    <label
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleConfirmManualPayment}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '14px',
+                        padding: '12px 40px',
+                        backgroundColor: '#4a90e2',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '25px',
+                        fontSize: '15px',
+                        fontWeight: '500',
                         cursor: 'pointer',
+                        minWidth: '120px',
                       }}
                     >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="Card by venue"
-                        checked={selectedPaymentMethod === 'Card by venue'}
-                        onChange={(e) =>
-                          setSelectedPaymentMethod(e.target.value)
-                        }
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          accentColor: '#002977',
-                        }}
-                      />
-                      Card by venue
-                    </label>
-                    <label
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="Cheque"
-                        checked={selectedPaymentMethod === 'Cheque'}
-                        onChange={(e) =>
-                          setSelectedPaymentMethod(e.target.value)
-                        }
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          accentColor: '#002977',
-                        }}
-                      />
-                      Cheque
-                    </label>
-                    <label
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="Management approved"
-                        checked={
-                          selectedPaymentMethod === 'Management approved'
-                        }
-                        onChange={(e) =>
-                          setSelectedPaymentMethod(e.target.value)
-                        }
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          accentColor: '#002977',
-                        }}
-                      />
-                      Management approved
-                    </label>
+                      Confirm
+                    </button>
                   </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '15px',
-                    marginTop: '320px',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <button
-                    onClick={handleCancelManualPayment}
-                    style={{
-                      padding: '12px 40px',
-                      backgroundColor: '#d3d3d3',
-                      color: '#666',
-                      border: 'none',
-                      borderRadius: '25px',
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      minWidth: '120px',
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleConfirmManualPayment}
-                    style={{
-                      padding: '12px 40px',
-                      backgroundColor: '#4a90e2',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '25px',
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      minWidth: '120px',
-                    }}
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
+                </>
+              )}
+            </section>
           </Elements>
         )}
       </div>

@@ -167,7 +167,7 @@ const SpecialOffers = () => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Platinum Black', label: 'Platinum Black'}
+      { value: 'Platinum Black', label: 'Platinum Black' },
     ];
   } else if (selectedVenue === 'Manly') {
     // Options for audience selection
@@ -180,7 +180,7 @@ const SpecialOffers = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ];
-  } else if(selectedVenue === 'Hogan') {
+  } else if (selectedVenue === 'Hogan') {
     audienceOptions = [
       { value: 'Bronze', label: 'Bronze' },
       { value: 'Silver', label: 'Silver' },
@@ -191,20 +191,20 @@ const SpecialOffers = () => {
       { value: 'Family', label: 'Family' },
       { value: 'Directors', label: 'Directors' },
     ];
-  } else if(selectedVenue === 'North') {
+  } else if (selectedVenue === 'North') {
     audienceOptions = [
-      {value: 'Gold', label: 'Gold'},
-      {value: 'Platinum', label: 'Platinum'},
-      {value: 'Pre Staff', label: 'Pre Staff'},
-      {value: 'Silver', label: 'Silver'},
-      {value: 'Staff', label: 'Staff'},
-      {value: 'Valued', label: 'Valued'}
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Pre Staff', label: 'Pre Staff' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Valued', label: 'Valued' },
     ];
   } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
-      audienceOptions = [
-        { value: 'Premium Member', label: 'Premium Member' },
-        { value: 'Member', label: 'Member' },
-      ];
+    audienceOptions = [
+      { value: 'Premium Member', label: 'Premium Member' },
+      { value: 'Member', label: 'Member' },
+    ];
   } else if (selectedVenue === 'Ace') {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -213,9 +213,9 @@ const SpecialOffers = () => {
       { value: 'Queens', label: 'Queens' },
       { value: 'Kings', label: 'Kings' },
       { value: 'Ace', label: 'Ace' },
-      { value: 'Ace Plus', label: 'Ace Plus'}
+      { value: 'Ace Plus', label: 'Ace Plus' },
     ];
-  }else if (selectedVenue === 'Queens') {
+  } else if (selectedVenue === 'Queens') {
     audienceOptions = [
       { value: 'Queens', label: 'Queens' },
       { value: 'Ruby', label: 'Ruby' },
@@ -223,7 +223,7 @@ const SpecialOffers = () => {
       { value: 'Sapphire', label: 'Sapphire' },
       { value: 'Diamond', label: 'Diamond' },
       { value: 'Diamond Plus', label: 'Diamond Plus' },
-      { value: 'Curtis Coast', label: 'Curtis Coast' }
+      { value: 'Curtis Coast', label: 'Curtis Coast' },
     ];
   } else if (selectedVenue === 'Brisbane') {
     audienceOptions = [
@@ -234,7 +234,7 @@ const SpecialOffers = () => {
       { value: 'Legend', label: 'Legend' },
     ];
   } else if (selectedVenue === 'Bluewater') {
-    audienceOptions = [  
+    audienceOptions = [
       { value: 'Deckhand', label: 'Deckhand' },
       { value: 'Firstmate', label: 'Firstmate' },
       { value: 'Captain', label: 'Captain' },
@@ -1556,13 +1556,12 @@ const SpecialOffers = () => {
         containerId: 'offerActions',
       });
 
-      setAddMode(false);    
+      setAddMode(false);
 
       // Add a delay before refreshing the page
       setTimeout(() => {
         navigate('/special-offers');
       }, 1500); // 1.5 seconds delay
-
     } catch (error) {
       console.error('Error submitting offer:', error);
       toast.error('Failed to submit offer. Please try again.');
@@ -2193,29 +2192,26 @@ const SpecialOffers = () => {
     }
   };
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
 
   return (
     <div className="digital-app-container-so">
-      
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -2427,19 +2423,21 @@ const SpecialOffers = () => {
           />
           Special Offers
         </button>
-        {/* <button
-          className={`sidebar-btn ${
-            isActive('/smart-incentives') ? 'active' : ''
-          }`}
-          onClick={() => handleNavigation('/smart-incentives')}
-        >
-          <FaRegStar
-            className={`sidebar-icon ${
-              isActive('/smart-incentives') ? '' : 'navy-icon'
+        {selectedVenue === 'Ace' && (
+          <button
+            className={`sidebar-btn ${
+              isActive('/smart-incentives') ? 'active' : ''
             }`}
-          />
-          Smart Incentives
-        </button> */}
+            onClick={() => handleNavigation('/smart-incentives')}
+          >
+            <FaRegStar
+              className={`sidebar-icon ${
+                isActive('/smart-incentives') ? '' : 'navy-icon'
+              }`}
+            />
+            Smart Incentives
+          </button>
+        )}
         <button
           className={`sidebar-btn ${isActive('/my-benefits') ? 'active' : ''}`}
           onClick={() => handleNavigation('/my-benefits')}
@@ -2466,8 +2464,12 @@ const SpecialOffers = () => {
       </aside>
 
       {offers.length === 0 && !addMode && activeTab === 'live' ? (
-        <div className="btn-sp-offer" style={{marginTop: '400px'}}>
-          <button className="add-offer-button" onClick={handleAddNewOffer} style={{width: '12%'}}>
+        <div className="btn-sp-offer" style={{ marginTop: '400px' }}>
+          <button
+            className="add-offer-button"
+            onClick={handleAddNewOffer}
+            style={{ width: '12%' }}
+          >
             <FaPlus /> ADD YOUR FIRST OFFER
           </button>
         </div>

@@ -14,8 +14,8 @@ import {
 } from 'react-icons/fa';
 import '../styles/art-gallery.css';
 import axios from 'axios';
-import {trackMenuAccess, handleLogout} from '../utils/api';
-import { toast, ToastContainer,Slide } from 'react-toastify';
+import { trackMenuAccess, handleLogout } from '../utils/api';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { uploadFileToS3, uploadImageToS3 } from '../s3/config';
@@ -348,9 +348,9 @@ const ArtGallery = () => {
       setShowImage(true);
       setIsEditMode(false);
       setCanEdit(true);
-      
+
       // if(!returnTo){
-        // toast.success('Image updated successfully!');
+      // toast.success('Image updated successfully!');
       // }
     } catch (error) {
       console.error('Error updating image:', error);
@@ -370,7 +370,7 @@ const ArtGallery = () => {
 
       if (response && response.success) {
         // if(!returnTo){
-          // toast.success('Image saved to gallery');
+        // toast.success('Image saved to gallery');
         // }
 
         // 🧹 Clear prompt & AI state
@@ -613,7 +613,7 @@ const ArtGallery = () => {
         setCanEdit(false); // 👈 Hide Edit, show Update
 
         setPromot(''); // 👈 Clear textarea so user starts fresh
-          // Focus the textarea after state updates
+        // Focus the textarea after state updates
         setTimeout(() => {
           if (textareaRef.current) {
             textareaRef.current.focus();
@@ -631,42 +631,43 @@ const ArtGallery = () => {
     }
   };
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="digital-app-container-ag">
-      <ToastContainer 
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
@@ -674,17 +675,16 @@ const handleCardClick = async (accessItem, navigateTo) => {
         pauseOnHover
         theme="light"
         transition={Slide}
-        style={{ zIndex: 9999, 
+        style={{
+          zIndex: 9999,
           marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
-          textAlign: 'center' }}
-            />
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -865,19 +865,21 @@ const handleCardClick = async (accessItem, navigateTo) => {
           />
           Special Offers
         </button>
-        {/* <button
-          className={`sidebar-btn ${
-            isActive('/smart-incentives') ? 'active' : ''
-          }`}
-          onClick={() => handleNavigation('/smart-incentives')}
-        >
-          <FaRegStar
-            className={`sidebar-icon ${
-              isActive('/smart-incentives') ? '' : 'navy-icon'
+        {selectedVenue === 'Ace' && (
+          <button
+            className={`sidebar-btn ${
+              isActive('/smart-incentives') ? 'active' : ''
             }`}
-          />
-          Smart Incentives
-        </button> */}
+            onClick={() => handleNavigation('/smart-incentives')}
+          >
+            <FaRegStar
+              className={`sidebar-icon ${
+                isActive('/smart-incentives') ? '' : 'navy-icon'
+              }`}
+            />
+            Smart Incentives
+          </button>
+        )}
         <button
           className={`sidebar-btn ${isActive('/my-benefits') ? 'active' : ''}`}
           onClick={() => handleNavigation('/my-benefits')}
@@ -1054,12 +1056,12 @@ const handleCardClick = async (accessItem, navigateTo) => {
             <div className="w-100">
               <h2>AI Image Creation</h2>
               <h6
-                // style={{
-                //   paddingBottom:
-                //     activeTab === 'Small' || activeTab === 'Special-Offers'
-                //       ? '50px'
-                //       : '30px', // Change padding conditionally
-                // }}
+              // style={{
+              //   paddingBottom:
+              //     activeTab === 'Small' || activeTab === 'Special-Offers'
+              //       ? '50px'
+              //       : '30px', // Change padding conditionally
+              // }}
               >
                 Create an image in seconds
               </h6>
@@ -1106,26 +1108,30 @@ const handleCardClick = async (accessItem, navigateTo) => {
             </div>
 
             {(!showImage || isEditMode) && (
-
-            <div className="d-flex w-100">
-              <div className="w-100">
-                <textarea
-                  ref={textareaRef}
-                  className="text-area-ai-text"
-                  rows="4"
-                  cols="50"
-                  style={{ paddingTop: '40px',
-                    marginBottom: activeTab === 'Small' || activeTab === 'Special-Offers' ? '0px' : '0px'}}
-                  placeholder={
-                    isEditMode
-                      ? 'Edit your changes here and select Update Image'
-                      : 'Type a description of the image here'
-                  }
-                  value={prompt}
-                  onChange={(e) => setPromot(e.target.value)}
-                ></textarea>
+              <div className="d-flex w-100">
+                <div className="w-100">
+                  <textarea
+                    ref={textareaRef}
+                    className="text-area-ai-text"
+                    rows="4"
+                    cols="50"
+                    style={{
+                      paddingTop: '40px',
+                      marginBottom:
+                        activeTab === 'Small' || activeTab === 'Special-Offers'
+                          ? '0px'
+                          : '0px',
+                    }}
+                    placeholder={
+                      isEditMode
+                        ? 'Edit your changes here and select Update Image'
+                        : 'Type a description of the image here'
+                    }
+                    value={prompt}
+                    onChange={(e) => setPromot(e.target.value)}
+                  ></textarea>
+                </div>
               </div>
-            </div>
             )}
 
             {showImage && !isEditMode && (
@@ -1141,7 +1147,11 @@ const handleCardClick = async (accessItem, navigateTo) => {
 
             {showImage && isEditMode && (
               <div className="d-flex align-items-end w-100 justify-content-center">
-                <button className="sky-border-btn update-image-btn" onClick={handleUpdateImage} disabled={prompt.trim() === '' || isUpdating}>
+                <button
+                  className="sky-border-btn update-image-btn"
+                  onClick={handleUpdateImage}
+                  disabled={prompt.trim() === '' || isUpdating}
+                >
                   Update Image
                 </button>
               </div>
@@ -1152,7 +1162,11 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 className="d-flex w-100 justify-content-center"
                 style={{ marginTop: '0px' }} // 👈 pushes button up relative to bottom
               >
-                <button className="sky-btn create-image-btn" onClick={handleCreateImage} disabled={prompt.trim() === '' || isLoading}>
+                <button
+                  className="sky-btn create-image-btn"
+                  onClick={handleCreateImage}
+                  disabled={prompt.trim() === '' || isLoading}
+                >
                   CREATE IMAGE
                 </button>
               </div>

@@ -36,7 +36,7 @@ const ClubDesk = () => {
   // Members (Members for approval) state
   const [members, setMembers] = useState([]);
   const [membersPage, setMembersPage] = useState(1);
-  const [membersLimit, setMembersLimit] = useState(20);
+  const [membersLimit, setMembersLimit] = useState(10);
   const [membersSearch, setMembersSearch] = useState('');
   const [membersTotalPages, setMembersTotalPages] = useState(1);
 
