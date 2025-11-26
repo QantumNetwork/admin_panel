@@ -199,9 +199,51 @@ const ManualReg = () => {
     setShowManualPayment(false);
   };
 
-  const handleConfirmManualPayment = () => {
-    console.log('Payment method selected:', selectedPaymentMethod);
-    // setShowManualPayment(false);
+  const handleConfirmManualPayment = async () => {
+    try {
+      const selectedPkg = membershipPackages.find(
+        (pkg) => pkg._id === formData.membershipLevel
+      );
+
+      const payload = {
+        GivenNames: formData.GivenNames,
+        Surname: formData.Surname,
+        Mobile: formData.Mobile,
+        DateOfBirth: formData.DateOfBirth,
+        PostCode: formData.PostCode,
+        Email: formData.Email,
+        Gender: formData.Gender,
+        Address: formData.Address,
+        Suburb: formData.Suburb,
+        State: formData.region || null,
+        amountPaid: selectedPkg?.calculatedPrice || 0,
+        currency: 'aud',
+        packageId: selectedPkg?._id,
+        packageName: selectedPkg?.membershipName,
+      };
+
+      const res = await axios.post(
+        `${baseUrl}/user/user-reception-register?appType=Ace`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res?.data?.thirdPartyData?.Id) {
+        toast.success('Payment successful');
+        setShowManualPayment(false);
+        // optionally close payment section:
+        // setS3Visible(false);
+      } else {
+        toast.error('Payment failed or cancelled');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Payment failed or cancelled');
+    }
   };
 
   const handleLock = async () => {

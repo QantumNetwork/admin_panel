@@ -43,7 +43,7 @@ const ClubDesk = () => {
   // Waiting for payment state
   const [payments, setPayments] = useState([]);
   const [paymentsPage, setPaymentsPage] = useState(1);
-  const [paymentsLimit, setPaymentsLimit] = useState(20);
+  const [paymentsLimit, setPaymentsLimit] = useState(10);
   const [paymentsSearch, setPaymentsSearch] = useState('');
   const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
   const [selectedLicense, setSelectedLicense] = useState(null);
