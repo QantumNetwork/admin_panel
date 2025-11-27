@@ -48,7 +48,6 @@ const ClubDesk = () => {
   const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
   const [selectedLicense, setSelectedLicense] = useState(null);
 
-
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -217,13 +216,13 @@ const ClubDesk = () => {
   }, [token]);
 
   // Fetch when pages/limits/search change for respective tabs
-useEffect(() => {
-  if (activeTab === 'membersForApproval') fetchMembers();
-}, [membersPage, membersLimit, membersSearch, token]);
+  useEffect(() => {
+    if (activeTab === 'membersForApproval') fetchMembers();
+  }, [membersPage, membersLimit, membersSearch, token]);
 
-useEffect(() => {
-  if (activeTab === 'waitingPayment') fetchPayments();
-}, [paymentsPage, paymentsLimit, paymentsSearch, token]);
+  useEffect(() => {
+    if (activeTab === 'waitingPayment') fetchPayments();
+  }, [paymentsPage, paymentsLimit, paymentsSearch, token]);
 
   // When switching tabs, sync search input and fetch for that tab
   useEffect(() => {
@@ -238,18 +237,18 @@ useEffect(() => {
   }, [activeTab]);
 
   // Trigger search on keystroke for members tab
-// useEffect(() => {
-//   if (activeTab === 'membersForApproval') {
-//     fetchMembers();
-//   }
-// }, [membersSearch]);
+  // useEffect(() => {
+  //   if (activeTab === 'membersForApproval') {
+  //     fetchMembers();
+  //   }
+  // }, [membersSearch]);
 
-// Trigger search on keystroke for payments tab
-// useEffect(() => {
-//   if (activeTab === 'waitingPayment') {
-//     fetchPayments();
-//   }
-// }, [paymentsSearch]);
+  // Trigger search on keystroke for payments tab
+  // useEffect(() => {
+  //   if (activeTab === 'waitingPayment') {
+  //     fetchPayments();
+  //   }
+  // }, [paymentsSearch]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -313,31 +312,46 @@ useEffect(() => {
   const getFullName = (user) =>
     `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
   const renderLicence = (field) =>
-  !field ? (
-    <span style={{ color: '#999' }}>-</span>
-  ) : (
-    <img
-      src={field}
-      alt="License"
-      onClick={() => setSelectedLicense(field)}
-      style={{
-        width: '80px',
-        height: '50px',
-        objectFit: 'cover',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        border: '1px solid #ddd',
-        transition: 'transform 0.2s',
-      }}
-      onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
-      onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
-    />
-  );
+    !field ? (
+      <img
+        src="/no_license.png"
+        alt="License"
+        onClick={() => setSelectedLicense('/no_license.png')}
+        style={{
+          width: '80px',
+          height: '50px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          border: '1px solid #ddd',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+        onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+      />
+    ) : (
+      <img
+        src={field}
+        alt="License"
+        onClick={() => setSelectedLicense(field)}
+        style={{
+          width: '80px',
+          height: '50px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          border: '1px solid #ddd',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+        onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+      />
+    );
   const renderMemberPaymentStatus = (u) =>
     u.paymentStatus === 'success' ? 'Approved' : 'Declined';
 
   const renderWaitingPaymentStatus = (u) =>
-    u.paymentType === 'reception' ? 'Pay at counter' : 'Declined'
+    u.paymentType === 'reception' ? 'Pay at counter' : 'Declined';
 
   // Pagination controls per tab
   const onPrev = () => {
@@ -581,28 +595,25 @@ useEffect(() => {
               placeholder="Search for member"
               value={searchInput}
               onChange={(e) => {
-      const value = e.target.value;
-      setSearchInput(value);
-      if (activeTab === 'membersForApproval') {
-        setMembersPage(1);
-        setMembersSearch(value);
-      } else {
-        setPaymentsPage(1);
-        setPaymentsSearch(value);
-      }
-    }}
-              
+                const value = e.target.value;
+                setSearchInput(value);
+                if (activeTab === 'membersForApproval') {
+                  setMembersPage(1);
+                  setMembersSearch(value);
+                } else {
+                  setPaymentsPage(1);
+                  setPaymentsSearch(value);
+                }
+              }}
               style={{
                 padding: '8px 12px',
-    borderRadius: '20px',
-    border: '2px solid #002977',
-    fontSize: '14px',
-    width: '250px',
-    outline: 'none',
-
+                borderRadius: '20px',
+                border: '2px solid #002977',
+                fontSize: '14px',
+                width: '250px',
+                outline: 'none',
               }}
             />
-            
           </div>
         </div>
       </div>
@@ -653,7 +664,7 @@ useEffect(() => {
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderWaitingPaymentStatus(member)}</td>
                       <td>
-                        <button className="action-btn approve">
+                        <button className="action-btn approve" onClick={() => navigate('/manual-reg')}>
                           Make Payment
                         </button>
                       </td>
@@ -771,66 +782,79 @@ useEffect(() => {
         )}
       </div>
       {selectedLicense && (
-  <div
-    style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-    }}
-    onClick={() => setSelectedLicense(null)}
-  >
-    <div
-      style={{
-        position: 'relative',
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        overflow: 'auto',
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        onClick={() => setSelectedLicense(null)}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          backgroundColor: '#002977',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '40px',
-          height: '40px',
-          fontSize: '20px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        ✕
-      </button>
-      <img
-        src={selectedLicense}
-        alt="Full License"
-        style={{
-          maxWidth: '100%',
-          maxHeight: '100%',
-          borderRadius: '4px',
-        }}
-      />
-    </div>
-  </div>
-)}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10000,
+          }}
+          onClick={() => setSelectedLicense(null)}
+        >
+          <div
+            style={
+              selectedLicense != '/no_license.png'
+              ? {
+              position: 'relative',
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+              overflow: 'auto',
+            } : {
+              position: 'relative',
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              maxWidth: '40vw',
+              maxHeight: '90vh',
+              overflow: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedLicense(null)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: '#002977',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                fontSize: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              ✕
+            </button>
+            <img
+              src={selectedLicense}
+              alt="Full License"
+              style={
+{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      borderRadius: '4px',
+                    }
+                  
+              }
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

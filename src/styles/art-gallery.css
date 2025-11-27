@@ -448,26 +448,6 @@
   border-radius: 4px;
 }
 
-/* .navigation-buttons-ag {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6px;
-  margin-bottom: 20px;
-  position: relative;
-  width: 100%;
-  margin-top: 15px;
-  min-height: 36px;
-}
-
-.nav-tabs-ag {
-  display: flex;
-  gap: 30px;
-  position: absolute;
-  left: 40px;
-  top: 0;
-} */
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
