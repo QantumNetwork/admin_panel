@@ -380,6 +380,35 @@ const ClubDesk = () => {
   //   }
   // };
 
+  const handleMakePayment = async (member) => {
+  try {
+    const userId = member._id;
+
+    const url = `https://betaapi.s2w.com.au/user/${userId}?appType=${selectedVenue}`;
+
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = res.data?.data;
+    if (!data) {
+      toast.error("No user data received");
+      return;
+    }
+
+    // Save data to localStorage so Manual Reg page can auto-fill
+    localStorage.setItem("manualRegUserData", JSON.stringify(data));
+
+    // Redirect to manual registration page
+    navigate("/manual-reg");
+
+  } catch (error) {
+    console.error("Make payment fetch failed:", error);
+    toast.error("Failed to fetch payment details");
+  }
+};
+
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -664,7 +693,7 @@ const ClubDesk = () => {
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderWaitingPaymentStatus(member)}</td>
                       <td>
-                        <button className="action-btn approve" onClick={() => navigate('/manual-reg')}>
+                        <button className="action-btn approve" onClick={() => handleMakePayment(member)}>
                           Make Payment
                         </button>
                       </td>

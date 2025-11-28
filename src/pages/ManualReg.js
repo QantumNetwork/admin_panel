@@ -78,6 +78,7 @@ const ManualReg = () => {
   const [showStripe, setShowStripe] = useState(false);
   const [verifyPayload, setVerifyPayload] = useState(null);
   const [showConfirmMembership, setShowConfirmMembership] = useState(false);
+  const [fromMakePayment, setFromMakePayment] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -93,6 +94,8 @@ const ManualReg = () => {
   );
 
   const [membershipPackages, setMembershipPackages] = useState([]);
+  const storedRaw = localStorage.getItem('manualRegUserData');
+  const stored = storedRaw ? JSON.parse(storedRaw) : null;
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -200,30 +203,56 @@ const ManualReg = () => {
   };
 
   const handleConfirmManualPayment = async () => {
+    const selectedPkg = membershipPackages.find(
+      (pkg) => pkg._id === formData.membershipLevel
+    );
+
+    const payload = {
+      GivenNames: formData.GivenNames,
+      Surname: formData.Surname,
+      DateOfBirth: formData.DateOfBirth,
+      PostCode: formData.PostCode,
+      Mobile: formData.Mobile,
+      Email: formData.Email,
+      Gender: formData.Gender,
+      Address: formData.Address,
+      Suburb: formData.Suburb,
+      State: null,
+      amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+      currency: 'aud',
+      packageId: selectedPkg?._id,
+      packageName: selectedPkg?.membershipName,
+    };
+
+    if (fromMakePayment && stored) {
+      try {
+        const res = await axios.put(
+          `${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (res?.data?.thirdPartyData?.Id) {
+          toast.success('Payment successful');
+          setShowManualPayment(false);
+          // optionally close payment section:
+          // setS3Visible(false);
+        } else {
+          toast.error('Payment failed or cancelled');
+        }
+
+        return;
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to update payment');
+        return;
+      }
+    }
     try {
-      const selectedPkg = membershipPackages.find(
-        (pkg) => pkg._id === formData.membershipLevel
-      );
-
-      const payload = {
-        GivenNames: formData.GivenNames,
-        Surname: formData.Surname,
-        Mobile: formData.Mobile,
-        DateOfBirth: formData.DateOfBirth,
-        PostCode: formData.PostCode,
-        Email: formData.Email,
-        Gender: formData.Gender,
-        Address: formData.Address,
-        Suburb: formData.Suburb,
-        State: formData.region || null,
-        amountPaid: selectedPkg?.calculatedPrice || 0,
-        currency: 'aud',
-        packageId: selectedPkg?._id,
-        packageName: selectedPkg?.membershipName,
-      };
-
       const res = await axios.post(
-        `${baseUrl}/user/user-reception-register?appType=Ace`,
+        `${baseUrl}/user/user-reception-register?appType=${selectedVenue}`,
         payload,
         {
           headers: {
@@ -265,6 +294,14 @@ const ManualReg = () => {
   const handleNextS1 = async () => {
     // Step forward from Register -> Membership Level
 
+    if (fromMakePayment) {
+      // BOTH FALSE → proceed to section 2
+      setS2Visible(true);
+      setEditing1(false);
+      setEditing2(true);
+      return;
+    }
+
     if (
       !formData.GivenNames ||
       !formData.Surname ||
@@ -278,7 +315,7 @@ const ManualReg = () => {
       return;
     }
 
-    if (!formData.Mobile || !formData.Email || formData.Mobile.length < 13) {
+    if (!formData.Mobile || !formData.Email || formData.Mobile.length < 10) {
       toast.error('Please enter valid mobile number and email');
       return;
     }
@@ -290,7 +327,7 @@ const ManualReg = () => {
       };
 
       const res = await axios.post(
-        `${baseUrl}/user/check-user?appType=Ace`,
+        `${baseUrl}/user/check-user?appType=${selectedVenue}`,
         body,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -411,12 +448,111 @@ const ManualReg = () => {
     fetchMembershipPackages();
   }, [token, selectedVenue, userTimeZone]);
 
-  const handlePay = async () => {
-    try {
-      const selectedPkg = membershipPackages.find(
-        (pkg) => pkg._id === formData.membershipLevel
-      );
+    const resetManualReg = () => {
+    // Remove stored data
+    localStorage.removeItem('manualRegUserData');
 
+    // Reset all local states
+    setFromMakePayment(false);
+    setShowStripe(false);
+    setClientSecret(null);
+    setVerifyPayload(null);
+    setShowConfirmMembership(false);
+    setShowManualPayment(false);
+
+    // Reset section visibility
+    setS1Visible(true);
+    setS2Visible(false);
+    setS3Visible(false);
+
+    // Reset editing mode
+    setEditing1(true);
+    setEditing2(false);
+
+    // Reset formData
+    setFormData({
+      GivenNames: '',
+      Surname: '',
+      Email: '',
+      Mobile: '',
+      Address: '',
+      Suburb: '',
+      PostCode: '',
+      DateOfBirth: '',
+      Gender: '',
+      membershipLevel: '',
+      paymentEmail: '',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      nameOnCard: '',
+      country: 'Australia',
+      region: null,
+    });
+  };
+
+  useEffect(() => {
+      resetManualReg();
+    },[]);
+
+  const handlePay = async () => {
+    const selectedPkg = membershipPackages.find(
+      (pkg) => pkg._id === formData.membershipLevel
+    );
+
+    if (fromMakePayment && stored) {
+      try {
+        const body = {
+          GivenNames: formData.GivenNames,
+          Surname: formData.Surname,
+          DateOfBirth: formData.DateOfBirth,
+          PostCode: formData.PostCode,
+          Mobile: formData.Mobile,
+          Email: formData.Email,
+          Gender: formData.Gender,
+          Address: formData.Address,
+          Suburb: formData.Suburb,
+          State: null,
+          amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+          currency: 'aud',
+          packageId: selectedPkg?._id,
+          packageName: selectedPkg?.membershipName,
+          paymentType: 'card',
+        };
+
+        const res = await axios.put(
+          `${baseUrl}/user/${stored._id}/payment?appType=${selectedVenue}`,
+          body,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const secret = res.data?.payment?.clientSecret;
+
+        if (!secret) {
+          toast.error('Could not initialize payment');
+          return;
+        }
+
+        // Automatically show confirm box like Stripe success
+        setShowStripe(true);
+        setClientSecret(secret);
+        setVerifyPayload({
+          paymentIntentId: res.data?.payment?.paymentIntentId,
+          userId: res.data?.userId,
+          appType: selectedVenue,
+          selectedPkg: selectedPkg,
+        });
+
+        return;
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to update payment');
+        return;
+      }
+    }
+    try {
       const payload = {
         GivenNames: formData.GivenNames,
         Surname: formData.Surname,
@@ -515,19 +651,23 @@ const ManualReg = () => {
 
         if (result.error) {
           toast.error(result.error.message);
+          resetManualReg();
         } else if (
           result.paymentIntent &&
           result.paymentIntent.status === 'succeeded'
         ) {
           toast.success('Payment successful');
-          onSuccess();
+          resetManualReg();
+          navigate('/approvals');
         } else {
           toast.error('Payment failed or cancelled');
+          resetManualReg();
         }
       } catch (err) {
         setLoading(false);
         console.error(err);
         toast.error('Payment failed');
+        resetManualReg();
       }
     };
 
@@ -572,6 +712,55 @@ const ManualReg = () => {
       ? { backgroundColor: '#f2f2f2', cursor: 'not-allowed' }
       : {},
   });
+
+  useEffect(() => {
+    if (!stored) return;
+
+    const u = stored;
+
+    // --- REGISTER NEW MEMBER (Section 1) ---
+    setFormData((prev) => ({
+      ...prev,
+      GivenNames: u.GivenNames || '',
+      Surname: u.Surname || '',
+      Email: u.Email || '',
+      Mobile: u.Mobile || '',
+      Address: u.Address || '',
+      PostCode: u.PostCode || '',
+      Suburb: u.Suburb || '',
+      Gender: u.Gender || '',
+      DateOfBirth: u.DateOfBirth ? u.DateOfBirth.substring(0, 10) : '',
+
+      // --- SET MEMBERSHIP LEVEL (Section 2) ---
+      membershipLevel: u.packageId || '',
+
+      // --- PAYMENT DETAILS (Section 3) ---
+      cardNumber: u.CardNumber || '',
+      paymentEmail: u.Email || '',
+      amountPaid: u.amountPaid || 0,
+
+      // these fields keep current values unless Manual-Payment or card is used
+      expiryDate: prev.expiryDate,
+      cvv: prev.cvv,
+      nameOnCard: prev.nameOnCard,
+      country: prev.country,
+      region: prev.region,
+    }));
+
+    setFromMakePayment(true);
+  }, []);
+
+  useEffect(() => {
+    if (!fromMakePayment) return;
+
+    // 1️⃣ Section 1 should be filled & locked (like after clicking Next)
+    setEditing1(false); // remove Cancel/Next, show EDIT button
+    setS1Visible(true);
+
+    // 2️⃣ Section 2 should be visible with EDIT mode enabled
+    setS2Visible(true);
+    setEditing2(true);
+  }, [fromMakePayment]);
 
   return (
     <div className="dashboard-container">
@@ -774,20 +963,12 @@ const ManualReg = () => {
 
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>Mobile</label>
-            <PhoneInput
-              defaultCountry="AU" // Australia → +61
+            <input
+              type="number"
+              name="Mobile"
               value={formData.Mobile}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, Mobile: value }))
-              }
-              placeholder="Enter mobile number"
-              international
-              countryCallingCodeEditable={false}
+              onChange={handleInputChange}
               {...disableIf(editing1)}
-              style={{
-                width: '100%',
-                backgroundColor: 'white',
-              }}
             />
           </div>
 
