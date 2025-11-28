@@ -384,7 +384,7 @@ const ClubDesk = () => {
   try {
     const userId = member._id;
 
-    const url = `https://betaapi.s2w.com.au/user/${userId}?appType=${selectedVenue}`;
+    const url = `${baseUrl}/user/${userId}?appType=${selectedVenue}`;
 
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },

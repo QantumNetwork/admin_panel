@@ -237,10 +237,6 @@ const ManualReg = () => {
     });
   };
 
-  useEffect(() => {
-      resetManualReg();
-    },[]);
-
   const handleManualPaymentClick = () => {
     setShowManualPayment(true);
   };
@@ -281,7 +277,7 @@ const ManualReg = () => {
           }
         );
 
-        if (res?.data?.thirdPartyData?.Id) {
+        if (res?.data?.message==="User updated successfully (Reception). Email sent.") {
           toast.success('Payment successful');
           setShowManualPayment(false);
           // optionally close payment section:
