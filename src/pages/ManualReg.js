@@ -194,6 +194,53 @@ const ManualReg = () => {
     return location.pathname === path;
   };
 
+      const resetManualReg = () => {
+    // Remove stored data
+    localStorage.removeItem('manualRegUserData');
+
+    // Reset all local states
+    setFromMakePayment(false);
+    setShowStripe(false);
+    setClientSecret(null);
+    setVerifyPayload(null);
+    setShowConfirmMembership(false);
+    setShowManualPayment(false);
+
+    // Reset section visibility
+    setS1Visible(true);
+    setS2Visible(false);
+    setS3Visible(false);
+
+    // Reset editing mode
+    setEditing1(true);
+    setEditing2(false);
+
+    // Reset formData
+    setFormData({
+      GivenNames: '',
+      Surname: '',
+      Email: '',
+      Mobile: '',
+      Address: '',
+      Suburb: '',
+      PostCode: '',
+      DateOfBirth: '',
+      Gender: '',
+      membershipLevel: '',
+      paymentEmail: '',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      nameOnCard: '',
+      country: 'Australia',
+      region: null,
+    });
+  };
+
+  useEffect(() => {
+      resetManualReg();
+    },[]);
+
   const handleManualPaymentClick = () => {
     setShowManualPayment(true);
   };
@@ -239,14 +286,18 @@ const ManualReg = () => {
           setShowManualPayment(false);
           // optionally close payment section:
           // setS3Visible(false);
+          resetManualReg();
+          setTimeout(() => navigate('/approvals'), 2000);
         } else {
           toast.error('Payment failed or cancelled');
+          resetManualReg();
         }
 
         return;
       } catch (err) {
         console.error(err);
         toast.error('Failed to update payment');
+        resetManualReg();
         return;
       }
     }
@@ -264,14 +315,18 @@ const ManualReg = () => {
       if (res?.data?.thirdPartyData?.Id) {
         toast.success('Payment successful');
         setShowManualPayment(false);
+        resetManualReg();
+        navigate('/approvals');
         // optionally close payment section:
         // setS3Visible(false);
       } else {
         toast.error('Payment failed or cancelled');
+        resetManualReg();
       }
     } catch (error) {
       console.error(error);
       toast.error('Payment failed or cancelled');
+      resetManualReg();
     }
   };
 
@@ -448,53 +503,6 @@ const ManualReg = () => {
     fetchMembershipPackages();
   }, [token, selectedVenue, userTimeZone]);
 
-    const resetManualReg = () => {
-    // Remove stored data
-    localStorage.removeItem('manualRegUserData');
-
-    // Reset all local states
-    setFromMakePayment(false);
-    setShowStripe(false);
-    setClientSecret(null);
-    setVerifyPayload(null);
-    setShowConfirmMembership(false);
-    setShowManualPayment(false);
-
-    // Reset section visibility
-    setS1Visible(true);
-    setS2Visible(false);
-    setS3Visible(false);
-
-    // Reset editing mode
-    setEditing1(true);
-    setEditing2(false);
-
-    // Reset formData
-    setFormData({
-      GivenNames: '',
-      Surname: '',
-      Email: '',
-      Mobile: '',
-      Address: '',
-      Suburb: '',
-      PostCode: '',
-      DateOfBirth: '',
-      Gender: '',
-      membershipLevel: '',
-      paymentEmail: '',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      nameOnCard: '',
-      country: 'Australia',
-      region: null,
-    });
-  };
-
-  useEffect(() => {
-      resetManualReg();
-    },[]);
-
   const handlePay = async () => {
     const selectedPkg = membershipPackages.find(
       (pkg) => pkg._id === formData.membershipLevel
@@ -605,6 +613,7 @@ const ManualReg = () => {
           err.response?.data?.Message || err.response?.data
         }`
       );
+      resetManualReg();
     }
   };
 
@@ -658,7 +667,7 @@ const ManualReg = () => {
         ) {
           toast.success('Payment successful');
           resetManualReg();
-          navigate('/approvals');
+          setTimeout(() => navigate('/approvals'), 2000);
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
