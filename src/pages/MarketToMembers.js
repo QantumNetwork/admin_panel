@@ -646,23 +646,25 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
+        let match=row.operator;
+
         if (row.operator === 'Exactly Matches') {
-          row.operator = 'exact';
+          match = 'exact';
         } else if (row.operator === 'Is before') {
-          row.operator = 'isBefore';
+          match = 'isBefore';
         } else if (row.operator === 'Is after') {
-          row.operator = 'isAfter';
+          match = 'isAfter';
         } else if (row.operator === 'Contains') {
-          row.operator = 'contains';
+          match = 'contains';
         } else if (row.operator === 'Is not') {
-          row.operator = 'IsNot';
+          match = 'IsNot';
         }
 
         return {
           type: type,
           category: category,
           market: row.value,
-          match: row.operator,
+          match: match,
         };
       });
 
@@ -760,23 +762,25 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
+        let match=row.operator;
+
         if (row.operator === 'Exactly Matches') {
-          row.operator = 'exact';
+          match = 'exact';
         } else if (row.operator === 'Is before') {
-          row.operator = 'isBefore';
+          match = 'isBefore';
         } else if (row.operator === 'Is after') {
-          row.operator = 'isAfter';
+          match = 'isAfter';
         } else if (row.operator === 'Contains') {
-          row.operator = 'contains';
+          match = 'contains';
         } else if (row.operator === 'Is not') {
-          row.operator = 'IsNot';
+          match = 'IsNot';
         }
 
         return {
           type: type,
           category: category,
           market: row.value,
-          match: row.operator,
+          match: match,
         };
       });
 
@@ -998,23 +1002,25 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
+        let match=row.operator;
+
         if (row.operator === 'Exactly Matches') {
-          row.operator = 'exact';
+          match = 'exact';
         } else if (row.operator === 'Is before') {
-          row.operator = 'isBefore';
+          match = 'isBefore';
         } else if (row.operator === 'Is after') {
-          row.operator = 'isAfter';
+          match = 'isAfter';
         } else if (row.operator === 'Contains') {
-          row.operator = 'contains';
+          match = 'contains';
         } else if (row.operator === 'Is not') {
-          row.operator = 'IsNot';
+          match = 'IsNot';
         }
 
         return {
           type: type,
           category: category,
           market: row.value,
-          match: row.operator,
+          match: match,
         };
       });
 
@@ -1159,6 +1165,8 @@ const MarketToMembers = () => {
       return row;
     });
     setFilterRows(updatedRows);
+
+    // setShowSuggestions((prev) => ({ ...prev, [id]: true }));
   };
 
   // Show all options when input is clicked
