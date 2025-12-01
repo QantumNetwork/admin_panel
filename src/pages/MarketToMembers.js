@@ -940,7 +940,7 @@ const MarketToMembers = () => {
         setSendingNow(true);
         // Automatically hide the overlay after 5 seconds irrespective of API response time
         setTimeout(() => setSendingNow(false), 5000);
-        const response = await fetch(`${baseUrl}/notification/send`, {
+        const response = await fetch(`${baseUrl}/notification/send-notification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1051,7 +1051,7 @@ const MarketToMembers = () => {
       try {
         // Set sending state and disable button
         setIsSending(true);
-        const response = await fetch(`${baseUrl}/notification/send`, {
+        const response = await fetch(`${baseUrl}/notification/send-notification`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

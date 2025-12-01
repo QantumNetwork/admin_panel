@@ -549,7 +549,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
           >
             Push
           </button>
-          <button
+          {/* <button
             className={`ssent-sms-btn ${
               activeFilter === 'sms' ? 'active' : ''
             }`}
@@ -572,7 +572,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
             onClick={() => setActiveFilter('sso')}
           >
             Geo
-          </button>
+          </button> */}
         </div>
         <div className="ssent-tab-row">
           <div className="ssent-tab-buttons">

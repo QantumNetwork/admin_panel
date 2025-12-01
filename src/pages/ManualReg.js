@@ -282,8 +282,9 @@ const ManualReg = () => {
           setShowManualPayment(false);
           // optionally close payment section:
           // setS3Visible(false);
-          resetManualReg();
+          
           setTimeout(() => navigate('/approvals'), 2000);
+          setTimeout(() => resetManualReg(), 4000);
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
@@ -311,8 +312,9 @@ const ManualReg = () => {
       if (res?.data?.thirdPartyData?.Id) {
         toast.success('Payment successful');
         setShowManualPayment(false);
-        resetManualReg();
-        navigate('/approvals');
+        
+        setTimeout(() => navigate('/approvals'), 2000);
+        setTimeout(() => resetManualReg(), 4000);
         // optionally close payment section:
         // setS3Visible(false);
       } else {
@@ -662,8 +664,10 @@ const ManualReg = () => {
           result.paymentIntent.status === 'succeeded'
         ) {
           toast.success('Payment successful');
-          resetManualReg();
+          
           setTimeout(() => navigate('/approvals'), 2000);
+          setTimeout(() => resetManualReg(), 4000);
+          
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
@@ -967,7 +971,7 @@ const ManualReg = () => {
           </div>
 
           <div className="form-group">
-            <label style={{ fontWeight: 'bold' }}>Mobile</label>
+            <label style={{ fontWeight: 'bold' }}>Phone</label>
             <input
               type="number"
               name="Mobile"
