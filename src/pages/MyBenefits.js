@@ -49,13 +49,13 @@ const MyBenefits = () => {
     const savedVenue = localStorage.getItem('selectedVenue');
     if (savedVenue === 'Manly') return 'Commodore';
     if (savedVenue === 'Hogan') return 'Bronze';
-    if (savedVenue === 'North') return 'Gold';
+    if (savedVenue === 'North') return 'Silver';
     if (savedVenue === 'StarReward') return 'Valued';
     if (savedVenue === 'Queens') return 'Queens';
     if (savedVenue === 'Ace') return 'Staff';
     if (savedVenue === 'Montauk' || savedVenue === 'Central')
       return 'Premium Member';
-    if (savedVenue === 'Brisbane') return 'Brew Crew';
+    if (savedVenue === 'Brisbane') return 'Member';
     if (savedVenue === 'Bluewater') return 'Deckhand';
     return 'Platinum Black';
   });
@@ -86,6 +86,8 @@ const MyBenefits = () => {
         if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
           return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
+      case 'Staff':
+        if (selectedVenue === 'Montauk') return '#006D88';
       case 'Staff Pre 3Mth':
         return '#FF0000';
       case 'Star Staff':
@@ -94,7 +96,7 @@ const MyBenefits = () => {
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':
         return '#333333'; // Dark gray/black color
-      case 'Premium':
+      case 'Premium Member':
         if (selectedVenue === 'Montauk') return '#26AEB1';
         if (selectedVenue === 'Central') return '#333333';
       case 'Member':
@@ -189,6 +191,7 @@ const MyBenefits = () => {
     audienceOptions = [
       { value: 'Premium Member', label: 'Premium Member' },
       { value: 'Member', label: 'Member' },
+      { value: 'Staff', label: 'Staff' },
     ];
   } else if (selectedVenue === 'Hogan') {
     audienceOptions = [
@@ -205,10 +208,10 @@ const MyBenefits = () => {
     audienceOptions = [
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Pre Staff', label: 'Pre Staff' },
+      // { value: 'Pre Staff', label: 'Pre Staff' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
+      // { value: 'Valued', label: 'Valued' },
     ];
   } else if (selectedVenue === 'StarReward') {
     // Options for audience selection

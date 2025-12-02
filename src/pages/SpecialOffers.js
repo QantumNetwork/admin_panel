@@ -195,15 +195,16 @@ const SpecialOffers = () => {
     audienceOptions = [
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-      { value: 'Pre Staff', label: 'Pre Staff' },
+      // { value: 'Pre Staff', label: 'Pre Staff' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
+      // { value: 'Valued', label: 'Valued' },
     ];
   } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
     audienceOptions = [
       { value: 'Premium Member', label: 'Premium Member' },
       { value: 'Member', label: 'Member' },
+      { value: 'Staff', label: 'Staff' },
     ];
   } else if (selectedVenue === 'Ace') {
     audienceOptions = [
