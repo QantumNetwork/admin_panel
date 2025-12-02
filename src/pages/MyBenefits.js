@@ -87,7 +87,7 @@ const MyBenefits = () => {
           return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
       case 'Staff':
-        if (selectedVenue === 'Montauk') return '#006D88';
+        if (selectedVenue === 'Montauk' || selectedVenue === 'Central') return '#006D88';
       case 'Staff Pre 3Mth':
         return '#FF0000';
       case 'Star Staff':
