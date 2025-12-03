@@ -79,6 +79,8 @@ const MembershipPage = () => {
         return 'Brisbane Brewing Co';
       case 'Bluewater':
         return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
       default:
         return appType;
     }

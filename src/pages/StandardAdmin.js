@@ -81,6 +81,8 @@ const StandardAdmin = () => {
         return 'Brisbane Brewing Co';
       case 'Bluewater':
         return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
       default:
         return appType;
     }
@@ -114,6 +116,8 @@ const StandardAdmin = () => {
         return '/brisbane.png';
       case 'Bluewater':
         return '/bluewater.png';
+      case 'Flinders':
+        return '/flinders.png';
       default:
         return appType;
     }

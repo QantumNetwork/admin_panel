@@ -246,6 +246,13 @@ const DigitalSmall = () => {
       { value: 'Commodore', label: 'Commodore' },
       { value: 'Admiral', label: 'Admiral' },
     ];
+  } else if (selectedVenue === 'Flinders') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' }, 
+      { value: 'Member', label: 'Member' },
+      { value: 'Corporate', label: 'Corporate' },
+      { value: 'Vip', label: 'Vip' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -885,6 +892,8 @@ const DigitalSmall = () => {
         return 'Brisbane Brewing Co';
       case 'Bluewater':
         return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
       default:
         return appType;
     }

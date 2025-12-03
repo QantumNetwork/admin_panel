@@ -57,6 +57,7 @@ const MyBenefits = () => {
       return 'Premium Member';
     if (savedVenue === 'Brisbane') return 'Member';
     if (savedVenue === 'Bluewater') return 'Deckhand';
+    if (savedVenue === 'Flinders') return 'Member';
     return 'Platinum Black';
   });
 
@@ -83,11 +84,11 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
-          return '#FF0000';
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
       case 'Staff':
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central') return '#006D88';
+        if (selectedVenue === 'Flinders') return '#FF0000';
       case 'Staff Pre 3Mth':
         return '#FF0000';
       case 'Star Staff':
@@ -103,6 +104,7 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk') return '#344361';
         if (selectedVenue === 'Central') return '#602373';
         if (selectedVenue === 'Brisbane') return '#376cc3ff';
+        if (selectedVenue === 'Flinders') return '#1d7d95ff';
       case 'Commodore':
         if (selectedVenue === 'Manly') return '#B0B0B0';
         if (selectedVenue === 'Bluewater') return '#333333';
@@ -149,6 +151,7 @@ const MyBenefits = () => {
       case 'Curtis Coast':
         return '#c7e957ff';
       case 'Brew Crew':
+      case 'Vip':
         return '#090606ff';
       case 'Regular':
         return '#9fd8e9ff';
@@ -160,6 +163,8 @@ const MyBenefits = () => {
         return '#c14810ff';
       case 'Admiral':
         return '#23a5ec';
+      case 'Corporate':
+        return '#b8e90aff';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -259,6 +264,13 @@ const MyBenefits = () => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
       { value: 'Admiral', label: 'Admiral' },
+    ];
+  } else if (selectedVenue === 'Flinders') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' }, 
+      { value: 'Member', label: 'Member' },
+      { value: 'Corporate', label: 'Corporate' },
+      { value: 'Vip', label: 'Vip' },
     ];
   }
 
@@ -450,6 +462,8 @@ const MyBenefits = () => {
         return 'Brisbane Brewing Co';
       case 'Bluewater':
         return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
       default:
         return appType;
     }

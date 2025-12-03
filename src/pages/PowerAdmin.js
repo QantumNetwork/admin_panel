@@ -86,6 +86,8 @@ const PowerAdmin = () => {
         return 'Brisbane';
       case 'Bluewater Captains Club':
         return 'Bluewater';
+      case 'Flinders Street Wharves':
+        return 'Flinders';
       default:
         return appName;
     }
@@ -117,6 +119,8 @@ const PowerAdmin = () => {
         return 'Brisbane Brewing Co';
       case 'Bluewater':
         return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
       default:
         return appType;
     }
@@ -150,6 +154,8 @@ const PowerAdmin = () => {
         return '/brisbane.png';
       case 'Bluewater':
         return '/bluewater.png';
+      case 'Flinders':
+        return '/flinders.png';
       default:
         return appType;
     }
@@ -168,7 +174,8 @@ const PowerAdmin = () => {
     'Ace Rewards',
     'Queens Hotel',
     'Brisbane Brewing Co',
-    'Bluewater Captains Club'
+    'Bluewater Captains Club',
+    'Flinders Street Wharves',
   ];
 
   const handleAddGroup = (index) => {
@@ -338,6 +345,8 @@ const PowerAdmin = () => {
               break;
             case 'Bluewater':
               appDisplayNames.push("Bluewater Captains Club");
+            case 'Flinders':
+              appDisplayNames.push("Flinders Street Wharves");
               break;
             default:
               appDisplayNames.push(app);
