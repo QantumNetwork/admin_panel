@@ -388,8 +388,8 @@ const MarketToMembers = () => {
 
                     // Determine which API endpoint to use
                     const apiEndpoint = newApiCallFields.includes(row.field)
-                      ? `${baseUrl}/notification/get?type=${fieldParam}`
-                      : `${baseUrl}/notification/getuser?type=${fieldParam}`;
+                      ? `${baseUrl}/notification/getnew?type=${fieldParam}`
+                      : `${baseUrl}/notification/getusernew?type=${fieldParam}`;
 
                     const response = await fetch(apiEndpoint, {
                       headers: {
@@ -485,8 +485,8 @@ const MarketToMembers = () => {
 
       // Determine which API endpoint to use
       const apiEndpoint = newApiCallFields.includes(initialField)
-        ? `${baseUrl}/notification/get?type=${fieldParam}`
-        : `${baseUrl}/notification/getuser?type=${fieldParam}`;
+        ? `${baseUrl}/notification/getnew?type=${fieldParam}`
+        : `${baseUrl}/notification/getusernew?type=${fieldParam}`;
 
       try {
         const response = await fetch(apiEndpoint, {
@@ -605,7 +605,6 @@ const MarketToMembers = () => {
 
   //utility func for handlePublish
   const calculateReach = async () => {
-
     if (selectedTargetMarket === 'Target') {
       // Create filters array from filterRows
       const filters = filterRows.map((row, index) => {
@@ -646,7 +645,7 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
-        let match=row.operator;
+        let match = row.operator;
 
         if (row.operator === 'Exactly Matches') {
           match = 'exact';
@@ -704,18 +703,17 @@ const MarketToMembers = () => {
 
         if (data.data.usersWithDeviceToken) {
           return data.data.usersWithDeviceToken;
-        } else if(data.data.totalUsers){
+        } else if (data.data.totalUsers) {
           return data.data.totalUsers;
         } else {
           return 0;
         }
       } catch (error) {
         console.error('Error calculating reach:', error);
-          toast.error('Failed to calculate reach. Please try again.');
+        toast.error('Failed to calculate reach. Please try again.');
       }
     }
   };
-
 
   //calculate handlereach function
 
@@ -762,7 +760,7 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
-        let match=row.operator;
+        let match = row.operator;
 
         if (row.operator === 'Exactly Matches') {
           match = 'exact';
@@ -820,20 +818,28 @@ const MarketToMembers = () => {
 
         if (data.data.usersWithDeviceToken) {
           setMemberReach(data.data.usersWithDeviceToken.toString());
-          console.log('About to show success toast with message:', data.message);
-            toast.success(data.message); 
-        } else if(data.data.totalUsers){
+          console.log(
+            'About to show success toast with message:',
+            data.message
+          );
+          toast.success(data.message);
+        } else if (data.data.totalUsers) {
           setMemberReach(data.data.totalUsers.toString());
-          console.log('About to show success toast with message:', data.message);
-            toast.success(data.message); 
+          console.log(
+            'About to show success toast with message:',
+            data.message
+          );
+          toast.success(data.message);
         } else {
           setMemberReach('0');
-          console.log('About to show info toast: No members match the selected criteria.');
-            toast.info('No members match the selected criteria.'); 
+          console.log(
+            'About to show info toast: No members match the selected criteria.'
+          );
+          toast.info('No members match the selected criteria.');
         }
       } catch (error) {
         console.error('Error calculating reach:', error);
-          toast.error('Failed to calculate reach. Please try again.');
+        toast.error('Failed to calculate reach. Please try again.');
       } finally {
         setIsCalculating(false);
       }
@@ -841,62 +847,60 @@ const MarketToMembers = () => {
   };
 
   const calculateReachSendToAll = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/notification/countss`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
 
-      try {
-        const response = await fetch(`${baseUrl}/notification/countss`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        });
+      const data = await response.json();
+      console.log('data', data);
 
-        const data = await response.json();
-        console.log('data', data);
-
-        if (data.count) {
-          return data.count;
-        } else {
-          return '0';
-        }
-      } catch (error) {
-        console.error('Error calculating reach:', error);
-          toast.error('Failed to calculate reach. Please try again.');
-      } 
+      if (data.count) {
+        return data.count;
+      } else {
+        return '0';
+      }
+    } catch (error) {
+      console.error('Error calculating reach:', error);
+      toast.error('Failed to calculate reach. Please try again.');
+    }
   };
 
   const handleCalculateReachSendToAll = async () => {
     setIsCalculating(true);
 
-      try {
-        const response = await fetch(`${baseUrl}/notification/countss`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        });
+    try {
+      const response = await fetch(`${baseUrl}/notification/countss`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
 
-        const data = await response.json();
-        console.log('data', data);
+      const data = await response.json();
+      console.log('data', data);
 
-        if (data.count) {
-          setMemberReach(data.count.toString());
-            toast.success('Target user count fetched successfully'); 
-        } else {
-          setMemberReach('0');
-            toast.info('No members match the selected criteria.'); 
-        }
-      } catch (error) {
-        console.error('Error calculating reach:', error);
-          toast.error('Failed to calculate reach. Please try again.');
-      } finally {
-        setIsCalculating(false);
+      if (data.count) {
+        setMemberReach(data.count.toString());
+        toast.success('Target user count fetched successfully');
+      } else {
+        setMemberReach('0');
+        toast.info('No members match the selected criteria.');
       }
+    } catch (error) {
+      console.error('Error calculating reach:', error);
+      toast.error('Failed to calculate reach. Please try again.');
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const handlePublish = async () => {
-
     if (!description || description.trim() === '') {
       toast.error('Cannot Send as Message is Empty');
       return;
@@ -920,7 +924,7 @@ const MarketToMembers = () => {
         sendType: 'all',
         heading: heading,
         description: description,
-        market: memberNum
+        market: memberNum,
       };
 
       // Add image to request body only if Rich Push is selected
@@ -940,14 +944,17 @@ const MarketToMembers = () => {
         setSendingNow(true);
         // Automatically hide the overlay after 5 seconds irrespective of API response time
         setTimeout(() => setSendingNow(false), 5000);
-        const response = await fetch(`${baseUrl}/notification/send-notification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        const response = await fetch(
+          `${baseUrl}/notification/send-notification`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: token ? `Bearer ${token}` : '',
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
 
         const data = await response.json();
         console.log('body', requestBody);
@@ -955,11 +962,15 @@ const MarketToMembers = () => {
 
         setMemberReach(memberNum);
 
-        displayType === 'immediate' ? toast.success('Notification sent successfully!') : toast.success('Notification has been scheduled');
+        displayType === 'immediate'
+          ? toast.success('Notification sent successfully!')
+          : toast.success('Notification has been scheduled');
         setIsSending(false);
       } catch (error) {
         console.error('Error sending notification:', error);
-        displayType === 'immediate' ? toast.error('Failed to send notification. Please try again.') : toast.error('Failed to schedule notification. Please try again.');
+        displayType === 'immediate'
+          ? toast.error('Failed to send notification. Please try again.')
+          : toast.error('Failed to schedule notification. Please try again.');
         setIsSending(false);
       }
     } else if (selectedTargetMarket === 'Target') {
@@ -1002,7 +1013,7 @@ const MarketToMembers = () => {
           category = row.field.replace(/ /g, '');
         }
 
-        let match=row.operator;
+        let match = row.operator;
 
         if (row.operator === 'Exactly Matches') {
           match = 'exact';
@@ -1024,7 +1035,7 @@ const MarketToMembers = () => {
         };
       });
 
-      const reachNum =await calculateReach();
+      const reachNum = await calculateReach();
       console.log('reachNum', reachNum);
 
       const requestBody = {
@@ -1034,7 +1045,7 @@ const MarketToMembers = () => {
         displayType: displayType,
         sendType: 'target',
         filters: filters,
-        market: reachNum
+        market: reachNum,
       };
 
       // Add image to request body only if Rich Push is selected
@@ -1051,31 +1062,37 @@ const MarketToMembers = () => {
       try {
         // Set sending state and disable button
         setIsSending(true);
-        const response = await fetch(`${baseUrl}/notification/send-notification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        const response = await fetch(
+          `${baseUrl}/notification/send-notification`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: token ? `Bearer ${token}` : '',
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
 
         const data = await response.json();
         console.log('body', requestBody);
         console.log('data', data);
-        console.log('json req body',JSON.stringify(requestBody));
-        
+        console.log('json req body', JSON.stringify(requestBody));
 
         setMemberReach(reachNum);
 
-        displayType === 'immediate' ? toast.success('Notification sent successfully!') : toast.success('Notification has been scheduled');
+        displayType === 'immediate'
+          ? toast.success('Notification sent successfully!')
+          : toast.success('Notification has been scheduled');
 
         setTimeout(() => {
           setIsSending(false);
         }, 5000);
       } catch (error) {
         console.error('Error sending notification:', error);
-        displayType === 'immediate' ? toast.error('Failed to send notification. Please try again.') : toast.error('Failed to schedule notification. Please try again.');
+        displayType === 'immediate'
+          ? toast.error('Failed to send notification. Please try again.')
+          : toast.error('Failed to schedule notification. Please try again.');
         setIsSending(false); // Re-enable button on error
       }
     }
@@ -1127,8 +1144,8 @@ const MarketToMembers = () => {
 
         // Determine which API endpoint to use
         const apiEndpoint = newApiCallFields.includes(field)
-          ? `${baseUrl}/notification/get?type=${fieldParam}`
-          : `${baseUrl}/notification/getuser?type=${fieldParam}`;
+          ? `${baseUrl}/notification/getnew?type=${fieldParam}&match=contains&search=`
+          : `${baseUrl}/notification/getusernew?type=${fieldParam}&match=contains&search=`;
 
         const response = await fetch(apiEndpoint, {
           headers: {
@@ -1157,7 +1174,7 @@ const MarketToMembers = () => {
   };
 
   // Handle value change for a specific filter row
-  const handleValueChange = (id, value) => {
+  const handleValueChange = async (id, value) => {
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
         return { ...row, value };
@@ -1166,7 +1183,55 @@ const MarketToMembers = () => {
     });
     setFilterRows(updatedRows);
 
-    // setShowSuggestions((prev) => ({ ...prev, [id]: true }));
+    const row = updatedRows.find((r) => r.id === id);
+    if (!row) return;
+
+    // Determine API type
+    let fieldParam = fieldToApiParam[row.field]
+      ? fieldToApiParam[row.field]
+      : row.field.replace(/ /g, '');
+
+    // Convert operator to API match param
+    let match =
+      row.operator === 'Exactly Matches'
+        ? 'exact'
+        : row.operator === 'Contains'
+        ? 'contains'
+        : row.operator === 'Is not'
+        ? 'IsNot'
+        : row.operator === 'Is before'
+        ? 'isBefore'
+        : row.operator === 'Is after'
+        ? 'isAfter'
+        : 'contains';
+
+    if (!value || value.length < 1) {
+      setFilteredOptions((prev) => ({ ...prev, [id]: [] }));
+      return;
+    }
+
+    // Choose correct endpoint
+    const isNew = newApiCallFields.includes(row.field);
+    const apiEndpoint = isNew
+      ? `${baseUrl}/notification/getnew?type=${fieldParam}&match=${match}&search=${value}`
+      : `${baseUrl}/notification/getusernew?type=${fieldParam}&match=${match}&search=${value}`;
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setFilterValueOptions((prev) => ({ ...prev, [id]: data }));
+        setFilteredOptions((prev) => ({ ...prev, [id]: data }));
+      }
+    } catch (err) {
+      console.error('Suggestion fetch error:', err);
+    } // setShowSuggestions((prev) => ({ ...prev, [id]: true }));
   };
 
   // Show all options when input is clicked
@@ -1296,60 +1361,60 @@ const MarketToMembers = () => {
     }
   }, [token]);
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="digital-app-container">
-      <ToastContainer 
-                          position="top-center"
-                          autoClose={3000}
-                          hideProgressBar={false}
-                          newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                    transition={Slide}
-                    style={{ zIndex: 9999, 
-                      marginTop: '90px',
-                      fontSize: '14px',
-                      minWidth: '300px',
-                      textAlign: 'center' }}
-                        />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -1872,12 +1937,14 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 <span className="target-span">Target</span>
 
                 {/* First filter row (always visible) */}
-                <div className="filter-scroll-container"
-                style={{
-                  maxHeight: filterRows.length >= 6 ? '350px' : 'none',
-                  overflowY: filterRows.length >= 6 ? 'auto' : 'visible',
-                  paddingRight: filterRows.length >= 6 ? '8px' : '0'
-                }}>
+                <div
+                  className="filter-scroll-container"
+                  style={{
+                    maxHeight: filterRows.length >= 6 ? '350px' : 'none',
+                    overflowY: filterRows.length >= 6 ? 'auto' : 'visible',
+                    paddingRight: filterRows.length >= 6 ? '8px' : '0',
+                  }}
+                >
                   <div className="filter-row-first">
                     <div className="filter-condition">
                       {/* No dropdown for first row */}
@@ -2138,7 +2205,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   disabled={isCalculating}
                 >
                   {isCalculating ? 'CALCULATING...' : 'CALCULATE REACH'}
-                  </button>
+                </button>
               </>
             )}
           </div>
@@ -2288,7 +2355,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
           </div>
         </div>
       </div>
-            {isCalculating && (
+      {isCalculating && (
         <div
           style={{
             position: 'fixed',
