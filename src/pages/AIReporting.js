@@ -160,6 +160,7 @@ const AIReporting = () => {
     const isMontauk = selectedVenue === 'Montauk';
     const isNorth = selectedVenue === 'North';
     const isBluewater = selectedVenue === 'Bluewater';
+    const isFlinders = selectedVenue === 'Flinders';
 
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
@@ -181,6 +182,8 @@ const AIReporting = () => {
       ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
       : isBluewater
       ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isFlinders
+      ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
       : null;
 
     if (!endpoint) {

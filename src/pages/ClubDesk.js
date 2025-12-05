@@ -23,6 +23,10 @@ const ClubDesk = () => {
   // const [membersForApproval, setMembersForApproval] = useState([]);
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [confirmVerify, setConfirmVerify] = useState({
+    open: false,
+    userId: null,
+  });
 
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
@@ -103,63 +107,6 @@ const ClubDesk = () => {
       setLoading(false);
     }
   };
-
-  // const [membersForApproval, setMembersForApproval] = useState([
-  //   {
-  //     _id: '1',
-  //     firstName: 'John',
-  //     lastName: 'Smith',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 412 345 678',
-  //     membership: 'Social',
-  //   },
-  //   {
-  //     _id: '2',
-  //     firstName: 'Sarah',
-  //     lastName: 'Johnson',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 423 456 789',
-  //     membership: 'Social',
-  //   },
-  //   {
-  //     _id: '3',
-  //     firstName: 'Michael',
-  //     lastName: 'Brown',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 434 567 890',
-  //     membership: 'Full',
-  //   },
-  // ]);
-
-  // const [waitingPayment, setWaitingPayment] = useState([
-  //   {
-  //     _id: '4',
-  //     firstName: 'David',
-  //     lastName: 'Ohlson',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 423 456 789',
-  //     membership: 'Social',
-  //     payment: 'Approved',
-  //   },
-  //   {
-  //     _id: '5',
-  //     firstName: 'James',
-  //     lastName: 'Wilson',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 423 456 789',
-  //     membership: 'Social',
-  //     payment: 'Approved',
-  //   },
-  //   {
-  //     _id: '6',
-  //     firstName: 'Emma',
-  //     lastName: 'Davis',
-  //     address: '00 Barrabooka Dr. The Gap 0000',
-  //     phoneNumber: '+61 423 456 789',
-  //     membership: 'Social',
-  //     payment: 'Declined',
-  //   },
-  // ]);
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -381,35 +328,56 @@ const ClubDesk = () => {
   //     setPaymentsPage(1);
   //   }
   // };
+  const handleVerify = async () => {
+    const memberId = confirmVerify.userId;
+    if (!memberId) return;
+
+    try {
+      const url = `${baseUrl}/user/${memberId}?appType=${selectedVenue}`;
+
+      const res = await axios.patch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 200) {
+        toast.success('Member Verified successfully!');
+        setConfirmVerify({ open: false, userId: null });
+        fetchMembers();
+      } else {
+        toast.error('Verification failed. Try again.');
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
+      toast.error('Verification failed');
+    }
+  };
 
   const handleMakePayment = async (member) => {
-  try {
-    const userId = member._id;
+    try {
+      const userId = member._id;
 
-    const url = `${baseUrl}/user/${userId}?appType=${selectedVenue}`;
+      const url = `${baseUrl}/user/${userId}?appType=${selectedVenue}`;
 
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = res.data?.data;
-    if (!data) {
-      toast.error("No user data received");
-      return;
+      const data = res.data?.data;
+      if (!data) {
+        toast.error('No user data received');
+        return;
+      }
+
+      // Save data to localStorage so Manual Reg page can auto-fill
+      localStorage.setItem('manualRegUserData', JSON.stringify(data));
+
+      // Redirect to manual registration page
+      navigate('/manual-reg');
+    } catch (error) {
+      console.error('Make payment fetch failed:', error);
+      toast.error('Failed to fetch payment details');
     }
-
-    // Save data to localStorage so Manual Reg page can auto-fill
-    localStorage.setItem("manualRegUserData", JSON.stringify(data));
-
-    // Redirect to manual registration page
-    navigate("/manual-reg");
-
-  } catch (error) {
-    console.error("Make payment fetch failed:", error);
-    toast.error("Failed to fetch payment details");
-  }
-};
-
+  };
 
   return (
     <div className="dashboard-container">
@@ -679,7 +647,14 @@ const ClubDesk = () => {
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderMemberPaymentStatus(member)}</td>
                       <td>
-                        <button className="action-btn approve">Verified</button>
+                        <button
+                          className="action-btn approve"
+                          onClick={() =>
+                            setConfirmVerify({ open: true, userId: member._id })
+                          }
+                        >
+                          Verified
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -695,7 +670,10 @@ const ClubDesk = () => {
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderWaitingPaymentStatus(member)}</td>
                       <td>
-                        <button className="action-btn approve" onClick={() => handleMakePayment(member)}>
+                        <button
+                          className="action-btn approve"
+                          onClick={() => handleMakePayment(member)}
+                        >
                           Make Payment
                         </button>
                       </td>
@@ -831,23 +809,25 @@ const ClubDesk = () => {
           <div
             style={
               selectedLicense != '/no_license.png'
-              ? {
-              position: 'relative',
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              maxWidth: '100vw',
-              maxHeight: '100vh',
-              overflow: 'auto',
-            } : {
-              position: 'relative',
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              maxWidth: '40vw',
-              maxHeight: '90vh',
-              overflow: 'auto',
-            }}
+                ? {
+                    position: 'relative',
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                    overflow: 'auto',
+                  }
+                : {
+                    position: 'relative',
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    maxWidth: '40vw',
+                    maxHeight: '90vh',
+                    overflow: 'auto',
+                  }
+            }
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -874,15 +854,73 @@ const ClubDesk = () => {
             <img
               src={selectedLicense}
               alt="Full License"
-              style={
-{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      borderRadius: '4px',
-                    }
-                  
-              }
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                borderRadius: '4px',
+              }}
             />
+          </div>
+        </div>
+      )}
+      {confirmVerify.open && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              padding: '25px',
+              borderRadius: '8px',
+              textAlign: 'center',
+              width: '350px',
+            }}
+          >
+            <h3 style={{ marginBottom: '15px', color: '#002977' }}>
+              Confirm Verification
+            </h3>
+            <p style={{ fontSize: '14px', marginBottom: '25px' }}>
+              Are you sure you want to verify this member?
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button
+                onClick={() => setConfirmVerify({ open: false, userId: null })}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  background: '#ccc',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleVerify}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  background: '#002977',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Yes, Verify
+              </button>
+            </div>
           </div>
         </div>
       )}
