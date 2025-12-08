@@ -945,7 +945,7 @@ const MarketToMembers = () => {
         // Automatically hide the overlay after 5 seconds irrespective of API response time
         setTimeout(() => setSendingNow(false), 5000);
         const response = await fetch(
-          `${baseUrl}/notification/send-notification`,
+          `https://betaapi.s2w.com.au/notification/send-notification`,
           {
             method: 'POST',
             headers: {
@@ -1063,7 +1063,7 @@ const MarketToMembers = () => {
         // Set sending state and disable button
         setIsSending(true);
         const response = await fetch(
-          `${baseUrl}/notification/send-notification`,
+          `https://betaapi.s2w.com.au/notification/send-notification`,
           {
             method: 'POST',
             headers: {
