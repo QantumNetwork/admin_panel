@@ -159,7 +159,7 @@ const MyBenefits = () => {
         return '#3313d5ff';
       case 'Legend':
         return '#f8f5f5c3';
-      case 'Firstmate':
+      case 'First Mate':
         return '#c14810ff';
       case 'Admiral':
         return '#23a5ec';
@@ -260,7 +260,7 @@ const MyBenefits = () => {
   } else if (selectedVenue === 'Bluewater') {
     audienceOptions = [
       { value: 'Deckhand', label: 'Deckhand' },
-      { value: 'Firstmate', label: 'Firstmate' },
+      { value: 'First Mate', label: 'First Mate' },
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
       { value: 'Admiral', label: 'Admiral' },

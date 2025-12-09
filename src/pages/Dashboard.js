@@ -395,7 +395,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 />
               </div>
 
-              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace') && (
+              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace' || selectedVenue === 'Manly') && (
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}
