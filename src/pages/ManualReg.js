@@ -269,6 +269,10 @@ const ManualReg = () => {
       packageName: selectedPkg?.membershipName,
     };
 
+    {selectedVenue === 'Manly' && (
+      payload.type = 'new'
+    )}
+
     if (fromMakePayment && stored) {
       try {
         const res = await axios.put(
@@ -302,7 +306,7 @@ const ManualReg = () => {
     }
     try {
       const res = await axios.post(
-        `${baseUrl}/user/user-reception-register?appType=${selectedVenue}`,
+        selectedVenue === 'Manly' ? `${baseUrl}/user/user-reception-register-mhbc?appType=${selectedVenue}` : `${baseUrl}/user/user-reception-register?appType=${selectedVenue}`,
         payload,
         {
           headers: {
@@ -578,10 +582,14 @@ const ManualReg = () => {
         packageName: selectedPkg?.membershipName,
         paymentType: 'card',
       };
+      {selectedVenue === 'Manly' && (
+        payload.type = 'new'
+      )}
+      
 
       // 1) Create user + paymentIntent via your backend
       const res = await axios.post(
-        `${baseUrl}/user/user-register?appType=${selectedVenue}`,
+        selectedVenue === 'Manly' ? `${baseUrl}/user/user-register-mhbc?appType=${selectedVenue}` : `${baseUrl}/user/user-register?appType=${selectedVenue}`, 
         payload,
         {
           headers: {

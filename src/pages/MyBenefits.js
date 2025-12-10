@@ -151,7 +151,7 @@ const MyBenefits = () => {
       case 'Curtis Coast':
         return '#c7e957ff';
       case 'Brew Crew':
-      case 'Vip':
+      case 'VIP':
         return '#090606ff';
       case 'Regular':
         return '#9fd8e9ff';
@@ -270,7 +270,7 @@ const MyBenefits = () => {
       { value: 'Staff', label: 'Staff' }, 
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
-      { value: 'Vip', label: 'Vip' },
+      { value: 'VIP', label: 'VIP' },
     ];
   }
 

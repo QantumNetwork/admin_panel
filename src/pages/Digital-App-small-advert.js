@@ -251,7 +251,7 @@ const DigitalSmall = () => {
       { value: 'Staff', label: 'Staff' }, 
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
-      { value: 'Vip', label: 'Vip' },
+      { value: 'VIP', label: 'VIP' },
     ];
   } else {
     audienceOptions = [
