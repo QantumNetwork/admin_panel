@@ -196,7 +196,7 @@ const ManualReg = () => {
     return location.pathname === path;
   };
 
-      const resetManualReg = () => {
+  const resetManualReg = () => {
     // Remove stored data
     localStorage.removeItem('manualRegUserData');
 
@@ -269,9 +269,9 @@ const ManualReg = () => {
       packageName: selectedPkg?.membershipName,
     };
 
-    {selectedVenue === 'Manly' && (
-      payload.type = 'new'
-    )}
+    {
+      selectedVenue === 'Manly' && (payload.type = 'new');
+    }
 
     if (fromMakePayment && stored) {
       try {
@@ -283,12 +283,15 @@ const ManualReg = () => {
           }
         );
 
-        if (res?.data?.message==="User updated successfully (Reception). Email sent.") {
+        if (
+          res?.data?.message ===
+          'User updated successfully (Reception). Email sent.'
+        ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
           // optionally close payment section:
           // setS3Visible(false);
-          
+
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
         } else {
@@ -306,7 +309,9 @@ const ManualReg = () => {
     }
     try {
       const res = await axios.post(
-        selectedVenue === 'Manly' ? `${baseUrl}/user/user-reception-register-mhbc?appType=${selectedVenue}` : `${baseUrl}/user/user-reception-register?appType=${selectedVenue}`,
+        selectedVenue === 'Manly'
+          ? `${baseUrl}/user/user-reception-register-mhbc?appType=${selectedVenue}`
+          : `${baseUrl}/user/user-reception-register?appType=${selectedVenue}`,
         payload,
         {
           headers: {
@@ -318,7 +323,7 @@ const ManualReg = () => {
       if (res?.data?.thirdPartyData?.Id) {
         toast.success('Payment successful');
         setShowManualPayment(false);
-        
+
         setTimeout(() => navigate('/approvals'), 2000);
         setTimeout(() => resetManualReg(), 4000);
         // optionally close payment section:
@@ -336,6 +341,7 @@ const ManualReg = () => {
 
   const handleLock = async () => {
     try {
+      resetManualReg();
       const result = await handleLogout();
       if (result.success) {
         navigate('/dashboard');
@@ -582,14 +588,15 @@ const ManualReg = () => {
         packageName: selectedPkg?.membershipName,
         paymentType: 'card',
       };
-      {selectedVenue === 'Manly' && (
-        payload.type = 'new'
-      )}
-      
+      {
+        selectedVenue === 'Manly' && (payload.type = 'new');
+      }
 
       // 1) Create user + paymentIntent via your backend
       const res = await axios.post(
-        selectedVenue === 'Manly' ? `${baseUrl}/user/user-register-mhbc?appType=${selectedVenue}` : `${baseUrl}/user/user-register?appType=${selectedVenue}`, 
+        selectedVenue === 'Manly'
+          ? `${baseUrl}/user/user-register-mhbc?appType=${selectedVenue}`
+          : `${baseUrl}/user/user-register?appType=${selectedVenue}`,
         payload,
         {
           headers: {
@@ -674,10 +681,9 @@ const ManualReg = () => {
           result.paymentIntent.status === 'succeeded'
         ) {
           toast.success('Payment successful');
-          
+
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
-          
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
@@ -894,7 +900,13 @@ const ManualReg = () => {
           {showDropdown && (
             <div className="dropdown-menu">
               <p>{email}</p>
-              <button className="logout-btn" onClick={() => logout(navigate)}>
+              <button
+                className="logout-btn"
+                onClick={() => {
+                  resetManualReg();
+                  logout(navigate);
+                }}
+              >
                 Logout
               </button>
             </div>
@@ -907,7 +919,10 @@ const ManualReg = () => {
         <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
-          onClick={() => navigate('/approvals')}
+          onClick={() => {
+            resetManualReg();
+            navigate('/approvals')
+          }}
         >
           <FaUsersRectangle
             className={`sidebar-icon ${
@@ -931,7 +946,10 @@ const ManualReg = () => {
         <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
-          onClick={() => navigate('/club-pkg')}
+          onClick={() => {
+            resetManualReg();
+            navigate('/club-pkg');
+          }}
         >
           <PiListBulletsFill
             className={`sidebar-icon ${
@@ -944,7 +962,10 @@ const ManualReg = () => {
         <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
-          onClick={() => navigate('/app-settings')}
+          onClick={() => {
+          resetManualReg();
+          navigate('/app-settings');
+          }}
         >
           <FaMobileScreenButton
             className={`sidebar-icon ${
