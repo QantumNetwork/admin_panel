@@ -7,6 +7,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { MdVerified } from 'react-icons/md';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -43,8 +44,20 @@ const MembershipPage = () => {
     }
     // Default rows if no data
     return [
-      { id: 1, name: 'Social Member 1 Year', price: '$5', proRata: false, renewalDate: '' },
-      { id: 2, name: 'Social Member 3 Years', price: '$10', proRata: false, renewalDate: '' },
+      {
+        id: 1,
+        name: 'Social Member 1 Year',
+        price: '$5',
+        proRata: false,
+        renewalDate: '',
+      },
+      {
+        id: 2,
+        name: 'Social Member 3 Years',
+        price: '$10',
+        proRata: false,
+        renewalDate: '',
+      },
     ];
   });
 
@@ -202,10 +215,10 @@ const MembershipPage = () => {
   };
 
   useEffect(() => {
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  setUserTimeZone(tz);
-  localStorage.setItem('userTimeZone', tz); // optional
-}, []);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimeZone(tz);
+    localStorage.setItem('userTimeZone', tz); // optional
+  }, []);
 
   const calculateDaysRemaining = (dateString) => {
     const today = new Date();
@@ -217,8 +230,8 @@ const MembershipPage = () => {
   };
 
   const getSelectedRow = () => {
-  return membershipRows.find((row) => row.id === selectedRowId);
-};
+    return membershipRows.find((row) => row.id === selectedRowId);
+  };
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
@@ -226,7 +239,7 @@ const MembershipPage = () => {
     setDaysRemaining(calculateDaysRemaining(selectedDate));
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (membershipRows.length > 0 && !selectedRowId) {
       setSelectedRowId(membershipRows[0].id);
     }
@@ -239,7 +252,14 @@ const MembershipPage = () => {
         : 1;
     setMembershipRows([
       ...membershipRows,
-      { id: newId, _id: null, name: '', price: '', proRata: false, renewalDate: '' },
+      {
+        id: newId,
+        _id: null,
+        name: '',
+        price: '',
+        proRata: false,
+        renewalDate: '',
+      },
     ]);
   };
 
@@ -263,24 +283,25 @@ const MembershipPage = () => {
       // Prepare the request body
       const requestBody = {
         membershipLevels: membershipRows.map((row) => {
-  const levelObject = {
-    membershipName: row.name,
-    price: parseFloat(row.price.replace(/[^0-9.-]+/g, "")),
-    proRata: row.proRata,
-    renewalDate: row.renewalDate,
-    gracePeriod: 0,
-    proRataDays: row.proRata ? calculateDaysRemaining(row.renewalDate) : 0,
-  };
+          const levelObject = {
+            membershipName: row.name,
+            price: parseFloat(row.price.replace(/[^0-9.-]+/g, '')),
+            proRata: row.proRata,
+            renewalDate: row.renewalDate,
+            gracePeriod: 0,
+            proRataDays: row.proRata
+              ? calculateDaysRemaining(row.renewalDate)
+              : 0,
+          };
 
-  if (row._id) {
-    levelObject._id = row._id;   // <-- Attach only if exists
-  }
+          if (row._id) {
+            levelObject._id = row._id; // <-- Attach only if exists
+          }
 
-  return levelObject;
-}),
+          return levelObject;
+        }),
 
-
-  timezone: userTimeZone
+        timezone: userTimeZone,
       };
 
       let response;
@@ -294,7 +315,7 @@ const MembershipPage = () => {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
-              'X-User-Timezone': userTimeZone
+              'X-User-Timezone': userTimeZone,
             },
           }
         );
@@ -305,7 +326,7 @@ const MembershipPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'X-User-Timezone': userTimeZone
+            'X-User-Timezone': userTimeZone,
           },
         });
       }
@@ -519,6 +540,21 @@ const MembershipPage = () => {
           />{' '}
           &nbsp; App Settings
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${
+            isActive('/payment-reporting') ? 'active' : ''
+          }`}
+          onClick={() => navigate('/payment-reporting')}
+        >
+          <MdVerified
+            className={`sidebar-icon ${
+              isActive('/payment-reporting') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Payment Reporting
+        </button>
       </aside>
 
       <div className="navigation-buttons-member">
@@ -627,8 +663,8 @@ const MembershipPage = () => {
                             updateMembershipRow(row.id, 'price', e.target.value)
                           }
                           onFocus={() => {
-    setSelectedRowId(row.id);
-  }}
+                            setSelectedRowId(row.id);
+                          }}
                           style={{
                             width: '50%',
                             padding: '8px',
@@ -657,9 +693,9 @@ const MembershipPage = () => {
                                 e.target.checked
                               )
                             }
-                             onFocus={() => {
-    setSelectedRowId(row.id);
-  }}
+                            onFocus={() => {
+                              setSelectedRowId(row.id);
+                            }}
                             style={{ accentColor: '#002977' }}
                           />
                           <div>
@@ -717,7 +753,13 @@ const MembershipPage = () => {
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
                   value={getSelectedRow()?.renewalDate || ''}
-                  onChange={(e) => updateMembershipRow(selectedRowId, 'renewalDate', e.target.value)}
+                  onChange={(e) =>
+                    updateMembershipRow(
+                      selectedRowId,
+                      'renewalDate',
+                      e.target.value
+                    )
+                  }
                   style={{
                     width: '60%',
                     padding: '8px',

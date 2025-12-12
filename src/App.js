@@ -24,6 +24,7 @@ import ManualReg from "./pages/ManualReg";
 import ClubPackage from "./pages/ClubPackage";
 import MembershipPage from "./pages/MembershipPage";
 import AppSettings from "./pages/AppSettings";
+import PaymentReporting from "./pages/PaymentReporting";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
@@ -85,6 +86,7 @@ function App() {
         <Route path="/club-pkg" element={<ClubPackage />} />
         <Route path="/membership" element={<MembershipPage />} />
         <Route path="/app-settings" element={<AppSettings />} />
+        <Route path="/payment-reporting" element={<PaymentReporting />} />
       </Routes>
       
     </Router>

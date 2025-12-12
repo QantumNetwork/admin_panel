@@ -7,6 +7,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
+import { MdVerified } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/club-desk.css';
@@ -549,6 +550,21 @@ const ClubDesk = () => {
             }`}
           />{' '}
           &nbsp; App Settings
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${
+            isActive('/payment-reporting') ? 'active' : ''
+          }`}
+          onClick={() => navigate('/payment-reporting')}
+        >
+          <MdVerified
+            className={`sidebar-icon ${
+              isActive('/payment-reporting') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Payment Reporting
         </button>
       </aside>
 

@@ -8,6 +8,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { handleLogout } from '../utils/api';
+import { MdVerified } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
@@ -921,7 +922,7 @@ const ManualReg = () => {
           className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
           onClick={() => {
             resetManualReg();
-            navigate('/approvals')
+            navigate('/approvals');
           }}
         >
           <FaUsersRectangle
@@ -963,8 +964,8 @@ const ManualReg = () => {
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => {
-          resetManualReg();
-          navigate('/app-settings');
+            resetManualReg();
+            navigate('/app-settings');
           }}
         >
           <FaMobileScreenButton
@@ -973,6 +974,24 @@ const ManualReg = () => {
             }`}
           />{' '}
           &nbsp; App Settings
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${
+            isActive('/payment-reporting') ? 'active' : ''
+          }`}
+          onClick={() => {
+            resetManualReg();
+            navigate('/payment-reporting');
+          }}
+        >
+          <MdVerified
+            className={`sidebar-icon ${
+              isActive('/payment-reporting') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Payment Reporting
         </button>
       </aside>
 

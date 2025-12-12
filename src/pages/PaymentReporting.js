@@ -7,12 +7,12 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
+import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/club-package.css';
+import '../styles/club-desk.css';
 
-const ClubPackage = () => {
+const PaymentReporting = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const location = useLocation();
@@ -21,19 +21,56 @@ const ClubPackage = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
-  // const [membersForApproval, setMembersForApproval] = useState([]);
-  //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [confirmPage, setConfirmPage] = useState(false);
+  const [confirmVerify, setConfirmVerify] = useState({
+    open: false,
+    userId: null,
+  });
 
   // API functions
-  // const [activeTab, setActiveTab] = useState('confirm');
+  const [activeTab, setActiveTab] = useState('approvedPayments');
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
+
+  // Members (Members for approval) state
+  const [members, setMembers] = useState([]);
+  const [membersPage, setMembersPage] = useState(1);
+  const [membersLimit, setMembersLimit] = useState(10);
+  const [membersSearch, setMembersSearch] = useState('');
+  const [membersTotalPages, setMembersTotalPages] = useState(1);
+
+  // input shown in search bar (applies to active tab)
+  const [searchInput, setSearchInput] = useState('');
+
+  // Fetch members (for approvals)
+  const fetchMembers = async () => {
+    setLoading(true);
+    try {
+      let url = `${baseUrl}/user/get/verified?page=${membersPage}`;
+      if (membersSearch && membersSearch.trim() !== '')
+        url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data && Array.isArray(res.data.users)) {
+        setMembers(res.data.users);
+        setMembersTotalPages(res.data.totalPages || 1);
+      } else {
+        setMembers([]);
+        setMembersTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Error fetching members:', err);
+      toast.error('Failed to fetch members');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -68,31 +105,6 @@ const ClubPackage = () => {
     }
   };
 
-  // Add this useEffect hook at the beginning of the ClubPackage component, after the state declarations
-  useEffect(() => {
-    const checkExistingMember = async () => {
-      if (!selectedVenue) return;
-
-      try {
-        const response = await axios.get(`${baseUrl}/club-package`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // If member exists, navigate directly to MembershipPage
-        if (response.data?.data?.length > 0) {
-          navigate('/membership');
-        }
-      } catch (error) {
-        console.error('Error checking member status:', error);
-        // Continue showing the ClubPackage form if there's an error
-      }
-    };
-
-    checkExistingMember();
-  }, [selectedVenue, token]);
-
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -115,6 +127,20 @@ const ClubPackage = () => {
       fetchVenues();
     }
   }, [token]);
+
+  // Fetch when pages/limits/search change for respective tabs
+  useEffect(() => {
+    if (activeTab === 'approvedPayments') fetchMembers();
+  }, [membersPage, membersLimit, membersSearch, token]);
+
+  // When switching tabs, sync search input and fetch for that tab
+  useEffect(() => {
+    if (activeTab === 'approvedPayments') {
+      setSearchInput(membersSearch);
+      fetchMembers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -172,6 +198,21 @@ const ClubPackage = () => {
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
+  const getFullName = (user) =>
+    `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
+
+  // Pagination controls per tab
+  const onPrev = () => {
+    if (activeTab === 'approvedPayments') {
+      if (membersPage > 1) setMembersPage((p) => p - 1);
+    }
+  };
+  const onNext = () => {
+    if (activeTab === 'approvedPayments') {
+      if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
     }
   };
 
@@ -363,69 +404,188 @@ const ClubPackage = () => {
         </button>
       </aside>
 
-      {!confirmPage ? (
-        <main
-          className="club-package-main"
-          role="main"
-          aria-label="Club Package"
+      <div className="sa-filter-buttons">
+        <button
+          className={`user-btn ${
+            activeTab === 'approvedPayments' ? 'active' : ''
+          }`}
+          onClick={() => setActiveTab('approvedPayments')}
         >
-          <div className="club-package-card">
-            <h1 className="cp-title">Do you wish to add a Club Package?</h1>
-            <p className="cp-subtitle">
-              By adding a Club Package will allow you to add memberships and
-              pricing.
-            </p>
+          Approved Payments
+        </button>
+      </div>
 
-            <div className="cp-warning">
-              <span className="cp-warning-icon" aria-hidden>
-                !
-              </span>
-              <h2 className="cp-warning-text">
-                DO NOT PROCEED IF YOU ARE NOT SURE
-              </h2>
-              <span className="cp-warning-icon" aria-hidden>
-                !
-              </span>
-            </div>
-
-            <div className="cp-action">
-              <button
-                className="create-btn"
-                onClick={() => setConfirmPage(true)}
-              >
-                Create Club Package
-              </button>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main
-          className="club-package-main"
-          role="main"
-          aria-label="Club Package"
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '20px',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            right: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
         >
-          <div className="club-package-card-confirm">
-            <h1 className="cp-title">You are creating a new club package</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <input
+              type="text"
+              placeholder="Search for member"
+              value={searchInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchInput(value);
+                if (activeTab === 'approvedPayments') {
+                  setMembersPage(1);
+                  setMembersSearch(value);
+                }
+              }}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '20px',
+                border: '2px solid #002977',
+                fontSize: '14px',
+                width: '250px',
+                outline: 'none',
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
-            <div className="cp-filter-buttons-confirm">
+      <div className="members-table-container">
+        {loading ? (
+          <div className="loading">Loading...</div>
+        ) : (
+          <>
+            <table className="members-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Address</th>
+                  <th>Suburb</th>
+                  <th>Post Code</th>
+                  <th>Mobile</th>
+                  <th>Email</th>
+                  <th>Membership</th>
+                  <th>Amount Paid</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeTab === 'approvedPayments' &&
+                  members.map((member) => (
+                    <tr key={member._id}>
+                      <td>{getFullName(member)}</td>
+                      <td>{member.Address || member.address || '-'}</td>
+                      <td>{member.Suburb || member.suburb || '-'}</td>
+                      <td>{member.PostCode || member.postCode || '-'}</td>
+                      <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.Email || member.email || '-'}</td>
+                      <td>{member.packageName || '-'}</td>
+                      <td>{member.amountPaid || '-'}</td>
+                    </tr>
+                  ))}
+
+                {activeTab === 'approvedPayments' && members.length === 0 && (
+                  <tr>
+                    <td colSpan="8" className="no-data">
+                      No members found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                paddingRight: '20px',
+                paddingLeft: '20px',
+              }}
+            >
               <button
-                className="back-btn"
-                onClick={() => navigate('/dashboard')}
+                onClick={onPrev}
+                disabled={
+                  activeTab === 'approvedPayments' ? membersPage === 1 : null
+                }
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor: (
+                    activeTab === 'approvedPayments' ? membersPage === 1 : null
+                  )
+                    ? '#e0e0e0'
+                    : '#002977',
+                  color: (
+                    activeTab === 'approvedPayments' ? membersPage === 1 : null
+                  )
+                    ? '#999'
+                    : 'white',
+                  cursor: (
+                    activeTab === 'approvedPayments' ? membersPage === 1 : null
+                  )
+                    ? 'not-allowed'
+                    : 'pointer',
+                  fontWeight: '500',
+                }}
               >
-                Back
+                ← Previous
               </button>
+              <span style={{ fontWeight: '500', color: '#002977' }}>
+                Page {activeTab === 'approvedPayments' ? membersPage : null} of{' '}
+                {activeTab === 'approvedPayments' ? membersTotalPages : null}
+              </span>
               <button
-                className="confirm-btn"
-                onClick={() => navigate('/membership')}
+                onClick={onNext}
+                disabled={
+                  activeTab === 'approvedPayments'
+                    ? membersPage >= membersTotalPages
+                    : null
+                }
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor: (
+                    activeTab === 'approvedPayments'
+                      ? membersPage >= membersTotalPages
+                      : null
+                  )
+                    ? '#e0e0e0'
+                    : '#002977',
+                  color: (
+                    activeTab === 'approvedPayments'
+                      ? membersPage >= membersTotalPages
+                      : null
+                  )
+                    ? '#999'
+                    : 'white',
+                  cursor: (
+                    activeTab === 'approvedPayments'
+                      ? membersPage >= membersTotalPages
+                      : null
+                  )
+                    ? 'not-allowed'
+                    : 'pointer',
+                  fontWeight: '500',
+                }}
               >
-                Confirm
+                Next →
               </button>
             </div>
-          </div>
-        </main>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
-export default ClubPackage;
+export default PaymentReporting;

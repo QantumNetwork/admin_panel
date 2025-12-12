@@ -7,6 +7,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { MdVerified } from 'react-icons/md';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -311,24 +312,51 @@ const AppSettings = () => {
           />{' '}
           &nbsp; App Settings
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${
+            isActive('/payment-reporting') ? 'active' : ''
+          }`}
+          onClick={() => {
+            navigate('/payment-reporting');
+          }}
+        >
+          <MdVerified
+            className={`sidebar-icon ${
+              isActive('/payment-reporting') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Payment Reporting
+        </button>
       </aside>
 
       <main className="special-offers-container">
         <div className="special-offers-card">
           <h3 className="special-offers-title">Set Special Offers Menu</h3>
 
-          <div className="menu-type-section" style={{marginBottom: '50px'}}>
+          <div className="menu-type-section" style={{ marginBottom: '50px' }}>
             <label>
-              <input type="radio" name="menuType" style={{accentColor: '#002977'}}/> Standard menu
+              <input
+                type="radio"
+                name="menuType"
+                style={{ accentColor: '#002977' }}
+              />{' '}
+              Standard menu
             </label>
             <label>
-              <input type="radio" name="menuType" style={{accentColor: '#002977'}} defaultChecked /> Multiple
-              special offer types
+              <input
+                type="radio"
+                name="menuType"
+                style={{ accentColor: '#002977' }}
+                defaultChecked
+              />{' '}
+              Multiple special offer types
             </label>
 
             <div className="offer-type-field">
               <label>Type 1</label>
-              <input type="text" style={{width: '92%'}} defaultValue="WMLC" />
+              <input type="text" style={{ width: '92%' }} defaultValue="WMLC" />
             </div>
 
             <div className="offer-type-field">
@@ -350,7 +378,12 @@ const AppSettings = () => {
           </div>
 
           <div className="update-btn-app-wrapper">
-            <button className="action-btn approve" style={{width: '30%', marginLeft: '34%'}}>Update</button>
+            <button
+              className="action-btn approve"
+              style={{ width: '30%', marginLeft: '34%' }}
+            >
+              Update
+            </button>
           </div>
         </div>
       </main>

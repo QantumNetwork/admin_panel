@@ -163,7 +163,7 @@ const ScheduledSent = () => {
           return;
         }
 
-        if (activeTab === 'sent') {
+        if (activeTab === 'completed') {
           setLoadingSent(true);
         }
         const url = `${baseUrl}/notification/details?type=${activeTab}&page=${page}&limit=10`;
@@ -177,9 +177,17 @@ const ScheduledSent = () => {
 
         if (response.data && response.data.success) {
           console.log('response.data', response.data);
-          
+
           const formattedData = response.data.data.logs.map((log) => {
-            const rawDate = log.sendDate || log.sentAt;
+            // Pick correct field based on status
+            let rawDate = null;
+
+            if (log.status === 'scheduled') {
+              rawDate = log.scheduledAt; // <-- Use scheduledAt
+            } else if (log.status === 'completed') {
+              rawDate = log.executedAt; // <-- Use executedAt
+            }
+
             const dateObj = rawDate ? new Date(rawDate) : null;
 
             const formattedDate = dateObj
@@ -208,7 +216,7 @@ const ScheduledSent = () => {
           });
 
           setAllData(formattedData);
-          if (activeTab === 'sent') {
+          if (activeTab === 'completed') {
             setLoadingSent(false);
           }
           setTotalPages(response.data.data.totalPages);
@@ -223,7 +231,7 @@ const ScheduledSent = () => {
       } catch (error) {
         console.error('Error fetching notifications:', error);
         toast.error(error.message || 'Something went wrong!');
-        if (activeTab === 'sent') {
+        if (activeTab === 'completed') {
           setLoadingSent(false);
         }
       }
@@ -300,60 +308,60 @@ const ScheduledSent = () => {
     }
   }, [token]);
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   const handleLock = async () => {
     try {
       const result = await handleLogout();
-      if(result.success) {
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        toast.error(result.message || 'Failed to remove lock. Please try again.');
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
-
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="ssent-digital-app-container">
-      <ToastContainer 
-                                      position="top-center"
-                                      autoClose={3000}
-                                      hideProgressBar={false}
-                                      newestOnTop
-                                closeOnClick
-                                rtl={false}
-                                pauseOnFocusLoss
-                                draggable
-                                pauseOnHover
-                                theme="light"
-                                transition={Slide}
-                                style={{ zIndex: 9999, 
-                                  marginTop: '90px',
-                                  fontSize: '14px',
-                                  minWidth: '300px',
-                                  textAlign: 'center' }}
-                                    />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       <header className="ssent-app-header">
-        <div
-          className="s2w-logo"
-          onClick={async () => await handleLock()}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -588,9 +596,9 @@ const handleCardClick = async (accessItem, navigateTo) => {
             </button>
             <button
               className={`ssent-tab-btn ${
-                activeTab === 'sent' ? 'active' : ''
+                activeTab === 'completed' ? 'active' : ''
               }`}
-              onClick={() => setActiveTab('sent')}
+              onClick={() => setActiveTab('completed')}
             >
               Sent
             </button>
@@ -657,7 +665,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                     marginTop: '0.85rem',
                   }}
                 >
-                  {activeTab === 'sent'
+                  {activeTab === 'completed'
                     ? 'No sent notifications found.'
                     : 'No scheduled notifications found.'}
                 </div>
@@ -677,7 +685,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   <div className="ssent-time-column">Time</div>
                   <div className="ssent-message-column">Message</div>
                   <div className="ssent-reach-column">Member Reach</div>
-                  {activeTab === 'sent' ? (
+                  {activeTab === 'completed' ? (
                     <>
                       <div className="ssent-completed-column">Completed</div>
                       <div className="ssent-reuse-column"></div>
@@ -735,16 +743,16 @@ const handleCardClick = async (accessItem, navigateTo) => {
                       <div className="ssent-reach-column">
                         {message.status === 'scheduled'
                           ? message.market
-                          : message.status === 'sent'
+                          : message.status === 'completed'
                           ? message.successCount
                           : null}
                       </div>
 
-                      {activeTab === 'sent' ? (
+                      {activeTab === 'completed' ? (
                         <>
                           <div className="ssent-completed-column">
                             {message.displayType === 'schedule' &&
-                              message.status === 'sent' && (
+                              message.status === 'completed' && (
                                 <div className="ssent-checkbox-checked">
                                   <FaCheck />
                                 </div>
