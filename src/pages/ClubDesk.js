@@ -52,6 +52,7 @@ const ClubDesk = () => {
   const [paymentsSearch, setPaymentsSearch] = useState('');
   const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
   const [selectedLicense, setSelectedLicense] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
@@ -229,7 +230,7 @@ const ClubDesk = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        await handleLock();
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -243,24 +244,61 @@ const ClubDesk = () => {
     return location.pathname === path;
   };
 
-  const handleLock = async () => {
-    try {
-      const result = await handleLogout();
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        toast.error(
-          result.message || 'Failed to remove lock. Please try again.'
-        );
-      }
-    } catch (error) {
-      console.error('Error in handleLock:', error);
-      toast.error(error.message || 'Failed to remove lock. Please try again.');
-    }
-  };
+  // const handleLock = async () => {
+  //   try {
+  //     const result = await handleLogout();
+  //     if (result.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       toast.error(
+  //         result.message || 'Failed to remove lock. Please try again.'
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handleLock:', error);
+  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
+  //   }
+  // };
 
   const getFullName = (user) =>
     `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
+
+  const renderImage = (field) =>
+    !field ? (
+      <img
+        src="/no_image.png"
+        alt="Image"
+        onClick={() => setSelectedImage('/no_image.png')}
+        style={{
+          width: '80px',
+          height: '50px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          border: '1px solid #ddd',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+        onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+      />
+    ) : (
+      <img
+        src={field}
+        alt="Image"
+        onClick={() => setSelectedImage(field)}
+        style={{
+          width: '80px',
+          height: '50px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          border: '1px solid #ddd',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => (e.target.style.transform = 'scale(1.05)')}
+        onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+      />
+    );
   const renderLicence = (field) =>
     !field ? (
       <img
@@ -404,7 +442,7 @@ const ClubDesk = () => {
       />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={async () => await handleLock()}>
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -647,6 +685,7 @@ const ClubDesk = () => {
                   <th>Membership</th>
                   <th>Licence Front</th>
                   <th>Licence Back</th>
+                  <th>Selfie</th>
                   <th>Payment</th>
                   <th></th>
                 </tr>
@@ -661,6 +700,7 @@ const ClubDesk = () => {
                       <td>{member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderImage(member.profile_Image)}</td>
                       <td>{renderMemberPaymentStatus(member)}</td>
                       <td>
                         <button
@@ -684,6 +724,7 @@ const ClubDesk = () => {
                       <td>{member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderImage(member.profile_Image)}</td>
                       <td>{renderWaitingPaymentStatus(member)}</td>
                       <td>
                         <button
@@ -870,6 +911,80 @@ const ClubDesk = () => {
             <img
               src={selectedLicense}
               alt="Full License"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                borderRadius: '4px',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {selectedImage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10000,
+          }}
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            style={
+              selectedImage != '/no_image.png'
+                ? {
+                    position: 'relative',
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                    overflow: 'auto',
+                  }
+                : {
+                    position: 'relative',
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    maxWidth: '40vw',
+                    maxHeight: '90vh',
+                    overflow: 'auto',
+                  }
+            }
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedImage(null)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: '#002977',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                fontSize: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              ✕
+            </button>
+            <img
+              src={selectedImage}
+              alt="Full Image"
               style={{
                 maxWidth: '100%',
                 maxHeight: '100%',

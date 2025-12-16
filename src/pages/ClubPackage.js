@@ -145,7 +145,7 @@ const ClubPackage = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        await handleLock();
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -159,21 +159,21 @@ const ClubPackage = () => {
     return location.pathname === path;
   };
 
-  const handleLock = async () => {
-    try {
-      const result = await handleLogout();
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        toast.error(
-          result.message || 'Failed to remove lock. Please try again.'
-        );
-      }
-    } catch (error) {
-      console.error('Error in handleLock:', error);
-      toast.error(error.message || 'Failed to remove lock. Please try again.');
-    }
-  };
+  // const handleLock = async () => {
+  //   try {
+  //     const result = await handleLogout();
+  //     if (result.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       toast.error(
+  //         result.message || 'Failed to remove lock. Please try again.'
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handleLock:', error);
+  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
+  //   }
+  // };
 
   return (
     <div className="dashboard-container">
@@ -199,7 +199,7 @@ const ClubPackage = () => {
       />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={async () => await handleLock()}>
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 

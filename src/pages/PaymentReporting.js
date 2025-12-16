@@ -171,7 +171,7 @@ const PaymentReporting = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        await handleLock();
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -185,21 +185,21 @@ const PaymentReporting = () => {
     return location.pathname === path;
   };
 
-  const handleLock = async () => {
-    try {
-      const result = await handleLogout();
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        toast.error(
-          result.message || 'Failed to remove lock. Please try again.'
-        );
-      }
-    } catch (error) {
-      console.error('Error in handleLock:', error);
-      toast.error(error.message || 'Failed to remove lock. Please try again.');
-    }
-  };
+  // const handleLock = async () => {
+  //   try {
+  //     const result = await handleLogout();
+  //     if (result.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       toast.error(
+  //         result.message || 'Failed to remove lock. Please try again.'
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handleLock:', error);
+  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
+  //   }
+  // };
 
   const getFullName = (user) =>
     `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
@@ -213,6 +213,23 @@ const PaymentReporting = () => {
   const onNext = () => {
     if (activeTab === 'approvedPayments') {
       if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
+    }
+  };
+
+  const fetchPaymentType = (type) => {
+    switch (type) {
+      case 'cash':
+        return 'Cash';
+      case 'card_by_venue':
+        return 'Card by Venue';
+      case 'cheque':
+        return 'Cheque';
+      case 'management':
+        return 'Management Approved';
+      case 'card':
+        return 'Stripe';
+      default:
+        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
     }
   };
 
@@ -240,7 +257,7 @@ const PaymentReporting = () => {
       />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={async () => await handleLock()}>
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -473,6 +490,7 @@ const PaymentReporting = () => {
                   <th>Mobile</th>
                   <th>Email</th>
                   <th>Membership</th>
+                  <th>Payment Type</th>
                   <th>Amount Paid</th>
                 </tr>
               </thead>
@@ -487,7 +505,8 @@ const PaymentReporting = () => {
                       <td>{member.Mobile || member.mobile || '-'}</td>
                       <td>{member.Email || member.email || '-'}</td>
                       <td>{member.packageName || '-'}</td>
-                      <td>{member.amountPaid || '-'}</td>
+                      <td>{fetchPaymentType(member.paymentType) || '-'}</td>
+                      <td>{'$'+member.amountPaid || '-'}</td>
                     </tr>
                   ))}
 

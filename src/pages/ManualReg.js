@@ -37,7 +37,7 @@ const ManualReg = () => {
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showManualPayment, setShowManualPayment] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Cash');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
 
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
@@ -83,10 +83,49 @@ const ManualReg = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    let sanitizedValue = value;
+
+  // Email: allow letters, numbers, @ . _ -
+  if (name === 'Email' || name === 'paymentEmail') {
+    sanitizedValue = value.replace(/[^a-zA-Z0-9@._-]/g, '');
+  }
+
+  // Address: allow letters (all languages), numbers, space, comma
+  else if (name === 'Address') {
+    sanitizedValue = value.replace(
+      /[^\p{L}\p{M}0-9\s,]/gu,
+      ''
+    );
+  }
+
+  // Names, Suburb, Region: letters (all languages) + space only
+  else if (
+    name === 'GivenNames' ||
+    name === 'Surname' ||
+    name === 'Suburb' ||
+    name === 'region' ||
+    name === 'nameOnCard'
+  ) {
+    sanitizedValue = value.replace(
+      /[^\p{L}\p{M}\s]/gu,
+      ''
+    );
+  }
+
+  // PostCode: numbers only
+  else if (name === 'PostCode') {
+    sanitizedValue = value.replace(/[^0-9]/g, '');
+  }
+
+  // Mobile: numbers only
+  else if (name === 'Mobile') {
+    sanitizedValue = value.replace(/[^0-9]/g, '');
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: sanitizedValue,
+  }));
   };
 
   const token = localStorage.getItem('token');
@@ -183,7 +222,7 @@ const ManualReg = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        await handleLock();
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -266,6 +305,7 @@ const ManualReg = () => {
       State: null,
       amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
       currency: 'aud',
+      paymentType: selectedPaymentMethod,
       packageId: selectedPkg?._id,
       packageName: selectedPkg?.membershipName,
     };
@@ -340,22 +380,22 @@ const ManualReg = () => {
     }
   };
 
-  const handleLock = async () => {
-    try {
-      resetManualReg();
-      const result = await handleLogout();
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        toast.error(
-          result.message || 'Failed to remove lock. Please try again.'
-        );
-      }
-    } catch (error) {
-      console.error('Error in handleLock:', error);
-      toast.error(error.message || 'Failed to remove lock. Please try again.');
-    }
-  };
+  // const handleLock = async () => {
+  //   try {
+  //     resetManualReg();
+  //     const result = await handleLogout();
+  //     if (result.success) {
+  //       navigate('/dashboard');
+  //     } else {
+  //       toast.error(
+  //         result.message || 'Failed to remove lock. Please try again.'
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handleLock:', error);
+  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
+  //   }
+  // };
 
   const handleNextS1 = async () => {
     // Step forward from Register -> Membership Level
@@ -813,7 +853,7 @@ const ManualReg = () => {
 
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={async () => await handleLock()}>
+        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -1521,8 +1561,8 @@ const ManualReg = () => {
                         <input
                           type="radio"
                           name="paymentMethod"
-                          value="Cash"
-                          checked={selectedPaymentMethod === 'Cash'}
+                          value="cash"
+                          checked={selectedPaymentMethod === 'cash'}
                           onChange={(e) =>
                             setSelectedPaymentMethod(e.target.value)
                           }
@@ -1547,8 +1587,8 @@ const ManualReg = () => {
                         <input
                           type="radio"
                           name="paymentMethod"
-                          value="Card by venue"
-                          checked={selectedPaymentMethod === 'Card by venue'}
+                          value="card_by_venue"
+                          checked={selectedPaymentMethod === 'card_by_venue'}
                           onChange={(e) =>
                             setSelectedPaymentMethod(e.target.value)
                           }
@@ -1573,8 +1613,8 @@ const ManualReg = () => {
                         <input
                           type="radio"
                           name="paymentMethod"
-                          value="Cheque"
-                          checked={selectedPaymentMethod === 'Cheque'}
+                          value="cheque"
+                          checked={selectedPaymentMethod === 'cheque'}
                           onChange={(e) =>
                             setSelectedPaymentMethod(e.target.value)
                           }
@@ -1599,9 +1639,9 @@ const ManualReg = () => {
                         <input
                           type="radio"
                           name="paymentMethod"
-                          value="Management approved"
+                          value="management"
                           checked={
-                            selectedPaymentMethod === 'Management approved'
+                            selectedPaymentMethod === 'management'
                           }
                           onChange={(e) =>
                             setSelectedPaymentMethod(e.target.value)
