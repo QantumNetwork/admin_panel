@@ -10,7 +10,7 @@ import { PiListBulletsFill } from 'react-icons/pi';
 import { MdVerified } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/club-desk.css';
+import '../styles/payment-reporting.css';
 
 const PaymentReporting = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -42,6 +42,12 @@ const PaymentReporting = () => {
   const [membersLimit, setMembersLimit] = useState(10);
   const [membersSearch, setMembersSearch] = useState('');
   const [membersTotalPages, setMembersTotalPages] = useState(1);
+
+  const [dateFilter, setDateFilter] = useState('MTD');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const [paymentFilter, setPaymentFilter] = useState('all payment types');
 
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
@@ -424,6 +430,14 @@ const PaymentReporting = () => {
       <div className="sa-filter-buttons">
         <button
           className={`user-btn ${
+            activeTab === 'totalsAllPaymentMethods' ? 'active' : ''
+          }`}
+          onClick={() => setActiveTab('totalsAllPaymentMethods')}
+        >
+          Totals All Payment Methods
+        </button>
+        <button
+          className={`user-btn ${
             activeTab === 'approvedPayments' ? 'active' : ''
           }`}
           onClick={() => setActiveTab('approvedPayments')}
@@ -432,177 +446,344 @@ const PaymentReporting = () => {
         </button>
       </div>
 
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '20px',
-        }}
-      >
+      {activeTab === 'approvedPayments' && (
         <div
           style={{
-            position: 'absolute',
-            right: '40px',
+            width: '100%',
             display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
+            justifyContent: 'center',
+            marginTop: '20px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <input
-              type="text"
-              placeholder="Search for member"
-              value={searchInput}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearchInput(value);
-                if (activeTab === 'approvedPayments') {
-                  setMembersPage(1);
-                  setMembersSearch(value);
-                }
-              }}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '20px',
-                border: '2px solid #002977',
-                fontSize: '14px',
-                width: '250px',
-                outline: 'none',
-              }}
-            />
+          <div
+            style={{
+              position: 'absolute',
+              right: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="text"
+                placeholder="Search for member"
+                value={searchInput}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchInput(value);
+                  if (activeTab === 'approvedPayments') {
+                    setMembersPage(1);
+                    setMembersSearch(value);
+                  }
+                }}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '20px',
+                  border: '2px solid #002977',
+                  fontSize: '14px',
+                  width: '250px',
+                  outline: 'none',
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="members-table-container">
-        {loading ? (
-          <div className="loading">Loading...</div>
-        ) : (
-          <>
-            <table className="members-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Address</th>
-                  <th>Suburb</th>
-                  <th>Post Code</th>
-                  <th>Mobile</th>
-                  <th>Email</th>
-                  <th>Membership</th>
-                  <th>Payment Type</th>
-                  <th>Amount Paid</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeTab === 'approvedPayments' &&
-                  members.map((member) => (
-                    <tr key={member._id}>
-                      <td>{getFullName(member)}</td>
-                      <td>{member.Address || member.address || '-'}</td>
-                      <td>{member.Suburb || member.suburb || '-'}</td>
-                      <td>{member.PostCode || member.postCode || '-'}</td>
-                      <td>{member.Mobile || member.mobile || '-'}</td>
-                      <td>{member.Email || member.email || '-'}</td>
-                      <td>{member.packageName || '-'}</td>
-                      <td>{fetchPaymentType(member.paymentType) || '-'}</td>
-                      <td>{'$'+member.amountPaid || '-'}</td>
-                    </tr>
-                  ))}
+      <div
+  style={{
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: '12px',
+    marginLeft: '16.5%',
+    marginTop: activeTab === 'approvedPayments' ? '5%' : '6%',
+    flexWrap: 'nowrap',
+  }}
+>
+  {/* MTD / Date filter */}
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <select
+      value={dateFilter}
+      onChange={(e) => setDateFilter(e.target.value)}
+      style={{
+        padding: '6px 10px',
+        borderRadius: '6px',
+        border: '1px solid #ccc',
+        backgroundColor: '#F2F2F2',
+        cursor: 'pointer',
+        minWidth: '100px',
+      }}
+    >
+      <option value="mtd">MTD</option>
+      <option value="today">Today</option>
+      <option value="yesterday">Yesterday</option>
+      <option value="last 3 months">Last 3 Months</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
 
-                {activeTab === 'approvedPayments' && members.length === 0 && (
-                  <tr>
-                    <td colSpan="8" className="no-data">
-                      No members found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+  {/* START DATE */}
+  {dateFilter === 'custom' && (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <label
+        style={{
+          fontSize: '10px',
+          fontWeight: '600',
+          color: '#6b6b6b',
+          marginBottom: '4px',
+        }}
+      >
+        START DATE
+      </label>
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+        style={{
+          padding: '6px 8px',
+          borderRadius: '4px',
+          border: '1px solid #cfcfcf',
+          fontSize: '12px',
+          width: '130px',
+        }}
+      />
+    </div>
+  )}
+
+  {/* END DATE */}
+  {dateFilter === 'custom' && (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <label
+        style={{
+          fontSize: '10px',
+          fontWeight: '600',
+          color: '#6b6b6b',
+          marginBottom: '4px',
+        }}
+      >
+        END DATE
+      </label>
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        style={{
+          padding: '6px 8px',
+          borderRadius: '4px',
+          border: '1px solid #cfcfcf',
+          fontSize: '12px',
+          width: '130px',
+        }}
+      />
+    </div>
+  )}
+
+  {/* ALL PAYMENT TYPES */}
+  {activeTab === 'approvedPayments' && (
+    <select
+      style={{
+        padding: '6px 10px',
+        borderRadius: '6px',
+        border: '1px solid #ccc',
+        backgroundColor: '#F2F2F2',
+        cursor: 'pointer',
+        minWidth: '160px',
+        marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
+      }}
+    >
+      <option value="all">All Payment Types</option>
+      <option value="stripe">Stripe</option>
+      <option value="cash">Cash</option>
+      <option value="venue eftpos">Venue EFTPOS</option>
+      <option value="mgmt approved">Mgmt Approved</option>
+    </select>
+  )}
+</div>
+
+      {activeTab === 'totalsAllPaymentMethods' && (
+        <div
+          style={{
+            width: '360px',
+            backgroundColor: '#f3f3f3',
+            borderRadius: '8px',
+            padding: '16px',
+            marginLeft: '16%',
+            marginTop: '3%',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontWeight: '600',
+              marginBottom: '12px',
+            }}
+          >
+            <span>Payment Type</span>
+            <span>Total Payments</span>
+          </div>
+
+          {[
+            { label: 'Total Value', value: '7,920.90', bold: true },
+            { label: 'Stripe', value: '4,500.34' },
+            { label: 'Venue EFTPOS', value: '2,900.22' },
+            { label: 'Cash', value: '520.34' },
+            { label: 'Mgmt Approved', value: '0.00' },
+          ].map((item) => (
             <div
+              key={item.label}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '20px',
-                paddingRight: '20px',
-                paddingLeft: '20px',
+                padding: '6px 0',
+                fontWeight: item.bold ? '600' : '400',
               }}
             >
-              <button
-                onClick={onPrev}
-                disabled={
-                  activeTab === 'approvedPayments' ? membersPage === 1 : null
-                }
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  backgroundColor: (
-                    activeTab === 'approvedPayments' ? membersPage === 1 : null
-                  )
-                    ? '#e0e0e0'
-                    : '#002977',
-                  color: (
-                    activeTab === 'approvedPayments' ? membersPage === 1 : null
-                  )
-                    ? '#999'
-                    : 'white',
-                  cursor: (
-                    activeTab === 'approvedPayments' ? membersPage === 1 : null
-                  )
-                    ? 'not-allowed'
-                    : 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                ← Previous
-              </button>
-              <span style={{ fontWeight: '500', color: '#002977' }}>
-                Page {activeTab === 'approvedPayments' ? membersPage : null} of{' '}
-                {activeTab === 'approvedPayments' ? membersTotalPages : null}
-              </span>
-              <button
-                onClick={onNext}
-                disabled={
-                  activeTab === 'approvedPayments'
-                    ? membersPage >= membersTotalPages
-                    : null
-                }
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  backgroundColor: (
-                    activeTab === 'approvedPayments'
-                      ? membersPage >= membersTotalPages
-                      : null
-                  )
-                    ? '#e0e0e0'
-                    : '#002977',
-                  color: (
-                    activeTab === 'approvedPayments'
-                      ? membersPage >= membersTotalPages
-                      : null
-                  )
-                    ? '#999'
-                    : 'white',
-                  cursor: (
-                    activeTab === 'approvedPayments'
-                      ? membersPage >= membersTotalPages
-                      : null
-                  )
-                    ? 'not-allowed'
-                    : 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                Next →
-              </button>
+              <span>{item.label}</span>
+              <span>{item.value}</span>
             </div>
-          </>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {activeTab === 'approvedPayments' && (
+        <div className="members-table-container-pr">
+          {loading ? (
+            <div className="loading">Loading...</div>
+          ) : (
+            <>
+              <table className="members-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Suburb</th>
+                    <th>Post Code</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Membership</th>
+                    <th>Payment Type</th>
+                    <th>Amount Paid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeTab === 'approvedPayments' &&
+                    members.map((member) => (
+                      <tr key={member._id}>
+                        <td>{getFullName(member)}</td>
+                        <td>{member.Address || member.address || '-'}</td>
+                        <td>{member.Suburb || member.suburb || '-'}</td>
+                        <td>{member.PostCode || member.postCode || '-'}</td>
+                        <td>{member.Mobile || member.mobile || '-'}</td>
+                        <td>{member.Email || member.email || '-'}</td>
+                        <td>{member.packageName || '-'}</td>
+                        <td>{fetchPaymentType(member.paymentType) || '-'}</td>
+                        <td>{'$' + member.amountPaid || '-'}</td>
+                      </tr>
+                    ))}
+
+                  {activeTab === 'approvedPayments' && members.length === 0 && (
+                    <tr>
+                      <td colSpan="8" className="no-data">
+                        No members found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  paddingRight: '20px',
+                  paddingLeft: '20px',
+                }}
+              >
+                <button
+                  onClick={onPrev}
+                  disabled={
+                    activeTab === 'approvedPayments' ? membersPage === 1 : null
+                  }
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage === 1
+                        : null
+                    )
+                      ? '#e0e0e0'
+                      : '#002977',
+                    color: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage === 1
+                        : null
+                    )
+                      ? '#999'
+                      : 'white',
+                    cursor: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage === 1
+                        : null
+                    )
+                      ? 'not-allowed'
+                      : 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  ← Previous
+                </button>
+                <span style={{ fontWeight: '500', color: '#002977' }}>
+                  Page {activeTab === 'approvedPayments' ? membersPage : null}{' '}
+                  of{' '}
+                  {activeTab === 'approvedPayments' ? membersTotalPages : null}
+                </span>
+                <button
+                  onClick={onNext}
+                  disabled={
+                    activeTab === 'approvedPayments'
+                      ? membersPage >= membersTotalPages
+                      : null
+                  }
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage >= membersTotalPages
+                        : null
+                    )
+                      ? '#e0e0e0'
+                      : '#002977',
+                    color: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage >= membersTotalPages
+                        : null
+                    )
+                      ? '#999'
+                      : 'white',
+                    cursor: (
+                      activeTab === 'approvedPayments'
+                        ? membersPage >= membersTotalPages
+                        : null
+                    )
+                      ? 'not-allowed'
+                      : 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  Next →
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

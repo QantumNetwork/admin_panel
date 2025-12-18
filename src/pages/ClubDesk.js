@@ -54,6 +54,33 @@ const ClubDesk = () => {
   const [selectedLicense, setSelectedLicense] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const rejectedMembers = [
+    {
+      _id: '1',
+      GivenNames: 'user',
+      Surname: '1',
+      Address: '1 Main St',
+      Mobile: '1234567890',
+      packageName: 'Social 1 year',
+      licence_front: null,
+      licence_back: null,
+      profile_Image: null,
+      paymentStatus: 'Declined',
+    },
+    {
+      _id: '2',
+      GivenNames: 'user',
+      Surname: '2',
+      Address: '2 Main St',
+      Mobile: '1234567890',
+      packageName: 'Social 2 years',
+      licence_front: null,
+      licence_back: null,
+      profile_Image: null,
+      paymentStatus: 'success',
+    },
+  ]; // Placeholder for rejected members
+
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -623,6 +650,13 @@ const ClubDesk = () => {
         >
           Waiting for Payment
         </button>
+
+        <button
+          className={`user-btn ${activeTab === 'rejected' ? 'active' : ''}`}
+          onClick={() => setActiveTab('rejected')}
+        >
+          Rejected
+        </button>
       </div>
 
       <div
@@ -687,6 +721,7 @@ const ClubDesk = () => {
                   <th>Licence Back</th>
                   <th>Selfie</th>
                   <th>Payment</th>
+                  {activeTab === 'rejected' && <th>Status</th>}
                   <th></th>
                 </tr>
               </thead>
@@ -702,6 +737,42 @@ const ClubDesk = () => {
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderImage(member.profile_Image)}</td>
                       <td>{renderMemberPaymentStatus(member)}</td>
+                      <td>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <button
+                            // onClick={() => handleReject(member)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#002977',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: '12px',
+                            }}
+                          >
+                            ✖ Rejected
+                          </button>
+                          <button
+                            // onClick={() => handleEdit(member)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#002977',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: '12px',
+                            }}
+                          >
+                            ✎ Edit
+                          </button>
+                        </div>
+                      </td>
                       <td>
                         <button
                           className="action-btn approve"
@@ -732,6 +803,39 @@ const ClubDesk = () => {
                           onClick={() => handleMakePayment(member)}
                         >
                           Make Payment
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                {activeTab === 'rejected' &&
+                  rejectedMembers.map((member) => (
+                    <tr key={member._id}>
+                      <td>{getFullName(member)}</td>
+                      <td>{member.Address || member.address || '-'}</td>
+                      <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.packageName || '-'}</td>
+                      <td>{renderLicence(member.licence_front)}</td>
+                      <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderImage(member.profile_Image)}</td>
+                      <td>{renderMemberPaymentStatus(member)}</td>
+                      <td style={{ color: 'red', fontWeight: 'bold' }}>
+                        REJECTED
+                      </td>
+                      <td>
+                        <button
+                          className="action-btn approve"
+                          // onClick={() => handleMakePayment(member)}
+                          style={{
+                            whiteSpace: 'normal',
+                            maxWidth: '150px',
+                            padding: '8px 12px',
+                            textAlign: 'center',
+                            display: 'inline-block',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          Send back to members for approval
                         </button>
                       </td>
                     </tr>

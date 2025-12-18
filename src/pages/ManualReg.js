@@ -1599,9 +1599,9 @@ const ManualReg = () => {
                             accentColor: '#002977',
                           }}
                         />
-                        Card by venue
+                        Venue EFT POS
                       </label>
-                      <label
+                      {/* <label
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -1626,7 +1626,7 @@ const ManualReg = () => {
                           }}
                         />
                         Cheque
-                      </label>
+                      </label> */}
                       <label
                         style={{
                           display: 'flex',
