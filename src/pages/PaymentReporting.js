@@ -43,11 +43,11 @@ const PaymentReporting = () => {
   const [membersSearch, setMembersSearch] = useState('');
   const [membersTotalPages, setMembersTotalPages] = useState(1);
 
-  const [dateFilter, setDateFilter] = useState('MTD');
+  const [dateFilter, setDateFilter] = useState('mtd');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [paymentFilter, setPaymentFilter] = useState('all payment types');
+  const [paymentFilter, setPaymentFilter] = useState('all');
 
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
@@ -57,8 +57,22 @@ const PaymentReporting = () => {
     setLoading(true);
     try {
       let url = `${baseUrl}/user/get/verified?page=${membersPage}`;
+      //search
       if (membersSearch && membersSearch.trim() !== '')
         url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+
+      // payment type
+      if (paymentFilter && paymentFilter !== 'all') {
+        url += `&paymentType=${paymentFilter}`;
+      }
+
+      // date filter
+      url += `&dateType=${dateFilter}`;
+
+      // custom date handling
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
+      }
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -137,7 +151,16 @@ const PaymentReporting = () => {
   // Fetch when pages/limits/search change for respective tabs
   useEffect(() => {
     if (activeTab === 'approvedPayments') fetchMembers();
-  }, [membersPage, membersLimit, membersSearch, token]);
+  }, [
+    membersPage,
+    membersLimit,
+    membersSearch,
+    paymentFilter,
+    dateFilter,
+    startDate,
+    endDate,
+    token,
+  ]);
 
   // When switching tabs, sync search input and fetch for that tab
   useEffect(() => {
@@ -492,114 +515,128 @@ const PaymentReporting = () => {
       )}
 
       <div
-  style={{
-    display: 'flex',
-    alignItems: 'flex-end',
-    gap: '12px',
-    marginLeft: '16.5%',
-    marginTop: activeTab === 'approvedPayments' ? '5%' : '6%',
-    flexWrap: 'nowrap',
-  }}
->
-  {/* MTD / Date filter */}
-  <div style={{ display: 'flex', flexDirection: 'column' }}>
-    <select
-      value={dateFilter}
-      onChange={(e) => setDateFilter(e.target.value)}
-      style={{
-        padding: '6px 10px',
-        borderRadius: '6px',
-        border: '1px solid #ccc',
-        backgroundColor: '#F2F2F2',
-        cursor: 'pointer',
-        minWidth: '100px',
-      }}
-    >
-      <option value="mtd">MTD</option>
-      <option value="today">Today</option>
-      <option value="yesterday">Yesterday</option>
-      <option value="last 3 months">Last 3 Months</option>
-      <option value="custom">Custom</option>
-    </select>
-  </div>
-
-  {/* START DATE */}
-  {dateFilter === 'custom' && (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <label
         style={{
-          fontSize: '10px',
-          fontWeight: '600',
-          color: '#6b6b6b',
-          marginBottom: '4px',
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '12px',
+          marginLeft: '16.5%',
+          marginTop: activeTab === 'approvedPayments' ? '5%' : '6%',
+          flexWrap: 'nowrap',
         }}
       >
-        START DATE
-      </label>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        style={{
-          padding: '6px 8px',
-          borderRadius: '4px',
-          border: '1px solid #cfcfcf',
-          fontSize: '12px',
-          width: '130px',
-        }}
-      />
-    </div>
-  )}
+        {/* MTD / Date filter */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <select
+            value={dateFilter}
+            onChange={(e) => {
+              setMembersPage(1);
+              setDateFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '100px',
+            }}
+          >
+            <option value="mtd">MTD</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last3month">Last 3 Months</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
 
-  {/* END DATE */}
-  {dateFilter === 'custom' && (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <label
-        style={{
-          fontSize: '10px',
-          fontWeight: '600',
-          color: '#6b6b6b',
-          marginBottom: '4px',
-        }}
-      >
-        END DATE
-      </label>
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        style={{
-          padding: '6px 8px',
-          borderRadius: '4px',
-          border: '1px solid #cfcfcf',
-          fontSize: '12px',
-          width: '130px',
-        }}
-      />
-    </div>
-  )}
+        {/* START DATE */}
+        {dateFilter === 'custom' && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: '600',
+                color: '#6b6b6b',
+                marginBottom: '4px',
+              }}
+            >
+              START DATE
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setMembersPage(1);
+                setStartDate(e.target.value);
+              }}
+              style={{
+                padding: '6px 8px',
+                borderRadius: '4px',
+                border: '1px solid #cfcfcf',
+                fontSize: '12px',
+                width: '130px',
+              }}
+            />
+          </div>
+        )}
 
-  {/* ALL PAYMENT TYPES */}
-  {activeTab === 'approvedPayments' && (
-    <select
-      style={{
-        padding: '6px 10px',
-        borderRadius: '6px',
-        border: '1px solid #ccc',
-        backgroundColor: '#F2F2F2',
-        cursor: 'pointer',
-        minWidth: '160px',
-        marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
-      }}
-    >
-      <option value="all">All Payment Types</option>
-      <option value="stripe">Stripe</option>
-      <option value="cash">Cash</option>
-      <option value="venue eftpos">Venue EFTPOS</option>
-      <option value="mgmt approved">Mgmt Approved</option>
-    </select>
-  )}
-</div>
+        {/* END DATE */}
+        {dateFilter === 'custom' && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: '600',
+                color: '#6b6b6b',
+                marginBottom: '4px',
+              }}
+            >
+              END DATE
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setMembersPage(1);
+                setEndDate(e.target.value);
+              }}
+              style={{
+                padding: '6px 8px',
+                borderRadius: '4px',
+                border: '1px solid #cfcfcf',
+                fontSize: '12px',
+                width: '130px',
+              }}
+            />
+          </div>
+        )}
+
+        {/* ALL PAYMENT TYPES */}
+        {activeTab === 'approvedPayments' && (
+          <select
+            value={paymentFilter}
+            onChange={(e) => {
+              setMembersPage(1);
+              setPaymentFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '160px',
+              marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
+            }}
+          >
+            <option value="all">All Payment Types</option>
+            <option value="card">Stripe</option>
+            <option value="cash">Cash</option>
+            <option value="card_by_venue">Venue EFTPOS</option>
+            <option value="management">Mgmt Approved</option>
+          </select>
+        )}
+      </div>
 
       {activeTab === 'totalsAllPaymentMethods' && (
         <div
@@ -656,6 +693,7 @@ const PaymentReporting = () => {
               <table className="members-table">
                 <thead>
                   <tr>
+                    <th>Date</th>
                     <th>Name</th>
                     <th>Address</th>
                     <th>Suburb</th>
@@ -671,6 +709,14 @@ const PaymentReporting = () => {
                   {activeTab === 'approvedPayments' &&
                     members.map((member) => (
                       <tr key={member._id}>
+                        <td>
+                          {member.lastPaymentAtBrisbane
+                            ? member.lastPaymentAtBrisbane.replace(
+                                /\s\d{1,2}:\d{2}\s[AP]M$/,
+                                ''
+                              )
+                            : '-'}
+                        </td>
                         <td>{getFullName(member)}</td>
                         <td>{member.Address || member.address || '-'}</td>
                         <td>{member.Suburb || member.suburb || '-'}</td>
