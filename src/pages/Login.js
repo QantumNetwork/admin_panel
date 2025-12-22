@@ -39,7 +39,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    email = email.trim().toLowerCase();
+    email = email.trim();
 
     if (!validator.isEmail(email)) {
       setError("Please enter a valid email address.");
