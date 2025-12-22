@@ -445,6 +445,35 @@ const ClubDesk = () => {
     }
   };
 
+  const handleReject = async (memberId) => {
+  if (!memberId) return;
+
+  try {
+    const url = `${baseUrl}/user/declined/${memberId}?appType=${selectedVenue}`;
+
+    const res = await axios.patch(
+      url,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (res.data.message === "User declined successfully") {
+      toast.success('Member rejected successfully');
+      fetchMembers(); // refresh list
+    } else {
+      toast.error('Failed to reject member');
+    }
+  } catch (error) {
+    console.error('Reject error:', error);
+    toast.error('Failed to reject member');
+  }
+};
+
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -746,7 +775,7 @@ const ClubDesk = () => {
                           }}
                         >
                           <button
-                            // onClick={() => handleReject(member)}
+                            onClick={() => handleReject(member._id)}
                             style={{
                               background: 'transparent',
                               border: 'none',

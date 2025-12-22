@@ -322,6 +322,18 @@ const ScheduledSent = () => {
     }
   };
 
+  const onPrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage((p) => p - 1);
+    }
+  };
+
+  const onNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((p) => p + 1);
+    }
+  };
+
   const handleLock = async () => {
     try {
       const result = await handleLogout();
@@ -797,36 +809,57 @@ const ScheduledSent = () => {
                     </div>
                   ))}
                 </div>
-                <div className="ssent-pagination-container">
-                  <div className="ssent-pagination">
-                    <button
-                      className="circle-btn"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
+              </div>
+            )}
+            {allData.length > 0 && (
+              <div className="ssent-pagination-container">
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '20px',
+                    width: '100%',
+                  }}
+                >
+                  <button
+                    onClick={onPrev}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      backgroundColor:
+                        currentPage === 1 ? '#e0e0e0' : '#002977',
+                      color: currentPage === 1 ? '#999' : 'white',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      fontWeight: '500',
+                    }}
+                  >
+                    ← Previous
+                  </button>
 
-                    {[...Array(totalPages)].map((_, index) => (
-                      <button
-                        key={index}
-                        className={`circle-btn ${
-                          currentPage === index + 1 ? 'active' : ''
-                        }`}
-                        onClick={() => handlePageChange(index + 1)}
-                      >
-                        {index + 1}
-                      </button>
-                    ))}
+                  <span style={{ fontWeight: '500', color: '#002977' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
 
-                    <button
-                      className="circle-btn"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </div>
+                  <button
+                    onClick={onNext}
+                    disabled={currentPage >= totalPages}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      backgroundColor:
+                        currentPage >= totalPages ? '#e0e0e0' : '#002977',
+                      color: currentPage >= totalPages ? '#999' : 'white',
+                      cursor:
+                        currentPage >= totalPages ? 'not-allowed' : 'pointer',
+                      fontWeight: '500',
+                    }}
+                  >
+                    Next →
+                  </button>
                 </div>
               </div>
             )}
