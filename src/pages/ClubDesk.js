@@ -54,32 +54,11 @@ const ClubDesk = () => {
   const [selectedLicense, setSelectedLicense] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const rejectedMembers = [
-    {
-      _id: '1',
-      GivenNames: 'user',
-      Surname: '1',
-      Address: '1 Main St',
-      Mobile: '1234567890',
-      packageName: 'Social 1 year',
-      licence_front: null,
-      licence_back: null,
-      profile_Image: null,
-      paymentStatus: 'Declined',
-    },
-    {
-      _id: '2',
-      GivenNames: 'user',
-      Surname: '2',
-      Address: '2 Main St',
-      Mobile: '1234567890',
-      packageName: 'Social 2 years',
-      licence_front: null,
-      licence_back: null,
-      profile_Image: null,
-      paymentStatus: 'success',
-    },
-  ]; // Placeholder for rejected members
+  const [rejected, setRejected] = useState([]);
+  const [rejectedPage, setRejectedPage] = useState(1);
+  const [rejectedLimit, setRejectedLimit] = useState(20);
+  const [rejectedSearch, setRejectedSearch] = useState('');
+  const [rejectedTotalPages, setRejectedTotalPages] = useState(1);
 
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
@@ -202,14 +181,21 @@ const ClubDesk = () => {
     if (activeTab === 'waitingPayment') fetchPayments();
   }, [paymentsPage, paymentsLimit, paymentsSearch, token]);
 
+  useEffect(() => {
+    if (activeTab === 'rejected') fetchRejected();
+  }, [rejectedPage, rejectedLimit, rejectedSearch, token]);
+
   // When switching tabs, sync search input and fetch for that tab
   useEffect(() => {
     if (activeTab === 'membersForApproval') {
       setSearchInput(membersSearch);
       fetchMembers();
-    } else {
+    } else if (activeTab === 'waitingPayment') {
       setSearchInput(paymentsSearch);
       fetchPayments();
+    } else if (activeTab === 'rejected') {
+      setSearchInput(rejectedSearch);
+      fetchRejected();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
@@ -372,15 +358,19 @@ const ClubDesk = () => {
   const onPrev = () => {
     if (activeTab === 'membersForApproval') {
       if (membersPage > 1) setMembersPage((p) => p - 1);
-    } else {
+    } else if (activeTab === 'waitingPayment') {
       if (paymentsPage > 1) setPaymentsPage((p) => p - 1);
+    } else {
+      if (rejectedPage > 1) setRejectedPage((p) => p - 1);
     }
   };
   const onNext = () => {
     if (activeTab === 'membersForApproval') {
       if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
-    } else {
+    } else if (activeTab === 'waitingPayment') {
       if (paymentsPage < paymentsTotalPages) setPaymentsPage((p) => p + 1);
+    } else {
+      if (rejectedPage < rejectedTotalPages) setRejectedPage((p) => p + 1);
     }
   };
 
@@ -446,33 +436,88 @@ const ClubDesk = () => {
   };
 
   const handleReject = async (memberId) => {
-  if (!memberId) return;
+    if (!memberId) return;
 
-  try {
-    const url = `${baseUrl}/user/declined/${memberId}?appType=${selectedVenue}`;
+    try {
+      const url = `${baseUrl}/user/declined/${memberId}?appType=${selectedVenue}`;
 
-    const res = await axios.patch(
-      url,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.patch(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.message === 'User declined successfully') {
+        toast.success('Member rejected successfully');
+        fetchMembers(); // refresh list
+      } else {
+        toast.error('Failed to reject member');
       }
-    );
-
-    if (res.data.message === "User declined successfully") {
-      toast.success('Member rejected successfully');
-      fetchMembers(); // refresh list
-    } else {
+    } catch (error) {
+      console.error('Reject error:', error);
       toast.error('Failed to reject member');
     }
-  } catch (error) {
-    console.error('Reject error:', error);
-    toast.error('Failed to reject member');
-  }
-};
+  };
 
+  const fetchRejected = async () => {
+    setLoading(true);
+    try {
+      let url = `${baseUrl}/user/reject?page=${rejectedPage}&limit=${rejectedLimit}`;
+
+      if (rejectedSearch && rejectedSearch.trim() !== '') {
+        url += `&search=${encodeURIComponent(rejectedSearch.trim())}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data && Array.isArray(res.data.users)) {
+        setRejected(res.data.users);
+        setRejectedTotalPages(res.data.totalPages || 1);
+      } else {
+        setRejected([]);
+        setRejectedTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Error fetching rejected members:', err);
+      toast.error('Failed to fetch rejected members');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendBackToApproval = async (memberId) => {
+    if (!memberId) return;
+
+    try {
+      const url = `${baseUrl}/user/sent-to-verified/${memberId}?appType=${selectedVenue}`;
+
+      const response = await axios.patch(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data?.message === 'Successfully Send') {
+        toast.success('Member sent back to approval successfully');
+        fetchRejected(); // refresh rejected list
+      } else {
+        toast.error('Failed to send member back to approval');
+      }
+    } catch (error) {
+      console.error('Send back error:', error);
+      toast.error('Failed to send member back to approval');
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -716,9 +761,12 @@ const ClubDesk = () => {
                 if (activeTab === 'membersForApproval') {
                   setMembersPage(1);
                   setMembersSearch(value);
-                } else {
+                } else if (activeTab === 'waitingPayment') {
                   setPaymentsPage(1);
                   setPaymentsSearch(value);
+                } else if (activeTab === 'rejected') {
+                  setRejectedPage(1);
+                  setRejectedSearch(value);
                 }
               }}
               style={{
@@ -838,11 +886,11 @@ const ClubDesk = () => {
                   ))}
 
                 {activeTab === 'rejected' &&
-                  rejectedMembers.map((member) => (
+                  rejected.map((member) => (
                     <tr key={member._id}>
                       <td>{getFullName(member)}</td>
-                      <td>{member.Address || member.address || '-'}</td>
-                      <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.Address || '-'}</td>
+                      <td>{member.Mobile || '-'}</td>
                       <td>{member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
@@ -853,8 +901,8 @@ const ClubDesk = () => {
                       </td>
                       <td>
                         <button
-                          className="action-btn approve"
-                          // onClick={() => handleMakePayment(member)}
+                          className="action-btn approve send-back-btn"
+                          onClick={() => handleSendBackToApproval(member._id)}
                           style={{
                             whiteSpace: 'normal',
                             maxWidth: '150px',
@@ -864,7 +912,9 @@ const ClubDesk = () => {
                             wordBreak: 'break-word',
                           }}
                         >
-                          Send back to members for approval
+                          <span className="send-back-text">
+                            Send back to members for approval
+                          </span>
                         </button>
                       </td>
                     </tr>
