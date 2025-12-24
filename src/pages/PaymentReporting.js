@@ -190,7 +190,7 @@ const PaymentReporting = () => {
     if (activeTab === 'totalsAllPaymentMethods' && token) {
       fetchClubPackages();
     }
-  }, [token]);
+  }, [token, activeTab]);
 
   useEffect(() => {
     if (activeTab === 'totalsAllPaymentMethods' && token) {
