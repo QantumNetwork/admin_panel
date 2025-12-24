@@ -49,8 +49,23 @@ const PaymentReporting = () => {
 
   const [paymentFilter, setPaymentFilter] = useState('all');
 
+  const [memberships, setMemberships] = useState([]);
+  const [membershipFilter, setMembershipFilter] = useState('all');
+
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
+
+  const [totalsData, setTotalsData] = useState({
+    totalUsers: 0,
+    totalAmountPaid: 0,
+  });
+
+  const [paymentBreakdown, setPaymentBreakdown] = useState({
+    stripe: { amount: 0, users: 0 },
+    card_by_venue: { amount: 0, users: 0 },
+    cash: { amount: 0, users: 0 },
+    management: { amount: 0, users: 0 },
+  });
 
   // Fetch members (for approvals)
   const fetchMembers = async () => {
@@ -171,6 +186,18 @@ const PaymentReporting = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab === 'totalsAllPaymentMethods' && token) {
+      fetchClubPackages();
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (activeTab === 'totalsAllPaymentMethods' && token) {
+      fetchTotals();
+    }
+  }, [dateFilter, startDate, endDate, membershipFilter, activeTab, token]);
+
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
     if (!newVenue) return;
@@ -259,6 +286,82 @@ const PaymentReporting = () => {
         return 'Stripe';
       default:
         return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    }
+  };
+
+  const fetchClubPackages = async () => {
+    try {
+      const res = await axios.get(`${baseUrl}/club-package`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        const levels = res.data.data[0]?.membershipLevels || [];
+        setMemberships(levels);
+      }
+    } catch (err) {
+      console.error('Error fetching club packages:', err);
+    }
+  };
+
+  const fetchTotals = async () => {
+    try {
+      let url = `https://betaapi.s2w.com.au/user/get/total?dateType=${dateFilter}`;
+
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
+      }
+
+      if (membershipFilter !== 'all') {
+        url += `&packageId=${membershipFilter}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data?.success) {
+        // totals
+        setTotalsData(res.data.totals);
+
+        // reset breakdown
+        const breakdownMap = {
+          stripe: { amount: 0, users: 0 },
+          card_by_venue: { amount: 0, users: 0 },
+          cash: { amount: 0, users: 0 },
+          management: { amount: 0, users: 0 },
+        };
+
+        res.data.breakdown.forEach((item) => {
+          if (item.paymentType === 'card') {
+            breakdownMap.stripe.amount = item.totalAmountPaid;
+            breakdownMap.stripe.users = item.userCount;
+          }
+
+          if (item.paymentType === 'card_by_venue') {
+            breakdownMap.card_by_venue.amount = item.totalAmountPaid;
+            breakdownMap.card_by_venue.users = item.userCount;
+          }
+
+          if (item.paymentType === 'cash') {
+            breakdownMap.cash.amount = item.totalAmountPaid;
+            breakdownMap.cash.users = item.userCount;
+          }
+
+          if (item.paymentType === 'management') {
+            breakdownMap.management.amount = item.totalAmountPaid;
+            breakdownMap.management.users = item.userCount;
+          }
+        });
+
+        setPaymentBreakdown(breakdownMap);
+      }
+    } catch (err) {
+      console.error('Error fetching totals:', err);
     }
   };
 
@@ -611,6 +714,35 @@ const PaymentReporting = () => {
           </div>
         )}
 
+        {activeTab === 'totalsAllPaymentMethods' && (
+          <select
+            value={membershipFilter}
+            onChange={(e) => {
+              setMembersPage(1);
+              setMembershipFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '160px',
+              marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
+            }}
+          >
+            {/* Default */}
+            <option value="all">All Memberships</option>
+
+            {/* Dynamic memberships */}
+            {memberships.map((membership) => (
+              <option key={membership._id} value={membership._id}>
+                {membership.membershipName}
+              </option>
+            ))}
+          </select>
+        )}
+
         {/* ALL PAYMENT TYPES */}
         {activeTab === 'approvedPayments' && (
           <select
@@ -641,46 +773,174 @@ const PaymentReporting = () => {
       {activeTab === 'totalsAllPaymentMethods' && (
         <div
           style={{
-            width: '360px',
-            backgroundColor: '#f3f3f3',
-            borderRadius: '8px',
-            padding: '16px',
+            display: 'flex',
+            alignItems: 'flex-start',
             marginLeft: '16%',
             marginTop: '3%',
+            gap: '24px',
           }}
         >
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontWeight: '600',
-              marginBottom: '12px',
+              width: '360px',
+              backgroundColor: '#f3f3f3',
+              borderRadius: '8px',
+              padding: '16px 20px 80px 20px',
+              // marginLeft: '16%',
+              // marginTop: '3%',
             }}
           >
-            <span>Payment Type</span>
-            <span>Total Payments</span>
-          </div>
-
-          {[
-            { label: 'Total Value', value: '7,920.90', bold: true },
-            { label: 'Stripe', value: '4,500.34' },
-            { label: 'Venue EFTPOS', value: '2,900.22' },
-            { label: 'Cash', value: '520.34' },
-            { label: 'Mgmt Approved', value: '0.00' },
-          ].map((item) => (
             <div
-              key={item.label}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                padding: '6px 0',
-                fontWeight: item.bold ? '600' : '400',
+                fontWeight: '600',
+                marginBottom: '12px',
               }}
             >
-              <span>{item.label}</span>
-              <span>{item.value}</span>
+              <span>Payment Type</span>
+              <span>Total Payments</span>
             </div>
-          ))}
+
+            {[
+              {
+                label: 'Total Value',
+                value: totalsData.totalAmountPaid.toFixed(2) ?? '0.00',
+                bold: true,
+              },
+              {
+                label: 'Stripe',
+                value: paymentBreakdown.stripe.amount.toFixed(2) ?? '0.00',
+              },
+              {
+                label: 'Venue EFTPOS',
+                value:
+                  paymentBreakdown.card_by_venue.amount.toFixed(2) ?? '0.00',
+              },
+              {
+                label: 'Cash',
+                value: paymentBreakdown.cash.amount.toFixed(2) ?? '0.00',
+              },
+              {
+                label: 'Mgmt Approved',
+                value: paymentBreakdown.management.amount.toFixed(2) ?? '0.00',
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '6px 0',
+                  fontWeight: item.bold ? '600' : '400',
+                }}
+              >
+                <span>{item.label}</span>
+                <span>{item.value}</span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              width: '200px',
+              backgroundColor: '#f3f3f3',
+              borderRadius: '8px',
+              padding: '10px 18px 84px 12px',
+              marginLeft: '12px',
+              // lineHeight: '1.3'
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '7px',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#000',
+                  textAlign: 'center',
+                  marginBottom: '3px',
+                }}
+              >
+                Membership by
+                <br />
+                payment method
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '6px 0',
+                fontSize: '13px',
+                color: '#4d4d4d',
+                marginBottom: '1px',
+              }}
+            >
+              {totalsData.totalUsers}
+            </div>
+
+            {/* Stripe */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '6px 0',
+                fontSize: '13px',
+                color: '#4d4d4d',
+                marginBottom: '3px',
+              }}
+            >
+              {paymentBreakdown.stripe.users}
+            </div>
+
+            {/* Venue EFTPOS */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '6px 0',
+                fontSize: '13px',
+                color: '#4d4d4d',
+                marginBottom: '4px',
+              }}
+            >
+              {paymentBreakdown.card_by_venue.users}
+            </div>
+
+            {/* Cash */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '6px 0',
+                fontSize: '13px',
+                color: '#4d4d4d',
+                marginBottom: '3px'
+              }}
+            >
+              {paymentBreakdown.cash.users}
+            </div>
+
+            {/* Mgmt Approved */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '6px 0',
+                fontSize: '13px',
+                color: '#4d4d4d',
+              }}
+            >
+              {paymentBreakdown.management.users}
+            </div>
+          </div>
         </div>
       )}
 
