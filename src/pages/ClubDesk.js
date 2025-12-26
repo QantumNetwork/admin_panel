@@ -11,6 +11,7 @@ import { MdVerified } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/club-desk.css';
+import { set } from 'react-hook-form';
 
 const ClubDesk = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -56,10 +57,15 @@ const ClubDesk = () => {
 
   const [rejected, setRejected] = useState([]);
   const [rejectedPage, setRejectedPage] = useState(1);
-  const [rejectedLimit, setRejectedLimit] = useState(20);
+  const [rejectedLimit, setRejectedLimit] = useState(10);
   const [rejectedSearch, setRejectedSearch] = useState('');
   const [rejectedTotalPages, setRejectedTotalPages] = useState(1);
 
+  const [verified, setVerified] = useState([]);
+  const [verifiedPage, setVerifiedPage] = useState(1);
+  const [verifiedLimit, setVerifiedLimit] = useState(10);
+  const [verifiedSearch, setVerifiedSearch] = useState('');
+  const [verifiedTotalPages, setVerifiedTotalPages] = useState(1);
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -185,6 +191,10 @@ const ClubDesk = () => {
     if (activeTab === 'rejected') fetchRejected();
   }, [rejectedPage, rejectedLimit, rejectedSearch, token]);
 
+  useEffect(() => {
+    if (activeTab === 'verified') fetchVerified();
+  }, [verifiedPage, verifiedLimit, verifiedSearch, token]);
+
   // When switching tabs, sync search input and fetch for that tab
   useEffect(() => {
     if (activeTab === 'membersForApproval') {
@@ -196,6 +206,9 @@ const ClubDesk = () => {
     } else if (activeTab === 'rejected') {
       setSearchInput(rejectedSearch);
       fetchRejected();
+    } else if (activeTab === 'verified') {
+      setSearchInput(verifiedSearch);
+      fetchVerified();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
@@ -360,8 +373,10 @@ const ClubDesk = () => {
       if (membersPage > 1) setMembersPage((p) => p - 1);
     } else if (activeTab === 'waitingPayment') {
       if (paymentsPage > 1) setPaymentsPage((p) => p - 1);
-    } else {
+    } else if (activeTab === 'rejected'){
       if (rejectedPage > 1) setRejectedPage((p) => p - 1);
+    } else {
+      if (verifiedPage > 1) setVerifiedPage((p) => p - 1);
     }
   };
   const onNext = () => {
@@ -369,8 +384,10 @@ const ClubDesk = () => {
       if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
     } else if (activeTab === 'waitingPayment') {
       if (paymentsPage < paymentsTotalPages) setPaymentsPage((p) => p + 1);
-    } else {
+    } else if (activeTab === 'rejected') {
       if (rejectedPage < rejectedTotalPages) setRejectedPage((p) => p + 1);
+    } else {
+      if (verifiedPage < verifiedTotalPages) setVerifiedPage((p) => p + 1);
     }
   };
 
@@ -491,6 +508,34 @@ const ClubDesk = () => {
     }
   };
 
+  const fetchVerified = async () => {
+    setLoading(true);
+    try {
+      let url=`${baseUrl}/user/approved?page=${verifiedPage}&limit=${verifiedLimit}`;
+
+      if(verifiedSearch && verifiedSearch.trim()!=='') {
+        url += `&search=${encodeURIComponent(verifiedSearch.trim())}`
+      }
+
+      const res = await axios.get(url, {
+        headers : {Authorization: `Bearer ${token}`},
+      });
+
+      if (res.data && Array.isArray(res.data.users)) {
+        setVerified(res.data.users);
+        setVerifiedTotalPages(res.data.totalPages || 1);
+      } else {
+        setVerified([]);
+        setVerifiedTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Error fetching verified members:', err);
+      toast.error('Failed to fetch verified members');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const handleSendBackToApproval = async (memberId) => {
     if (!memberId) return;
 
@@ -518,6 +563,24 @@ const ClubDesk = () => {
       toast.error('Failed to send member back to approval');
     }
   };
+
+  const currentPage =
+    activeTab === 'membersForApproval'
+      ? membersPage
+      : activeTab === 'waitingPayment'
+      ? paymentsPage
+      : activeTab === 'rejected'
+      ? rejectedPage
+      : verifiedPage;
+
+  const currentTotalPages =
+    activeTab === 'membersForApproval'
+      ? membersTotalPages
+      : activeTab === 'waitingPayment'
+      ? paymentsTotalPages
+      : activeTab === 'rejected'
+      ? rejectedTotalPages
+      : verifiedTotalPages;
 
   return (
     <div className="dashboard-container">
@@ -731,6 +794,13 @@ const ClubDesk = () => {
         >
           Rejected
         </button>
+
+        <button
+          className={`user-btn ${activeTab === 'verified' ? 'active' : ''}`}
+          onClick={() => setActiveTab('verified')}
+        >
+          Verified
+        </button>
       </div>
 
       <div
@@ -767,6 +837,9 @@ const ClubDesk = () => {
                 } else if (activeTab === 'rejected') {
                   setRejectedPage(1);
                   setRejectedSearch(value);
+                } else if(activeTab === 'verified') {
+                  setVerifiedPage(1);
+                  setVerifiedSearch(value);
                 }
               }}
               style={{
@@ -920,10 +993,29 @@ const ClubDesk = () => {
                     </tr>
                   ))}
 
+                  {activeTab === 'verified' &&
+                    verified.map((member) => (
+                      <tr key={member._id}>
+                        <td>{getFullName(member)}</td>
+                        <td>{member.Address || '-'}</td>
+                        <td>{member.Mobile || '-'}</td>
+                        <td>{member.packageName || '-'}</td>
+                        <td>{renderLicence(member.licence_front)}</td>
+                        <td>{renderLicence(member.licence_back)}</td>
+                        <td>{renderImage(member.profile_Image)}</td>
+                        <td>{renderMemberPaymentStatus(member)}</td>
+                      </tr>
+                    ))
+                  }
+
                 {((activeTab === 'membersForApproval' &&
                   members.length === 0) ||
                   (activeTab === 'waitingPayment' &&
-                    payments.length === 0)) && (
+                  payments.length === 0) ||
+                  (activeTab === 'rejected' && 
+                  rejected.length === 0) ||
+                  (activeTab === 'verified' && 
+                  verified.length === 0)) && (
                   <tr>
                     <td colSpan="8" className="no-data">
                       No members found
@@ -945,82 +1037,35 @@ const ClubDesk = () => {
               <button
                 onClick={onPrev}
                 disabled={
-                  activeTab === 'membersForApproval'
-                    ? membersPage === 1
-                    : paymentsPage === 1
+                  currentPage === 1
                 }
                 style={{
                   padding: '8px 16px',
                   borderRadius: '4px',
                   border: '1px solid #ccc',
-                  backgroundColor: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage === 1
-                      : paymentsPage === 1
-                  )
-                    ? '#e0e0e0'
-                    : '#002977',
-                  color: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage === 1
-                      : paymentsPage === 1
-                  )
-                    ? '#999'
-                    : 'white',
-                  cursor: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage === 1
-                      : paymentsPage === 1
-                  )
-                    ? 'not-allowed'
-                    : 'pointer',
+                  backgroundColor: currentPage === 1 ? '#e0e0e0' : '#002977',                 
+                  color: currentPage === 1 ? '#999' : 'white',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                   fontWeight: '500',
                 }}
               >
                 ← Previous
               </button>
               <span style={{ fontWeight: '500', color: '#002977' }}>
-                Page{' '}
-                {activeTab === 'membersForApproval'
-                  ? membersPage
-                  : paymentsPage}{' '}
-                of{' '}
-                {activeTab === 'membersForApproval'
-                  ? membersTotalPages
-                  : paymentsTotalPages}
+                Page {currentPage} of {currentTotalPages}
               </span>
               <button
                 onClick={onNext}
-                disabled={
-                  activeTab === 'membersForApproval'
-                    ? membersPage >= membersTotalPages
-                    : paymentsPage >= paymentsTotalPages
-                }
+                disabled={currentPage >= currentTotalPages}
                 style={{
                   padding: '8px 16px',
                   borderRadius: '4px',
                   border: '1px solid #ccc',
-                  backgroundColor: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage >= membersTotalPages
-                      : paymentsPage >= paymentsTotalPages
-                  )
-                    ? '#e0e0e0'
-                    : '#002977',
-                  color: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage >= membersTotalPages
-                      : paymentsPage >= paymentsTotalPages
-                  )
-                    ? '#999'
-                    : 'white',
-                  cursor: (
-                    activeTab === 'membersForApproval'
-                      ? membersPage >= membersTotalPages
-                      : paymentsPage >= paymentsTotalPages
-                  )
-                    ? 'not-allowed'
-                    : 'pointer',
+                  backgroundColor:
+                    currentPage >= currentTotalPages ? '#e0e0e0' : '#002977',
+                  color: currentPage >= currentTotalPages ? '#999' : 'white',
+                  cursor:
+                    currentPage >= currentTotalPages ? 'not-allowed' : 'pointer',
                   fontWeight: '500',
                 }}
               >
