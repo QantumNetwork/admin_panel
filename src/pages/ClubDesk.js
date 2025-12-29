@@ -777,7 +777,7 @@ const ClubDesk = () => {
           }`}
           onClick={() => setActiveTab('membersForApproval')}
         >
-          Members For Approval
+          Members for Approval
         </button>
         <button
           className={`user-btn ${

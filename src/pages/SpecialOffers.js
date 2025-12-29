@@ -3279,6 +3279,18 @@ const SpecialOffers = () => {
                     )}
                   </div>
 
+                  {/* <div className="bonus-pts">
+                          <input
+                            type="radio"
+                            id="bonuspts"
+                            name="redeem"
+                            value="bonuspts"
+                            checked={expiryType === 'bonuspts'}
+                            onChange={() => handleExpiryChange('bonuspts')}
+                          />
+                          <label htmlFor="bonuspts">Add bonus points when redeemed</label>
+                        </div> */}
+
                   <div className="form-group inline-form-group">
                     <label>
                       <strong>Enter trigger value</strong>

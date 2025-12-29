@@ -28,7 +28,7 @@ const PaymentReporting = () => {
   });
 
   // API functions
-  const [activeTab, setActiveTab] = useState('approvedPayments');
+  const [activeTab, setActiveTab] = useState('totalsAllPaymentMethods');
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
@@ -560,7 +560,7 @@ const PaymentReporting = () => {
           }`}
           onClick={() => setActiveTab('totalsAllPaymentMethods')}
         >
-          Totals All Payment Methods
+          Total all Payment Methods
         </button>
         <button
           className={`user-btn ${

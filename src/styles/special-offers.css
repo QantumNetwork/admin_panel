@@ -901,6 +901,11 @@ input:focus{
   margin-top: 10px;
 }
 
+/* .bonus-pts {
+  margin-top: 6px;
+  font-size: 13px;
+} */
+
 /* Fix header overlap when scrolling */
 html, body {
   overflow-x: hidden;
