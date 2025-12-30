@@ -90,10 +90,10 @@ const ManualReg = () => {
     sanitizedValue = value.replace(/[^a-zA-Z0-9@._-]/g, '');
   }
 
-  // Address: allow letters (all languages), numbers, space, comma
+  // Address: allow letters (all languages), numbers, space, comma and '/'
   else if (name === 'Address') {
     sanitizedValue = value.replace(
-      /[^\p{L}\p{M}0-9\s,]/gu,
+      /[^\p{L}\p{M}0-9\s,\/]/gu,
       ''
     );
   }
@@ -499,13 +499,8 @@ const ManualReg = () => {
   };
 
   const handleCancelS2 = () => {
-    // Hide membership level and payment, show only register section.
-    setS2Visible(false);
-    setS3Visible(false);
-    // Requirement: when membership level cancelled, only register should appear.
-    // When returning to register, it should show EDIT as described earlier (if user had progressed and returned)
-    setEditing1(false);
-    setEditing2(false);
+    setTimeout(() => navigate('/approvals'), 1000);
+    setTimeout(() => resetManualReg(), 2000);
   };
 
   const handleEditS2 = () => {
@@ -1525,7 +1520,7 @@ const ManualReg = () => {
                       className="payment-btn"
                       onClick={handleManualPaymentClick}
                     >
-                      Manually approve payment
+                      Select other payment method
                     </button>
                   </div>
                 </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
@@ -70,7 +70,7 @@ const ClubDesk = () => {
   const [searchInput, setSearchInput] = useState('');
 
   // Fetch members (for approvals)
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     setLoading(true);
     try {
       let url = `${baseUrl}/user/user-details?page=${membersPage}&limit=${membersLimit}`;
@@ -93,7 +93,7 @@ const ClubDesk = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [baseUrl, membersPage, membersLimit, membersSearch, token]);
 
   // Fetch payments (waiting payment)
   const fetchPayments = async () => {
@@ -212,6 +212,17 @@ const ClubDesk = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  // Poll members every 30 seconds while on the Members for Approval tab
+  useEffect(() => {
+    if (activeTab !== 'membersForApproval') return;
+
+    const id = setInterval(() => {
+      fetchMembers();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(id);
+  }, [activeTab, fetchMembers]);
 
   // Trigger search on keystroke for members tab
   // useEffect(() => {
