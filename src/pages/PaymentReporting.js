@@ -28,7 +28,7 @@ const PaymentReporting = () => {
   });
 
   // API functions
-  const [activeTab, setActiveTab] = useState('totalsAllPaymentMethods');
+  const [activeTab, setActiveTab] = useState('approvedPayments');
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');

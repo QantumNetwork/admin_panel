@@ -48,16 +48,34 @@
 }
 
 .type-input-with-plus {
-  display: flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 24px; /* input | icon */
   align-items: center;
-  gap: 5px;
+  column-gap: 8px;
 }
+
+
+.type-input-with-plus input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 
 .add-icon {
   font-size: 22px;
   color: #5396D1;
   cursor: pointer;
 }
+
+.add-icon,
+.remove-icon {
+  font-size: 22px;
+  /* color: #5396D1; */
+  cursor: pointer;
+  text-align: center;
+}
+
 
 .preview-app-section {
   background-color: #002977; /* dark blue */
@@ -78,14 +96,18 @@
 }
 
 .preview-app-buttons {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, max-content);
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .preview-app-buttons button {
   background-color: transparent;
   border: 1px solid white;
   color: white;
+  white-space: nowrap;
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 12px;

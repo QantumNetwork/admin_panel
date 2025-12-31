@@ -481,7 +481,8 @@ const ClubDesk = () => {
 
       if (res.data.message === 'User declined successfully') {
         toast.success('Member rejected successfully');
-        fetchMembers(); // refresh list
+        {activeTab === 'membersForApproval' && fetchMembers()} // refresh list
+        {activeTab === 'verified' && fetchVerified()} // refresh list
       } else {
         toast.error('Failed to reject member');
       }
@@ -881,7 +882,7 @@ const ClubDesk = () => {
                   <th>Licence Front</th>
                   <th>Licence Back</th>
                   <th>Selfie</th>
-                  <th>Payment</th>
+                  {activeTab !== 'verified' && <th>Payment</th>}
                   {activeTab === 'rejected' && <th>Status</th>}
                   <th></th>
                 </tr>
@@ -1014,6 +1015,29 @@ const ClubDesk = () => {
                         <td>{renderLicence(member.licence_front)}</td>
                         <td>{renderLicence(member.licence_back)}</td>
                         <td>{renderImage(member.profile_Image)}</td>
+                        <td>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <button
+                            onClick={() => handleReject(member._id)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#002977',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: '12px',
+                            }}
+                          >
+                            ✖ Rejected
+                          </button>
+                        </div>
+                      </td>
                         <td>{renderMemberPaymentStatus(member)}</td>
                       </tr>
                     ))

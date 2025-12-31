@@ -22,6 +22,9 @@ const AppSettings = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
+  const [menuType, setMenuType] = useState('multiple'); // 'standard' | 'multiple'
+  const [offerTypes, setOfferTypes] = useState(['WMLC', 'Fielders']);
+
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
@@ -83,6 +86,46 @@ const AppSettings = () => {
     }
   }, [token]);
 
+  useEffect(() => {
+  const fetchOfferButtons = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/offer/button/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data?.success && response.data?.data) {
+        const { menu_Type, filter_Type } = response.data.data;
+
+        if (menu_Type === 'standard') {
+          setMenuType('standard');
+          setOfferTypes(['']); // reset
+        } else {
+          setMenuType('multiple');
+          setOfferTypes(
+            Array.isArray(filter_Type) && filter_Type.length
+              ? filter_Type
+              : ['']
+          );
+        }
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          'Failed to fetch offer buttons'
+      );
+    }
+  };
+
+  if (token) {
+    fetchOfferButtons();
+  }
+}, [token]);
+
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
     if (!newVenue) return;
@@ -124,6 +167,57 @@ const AppSettings = () => {
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const addOfferType = () => {
+    setOfferTypes([...offerTypes, '']);
+  };
+
+  const removeOfferType = (index) => {
+    setOfferTypes(offerTypes.filter((_, i) => i !== index));
+  };
+
+  const updateOfferType = (index, value) => {
+    const updated = [...offerTypes];
+    updated[index] = value;
+    setOfferTypes(updated);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const payload =
+        menuType === 'standard'
+          ? {
+              menu_Type: 'standard',
+            }
+          : {
+              menu_Type: 'multiple',
+              filter_Type: offerTypes.filter(
+                (t) => typeof t === 'string' && t !== ''
+              ),
+            };
+
+      const response = await axios.post(
+        `${baseUrl}/offer/button/create`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data?.success) {
+        toast.success(response.data.message || 'Updated successfully');
+      } else {
+        toast.error(response.data?.message || 'Something went wrong');
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || 'Failed to update offer buttons'
+      );
+    }
   };
 
   const handleLock = async () => {
@@ -341,6 +435,8 @@ const AppSettings = () => {
                 type="radio"
                 name="menuType"
                 style={{ accentColor: '#002977' }}
+                checked={menuType === 'standard'}
+                onChange={() => setMenuType('standard')}
               />{' '}
               Standard menu
             </label>
@@ -349,38 +445,66 @@ const AppSettings = () => {
                 type="radio"
                 name="menuType"
                 style={{ accentColor: '#002977' }}
+                checked={menuType === 'multiple'}
+                onChange={() => setMenuType('multiple')}
                 defaultChecked
               />{' '}
               Multiple special offer types
             </label>
 
-            <div className="offer-type-field">
-              <label>Type 1</label>
-              <input type="text" style={{ width: '92%' }} defaultValue="WMLC" />
-            </div>
+            {menuType === 'multiple' && (
+              <>
+                {offerTypes.map((type, index) => {
+                  const isFirst = index === 0;
+                  const isLast = index === offerTypes.length - 1;
 
-            <div className="offer-type-field">
-              <label>Type 2</label>
-              <div className="type-input-with-plus">
-                <input type="text" defaultValue="Fielders" />
-                <span className="add-icon">+</span>
-              </div>
-            </div>
-          </div>
+                  return (
+                    <div className="offer-type-field" key={index}>
+                      <label>{`Type ${index + 1}`}</label>
+                      <div className="type-input-with-plus">
+                        <input
+                          type="text"
+                          value={type}
+                          onChange={(e) => updateOfferType(index, e.target.value)}
+                        />
 
-          <div className="preview-app-section">
-            <div className="preview-app-label">Preview</div>
-            <div className="preview-app-buttons">
-              <button className="active">ALL</button>
-              <button>WMLC</button>
-              <button>FIELDERS</button>
-            </div>
+                        {!isFirst && !isLast && (
+                          <span
+                            className="remove-icon"
+                            onClick={() => removeOfferType(index)}
+                          >
+                            ×
+                          </span>
+                        )}
+
+                        {isLast && (
+                          <span className="add-icon" onClick={addOfferType}>
+                            +
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="preview-app-section">
+                  <div className="preview-app-label">Preview</div>
+                  <div className="preview-app-buttons">
+                    <button className="active">ALL</button>
+                    {offerTypes.map((offer, idx) => (
+                      <button key={idx}>{offer}</button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="update-btn-app-wrapper">
             <button
               className="action-btn approve"
               style={{ width: '30%', marginLeft: '34%' }}
+              onClick={handleUpdate}
             >
               Update
             </button>
