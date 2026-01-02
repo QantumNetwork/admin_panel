@@ -121,6 +121,11 @@ const SpecialOffers = () => {
   const [showAudienceDropdown, setShowAudienceDropdown] = useState(false);
   const [isEveryone, setIsEveryone] = useState(false);
 
+  // --- Add these states near the top with your other useState declarations ---
+  const [menuType, setMenuType] = useState(''); // 'standard' or 'multiple'
+  const [offerTypes, setOfferTypes] = useState([]); // items coming from filter_Type
+  const [activeOfferFilter, setActiveOfferFilter] = useState('ALL'); // currently selected pill
+
   const toggleAudienceDropdown = () => {
     if (!isEveryone) {
       setShowAudienceDropdown((open) => !open);
@@ -2188,6 +2193,42 @@ const SpecialOffers = () => {
     }
   }, [token]);
 
+  // --- Add this useEffect (fetch offer buttons) ---
+  useEffect(() => {
+    const fetchOfferButtons = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/offer/button/get`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
+
+        if (response.data?.success && response.data?.data) {
+          const { menu_Type, filter_Type } = response.data.data;
+
+          if (menu_Type === 'standard') {
+            setMenuType('standard');
+            setOfferTypes([]); // no extra pills when standard
+          } else {
+            setMenuType('multiple');
+            setOfferTypes(
+              Array.isArray(filter_Type) && filter_Type.length
+                ? filter_Type
+                : []
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch offer buttons', error);
+        // keep existing behaviour: don't crash UI — optional toast if you want
+      }
+    };
+
+    if (token) {
+      fetchOfferButtons();
+    }
+  }, [token, baseUrl]);
+
   const handleCardClick = async (accessItem, navigateTo) => {
     try {
       const result = await trackMenuAccess(accessItem);
@@ -2523,8 +2564,12 @@ const SpecialOffers = () => {
         </div>
 
         <div className="special-offers-page">
+          {/* Offer filter pills (above offers list) */}
+
           {/* Left Panel - Offers List */}
-          <div className="offers-panel responsive-panel">
+          <div className={"offers-panel responsive-panel"}>
+            
+
             <button
               className="nav-arrow up-arrow"
               aria-label="Scroll up"
@@ -2532,6 +2577,37 @@ const SpecialOffers = () => {
             >
               <IoIosArrowUp />
             </button>
+
+            {activeTab === 'live' && (
+              <div className={`offer-filter-row`} style={{marginBottom: '8px'}}>
+                <div className="filter-pills">
+                  {menuType === 'multiple' && (
+                    <button
+                      className={`filter-pill ${
+                        activeOfferFilter === 'ALL' ? 'active' : ''
+                      }`}
+                      onClick={() => setActiveOfferFilter('ALL')}
+                    >
+                      ALL
+                    </button>
+                  )}
+
+                  {/* show other pills only if menuType !== 'standard' */}
+                  {menuType !== 'standard' &&
+                    offerTypes.map((t, idx) => (
+                      <button
+                        key={`pill-left-${idx}`}
+                        className={`filter-pill ${
+                          activeOfferFilter === t ? 'active' : ''
+                        }`}
+                        onClick={() => setActiveOfferFilter(t)}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
             <div className="offers-list responsive-list">
               {offers.map((offer) => (
                 <div
@@ -2600,6 +2676,40 @@ const SpecialOffers = () => {
 
           {/* Center Panel - Current Post */}
           <div className="current-post-panel responsive-panel">
+            {activeTab === 'live' && (
+              <div className="offer-filter-row form-row">
+                <label>
+                  <strong style={{ color: 'black' }}>Appears</strong>
+                </label>
+                <div className="filter-pills">
+                  {menuType === 'multiple' && (
+                    <button
+                      className={`filter-pill current-post ${
+                        activeOfferFilter === 'ALL' ? 'active' : ''
+                      }`}
+                      onClick={() => setActiveOfferFilter('ALL')}
+                    >
+                      ALL
+                    </button>
+                  )}
+
+                  {/* show other pills only if menuType !== 'standard' */}
+                  {menuType === 'multiple' &&
+                    offerTypes.map((t, idx) => (
+                      <button
+                        key={`pill-left-${idx}`}
+                        className={`filter-pill current-post ${
+                          activeOfferFilter === t ? 'active' : ''
+                        }`}
+                        onClick={() => setActiveOfferFilter(t)}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+
             <h2>Current post</h2>
 
             {addMode ? (
