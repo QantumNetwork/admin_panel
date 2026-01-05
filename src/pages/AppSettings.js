@@ -4,9 +4,10 @@ import axios from 'axios';
 import { logout } from '../utils/auth';
 import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
+import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { FaUser } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
@@ -21,6 +22,7 @@ const AppSettings = () => {
   const email = localStorage.getItem('userEmail'); // default if missing
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
+  const isAdmin = location.state?.admin || false;
   const appGroup = localStorage.getItem('appGroup');
   const [menuType, setMenuType] = useState('multiple'); // 'standard' | 'multiple'
   const [offerTypes, setOfferTypes] = useState(['WMLC', 'Fielders']);
@@ -357,7 +359,9 @@ const AppSettings = () => {
 
       {/* sidebar */}
       <aside className="sidebar-sa">
-        <button
+        {!isAdmin ? (
+<>
+<button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
           onClick={() => navigate('/approvals')}
@@ -423,6 +427,52 @@ const AppSettings = () => {
           />{' '}
           &nbsp; Payment Reporting
         </button>
+</>
+        ):(
+          <>
+<button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${
+            isActive('/standard-admin') ? 'active' : ''
+          }`}
+          onClick={() => navigate('/standard-admin')}
+        >
+          <FaUser
+            className={`sidebar-icon ${
+              isActive('/standard-admin') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Users
+        </button>
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/admin-custom') ? 'active' : ''}`}
+          onClick={() => navigate('/admin-custom')}
+        >
+          <TiCreditCard
+            className={`sidebar-icon ${
+              isActive('/admin-custom') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Custom Buttons
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings', { state: { admin: true } })}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
+        </button>
+          </>
+
+        )}
+        
       </aside>
 
       <main className="special-offers-container">

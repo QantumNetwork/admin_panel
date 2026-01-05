@@ -753,7 +753,7 @@ const ClubDesk = () => {
           &nbsp; Club Package
         </button>
 
-        <button
+        {/* <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => navigate('/app-settings')}
@@ -764,7 +764,7 @@ const ClubDesk = () => {
             }`}
           />{' '}
           &nbsp; App Settings
-        </button>
+        </button> */}
 
         <button
           style={{ fontSize: '12px' }}
@@ -878,6 +878,7 @@ const ClubDesk = () => {
                   <th>Name</th>
                   <th>Address</th>
                   <th>Mobile</th>
+                  {activeTab === 'membersForApproval' && <th>Date Of Birth</th>}
                   <th>Membership</th>
                   <th>Licence Front</th>
                   <th>Licence Back</th>
@@ -894,6 +895,7 @@ const ClubDesk = () => {
                       <td>{getFullName(member)}</td>
                       <td>{member.Address || member.address || '-'}</td>
                       <td>{member.Mobile || member.mobile || '-'}</td>
+                      <td>{member.DateOfBirth ? member.DateOfBirth.substring(0, 10).split('-').reverse().join('-') : '-'}</td>
                       <td>{member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>

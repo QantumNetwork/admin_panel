@@ -528,7 +528,7 @@ const MembershipPage = () => {
           &nbsp; Club Package
         </button>
 
-        <button
+        {/* <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => navigate('/app-settings')}
@@ -539,7 +539,7 @@ const MembershipPage = () => {
             }`}
           />{' '}
           &nbsp; App Settings
-        </button>
+        </button> */}
 
         <button
           style={{ fontSize: '12px' }}

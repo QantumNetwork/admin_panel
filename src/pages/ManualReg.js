@@ -995,7 +995,7 @@ const ManualReg = () => {
           &nbsp; Club Package
         </button>
 
-        <button
+        {/* <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => {
@@ -1009,7 +1009,7 @@ const ManualReg = () => {
             }`}
           />{' '}
           &nbsp; App Settings
-        </button>
+        </button> */}
 
         <button
           style={{ fontSize: '12px' }}

@@ -8,6 +8,7 @@ import {
   FaTrash,
 } from 'react-icons/fa';
 import { TiCreditCard } from 'react-icons/ti';
+import { FaMobileScreenButton } from 'react-icons/fa6';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
@@ -399,28 +400,29 @@ const AdminCustom = () => {
 
   const userType = 'admin';
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
 
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
@@ -428,12 +430,14 @@ const AdminCustom = () => {
         pauseOnHover
         theme="light"
         transition={Slide}
-        style={{ zIndex: 9999, 
+        style={{
+          zIndex: 9999,
           marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
-          textAlign: 'center' }}
-            />
+          textAlign: 'center',
+        }}
+      />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={async () => await handleLock()}>
@@ -560,6 +564,19 @@ const AdminCustom = () => {
           />{' '}
           &nbsp; Custom Buttons
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings', { state: { admin: true } })}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
+        </button>
       </aside>
 
       {/* Main Content - Custom Buttons */}
@@ -664,7 +681,6 @@ const AdminCustom = () => {
         <FaRegCheckCircle className="button-icon" />
         PUBLISH
       </button>
-
     </div>
   );
 };

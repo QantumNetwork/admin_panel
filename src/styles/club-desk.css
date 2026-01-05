@@ -93,14 +93,9 @@
   position: relative;
 }
 
-/* Hide original text on hover */
-.send-back-btn:hover .send-back-text {
-  visibility: hidden;
-}
-
 /* Show "Verified" on hover */
 .send-back-btn:hover::after {
-  content: "Verified";
+  /* content: "Verified"; */
   position: absolute;
   inset: 0;
   display: flex;

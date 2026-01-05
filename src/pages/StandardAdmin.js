@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaRegCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaMobileScreenButton } from 'react-icons/fa6';
 import { TiCreditCard } from 'react-icons/ti';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -164,7 +165,6 @@ const StandardAdmin = () => {
 
   // Fetch users when the edit tab is active
   useEffect(() => {
-    
     if (activeTab === 'edit-users' && currentUserId === null) {
       fetchUsers();
     }
@@ -376,56 +376,58 @@ const StandardAdmin = () => {
     setErrors(newErrors);
     return !hasErrors;
   };
- const handleDeleteUser = async (userId) => {
-  const result = await Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you really want to delete this user?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'No, cancel',
-  });
+  const handleDeleteUser = async (userId) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel',
+    });
 
-  if (result.isConfirmed) {
-    try {
-      const token = localStorage.getItem('token');
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem('token');
 
-      const response = await axios.delete(
-        `${baseUrl}/admin/delete?id=${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.delete(
+          `${baseUrl}/admin/delete?id=${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (
+          response.data &&
+          response.data.message === 'Admin deleted successfully'
+        ) {
+          await Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          // Refresh users
+          fetchUsers();
+        } else {
+          throw new Error('Unexpected response');
         }
-      );
-
-      if (response.data && response.data.message === 'Admin deleted successfully') {
+      } catch (error) {
+        console.error('Delete failed:', error);
         await Swal.fire({
-          title: 'Deleted!',
-          text: 'The user has been deleted.',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
+          title: 'Error!',
+          text: 'Failed to delete the user.',
+          icon: 'error',
         });
-
-        // Refresh users
-        fetchUsers();
-      } else {
-        throw new Error('Unexpected response');
       }
-    } catch (error) {
-      console.error('Delete failed:', error);
-      await Swal.fire({
-        title: 'Error!',
-        text: 'Failed to delete the user.',
-        icon: 'error',
-      });
     }
-  }
-};
-
+  };
 
   // Handle activate button click
   // Function to handle editing a user
@@ -601,42 +603,45 @@ const StandardAdmin = () => {
     return location.pathname === path;
   };
 
-    const handleLock = async () => {
-      try {
-        const result = await handleLogout();
-        if(result.success) {
-          navigate('/dashboard');
-        } else {
-          toast.error(result.message || 'Failed to remove lock. Please try again.');
-        }
-  
-      } catch (error) {
-        console.error('Error in handleLock:', error);
-        toast.error(error.message || 'Failed to remove lock. Please try again.');
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
       }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
 
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-                                      position="top-center"
-                                      autoClose={3000}
-                                      hideProgressBar={false}
-                                      newestOnTop
-                                closeOnClick
-                                rtl={false}
-                                pauseOnFocusLoss
-                                draggable
-                                pauseOnHover
-                                theme="light"
-                                transition={Slide}
-                                style={{ zIndex: 9999, 
-                                  marginTop: '90px',
-                                  fontSize: '14px',
-                                  minWidth: '300px',
-                                  textAlign: 'center' }}
-                                    />
-      
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
+
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo" onClick={async () => await handleLock()}>
@@ -762,6 +767,19 @@ const StandardAdmin = () => {
             }`}
           />{' '}
           &nbsp; Custom Buttons
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+          onClick={() => navigate('/app-settings', { state: { admin: true } })}
+        >
+          <FaMobileScreenButton
+            className={`sidebar-icon ${
+              isActive('/app-settings') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; App Settings
         </button>
       </aside>
 
