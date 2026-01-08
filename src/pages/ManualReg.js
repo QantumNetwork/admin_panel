@@ -22,7 +22,12 @@ import 'react-phone-number-input/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(
+  process.env.REACT_APP_STRIPE_PUBLIC_KEY,
+  {
+    stripeAccount: process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+  }
+);
 
 const ManualReg = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -848,7 +853,10 @@ const ManualReg = () => {
 
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+        <div className="s2w-logo" onClick={() => {
+          resetManualReg();
+          navigate('/dashboard')
+        }}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
