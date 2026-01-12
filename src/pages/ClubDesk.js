@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaUsersRectangle } from 'react-icons/fa6';
@@ -22,6 +24,9 @@ const ClubDesk = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
+  const [dateFilter, setDateFilter] = useState('mtd');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   // const [membersForApproval, setMembersForApproval] = useState([]);
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -66,6 +71,7 @@ const ClubDesk = () => {
   const [verifiedLimit, setVerifiedLimit] = useState(10);
   const [verifiedSearch, setVerifiedSearch] = useState('');
   const [verifiedTotalPages, setVerifiedTotalPages] = useState(1);
+
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -193,7 +199,15 @@ const ClubDesk = () => {
 
   useEffect(() => {
     if (activeTab === 'verified') fetchVerified();
-  }, [verifiedPage, verifiedLimit, verifiedSearch, token]);
+  }, [
+    verifiedPage,
+    dateFilter,
+    verifiedLimit,
+    verifiedSearch,
+    startDate,
+    endDate,
+    token,
+  ]);
 
   // When switching tabs, sync search input and fetch for that tab
   useEffect(() => {
@@ -384,7 +398,7 @@ const ClubDesk = () => {
       if (membersPage > 1) setMembersPage((p) => p - 1);
     } else if (activeTab === 'waitingPayment') {
       if (paymentsPage > 1) setPaymentsPage((p) => p - 1);
-    } else if (activeTab === 'rejected'){
+    } else if (activeTab === 'rejected') {
       if (rejectedPage > 1) setRejectedPage((p) => p - 1);
     } else {
       if (verifiedPage > 1) setVerifiedPage((p) => p - 1);
@@ -481,8 +495,12 @@ const ClubDesk = () => {
 
       if (res.data.message === 'User declined successfully') {
         toast.success('Member rejected successfully');
-        {activeTab === 'membersForApproval' && fetchMembers()} // refresh list
-        {activeTab === 'verified' && fetchVerified()} // refresh list
+        {
+          activeTab === 'membersForApproval' && fetchMembers();
+        } // refresh list
+        {
+          activeTab === 'verified' && fetchVerified();
+        } // refresh list
       } else {
         toast.error('Failed to reject member');
       }
@@ -523,14 +541,24 @@ const ClubDesk = () => {
   const fetchVerified = async () => {
     setLoading(true);
     try {
-      let url=`${baseUrl}/user/approved?page=${verifiedPage}&limit=${verifiedLimit}`;
+      let url = `${baseUrl}/user/approved?page=${verifiedPage}&limit=${verifiedLimit}`;
 
-      if(verifiedSearch && verifiedSearch.trim()!=='') {
-        url += `&search=${encodeURIComponent(verifiedSearch.trim())}`
+      if (verifiedSearch && verifiedSearch.trim() !== '') {
+        url += `&search=${encodeURIComponent(verifiedSearch.trim())}`;
+      }
+
+      // date filter
+      if (dateFilter && dateFilter !== 'all') {
+        url += `&paymentRange=${dateFilter}`;
+      }
+
+      // custom date handling
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
       }
 
       const res = await axios.get(url, {
-        headers : {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.data && Array.isArray(res.data.users)) {
@@ -546,7 +574,7 @@ const ClubDesk = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleSendBackToApproval = async (memberId) => {
     if (!memberId) return;
@@ -574,6 +602,120 @@ const ClubDesk = () => {
       console.error('Send back error:', error);
       toast.error('Failed to send member back to approval');
     }
+  };
+
+  const fetchAllVerifiedForExport = async () => {
+    let page = 1;
+    let allData = [];
+    let totalPages = 1;
+
+    do {
+      let url = `${baseUrl}/user/approved?page=${page}&limit=100`;
+
+      if (verifiedSearch) {
+        url += `&search=${encodeURIComponent(verifiedSearch)}`;
+      }
+
+      if (dateFilter && dateFilter !== 'all') {
+        url += `&paymentRange=${dateFilter}`;
+      }
+
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      allData = allData.concat(res.data.users || []);
+      totalPages = res.data.totalPages || 1;
+      page++;
+    } while (page <= totalPages);
+
+    return allData;
+  };
+
+  const handleVerifiedExport = async () => {
+    toast.info('Preparing export...');
+
+    const allVerified = await fetchAllVerifiedForExport();
+
+    if (!allVerified.length) {
+      toast.warning('No verified members to export');
+      return;
+    }
+
+    const toAbsoluteUrl = (url) => {
+      if (!url) return '';
+      if (url.startsWith('http')) return url;
+      return `${baseUrl}${url}`;
+    };
+
+    const formattedData = allVerified.map((u) => ({
+      Name: `${u.GivenNames || ''} ${u.Surname || ''}`.trim(),
+      Address: u.Address || '',
+      Mobile: u.Mobile || '',
+      Membership: u.packageName || '',
+      // Image links
+      'Licence Front': u.licence_front ? toAbsoluteUrl(u.licence_front) : 'NA',
+
+      'Licence Back': u.licence_back ? toAbsoluteUrl(u.licence_back) : 'NA',
+
+      Selfie: u.profile_Image ? toAbsoluteUrl(u.profile_Image) : 'NA',
+      PaymentStatus: u.paymentStatus === 'success' ? 'Approved' : 'Declined',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    const autoSizeColumns = (worksheet, data) => {
+      const keys = Object.keys(data[0]);
+
+      worksheet['!cols'] = keys.map((key) => {
+        // Fixed width for image columns
+        if (['Licence Front', 'Licence Back', 'Selfie'].includes(key)) {
+          return { wch: 18 }; // good for "View Image"
+        }
+        const maxLength = Math.max(
+          key.length,
+          ...data.map((row) => (row[key] ? row[key].toString().length : 2))
+        );
+        return { wch: Math.min(maxLength + 4, 40) };
+      });
+    };
+
+    const headers = Object.keys(formattedData[0]);
+    const imageColumns = ['Licence Front', 'Licence Back', 'Selfie'];
+
+    imageColumns.forEach((colName) => {
+      const colIndex = headers.indexOf(colName);
+      if (colIndex === -1) return;
+
+      for (let row = 1; row <= formattedData.length; row++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: colIndex });
+        const cell = worksheet[cellAddress];
+
+        if (cell && cell.v && cell.v !== 'NA') {
+          cell.l = { Target: cell.v };
+          cell.v = 'View Image';
+        }
+      }
+    });
+    autoSizeColumns(worksheet, formattedData);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Verified Members');
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    const blob = new Blob([excelBuffer], {
+      type: 'application/octet-stream',
+    });
+
+    saveAs(blob, 'verified_members.xlsx');
   };
 
   const currentPage =
@@ -849,7 +991,7 @@ const ClubDesk = () => {
                 } else if (activeTab === 'rejected') {
                   setRejectedPage(1);
                   setRejectedSearch(value);
-                } else if(activeTab === 'verified') {
+                } else if (activeTab === 'verified') {
                   setVerifiedPage(1);
                   setVerifiedSearch(value);
                 }
@@ -867,7 +1009,127 @@ const ClubDesk = () => {
         </div>
       </div>
 
-      <div className="members-table-container">
+      {activeTab === 'verified' && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            gap: '12px',
+            marginLeft: '16.5%',
+            marginTop: '5%',
+            flexWrap: 'nowrap',
+          }}
+        >
+          {/* MTD / Date filter */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <select
+              value={dateFilter}
+              onChange={(e) => {
+                setVerifiedPage(1);
+                setDateFilter(e.target.value);
+              }}
+              style={{
+                padding: '6px 10px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                backgroundColor: '#F2F2F2',
+                cursor: 'pointer',
+                minWidth: '100px',
+              }}
+            >
+              <option value="mtd">MTD</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="all">All</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
+          {/* START DATE */}
+          {dateFilter === 'custom' && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label
+                style={{
+                  fontSize: '10px',
+                  fontWeight: '600',
+                  color: '#6b6b6b',
+                  marginBottom: '4px',
+                }}
+              >
+                START DATE
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setVerifiedPage(1);
+                  setStartDate(e.target.value);
+                }}
+                style={{
+                  padding: '6px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #cfcfcf',
+                  fontSize: '12px',
+                  width: '130px',
+                }}
+              />
+            </div>
+          )}
+
+          {/* END DATE */}
+          {dateFilter === 'custom' && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label
+                style={{
+                  fontSize: '10px',
+                  fontWeight: '600',
+                  color: '#6b6b6b',
+                  marginBottom: '4px',
+                }}
+              >
+                END DATE
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setVerifiedPage(1);
+                  setEndDate(e.target.value);
+                }}
+                style={{
+                  padding: '6px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #cfcfcf',
+                  fontSize: '12px',
+                  width: '130px',
+                }}
+              />
+            </div>
+          )}
+
+          {/* EXPORT BUTTON — VERIFIED ONLY */}
+          <button
+            onClick={handleVerifiedExport}
+            style={{
+              marginLeft: '80%',
+              padding: '8px 18px',
+              borderRadius: '20px',
+              border: '1px solid #002977',
+              backgroundColor: '#fff',
+              color: '#002977',
+              fontWeight: '600',
+              cursor: 'pointer',
+              height: '36px',
+            }}
+          >
+            Export
+          </button>
+        </div>
+      )}
+
+      <div
+        className="members-table-container"
+        style={activeTab === 'verified' ? { marginTop: '1.5%' } : {}}
+      >
         {loading ? (
           <div className="loading">Loading...</div>
         ) : (
@@ -895,7 +1157,14 @@ const ClubDesk = () => {
                       <td>{getFullName(member)}</td>
                       <td>{member.Address || member.address || '-'}</td>
                       <td>{member.Mobile || member.mobile || '-'}</td>
-                      <td>{member.DateOfBirth ? member.DateOfBirth.substring(0, 10).split('-').reverse().join('-') : '-'}</td>
+                      <td>
+                        {member.DateOfBirth
+                          ? member.DateOfBirth.substring(0, 10)
+                              .split('-')
+                              .reverse()
+                              .join('-')
+                          : '-'}
+                      </td>
                       <td>{member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
@@ -1007,17 +1276,17 @@ const ClubDesk = () => {
                     </tr>
                   ))}
 
-                  {activeTab === 'verified' &&
-                    verified.map((member) => (
-                      <tr key={member._id}>
-                        <td>{getFullName(member)}</td>
-                        <td>{member.Address || '-'}</td>
-                        <td>{member.Mobile || '-'}</td>
-                        <td>{member.packageName || '-'}</td>
-                        <td>{renderLicence(member.licence_front)}</td>
-                        <td>{renderLicence(member.licence_back)}</td>
-                        <td>{renderImage(member.profile_Image)}</td>
-                        <td>
+                {activeTab === 'verified' &&
+                  verified.map((member) => (
+                    <tr key={member._id}>
+                      <td>{getFullName(member)}</td>
+                      <td>{member.Address || '-'}</td>
+                      <td>{member.Mobile || '-'}</td>
+                      <td>{member.packageName || '-'}</td>
+                      <td>{renderLicence(member.licence_front)}</td>
+                      <td>{renderLicence(member.licence_back)}</td>
+                      <td>{renderImage(member.profile_Image)}</td>
+                      <td>
                         <div
                           style={{
                             display: 'flex',
@@ -1040,19 +1309,15 @@ const ClubDesk = () => {
                           </button>
                         </div>
                       </td>
-                        <td>{renderMemberPaymentStatus(member)}</td>
-                      </tr>
-                    ))
-                  }
+                      <td>{renderMemberPaymentStatus(member)}</td>
+                    </tr>
+                  ))}
 
                 {((activeTab === 'membersForApproval' &&
                   members.length === 0) ||
-                  (activeTab === 'waitingPayment' &&
-                  payments.length === 0) ||
-                  (activeTab === 'rejected' && 
-                  rejected.length === 0) ||
-                  (activeTab === 'verified' && 
-                  verified.length === 0)) && (
+                  (activeTab === 'waitingPayment' && payments.length === 0) ||
+                  (activeTab === 'rejected' && rejected.length === 0) ||
+                  (activeTab === 'verified' && verified.length === 0)) && (
                   <tr>
                     <td colSpan="8" className="no-data">
                       No members found
@@ -1073,14 +1338,12 @@ const ClubDesk = () => {
             >
               <button
                 onClick={onPrev}
-                disabled={
-                  currentPage === 1
-                }
+                disabled={currentPage === 1}
                 style={{
                   padding: '8px 16px',
                   borderRadius: '4px',
                   border: '1px solid #ccc',
-                  backgroundColor: currentPage === 1 ? '#e0e0e0' : '#002977',                 
+                  backgroundColor: currentPage === 1 ? '#e0e0e0' : '#002977',
                   color: currentPage === 1 ? '#999' : 'white',
                   cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                   fontWeight: '500',
@@ -1102,7 +1365,9 @@ const ClubDesk = () => {
                     currentPage >= currentTotalPages ? '#e0e0e0' : '#002977',
                   color: currentPage >= currentTotalPages ? '#999' : 'white',
                   cursor:
-                    currentPage >= currentTotalPages ? 'not-allowed' : 'pointer',
+                    currentPage >= currentTotalPages
+                      ? 'not-allowed'
+                      : 'pointer',
                   fontWeight: '500',
                 }}
               >
