@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -22,12 +23,9 @@ import 'react-phone-number-input/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
 
-const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLIC_KEY,
-  {
-    stripeAccount: process.env.REACT_APP_STRIPE_ACCOUNT_ID,
-  }
-);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
+  stripeAccount: process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+});
 
 const ManualReg = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -60,6 +58,7 @@ const ManualReg = () => {
   const [editing2, setEditing2] = useState(false);
 
   const [formData, setFormData] = useState({
+    Id: '',
     GivenNames: '',
     Surname: '',
     Email: '',
@@ -86,51 +85,50 @@ const ManualReg = () => {
   const [showConfirmMembership, setShowConfirmMembership] = useState(false);
   const [fromMakePayment, setFromMakePayment] = useState(false);
 
+  const [searchParams] = useSearchParams();
+  const user_id = searchParams.get('user_id');
+  const appType = searchParams.get('appType');
+  const isEditMode = searchParams.get('mode') === 'edit';
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let sanitizedValue = value;
 
-  // Email: allow letters, numbers, @ . _ -
-  if (name === 'Email' || name === 'paymentEmail') {
-    sanitizedValue = value.replace(/[^a-zA-Z0-9@._-]/g, '');
-  }
+    // Email: allow letters, numbers, @ . _ -
+    if (name === 'Email' || name === 'paymentEmail') {
+      sanitizedValue = value.replace(/[^a-zA-Z0-9@._-]/g, '');
+    }
 
-  // Address: allow letters (all languages), numbers, space, comma and '/'
-  else if (name === 'Address') {
-    sanitizedValue = value.replace(
-      /[^\p{L}\p{M}0-9\s,\/]/gu,
-      ''
-    );
-  }
+    // Address: allow letters (all languages), numbers, space, comma and '/'
+    else if (name === 'Address') {
+      sanitizedValue = value.replace(/[^\p{L}\p{M}0-9\s,\/]/gu, '');
+    }
 
-  // Names, Suburb, Region: letters (all languages) + space only
-  else if (
-    name === 'GivenNames' ||
-    name === 'Surname' ||
-    name === 'Suburb' ||
-    name === 'region' ||
-    name === 'nameOnCard'
-  ) {
-    sanitizedValue = value.replace(
-      /[^\p{L}\p{M}\s]/gu,
-      ''
-    );
-  }
+    // Names, Suburb, Region: letters (all languages) + space only
+    else if (
+      name === 'GivenNames' ||
+      name === 'Surname' ||
+      name === 'Suburb' ||
+      name === 'region' ||
+      name === 'nameOnCard'
+    ) {
+      sanitizedValue = value.replace(/[^\p{L}\p{M}\s]/gu, '');
+    }
 
-  // PostCode: numbers only
-  else if (name === 'PostCode') {
-    sanitizedValue = value.replace(/[^0-9]/g, '');
-  }
+    // PostCode: numbers only
+    else if (name === 'PostCode') {
+      sanitizedValue = value.replace(/[^0-9]/g, '');
+    }
 
-  // Mobile: numbers only
-  else if (name === 'Mobile') {
-    sanitizedValue = value.replace(/[^0-9]/g, '');
-  }
+    // Mobile: numbers only
+    else if (name === 'Mobile') {
+      sanitizedValue = value.replace(/[^0-9]/g, '');
+    }
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: sanitizedValue,
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: sanitizedValue,
+    }));
   };
 
   const token = localStorage.getItem('token');
@@ -828,6 +826,79 @@ const ManualReg = () => {
     setEditing2(true);
   }, [fromMakePayment]);
 
+  useEffect(() => {
+    if (!isEditMode || !user_id || !appType) return;
+
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(
+          `${baseUrl}/user/${user_id}?appType=${appType}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const u = res.data?.data;
+        if (!u) {
+          toast.error('User data not found');
+          return;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          Id: u.Id || '',
+          GivenNames: u.GivenNames || '',
+          Surname: u.Surname || '',
+          Email: u.Email || '',
+          Mobile: u.Mobile || '',
+          Address: u.Address || '',
+          Suburb: u.Suburb || '',
+          PostCode: u.PostCode || '',
+          Gender: u.Gender || '',
+          DateOfBirth: u.DateOfBirth ? u.DateOfBirth.substring(0, 10) : '',
+        }));
+
+        // 🔒 Edit-only mode
+        setS1Visible(true);
+        setS2Visible(false);
+        setS3Visible(false);
+        setEditing1(true);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to load user details');
+      }
+    };
+
+    fetchUser();
+  }, [isEditMode, user_id, appType]);
+
+  const handleSaveEdit = async () => {
+    try {
+      const payload = {
+        Id: formData.Id,
+        GivenNames: formData.GivenNames,
+        Surname: formData.Surname,
+        Email: formData.Email,
+        Mobile: formData.Mobile,
+        DateOfBirth: new Date(formData.DateOfBirth).toISOString(),
+        Address: formData.Address,
+        Suburb: formData.Suburb,
+        PostCode: formData.PostCode,
+        Gender: formData.Gender,
+      };
+
+      await axios.patch(`${baseUrl}/user/update-profile-s2w`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success('Profile updated successfully');
+      setTimeout(() => navigate('/approvals'), 1500);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update profile');
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -853,10 +924,13 @@ const ManualReg = () => {
 
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => {
-          resetManualReg();
-          navigate('/dashboard')
-        }}>
+        <div
+          className="s2w-logo"
+          onClick={() => {
+            resetManualReg();
+            navigate('/dashboard');
+          }}
+        >
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -1198,21 +1272,29 @@ const ManualReg = () => {
             className="d-flex w-100 justify-content-center"
             style={{ marginTop: '120px' }}
           >
-            {editing1 ? (
+            {!isEditMode ? (
               <>
-                <button
-                  className="cancel-btn cancel-s1"
-                  onClick={handleCancelS1}
-                >
-                  Cancel
-                </button>
-                <button className="next-btn" onClick={handleNextS1}>
-                  Next
-                </button>
+                {editing1 ? (
+                  <>
+                    <button
+                      className="cancel-btn cancel-s1"
+                      onClick={handleCancelS1}
+                    >
+                      Cancel
+                    </button>
+                    <button className="next-btn" onClick={handleNextS1}>
+                      Next
+                    </button>
+                  </>
+                ) : (
+                  <button className="blue-btn" onClick={handleEditS1}>
+                    EDIT
+                  </button>
+                )}
               </>
             ) : (
-              <button className="blue-btn" onClick={handleEditS1}>
-                EDIT
+              <button className="blue-btn" onClick={handleSaveEdit}>
+                Save
               </button>
             )}
           </div>
@@ -1643,9 +1725,7 @@ const ManualReg = () => {
                           type="radio"
                           name="paymentMethod"
                           value="management"
-                          checked={
-                            selectedPaymentMethod === 'management'
-                          }
+                          checked={selectedPaymentMethod === 'management'}
                           onChange={(e) =>
                             setSelectedPaymentMethod(e.target.value)
                           }

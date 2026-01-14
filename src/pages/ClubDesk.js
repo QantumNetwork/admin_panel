@@ -736,6 +736,12 @@ const ClubDesk = () => {
       ? rejectedTotalPages
       : verifiedTotalPages;
 
+  const handleEditMember = (member) => {
+    navigate(
+      `/manual-reg?user_id=${member._id}&appType=${selectedVenue}&mode=edit`
+    );
+  };
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -1192,7 +1198,7 @@ const ClubDesk = () => {
                             ✖ Rejected
                           </button>
                           <button
-                            // onClick={() => handleEdit(member)}
+                            onClick={() => handleEditMember(member)}
                             style={{
                               background: 'transparent',
                               border: 'none',
