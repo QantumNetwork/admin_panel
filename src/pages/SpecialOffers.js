@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, act } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import Select from 'react-select';
@@ -28,6 +28,7 @@ const SpecialOffers = () => {
   // track the Audience dropdown container
   const audienceWrapperRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const ignoreArtGalleryRestoreRef = useRef(false);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -125,6 +126,23 @@ const SpecialOffers = () => {
   const [menuType, setMenuType] = useState(''); // 'standard' or 'multiple'
   const [offerTypes, setOfferTypes] = useState([]); // items coming from filter_Type
   const [activeOfferFilter, setActiveOfferFilter] = useState('ALL'); // currently selected pill
+
+  // Bonus points UI
+  const [showBonusWhenRedeemed, setShowBonusWhenRedeemed] = useState(false);
+  const [bonusPoints, setBonusPoints] = useState('');
+
+  const filteredOffers = offers.filter((offer) => {
+    if (activeTab !== 'live') return true;
+
+    if (menuType !== 'multiple') return true;
+
+    if (activeOfferFilter === 'ALL') return true;
+
+    return (
+      typeof offer.appears === 'string' &&
+      offer.appears.trim() === activeOfferFilter
+    );
+  });
 
   const toggleAudienceDropdown = () => {
     if (!isEveryone) {
@@ -322,11 +340,65 @@ const SpecialOffers = () => {
             offerToSelect = vouchers.find(
               (offer) => offer._id === currentOfferId
             );
+
+            // If filtering by pill and the found offer doesn't belong to current pill, clear it
+            if (offerToSelect !== null) {
+              if (offerToSelect.appears !== activeOfferFilter) {
+                offerToSelect = null;
+              }
+            }
           }
 
-          // If we couldn't find the current offer or don't have one, use the first offer
           if (!offerToSelect) {
-            offerToSelect = vouchers[0];
+            if (menuType === 'multiple' && activeOfferFilter !== 'ALL') {
+              // 🔑 select first offer of CURRENT pill
+              offerToSelect = vouchers.find(
+                (o) =>
+                  typeof o.appears === 'string' &&
+                  o.appears.trim() === activeOfferFilter
+              );
+            } else {
+              // fallback only for ALL
+              offerToSelect = vouchers[0];
+            }
+          }
+
+          if (!offerToSelect) {
+            setSelectedOffer(null);
+            setHeadingText('');
+            setDescriptionText('');
+            setUploadedImage(null);
+            setSelectedAudiences([]);
+            setIsEveryone(false); // Reset the everyone state
+
+            setTriggerValue('');
+            setSelectedVoucherType('standard');
+
+            setVoucherType({ value: '', label: 'Select from list' });
+            setRatingLevel({ value: '', label: 'Select from list' });
+            setExpiryType('never');
+            setExpiryDays('');
+            setStartDate('');
+            setEndDate('');
+            setValidDays({
+              everyday: true,
+              mon: false,
+              tue: false,
+              wed: false,
+              thu: false,
+              fri: false,
+              sat: false,
+              sun: false,
+            });
+            setTimeValid({
+              allTimes: true,
+              start: '--:--',
+              end: '--:--',
+            });
+            setOneTimeUse(false);
+            setBonusPoints('');
+            setShowBonusWhenRedeemed(false);
+            return;
           }
 
           // Only update the selected offer if it's different from the current one
@@ -336,9 +408,12 @@ const SpecialOffers = () => {
 
             // Then update the rest of the state
             setSelectedOffer(offerToSelect);
+            console.log('Selected Offer:', offerToSelect);
             setHeadingText(offerToSelect.header || '');
             setDescriptionText(offerToSelect.description || '');
             setUploadedImage(offerToSelect.image || null);
+            console.log('img- ', uploadedImage);
+
             setSelectedVoucherType(offerToSelect.voucherType || 'standard');
             setVoucherTypeFromAPI(offerToSelect.voucherType);
             setRatingLevelFromAPI(offerToSelect.ratingLevel);
@@ -346,6 +421,8 @@ const SpecialOffers = () => {
             setValidDaysFromAPI(offerToSelect.validDaysOfWeek);
             setValidTimeFromAPI(offerToSelect.validTime);
             setOneTimeUse(offerToSelect.oneTimeUse || false);
+            setBonusPoints(offerToSelect.points?.toString() || '');
+            {offerToSelect.points ? setShowBonusWhenRedeemed(true) : setShowBonusWhenRedeemed(false)}
             setAddMode(false);
 
             // Update trigger value in state only once
@@ -364,6 +441,8 @@ const SpecialOffers = () => {
           setSelectedAudiences([]);
           setIsEveryone(false);
           setAddMode(false);
+          setBonusPoints('');
+          setShowBonusWhenRedeemed(false);
         }
       } catch (error) {
         console.error('Error fetching offers:', error);
@@ -375,9 +454,33 @@ const SpecialOffers = () => {
     activeTab,
     deleteSuccess,
     location.state?.selectedImageFromGallery,
+    activeOfferFilter,
     selectedVenue,
     token,
   ]); // Added selectedImageFromGallery to dependencies
+
+  // useEffect(() => {
+  //   // Don't auto-select offers when in add mode
+  //   if (addMode) {
+  //     return;
+  //   }
+
+  //   if (!filteredOffers.length) {
+  //     setSelectedOffer(null);
+  //     return;
+  //   }
+
+  //   // if current selected offer is not visible anymore
+  //   const stillVisible =
+  //     selectedOffer && filteredOffers.some((o) => o._id === selectedOffer._id);
+
+  //   if (!stillVisible) {
+  //   const offer = filteredOffers[0];
+  //   setSelectedOffer(offer);
+  //   setHeadingText(offer.header || '');
+  //   setDescriptionText(offer.description || '');
+  // }
+  // }, [activeOfferFilter, filteredOffers, addMode]);
 
   // Helper functions to set target market fields from API data
   const setVoucherTypeFromAPI = (voucherType) => {
@@ -889,6 +992,7 @@ const SpecialOffers = () => {
   const handleOfferSelect = (offer) => {
     // Set the selected offer
     setSelectedOffer(offer);
+    console.log('Selected Offer:', offer);
 
     // Exit add mode if we're in it
     if (addMode) setAddMode(false);
@@ -897,6 +1001,7 @@ const SpecialOffers = () => {
     setHeadingText(offer.header || '');
     setDescriptionText(offer.description || '');
     setUploadedImage(offer.image || null);
+    console.log('img- ', uploadedImage);
 
     // Set the voucher type to the one from the offer
     const voucherType = offer.voucherType || 'standard';
@@ -904,6 +1009,9 @@ const SpecialOffers = () => {
 
     // Always set the trigger value regardless of voucher type
     setTriggerValue(offer.triggerValue?.toString() || '');
+
+    setBonusPoints(offer.points ?? '');
+    setShowBonusWhenRedeemed(Boolean(offer.points));
 
     // Map the voucher type to select value
     const voucherTypeSelectValue =
@@ -1067,6 +1175,9 @@ const SpecialOffers = () => {
       // Reset one time use to default
       setOneTimeUse(false);
 
+      setShowBonusWhenRedeemed(false);
+      setBonusPoints('');
+
       // Clear trigger inputs again after other changes
       setTimeout(() => {
         const triggerInputsAgain = document.querySelectorAll('.trigger-input');
@@ -1140,6 +1251,7 @@ const SpecialOffers = () => {
       timeValid: { ...timeValid },
       triggerValue,
       oneTimeUse,
+      activeOfferFilter,
     };
 
     console.log('Sending form values to Art Gallery:', formValues);
@@ -1164,6 +1276,7 @@ const SpecialOffers = () => {
         const s3Url = await uploadFileToS3(file);
         console.log(s3Url);
         setUploadedImage(s3Url);
+        console.log('img- ', uploadedImage);
 
         // Update selectedOffer's image if we have one, regardless of addMode
         if (selectedOffer) {
@@ -1171,6 +1284,7 @@ const SpecialOffers = () => {
             ...selectedOffer,
             image: s3Url,
           });
+          console.log('selected offer', selectedOffer);
         }
       } catch (error) {
         console.error('Error uploading image to S3:', error);
@@ -1548,7 +1662,24 @@ const SpecialOffers = () => {
           };
         }
       }
-      // No additional properties needed for birthday voucher type
+
+      // appears (only if menuType === multiple)
+      if (menuType === 'multiple' && activeOfferFilter !== 'ALL') {
+        requestBody.appears = activeOfferFilter;
+      } else if (menuType === 'multiple' && activeOfferFilter === 'ALL') {
+        requestBody.appears = 'all';
+      }
+
+      console.log('activeOfferFilter', activeOfferFilter);
+      console.log('menuType', menuType);
+
+      if (
+        showBonusWhenRedeemed &&
+        bonusPoints !== '' &&
+        !isNaN(Number(bonusPoints))
+      ) {
+        requestBody.points = String(bonusPoints);
+      }
 
       console.log('Request Body:', requestBody);
 
@@ -1570,10 +1701,19 @@ const SpecialOffers = () => {
       });
 
       setAddMode(false);
+      setSelectedOffer(null);
+      setUploadedImage(null);
+      // Prevent Art Gallery restoration after creation
+      ignoreArtGalleryRestoreRef.current = true;
+
+      // 🔴 ALSO clear any Art Gallery state
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      setDeleteSuccess((prevState) => !prevState);
 
       // Add a delay before refreshing the page
       setTimeout(() => {
-        navigate('/special-offers');
+        navigate('/special-offers', { replace: true });
       }, 1500); // 1.5 seconds delay
     } catch (error) {
       console.error('Error submitting offer:', error);
@@ -1638,8 +1778,14 @@ const SpecialOffers = () => {
 
       if (response.status === 200) {
         toast.success('Voucher deleted successfully!');
-        setDeleteSuccess((prevState) => !prevState);
-        setOffers(offers.filter((offer) => offer._id !== voucherId));
+        setAddMode(false);
+      setSelectedOffer(null);
+      setUploadedImage(null);
+      setDeleteSuccess((prevState) => !prevState);
+
+      setTimeout(() => {
+        navigate('/special-offers', { replace: true });
+      }, 1500);
       } else {
         throw new Error('Failed to delete voucher');
       }
@@ -1785,6 +1931,7 @@ const SpecialOffers = () => {
         ratingLevel: ratingLevelArray,
         image: imageData,
         triggerValue: triggerValue, // Always include trigger value for all voucher types
+        appears: selectedOffer.appears,
       };
 
       if (voucherTypeValue === 'standard') {
@@ -1883,6 +2030,14 @@ const SpecialOffers = () => {
 
       const token = localStorage.getItem('token');
 
+      if (
+        showBonusWhenRedeemed &&
+        bonusPoints !== '' &&
+        !isNaN(Number(bonusPoints))
+      ) {
+        requestBody.points = String(bonusPoints);
+      }
+
       // Make the PUT request
       const response = await fetch(
         `${baseUrl}/offer/update?offerId=${selectedOffer._id}`,
@@ -1921,7 +2076,7 @@ const SpecialOffers = () => {
         // preserve a proper expiryDate so your UI’s “Valid to {expiryDate}” still prints
         const newExpiryDate =
           data.data.expiry?.validTo || selectedOffer.expiryDate;
-        const updatedOffers = offers.map((offer) =>
+        const updatedOffers = filteredOffers.map((offer) =>
           offer._id === selectedOffer._id
             ? {
                 ...data.data,
@@ -1973,8 +2128,23 @@ const SpecialOffers = () => {
           }, 100);
         }
 
-        // Toggle deleteSuccess to trigger any necessary re-renders
-        setDeleteSuccess((prev) => !prev);
+        setAddMode(false);
+        setSelectedOffer(null);
+        setUploadedImage(null);
+        // Prevent Art Gallery restoration after creation
+        ignoreArtGalleryRestoreRef.current = true;
+
+        // 🔴 ALSO clear any Art Gallery state
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+
+        setDeleteSuccess((prevState) => !prevState);
+        setTimeout(() => {
+          navigate('/special-offers', { replace: true });
+        }, 1500); // 1.5 seconds delay
       } else {
         throw new Error(data.message || 'Failed to update offer');
       }
@@ -2010,10 +2180,17 @@ const SpecialOffers = () => {
 
   // Add effect to check for selected image from Art Gallery
   useEffect(() => {
+    if (
+      ignoreArtGalleryRestoreRef.current ||
+      !location.state?.selectedImageFromGallery
+    ) {
+      return;
+    }
     // Check if we're coming back from Art Gallery with an image
     if (location.state?.selectedImageFromGallery) {
       const imageUrl = location.state.selectedImageFromGallery;
       setUploadedImage(imageUrl);
+      console.log('img- ', uploadedImage);
 
       // Preserve addMode state if it was set when navigating to Art Gallery
       if (location.state.isAddingNew !== undefined) {
@@ -2041,12 +2218,15 @@ const SpecialOffers = () => {
           timeValid: savedTimeValid,
           triggerValue: savedTriggerValue,
           oneTimeUse: savedOneTimeUse,
+          activeOfferFilter: savedActiveOfferFilter,
         } = location.state.formValues;
 
         // Preserve the current offer selection when returning from Art Gallery
         if (id) {
           // If we have an ID in formValues, try to find the offer in our offers array
-          const existingOffer = offers.find((offer) => offer._id === id);
+          const existingOffer = filteredOffers.find(
+            (offer) => offer._id === id
+          );
 
           if (existingOffer && !addMode) {
             // Update the found offer with the new image
@@ -2054,6 +2234,7 @@ const SpecialOffers = () => {
               ...existingOffer,
               image: imageUrl,
             });
+            console.log('selected offer', selectedOffer);
 
             // Also make sure heading and description are preserved
             // setHeadingText(savedHeading || "");
@@ -2065,6 +2246,7 @@ const SpecialOffers = () => {
             ...selectedOffer,
             image: imageUrl,
           });
+          console.log('selected offer', selectedOffer);
         }
 
         // Only update heading and description if we're in add mode
@@ -2075,6 +2257,10 @@ const SpecialOffers = () => {
 
         // Reset form value processing to avoid any interference
         setTimeout(() => {
+          // Restore offer filter if it was saved
+          if (savedActiveOfferFilter)
+            setActiveOfferFilter(savedActiveOfferFilter);
+
           // Restore other form values if they exist
           if (savedHeading) setHeadingText(savedHeading);
           if (savedDescription) setDescriptionText(savedDescription);
@@ -2243,6 +2429,14 @@ const SpecialOffers = () => {
     }
   };
 
+  const handlePillClick = (pill) => {
+    if (location.state?.selectedImageFromGallery) {
+      return;
+    }
+    // Only update the active filter; let the useEffect handle the offer selection
+    setActiveOfferFilter(pill);
+  };
+
   const handleLock = async () => {
     try {
       const result = await handleLogout();
@@ -2379,6 +2573,8 @@ const SpecialOffers = () => {
                     end: '--:--',
                   });
                   setOneTimeUse(false);
+                  setBonusPoints('');
+                  setShowBonusWhenRedeemed(false);
 
                   if (!selectedValue) return;
 
@@ -2524,7 +2720,12 @@ const SpecialOffers = () => {
               }`}
               onClick={() => {
                 setActiveTab('live');
+                setSelectedOffer(null);
                 setAddMode(false);
+                setHeadingText('');
+                setDescriptionText('');
+                setUploadedImage(null);
+                setTriggerValue('');
                 setHeadingError('');
                 setDescriptionError('');
                 setImageError('');
@@ -2532,6 +2733,8 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
+                setBonusPoints('');
+                setShowBonusWhenRedeemed(false);
               }}
             >
               Live Offers
@@ -2542,7 +2745,12 @@ const SpecialOffers = () => {
               }`}
               onClick={() => {
                 setActiveTab('expired');
+                setSelectedOffer(null);
                 setAddMode(false);
+                setHeadingText('');
+                setDescriptionText('');
+                setUploadedImage(null);
+                setTriggerValue('');
                 setHeadingError('');
                 setDescriptionError('');
                 setImageError('');
@@ -2550,6 +2758,8 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
+                setBonusPoints('');
+                setShowBonusWhenRedeemed(false);
               }}
             >
               Expired Offers
@@ -2567,9 +2777,7 @@ const SpecialOffers = () => {
           {/* Offer filter pills (above offers list) */}
 
           {/* Left Panel - Offers List */}
-          <div className={"offers-panel responsive-panel"}>
-            
-
+          <div className={'offers-panel responsive-panel'}>
             <button
               className="nav-arrow up-arrow"
               aria-label="Scroll up"
@@ -2579,14 +2787,17 @@ const SpecialOffers = () => {
             </button>
 
             {activeTab === 'live' && (
-              <div className={`offer-filter-row`} style={{marginBottom: '8px'}}>
+              <div
+                className={`offer-filter-row`}
+                style={{ marginBottom: '8px' }}
+              >
                 <div className="filter-pills">
                   {menuType === 'multiple' && (
                     <button
                       className={`filter-pill ${
                         activeOfferFilter === 'ALL' ? 'active' : ''
                       }`}
-                      onClick={() => setActiveOfferFilter('ALL')}
+                      onClick={() => handlePillClick('ALL')}
                     >
                       ALL
                     </button>
@@ -2600,7 +2811,7 @@ const SpecialOffers = () => {
                         className={`filter-pill ${
                           activeOfferFilter === t ? 'active' : ''
                         }`}
-                        onClick={() => setActiveOfferFilter(t)}
+                        onClick={() => handlePillClick(t)}
                       >
                         {t}
                       </button>
@@ -2609,7 +2820,7 @@ const SpecialOffers = () => {
               </div>
             )}
             <div className="offers-list responsive-list">
-              {offers.map((offer) => (
+              {filteredOffers.map((offer) => (
                 <div
                   key={offer._id}
                   className={`offer-card ${
@@ -2687,7 +2898,7 @@ const SpecialOffers = () => {
                       className={`filter-pill current-post ${
                         activeOfferFilter === 'ALL' ? 'active' : ''
                       }`}
-                      onClick={() => setActiveOfferFilter('ALL')}
+                      onClick={() => handlePillClick('ALL')}
                     >
                       ALL
                     </button>
@@ -2701,7 +2912,7 @@ const SpecialOffers = () => {
                         className={`filter-pill current-post ${
                           activeOfferFilter === t ? 'active' : ''
                         }`}
-                        onClick={() => setActiveOfferFilter(t)}
+                        onClick={() => handlePillClick(t)}
                       >
                         {t}
                       </button>
@@ -3389,17 +3600,33 @@ const SpecialOffers = () => {
                     )}
                   </div>
 
-                  {/* <div className="bonus-pts">
+                  {/* Bonus points toggle */}
+                  <div className="form-row bonus-points-row">
+                    <div className="bonus-points-container">
+                      <div className="bonus-points-toggle">
+                        <input
+                          type="checkbox"
+                          checked={showBonusWhenRedeemed}
+                          onChange={(e) =>
+                            setShowBonusWhenRedeemed(e.target.checked)
+                          }
+                          style={{ accentColor: '#002977' }}
+                        />
+                        <span>Add Bonus Points when redeemed</span>
+                      </div>
+
+                      {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
                           <input
-                            type="radio"
-                            id="bonuspts"
-                            name="redeem"
-                            value="bonuspts"
-                            checked={expiryType === 'bonuspts'}
-                            onChange={() => handleExpiryChange('bonuspts')}
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
                           />
-                          <label htmlFor="bonuspts">Add bonus points when redeemed</label>
-                        </div> */}
+                          <span>Points</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="form-group inline-form-group">
                     <label>
@@ -3468,6 +3695,34 @@ const SpecialOffers = () => {
                       The vouchers will automatically remove themselves <br />
                       at the end of that month.
                     </p>
+                  </div>
+
+                  {/* Bonus points toggle */}
+                  <div className="form-row bonus-points-row">
+                    <div className="bonus-points-container">
+                      <div className="bonus-points-toggle">
+                        <input
+                          type="checkbox"
+                          checked={showBonusWhenRedeemed}
+                          onChange={(e) =>
+                            setShowBonusWhenRedeemed(e.target.checked)
+                          }
+                          style={{ accentColor: '#002977' }}
+                        />
+                        <span>Add Bonus Points when redeemed</span>
+                      </div>
+
+                      {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div
@@ -3594,6 +3849,34 @@ const SpecialOffers = () => {
                       <br />
                       for the 1st time.
                     </p>
+                  </div>
+
+                  {/* Bonus points toggle */}
+                  <div className="form-row bonus-points-row">
+                    <div className="bonus-points-container">
+                      <div className="bonus-points-toggle">
+                        <input
+                          type="checkbox"
+                          checked={showBonusWhenRedeemed}
+                          onChange={(e) =>
+                            setShowBonusWhenRedeemed(e.target.checked)
+                          }
+                          style={{ accentColor: '#002977' }}
+                        />
+                        <span>Add Bonus Points when redeemed</span>
+                      </div>
+
+                      {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div

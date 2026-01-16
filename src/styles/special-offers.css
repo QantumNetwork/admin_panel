@@ -1029,6 +1029,44 @@ border: 1px solid #22ade3;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+.bonus-points-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;   /* 🔑 stops text breaking */
+}
+
+.bonus-points-inline span {
+  white-space: nowrap;   /* 🔑 critical */
+  margin-bottom: 5px;
+}
+
+/* Bonus Points layout */
+.bonus-points-container {
+  display: flex;
+  flex-direction: column;   /* 🔑 forces next line */
+  gap: 6px;
+}
+
+.bonus-points-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;      /* keeps text in one line */
+}
+
+.bonus-points-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bonus-points-input input {
+  width: 10px;
+  height: 10px;
+}
+
+
 
 @media screen and (min-width: 768px) and (max-width: 992px) {
   /* For tablet and smaller devices, adjust the sidebar overlap */
