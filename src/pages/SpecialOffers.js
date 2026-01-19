@@ -129,7 +129,7 @@ const SpecialOffers = () => {
 
   // Bonus points UI
   const [showBonusWhenRedeemed, setShowBonusWhenRedeemed] = useState(false);
-  const [bonusPoints, setBonusPoints] = useState('');
+  const [bonusPoints, setBonusPoints] = useState('null');
 
   const filteredOffers = offers.filter((offer) => {
     if (activeTab !== 'live') return true;
@@ -396,7 +396,7 @@ const SpecialOffers = () => {
               end: '--:--',
             });
             setOneTimeUse(false);
-            setBonusPoints('');
+            setBonusPoints("null");
             setShowBonusWhenRedeemed(false);
             return;
           }
@@ -422,7 +422,11 @@ const SpecialOffers = () => {
             setValidTimeFromAPI(offerToSelect.validTime);
             setOneTimeUse(offerToSelect.oneTimeUse || false);
             setBonusPoints(offerToSelect.points?.toString() || '');
-            {offerToSelect.points ? setShowBonusWhenRedeemed(true) : setShowBonusWhenRedeemed(false)}
+            {
+              offerToSelect.points !== "null"
+                ? setShowBonusWhenRedeemed(true)
+                : setShowBonusWhenRedeemed(false);
+            }
             setAddMode(false);
 
             // Update trigger value in state only once
@@ -441,7 +445,7 @@ const SpecialOffers = () => {
           setSelectedAudiences([]);
           setIsEveryone(false);
           setAddMode(false);
-          setBonusPoints('');
+          setBonusPoints("null");
           setShowBonusWhenRedeemed(false);
         }
       } catch (error) {
@@ -497,8 +501,8 @@ const SpecialOffers = () => {
       voucherType === 'birthday'
         ? 'birthdayOffer'
         : voucherType === 'new'
-        ? 'newSignUp'
-        : 'standard';
+          ? 'newSignUp'
+          : 'standard';
 
     // Update the select element value
     const selectElement = document.querySelector(
@@ -1010,8 +1014,8 @@ const SpecialOffers = () => {
     // Always set the trigger value regardless of voucher type
     setTriggerValue(offer.triggerValue?.toString() || '');
 
-    setBonusPoints(offer.points ?? '');
-    setShowBonusWhenRedeemed(Boolean(offer.points));
+    setBonusPoints(offer.points.toString());
+    setShowBonusWhenRedeemed(Boolean(offer.points!=="null"));
 
     // Map the voucher type to select value
     const voucherTypeSelectValue =
@@ -1176,7 +1180,7 @@ const SpecialOffers = () => {
       setOneTimeUse(false);
 
       setShowBonusWhenRedeemed(false);
-      setBonusPoints('');
+      setBonusPoints("null");
 
       // Clear trigger inputs again after other changes
       setTimeout(() => {
@@ -1377,6 +1381,13 @@ const SpecialOffers = () => {
       });
     }
   };
+
+  // useEffect(() => {
+  //   if (selectedOffer) {
+  //     setBonusPoints(selectedOffer.points?.toString() || '');
+  //     setShowBonusWhenRedeemed(Boolean(selectedOffer.points));
+  //   }
+  // }, [selectedOffer?._id]);
 
   // Add validation error state for day selection
   const [validDaysError, setValidDaysError] = useState('');
@@ -1679,6 +1690,8 @@ const SpecialOffers = () => {
         !isNaN(Number(bonusPoints))
       ) {
         requestBody.points = String(bonusPoints);
+      } else {
+        requestBody.points = "null";
       }
 
       console.log('Request Body:', requestBody);
@@ -1779,13 +1792,13 @@ const SpecialOffers = () => {
       if (response.status === 200) {
         toast.success('Voucher deleted successfully!');
         setAddMode(false);
-      setSelectedOffer(null);
-      setUploadedImage(null);
-      setDeleteSuccess((prevState) => !prevState);
+        setSelectedOffer(null);
+        setUploadedImage(null);
+        setDeleteSuccess((prevState) => !prevState);
 
-      setTimeout(() => {
-        navigate('/special-offers', { replace: true });
-      }, 1500);
+        setTimeout(() => {
+          navigate('/special-offers', { replace: true });
+        }, 1500);
       } else {
         throw new Error('Failed to delete voucher');
       }
@@ -2036,6 +2049,8 @@ const SpecialOffers = () => {
         !isNaN(Number(bonusPoints))
       ) {
         requestBody.points = String(bonusPoints);
+      } else {
+        requestBody.points = "null";
       }
 
       // Make the PUT request
@@ -2162,8 +2177,8 @@ const SpecialOffers = () => {
       selectedValue === 'type1'
         ? 'birthdayOffer'
         : selectedValue === 'type2'
-        ? 'newSignUp'
-        : 'standard'
+          ? 'newSignUp'
+          : 'standard'
     );
   };
 
@@ -2573,7 +2588,7 @@ const SpecialOffers = () => {
                     end: '--:--',
                   });
                   setOneTimeUse(false);
-                  setBonusPoints('');
+                  setBonusPoints("null");
                   setShowBonusWhenRedeemed(false);
 
                   if (!selectedValue) return;
@@ -2733,7 +2748,7 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
-                setBonusPoints('');
+                setBonusPoints("null");
                 setShowBonusWhenRedeemed(false);
               }}
             >
@@ -2758,7 +2773,7 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
-                setBonusPoints('');
+                setBonusPoints("null");
                 setShowBonusWhenRedeemed(false);
               }}
             >
@@ -2889,9 +2904,11 @@ const SpecialOffers = () => {
           <div className="current-post-panel responsive-panel">
             {activeTab === 'live' && (
               <div className="offer-filter-row form-row">
+                {menuType === 'multiple' && (
                 <label>
                   <strong style={{ color: 'black' }}>Appears</strong>
                 </label>
+                )}
                 <div className="filter-pills">
                   {menuType === 'multiple' && (
                     <button
@@ -3246,13 +3263,15 @@ const SpecialOffers = () => {
                     {isEveryone
                       ? 'All Selected'
                       : selectedAudiences.length > 0
-                      ? selectedAudiences.length > 2
-                        ? `${selectedAudiences.length} selected`
-                        : audienceOptions
-                            .filter((o) => selectedAudiences.includes(o.value))
-                            .map((o) => o.label)
-                            .join(', ')
-                      : 'Select from list'}
+                        ? selectedAudiences.length > 2
+                          ? `${selectedAudiences.length} selected`
+                          : audienceOptions
+                              .filter((o) =>
+                                selectedAudiences.includes(o.value)
+                              )
+                              .map((o) => o.label)
+                              .join(', ')
+                        : 'Select from list'}
                   </div>
 
                   {showAudienceDropdown && !isEveryone && (
