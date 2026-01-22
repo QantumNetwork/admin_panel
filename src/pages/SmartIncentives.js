@@ -9,6 +9,7 @@ import {
   FaUtensils,
   FaPaintBrush,
 } from 'react-icons/fa';
+import { FaChartPie } from 'react-icons/fa6';
 import axios from 'axios';
 import '../styles/smart-incentives.css';
 const SmartIncentives = () => {
@@ -440,6 +441,18 @@ const SmartIncentives = () => {
           />
           Art Gallery
         </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
+        </button>
       </aside>
 
       <div className="content-body">
@@ -521,13 +534,15 @@ const SmartIncentives = () => {
                     {isEveryone
                       ? 'All Selected'
                       : selectedAudiences.length > 0
-                      ? selectedAudiences.length > 2
-                        ? `${selectedAudiences.length} selected`
-                        : audienceOptions
-                            .filter((o) => selectedAudiences.includes(o.value))
-                            .map((o) => o.label)
-                            .join(', ')
-                      : 'Select from list'}
+                        ? selectedAudiences.length > 2
+                          ? `${selectedAudiences.length} selected`
+                          : audienceOptions
+                              .filter((o) =>
+                                selectedAudiences.includes(o.value)
+                              )
+                              .map((o) => o.label)
+                              .join(', ')
+                        : 'Select from list'}
                   </div>
 
                   {showAudienceDropdown && !isEveryone && (
@@ -591,7 +606,7 @@ const SmartIncentives = () => {
               <div className="field-block flex-row align-center">
                 <label className="field-label inline-label">Trigger by</label>
                 <div className="flex-row">
-                  {['Turnover', 'Revenue', 'Visits'].map(o => (
+                  {['Turnover', 'Revenue', 'Visits'].map((o) => (
                     <label key={o} className="radio-label">
                       <input
                         type="radio"
@@ -612,7 +627,7 @@ const SmartIncentives = () => {
                 <input
                   type="text"
                   value={triggerValue}
-                  onChange={e => setTriggerValue(e.target.value)}
+                  onChange={(e) => setTriggerValue(e.target.value)}
                   className="text-input-trigger"
                 />
               </div>
@@ -622,16 +637,16 @@ const SmartIncentives = () => {
                 <label className="field-label">Trigger time period</label>
                 {/* first row: daily + weekly */}
                 <div className="flex-row">
-                  {['daily','weekly'].map(tp=>(
+                  {['daily', 'weekly'].map((tp) => (
                     <label key={tp} className="radio-label">
                       <input
                         type="radio"
                         name="timePeriod"
                         value={tp}
-                        checked={timePeriod===tp}
-                        onChange={()=>setTimePeriod(tp)}
+                        checked={timePeriod === tp}
+                        onChange={() => setTimePeriod(tp)}
                       />
-                      <span>{tp.charAt(0).toUpperCase()+tp.slice(1)}</span>
+                      <span>{tp.charAt(0).toUpperCase() + tp.slice(1)}</span>
                     </label>
                   ))}
                 </div>
@@ -643,8 +658,8 @@ const SmartIncentives = () => {
                       type="radio"
                       name="timePeriod"
                       value="schedule"
-                      checked={timePeriod==='schedule'}
-                      onChange={()=>setTimePeriod('schedule')}
+                      checked={timePeriod === 'schedule'}
+                      onChange={() => setTimePeriod('schedule')}
                     />
                     <span>Schedule</span>
                   </label>
@@ -654,7 +669,7 @@ const SmartIncentives = () => {
                       <input
                         type="date"
                         value={scheduleStart}
-                        onChange={e=>setScheduleStart(e.target.value)}
+                        onChange={(e) => setScheduleStart(e.target.value)}
                         className="date-input"
                       />
                     </div>
@@ -663,7 +678,7 @@ const SmartIncentives = () => {
                       <input
                         type="date"
                         value={scheduleEnd}
-                        onChange={e=>setScheduleEnd(e.target.value)}
+                        onChange={(e) => setScheduleEnd(e.target.value)}
                         className="date-input"
                       />
                     </div>
@@ -676,15 +691,19 @@ const SmartIncentives = () => {
                 <>
                   {/* Temporary benefits level - Only for level_up */}
                   <div className="field-block">
-                    <label className="field-label">Temporary benefits level</label>
+                    <label className="field-label">
+                      Temporary benefits level
+                    </label>
                     <select
                       value={tempBenefits}
-                      onChange={e=>setTempBenefits(e.target.value)}
+                      onChange={(e) => setTempBenefits(e.target.value)}
                       className="select-input"
                     >
                       <option value="">Select from list</option>
-                      {audienceOptions.map(o=>(
-                        <option key={o.value} value={o.value}>{o.label}</option>
+                      {audienceOptions.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -699,7 +718,7 @@ const SmartIncentives = () => {
                         type="number"
                         min={1}
                         value={levelUpDays}
-                        onChange={e=>setLevelUpDays(e.target.value)}
+                        onChange={(e) => setLevelUpDays(e.target.value)}
                         className="small-number-input"
                       />
                       <span className="unit-label">Days</span>
@@ -710,10 +729,19 @@ const SmartIncentives = () => {
 
               {selectedIncentive === 'play_now' && (
                 <div className="field-block">
-                  <label className="field-label">Wheel average prize value</label>
-                  <div className="flex-row" style={{ flexWrap: 'wrap', gap: '10px' }}>
+                  <label className="field-label">
+                    Wheel average prize value
+                  </label>
+                  <div
+                    className="flex-row"
+                    style={{ flexWrap: 'wrap', gap: '10px' }}
+                  >
                     {[10, 20, 50, 100, 200].map((value) => (
-                      <label key={value} className="radio-label" style={{ marginRight: '15px' }}>
+                      <label
+                        key={value}
+                        className="radio-label"
+                        style={{ marginRight: '15px' }}
+                      >
                         <input
                           type="radio"
                           name="wheelPrizeValue"
@@ -730,11 +758,13 @@ const SmartIncentives = () => {
 
               {selectedIncentive === 'points_bonus' && (
                 <div className="field-block">
-                  <label className="field-label">Points bonus value to issue to member</label>
+                  <label className="field-label">
+                    Points bonus value to issue to member
+                  </label>
                   <input
                     type="text"
                     value={tempBenefits}
-                    onChange={e => setTempBenefits(e.target.value)}
+                    onChange={(e) => setTempBenefits(e.target.value)}
                     className="text-input-trigger"
                     placeholder="Enter points bonus value"
                   />
@@ -747,7 +777,7 @@ const SmartIncentives = () => {
                 <input
                   type="date"
                   value={expiresOn}
-                  onChange={e=>setExpiresOn(e.target.value)}
+                  onChange={(e) => setExpiresOn(e.target.value)}
                   className="date-input"
                 />
               </div>
@@ -762,7 +792,11 @@ const SmartIncentives = () => {
             {/* Row 1 - Spin & Win */}
             <div className="incentive-card">
               <div className="incentive-image-container">
-                <img src="/spin_win.png" alt="Spin & Win" className="incentive-img" />
+                <img
+                  src="/spin_win.png"
+                  alt="Spin & Win"
+                  className="incentive-img"
+                />
               </div>
               <div className="incentive-details">
                 <div className="incentive-header">
@@ -777,7 +811,11 @@ const SmartIncentives = () => {
             {/* Row 2 - Spin & Win */}
             <div className="incentive-card">
               <div className="incentive-image-container">
-                <img src="/spin_win.png" alt="Spin & Win" className="incentive-img" />
+                <img
+                  src="/spin_win.png"
+                  alt="Spin & Win"
+                  className="incentive-img"
+                />
               </div>
               <div className="incentive-details">
                 <div className="incentive-header">
@@ -792,14 +830,18 @@ const SmartIncentives = () => {
             {/* Row 3 - Level Up */}
             <div className="incentive-card">
               <div className="incentive-image-container">
-                <img src="/gold_star.png" alt="Level Up" className="incentive-img" />
+                <img
+                  src="/gold_star.png"
+                  alt="Level Up"
+                  className="incentive-img"
+                />
               </div>
               <div className="incentive-details">
                 <div className="incentive-header">
                   <h3>Level Up</h3>
                 </div>
                 <p className="incentive-description">
-                  $500 Revenue Trigger Daily 
+                  $500 Revenue Trigger Daily
                 </p>
               </div>
             </div>
@@ -807,7 +849,11 @@ const SmartIncentives = () => {
             {/* Row 4 - Special Offer */}
             <div className="incentive-card">
               <div className="incentive-image-container">
-                <img src="/gifts.png" alt="Special Offer" className="incentive-img" />
+                <img
+                  src="/gifts.png"
+                  alt="Special Offer"
+                  className="incentive-img"
+                />
               </div>
               <div className="incentive-details">
                 <div className="incentive-header">

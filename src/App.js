@@ -28,6 +28,7 @@ import PaymentReporting from "./pages/PaymentReporting";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
+import Reporting from "./pages/Reporting";
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -87,6 +88,7 @@ function App() {
         <Route path="/membership" element={<MembershipPage />} />
         <Route path="/app-settings" element={<AppSettings />} />
         <Route path="/payment-reporting" element={<PaymentReporting />} />
+        <Route path="/reporting" element={<Reporting />} />
       </Routes>
       
     </Router>

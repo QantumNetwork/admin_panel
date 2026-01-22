@@ -10,6 +10,7 @@ import {
   FaUtensils,
   FaPaintBrush,
 } from 'react-icons/fa';
+import { FaChartPie } from 'react-icons/fa6';
 import '../styles/my-benefits.css';
 import { trackMenuAccess, handleLogout } from '../utils/api';
 import axios from 'axios';
@@ -84,10 +85,12 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
+          return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
       case 'Staff':
-        if (selectedVenue === 'Montauk' || selectedVenue === 'Central') return '#006D88';
+        if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
+          return '#006D88';
         if (selectedVenue === 'Flinders') return '#FF0000';
       case 'Staff Pre 3Mth':
         return '#FF0000';
@@ -267,7 +270,7 @@ const MyBenefits = () => {
     ];
   } else if (selectedVenue === 'Flinders') {
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' }, 
+      { value: 'Staff', label: 'Staff' },
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
@@ -770,6 +773,18 @@ const MyBenefits = () => {
             }`}
           />
           Art Gallery
+        </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
         </button>
       </aside>
       <div className="page-container-mb benefits-page">

@@ -14,6 +14,7 @@ import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import AppLayout from '../components/AppLayout';
 import { trackMenuAccess, handleLogout } from '../utils/api';
+import { FaChartPie } from 'react-icons/fa6';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
@@ -163,7 +164,7 @@ const DigitalApp = () => {
     ];
   } else if (selectedVenue === 'Flinders') {
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' }, 
+      { value: 'Staff', label: 'Staff' },
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
@@ -1283,6 +1284,18 @@ const DigitalApp = () => {
           />
           Art Gallery
         </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
+        </button>
       </aside>
       <button className="large-advert-btns">Large Advert</button>
       <button className="small-advert-btns" onClick={handleSubmit}>
@@ -1879,9 +1892,9 @@ const DigitalApp = () => {
                     selectedImage
                       ? selectedImage
                       : advertImages.length > 0
-                      ? advertImages[activeImageIndex].imageUrl ||
-                        advertImages[activeImageIndex]
-                      : defaultImage
+                        ? advertImages[activeImageIndex].imageUrl ||
+                          advertImages[activeImageIndex]
+                        : defaultImage
                   }
                   alt="Pop Out"
                 />

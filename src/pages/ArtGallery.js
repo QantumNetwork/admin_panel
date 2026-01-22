@@ -12,6 +12,7 @@ import {
   FaPaintBrush,
   FaTrash,
 } from 'react-icons/fa';
+import { FaChartPie } from 'react-icons/fa6';
 import '../styles/art-gallery.css';
 import axios from 'axios';
 import { trackMenuAccess, handleLogout } from '../utils/api';
@@ -45,8 +46,8 @@ const ArtGallery = () => {
     advertType === 'small'
       ? 'Small'
       : advertType === 'Special-Offers'
-      ? 'Special-Offers'
-      : 'Large'
+        ? 'Special-Offers'
+        : 'Large'
   );
   const [allImage, setAllImage] = useState('');
   const [prompt, setPromot] = useState('');
@@ -54,8 +55,8 @@ const ArtGallery = () => {
     advertType === 'small'
       ? 'Small'
       : advertType === 'Special-Offers'
-      ? 'Voucher'
-      : 'Large'
+        ? 'Voucher'
+        : 'Large'
   );
   const [showImage, setShowImage] = useState(false);
   const [image, setImage] = useState('');
@@ -68,10 +69,10 @@ const ArtGallery = () => {
     advertType === 'Large'
       ? 'Large'
       : advertType === 'small'
-      ? 'Small'
-      : advertType === 'Special-Offers'
-      ? 'Voucher'
-      : 'Large'
+        ? 'Small'
+        : advertType === 'Special-Offers'
+          ? 'Voucher'
+          : 'Large'
   );
   // Add state to track selected images
   const [selectedImages, setSelectedImages] = useState([]);
@@ -904,6 +905,18 @@ const ArtGallery = () => {
             }`}
           />
           Art Gallery
+        </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
         </button>
       </aside>
 

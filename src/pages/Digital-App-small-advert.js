@@ -13,6 +13,7 @@ import {
   FaCalendarAlt,
   FaPaintBrush,
 } from 'react-icons/fa';
+import { FaChartPie } from 'react-icons/fa6';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import {
@@ -248,7 +249,7 @@ const DigitalSmall = () => {
     ];
   } else if (selectedVenue === 'Flinders') {
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' }, 
+      { value: 'Staff', label: 'Staff' },
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
@@ -1225,6 +1226,18 @@ const DigitalSmall = () => {
           />
           Art Gallery
         </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
+        </button>
       </aside>
       <div className="content-wrapper-small">
         {/* CURRENT POSTS SECTION */}
@@ -1821,9 +1834,9 @@ const DigitalSmall = () => {
                     selectedImage
                       ? selectedImage
                       : advertImages.length > 0
-                      ? advertImages[activeImageIndex].imageUrl ||
-                        advertImages[activeImageIndex]
-                      : defaultImage
+                        ? advertImages[activeImageIndex].imageUrl ||
+                          advertImages[activeImageIndex]
+                        : defaultImage
                   }
                   alt="Pop Out"
                 />

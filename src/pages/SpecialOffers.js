@@ -7,6 +7,7 @@ import { uploadFileToS3 } from '../s3/config';
 import { logout } from '../utils/auth';
 import { trackMenuAccess, handleLogout } from '../utils/api';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import { FaChartPie } from 'react-icons/fa6';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
@@ -396,7 +397,7 @@ const SpecialOffers = () => {
               end: '--:--',
             });
             setOneTimeUse(false);
-            setBonusPoints("null");
+            setBonusPoints('null');
             setShowBonusWhenRedeemed(false);
             return;
           }
@@ -423,7 +424,7 @@ const SpecialOffers = () => {
             setOneTimeUse(offerToSelect.oneTimeUse || false);
             setBonusPoints(offerToSelect.points?.toString() || '');
             {
-              offerToSelect.points !== "null"
+              offerToSelect.points !== 'null'
                 ? setShowBonusWhenRedeemed(true)
                 : setShowBonusWhenRedeemed(false);
             }
@@ -445,7 +446,7 @@ const SpecialOffers = () => {
           setSelectedAudiences([]);
           setIsEveryone(false);
           setAddMode(false);
-          setBonusPoints("null");
+          setBonusPoints('null');
           setShowBonusWhenRedeemed(false);
         }
       } catch (error) {
@@ -1015,7 +1016,7 @@ const SpecialOffers = () => {
     setTriggerValue(offer.triggerValue?.toString() || '');
 
     setBonusPoints(offer.points.toString());
-    setShowBonusWhenRedeemed(Boolean(offer.points!=="null"));
+    setShowBonusWhenRedeemed(Boolean(offer.points !== 'null'));
 
     // Map the voucher type to select value
     const voucherTypeSelectValue =
@@ -1180,7 +1181,7 @@ const SpecialOffers = () => {
       setOneTimeUse(false);
 
       setShowBonusWhenRedeemed(false);
-      setBonusPoints("null");
+      setBonusPoints('null');
 
       // Clear trigger inputs again after other changes
       setTimeout(() => {
@@ -1691,7 +1692,7 @@ const SpecialOffers = () => {
       ) {
         requestBody.points = String(bonusPoints);
       } else {
-        requestBody.points = "null";
+        requestBody.points = 'null';
       }
 
       console.log('Request Body:', requestBody);
@@ -2050,7 +2051,7 @@ const SpecialOffers = () => {
       ) {
         requestBody.points = String(bonusPoints);
       } else {
-        requestBody.points = "null";
+        requestBody.points = 'null';
       }
 
       // Make the PUT request
@@ -2588,7 +2589,7 @@ const SpecialOffers = () => {
                     end: '--:--',
                   });
                   setOneTimeUse(false);
-                  setBonusPoints("null");
+                  setBonusPoints('null');
                   setShowBonusWhenRedeemed(false);
 
                   if (!selectedValue) return;
@@ -2723,6 +2724,18 @@ const SpecialOffers = () => {
           />
           Art Gallery
         </button>
+
+        <button
+          className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
+          onClick={() => navigate('/reporting')}
+        >
+          <FaChartPie
+            className={`sidebar-icon ${
+              isActive('/reporting') ? '' : 'navy-icon'
+            }`}
+          />
+          Reporting
+        </button>
       </aside>
 
       <div className="page-container">
@@ -2748,7 +2761,7 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
-                setBonusPoints("null");
+                setBonusPoints('null');
                 setShowBonusWhenRedeemed(false);
               }}
             >
@@ -2773,7 +2786,7 @@ const SpecialOffers = () => {
                 setTimeError('');
                 setExpiryDaysError('');
                 setTriggerValueError('');
-                setBonusPoints("null");
+                setBonusPoints('null');
                 setShowBonusWhenRedeemed(false);
               }}
             >
@@ -2905,9 +2918,9 @@ const SpecialOffers = () => {
             {activeTab === 'live' && (
               <div className="offer-filter-row form-row">
                 {menuType === 'multiple' && (
-                <label>
-                  <strong style={{ color: 'black' }}>Appears</strong>
-                </label>
+                  <label>
+                    <strong style={{ color: 'black' }}>Appears</strong>
+                  </label>
                 )}
                 <div className="filter-pills">
                   {menuType === 'multiple' && (
