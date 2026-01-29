@@ -84,6 +84,8 @@ const StandardAdmin = () => {
         return 'Bluewater Captains Club';
       case 'Flinders':
         return 'Flinders Street Wharves';
+      case 'Drinks':
+        return 'Drinks HQ';
       default:
         return appType;
     }
@@ -119,6 +121,8 @@ const StandardAdmin = () => {
         return '/bluewater.png';
       case 'Flinders':
         return '/flinders.png';
+      case 'Drinks':
+        return '/drinks.png';
       default:
         return appType;
     }

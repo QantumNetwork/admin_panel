@@ -59,6 +59,7 @@ const MyBenefits = () => {
     if (savedVenue === 'Brisbane') return 'Member';
     if (savedVenue === 'Bluewater') return 'Deckhand';
     if (savedVenue === 'Flinders') return 'Member';
+    if (savedVenue === 'Drinks') return 'Explorer';
     return 'Platinum Black';
   });
 
@@ -92,10 +93,19 @@ const MyBenefits = () => {
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
           return '#006D88';
         if (selectedVenue === 'Flinders') return '#FF0000';
+        if (selectedVenue === 'Drinks') return '#ff00d9';
       case 'Staff Pre 3Mth':
         return '#FF0000';
       case 'Star Staff':
         return '#FF0000';
+      case 'Explorer':
+        return '#9d00ff';
+      case 'Masters':
+        return '#070505';
+      case 'Club':
+        return '#D4AF37';
+      case 'Reserve':
+        return '#602373';
       case 'Platinum':
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':
@@ -274,6 +284,14 @@ const MyBenefits = () => {
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
+    ];
+  } else if (selectedVenue === 'Drinks') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Explorer', label: 'Explorer' },
+      { value: 'Masters', label: 'Masters' },
+      { value: 'Club', label: 'Club' },
+      { value: 'Reserve', label: 'Reserve' },
     ];
   }
 
@@ -467,6 +485,8 @@ const MyBenefits = () => {
         return 'Bluewater Captains Club';
       case 'Flinders':
         return 'Flinders Street Wharves';
+      case 'Drinks':
+        return 'Drinks HQ';
       default:
         return appType;
     }

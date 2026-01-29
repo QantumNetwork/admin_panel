@@ -564,6 +564,8 @@ const ArtGallery = () => {
         return 'Bluewater Captains Club';
       case 'Flinders':
         return 'Flinders Street Wharves';
+      case 'Drinks':
+        return 'Drinks HQ';
       default:
         return appType;
     }

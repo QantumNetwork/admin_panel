@@ -111,67 +111,113 @@ const SmartIncentives = () => {
 
   let audienceOptions = [];
 
-  if (selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') {
-    // Options for audience selection - Match with venue's membership levels
+    if (selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') {
+    // Options for audience selection
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-    ];
-  } else if (selectedVenue === 'StarReward') {
-    // Star Reward specific audience levels
-    audienceOptions = [
-      { value: 'Pre 3 Month', label: 'Pre 3 Month' },
-      { value: 'Staff', label: 'Staff' },
+      { value: 'Platinum Black', label: 'Platinum Black' },
       { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
     ];
   } else if (selectedVenue === 'Manly') {
-    // Manly Harbour Boat Club specific audience levels
+    // Options for audience selection
+
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Crewmate', label: 'Crewmate' },
-      { value: 'Lieutenant', label: 'Lieutenant' },
-      { value: 'Commander', label: 'Commander' },
-      { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
+      { value: 'Captain', label: 'Captain' },
+      { value: 'Commander', label: 'Commander' },
+      { value: 'Lieutenant', label: 'Lieutenant' },
+      { value: 'Crewmate', label: 'Crewmate' },
+      { value: 'Non Financial', label: 'Non Financial' },
     ];
-  } else if (selectedVenue === 'Montauk') {
-    // Montauk Tavern specific audience levels
+  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
     audienceOptions = [
+      { value: 'Premium Member', label: 'Premium Member' },
+      { value: 'Member', label: 'Member' },
       { value: 'Staff', label: 'Staff' },
+    ];
+  } else if (selectedVenue === 'Hogan') {
+    audienceOptions = [
       { value: 'Bronze', label: 'Bronze' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
-    ];
-  } else if (selectedVenue === 'Central') {
-    // Central Lane Hotel specific audience levels
-    audienceOptions = [
       { value: 'Staff', label: 'Staff' },
-      { value: 'Member', label: 'Member' },
-      { value: 'VIP', label: 'VIP' },
+      { value: 'Management', label: 'Management' },
+      { value: 'Family', label: 'Family' },
+      { value: 'Directors', label: 'Directors' },
     ];
-  } else if (selectedVenue === 'Sense') {
-    // Sense Of Taste specific audience levels
+  } else if (selectedVenue === 'North') {
     audienceOptions = [
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      // { value: 'Pre Staff', label: 'Pre Staff' },
+      { value: 'Silver', label: 'Silver' },
       { value: 'Staff', label: 'Staff' },
-      { value: 'Regular', label: 'Regular' },
-      { value: 'VIP', label: 'VIP' },
-      { value: 'VVIP', label: 'VVIP' },
+      // { value: 'Valued', label: 'Valued' },
     ];
-  } else {
-    // Default audience levels for other venues
+  } else if (selectedVenue === 'StarReward') {
+    // Options for audience selection
     audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
+      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
+      { value: 'Star Staff', label: 'Star Staff' },
       { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
+      { value: 'Platinum Black', label: 'Platinum Black' },
+    ];
+  } else if (selectedVenue === 'Ace') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Tens', label: 'Tens' },
+      { value: 'Jacks', label: 'Jacks' },
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Kings', label: 'Kings' },
+      { value: 'Ace', label: 'Ace' },
+      { value: 'Ace Plus', label: 'Ace Plus' },
+    ];
+  } else if (selectedVenue === 'Queens') {
+    audienceOptions = [
+      { value: 'Queens', label: 'Queens' },
+      { value: 'Ruby', label: 'Ruby' },
+      { value: 'Emerald', label: 'Emerald' },
+      { value: 'Sapphire', label: 'Sapphire' },
+      { value: 'Diamond', label: 'Diamond' },
+      { value: 'Diamond Plus', label: 'Diamond Plus' },
+      { value: 'Curtis Coast', label: 'Curtis Coast' },
+    ];
+  } else if (selectedVenue === 'Brisbane') {
+    audienceOptions = [
+      { value: 'Brew Crew', label: 'Brew Crew' },
+      { value: 'Member', label: 'Member' },
+      { value: 'Regular', label: 'Regular' },
+      { value: 'Champion', label: 'Champion' },
+      { value: 'Legend', label: 'Legend' },
+    ];
+  } else if (selectedVenue === 'Bluewater') {
+    audienceOptions = [
+      { value: 'Deckhand', label: 'Deckhand' },
+      { value: 'First Mate', label: 'First Mate' },
+      { value: 'Captain', label: 'Captain' },
+      { value: 'Commodore', label: 'Commodore' },
+      { value: 'Admiral', label: 'Admiral' },
+    ];
+  } else if (selectedVenue === 'Flinders') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Member', label: 'Member' },
+      { value: 'Corporate', label: 'Corporate' },
+      { value: 'VIP', label: 'VIP' },
+    ];
+  } else if (selectedVenue === 'Drinks') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Explorer', label: 'Explorer' },
+      { value: 'Masters', label: 'Masters' },
+      { value: 'Club', label: 'Club' },
+      { value: 'Reserve', label: 'Reserve' },
     ];
   }
 
@@ -189,6 +235,22 @@ const SmartIncentives = () => {
         return 'Central Lane Hotel';
       case 'Sense':
         return 'Sense Of Taste';
+      case 'North':
+        return 'North Shore Tavern';
+      case 'Hogan':
+        return "Hogan's";
+      case 'Ace':
+        return 'Ace Rewards';
+      case 'Queens':
+        return 'Queens Hotel';
+      case 'Brisbane':
+        return 'Brisbane Brewing Co';
+      case 'Bluewater':
+        return 'Bluewater Captains Club';
+      case 'Flinders':
+        return 'Flinders Street Wharves';
+      case 'Drinks':
+        return 'Drinks HQ';
       default:
         return appType;
     }

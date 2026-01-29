@@ -169,6 +169,14 @@ const DigitalApp = () => {
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
     ];
+  } else if (selectedVenue === 'Drinks') {
+    audienceOptions = [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Explorer', label: 'Explorer' },
+      { value: 'Masters', label: 'Masters' },
+      { value: 'Club', label: 'Club' },
+      { value: 'Reserve', label: 'Reserve' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -951,6 +959,8 @@ const DigitalApp = () => {
         return 'Bluewater Captains Club';
       case 'Flinders':
         return 'Flinders Street Wharves';
+      case 'Drinks':
+        return 'Drinks HQ';
       default:
         return appType;
     }
