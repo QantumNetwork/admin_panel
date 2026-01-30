@@ -520,7 +520,7 @@ const AppSettings = () => {
                           onChange={(e) => updateOfferType(index, e.target.value)}
                         />
 
-                        {!isFirst && !isLast && (
+                        {!isFirst && (
                           <span
                             className="remove-icon"
                             onClick={() => removeOfferType(index)}

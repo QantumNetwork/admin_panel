@@ -52,7 +52,7 @@
 .type-input-with-plus {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 24px; /* input | icon */
+  grid-template-columns: 1fr 24px 24px; /* input | remove icon | add icon*/
   align-items: center;
   column-gap: 8px;
 }

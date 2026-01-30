@@ -39,6 +39,8 @@ const Reporting = () => {
     localStorage.getItem('selectedVenue') || ''
   );
 
+  const [reportingData, setReportingData] = useState([]);
+
   const getAppType = (appType) => {
     switch (appType) {
       case 'MaxGaming':
@@ -139,6 +141,33 @@ const Reporting = () => {
   const isActive = (path) => {
     return location.pathname === path;
   };
+
+  useEffect(() => {
+    const fetchReportingData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${baseUrl}/offer/list?appType=${selectedVenue}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.data && response.data.data) {
+          setReportingData(response.data.data);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching reporting data:', err);
+        toast.error('Failed to fetch reporting data');
+        setLoading(false);
+      }
+    };
+
+    fetchReportingData();
+
+  }, [token, selectedVenue]);
 
   return (
     <div className="dashboard-container">
@@ -402,38 +431,47 @@ const Reporting = () => {
                 <tbody>
                   {activeTab === 'special-offers' && (
                     <>
-                      <tr>
-                        <td>20/01/2026</td>
-                        <td>Get 50 points balter beer</td>
-                        <td>20/01/2026</td>
-                        <td>29/01/2026</td>
-                        <td>5010</td>
-                        <td>2300</td>
-                        <td>11</td>
-                        <td>5100</td>
-                        <td>$51.00</td>
-                      </tr>
-                      <tr>
-                        <td>19/01/2026</td>
-                        <td>Free Schooner</td>
-                        <td>10/01/2026</td>
-                        <td>28/01/2026</td>
-                        <td>4390</td>
-                        <td>1101</td>
-                        <td>18</td>
-                        <td>19345</td>
-                        <td>$193.45</td>
-                      </tr>
+                      {reportingData.length > 0 ? (
+                        reportingData.map((data, index) => (
+                          <tr key={index}>
+                            <td>
+                              {data.createdAt
+                                .substring(0, 10)
+                                .split('-')
+                                .reverse()
+                                .join('-') || '-'}
+                            </td>
+                            <td>{data.header || '-'}</td>
+                            <td>
+                              {data.startDate
+                                .substring(0, 10)
+                                .split('-')
+                                .reverse()
+                                .join('-') || '-'}
+                            </td>
+                            <td>
+                              {data.expiryDate
+                                .substring(0, 10)
+                                .split('-')
+                                .reverse()
+                                .join('-') || '-'}
+                            </td>
+                            <td>{data.reach || '-'}</td>
+                            <td>{data.claims || '-'}</td>
+                            <td>{data.daysActive || '-'}</td>
+                            <td>{data.points || '-'}</td>
+                            <td>{data.dollarValue || '-'}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="8" className="no-data">
+                            No members found
+                          </td>
+                        </tr>
+                      )}
                     </>
                   )}
-
-                  {/* {activeTab === 'special-offers' && members.length === 0 && (
-                    <tr>
-                      <td colSpan="8" className="no-data">
-                        No members found
-                      </td>
-                    </tr>
-                  )} */}
                 </tbody>
               </table>
             </>
