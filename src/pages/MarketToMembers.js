@@ -36,6 +36,7 @@ const MarketToMembers = () => {
   const [sendDate, setSendDate] = useState('');
   const [sendTime, setSendTime] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [jobId, setJobId] = useState(null);
 
   // Add loading state
   const [isCalculating, setIsCalculating] = useState(false);
@@ -265,13 +266,13 @@ const MarketToMembers = () => {
           setDescription(notification.description || '');
 
           // Set display type and related fields
-          setDisplayType(notification.displayType || 'immediate');
-          if (notification.displayType === 'schedule' && notification.sentAt) {
-            const sentAtDate = new Date(notification.sentAt);
-            setSendDate(sentAtDate.toISOString().split('T')[0]); // Format date as YYYY-MM-DD
-            setSendTime(
-              sentAtDate.toTimeString().split(' ')[0].substring(0, 5)
-            ); // Format time as HH:MM
+          {notification.isScheduled && notification.scheduledAt ? setDisplayType('schedule') : setDisplayType('immediate')}
+          if (notification.isScheduled && notification.scheduledAt) {
+            const dateString = notification.scheduledAt.substring(0, 10);
+            setSendDate(dateString);
+            // Extract time in HH:MM format from ISO string directly
+            const timeString = notification.scheduledAt.substring(11, 16);
+            setSendTime(timeString);
           }
 
           // Set notification type
@@ -285,6 +286,12 @@ const MarketToMembers = () => {
             notification.image
           ) {
             setImage(notification.image);
+          }
+
+          if (notification.jobId) {
+              setJobId(notification.jobId);
+            } else {
+              setJobId(null);
           }
 
           // Set target market
@@ -428,7 +435,6 @@ const MarketToMembers = () => {
               setIsReusing(true);
             }
           }
-          console.log('fnd');
         }
       } catch (error) {
         console.error('Error fetching notification details:', error);
@@ -915,6 +921,14 @@ const MarketToMembers = () => {
       return;
     }
 
+    const notificationId = searchParams.get('id');
+
+    let url = `https://betaapi.s2w.com.au/notification/send-notification`;
+
+    if (jobId !== null && jobId !== undefined && jobId !== '') {
+      url = `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`;
+    }
+
     if (selectedTargetMarket === 'Send to All') {
       const memberNum = await calculateReachSendToAll();
       console.log('memberNum', memberNum);
@@ -944,17 +958,15 @@ const MarketToMembers = () => {
         setSendingNow(true);
         // Automatically hide the overlay after 5 seconds irrespective of API response time
         setTimeout(() => setSendingNow(false), 5000);
-        const response = await fetch(
-          `https://betaapi.s2w.com.au/notification/send-notification`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: token ? `Bearer ${token}` : '',
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
+
+        const response = await fetch(url, {
+          method: jobId ? 'PATCH' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify(requestBody),
+        });
 
         const data = await response.json();
         console.log('body', requestBody);
@@ -1062,17 +1074,14 @@ const MarketToMembers = () => {
       try {
         // Set sending state and disable button
         setIsSending(true);
-        const response = await fetch(
-          `https://betaapi.s2w.com.au/notification/send-notification`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: token ? `Bearer ${token}` : '',
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
+        const response = await fetch(url, {
+          method: jobId ? 'PATCH' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify(requestBody),
+        });
 
         const data = await response.json();
         console.log('body', requestBody);
@@ -1196,14 +1205,14 @@ const MarketToMembers = () => {
       row.operator === 'Exactly Matches'
         ? 'exact'
         : row.operator === 'Contains'
-        ? 'contains'
-        : row.operator === 'Is not'
-        ? 'IsNot'
-        : row.operator === 'Is before'
-        ? 'isBefore'
-        : row.operator === 'Is after'
-        ? 'isAfter'
-        : 'contains';
+          ? 'contains'
+          : row.operator === 'Is not'
+            ? 'IsNot'
+            : row.operator === 'Is before'
+              ? 'isBefore'
+              : row.operator === 'Is after'
+                ? 'isAfter'
+                : 'contains';
 
     if (!value || value.length < 1) {
       setFilteredOptions((prev) => ({ ...prev, [id]: [] }));
