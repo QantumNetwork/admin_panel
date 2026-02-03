@@ -1237,7 +1237,7 @@ const DigitalSmall = () => {
           Art Gallery
         </button>
 
-        <button
+        {/* <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -1247,7 +1247,7 @@ const DigitalSmall = () => {
             }`}
           />
           Reporting
-        </button>
+        </button> */}
       </aside>
       <div className="content-wrapper-small">
         {/* CURRENT POSTS SECTION */}

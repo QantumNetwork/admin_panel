@@ -795,7 +795,7 @@ const MyBenefits = () => {
           Art Gallery
         </button>
 
-        <button
+        {/* <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -805,7 +805,7 @@ const MyBenefits = () => {
             }`}
           />
           Reporting
-        </button>
+        </button> */}
       </aside>
       <div className="page-container-mb benefits-page">
         <div className="page-header">

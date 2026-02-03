@@ -2735,7 +2735,7 @@ const SpecialOffers = () => {
           Art Gallery
         </button>
 
-        <button
+        {/* <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -2745,7 +2745,7 @@ const SpecialOffers = () => {
             }`}
           />
           Reporting
-        </button>
+        </button> */}
       </aside>
 
       <div className="page-container">

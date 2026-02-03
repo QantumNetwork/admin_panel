@@ -1295,7 +1295,7 @@ const DigitalApp = () => {
           Art Gallery
         </button>
 
-        <button
+        {/* <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -1305,7 +1305,7 @@ const DigitalApp = () => {
             }`}
           />
           Reporting
-        </button>
+        </button> */}
       </aside>
       <button className="large-advert-btns">Large Advert</button>
       <button className="small-advert-btns" onClick={handleSubmit}>
