@@ -3643,7 +3643,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
+                  {/* <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3668,7 +3668,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="form-group inline-form-group">
                     <label>
@@ -3740,7 +3740,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
+                  {/* <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3765,7 +3765,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div
                     className="form-group inline-form-group"
@@ -3894,7 +3894,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
+                  {/* <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3919,7 +3919,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div
                     className="form-group inline-form-group"
