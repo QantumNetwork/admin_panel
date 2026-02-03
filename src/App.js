@@ -88,7 +88,7 @@ function App() {
         <Route path="/membership" element={<MembershipPage />} />
         <Route path="/app-settings" element={<AppSettings />} />
         <Route path="/payment-reporting" element={<PaymentReporting />} />
-        {/* <Route path="/reporting" element={<Reporting />} /> */}
+        <Route path="/reporting" element={<Reporting />} />
       </Routes>
       
     </Router>

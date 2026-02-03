@@ -909,7 +909,7 @@ const ArtGallery = () => {
           Art Gallery
         </button>
 
-        {/* <button
+        <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -919,7 +919,7 @@ const ArtGallery = () => {
             }`}
           />
           Reporting
-        </button> */}
+        </button>
       </aside>
 
       <div

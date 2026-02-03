@@ -2735,7 +2735,7 @@ const SpecialOffers = () => {
           Art Gallery
         </button>
 
-        {/* <button
+        <button
           className={`sidebar-btn ${isActive('/reporting') ? 'active' : ''}`}
           onClick={() => navigate('/reporting')}
         >
@@ -2745,7 +2745,7 @@ const SpecialOffers = () => {
             }`}
           />
           Reporting
-        </button> */}
+        </button>
       </aside>
 
       <div className="page-container">
@@ -3643,7 +3643,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  {/* <div className="form-row bonus-points-row">
+                  <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3668,7 +3668,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div> */}
+                  </div>
 
                   <div className="form-group inline-form-group">
                     <label>
@@ -3740,7 +3740,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  {/* <div className="form-row bonus-points-row">
+                  <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3765,7 +3765,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div> */}
+                  </div>
 
                   <div
                     className="form-group inline-form-group"
@@ -3894,7 +3894,7 @@ const SpecialOffers = () => {
                   </div>
 
                   {/* Bonus points toggle */}
-                  {/* <div className="form-row bonus-points-row">
+                  <div className="form-row bonus-points-row">
                     <div className="bonus-points-container">
                       <div className="bonus-points-toggle">
                         <input
@@ -3919,7 +3919,7 @@ const SpecialOffers = () => {
                         </div>
                       )}
                     </div>
-                  </div> */}
+                  </div>
 
                   <div
                     className="form-group inline-form-group"
