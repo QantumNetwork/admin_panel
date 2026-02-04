@@ -569,14 +569,14 @@ const MembershipPage = () => {
           >
             Set Member Levels
           </button>
-          <button
+          {/* <button
             className={`user-btn ${
               activeTab === 'manualMembership' ? 'active' : ''
             }`}
             onClick={() => setActiveTab('manualMembership')}
           >
             Manual Membership
-          </button>
+          </button> */}
         </div>
         <button className="publish-button" onClick={handleActivate}>
           <FaUpload /> Activate

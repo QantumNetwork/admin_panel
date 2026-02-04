@@ -1,95 +1,105 @@
 /* Members Table Styles */
 .members-table-container {
-    padding: 20px;
-    /* background-color: #f8f9fa; */
-    min-height: 400px;
-    margin-left: 15%;
-    margin-top: 4%;
-  }
-  
-  .members-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #F2F2F2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .members-table th {
-    background-color: #F2F2F2;
-    border-bottom: 1px solid #a09e9e53;
-    padding: 15px 12px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  
-  .members-table td {
-    padding: 12px;
-    border-bottom: 1px solid #a09e9e53;
-    font-size: 13px;
-    color: #333;
-  }
-  
-  .members-table tbody tr:hover {
-    background-color: #f1f3f4;
-  }
-  
-  .members-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-  
-  /* Status Badges */
-  .status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .status-badge.pending {
-    background-color: #fff3cd;
-    color: #856404;
-  }
-  
-  .status-badge.declined {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-  
-  /* Action Buttons */
-  .action-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 400;
-    cursor: pointer;
-    margin-right: 4px;
-    transition: all 0.2s ease;
-  }
-  
-  .action-btn.approve {
-    background-color: #5396D1;
-    color: white;
-  }
-  
-  .action-btn.approve:hover {
-    background-color: #002977;
-  }
-  
-  .action-btn.decline {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .action-btn.decline:hover {
-    background-color: #c82333;
-  }
+  padding: 20px;
+  /* background-color: #f8f9fa; */
+  min-height: 400px;
+  margin-left: 15%;
+  margin-top: 4%;
+}
 
-  .send-back-btn {
+.members-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.members-table th {
+  background-color: #f2f2f2;
+  border-bottom: 1px solid #a09e9e53;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.members-table td {
+  padding: 12px;
+  border-bottom: 1px solid #a09e9e53;
+  font-size: 13px;
+  color: #333;
+}
+
+.members-table tbody tr:hover {
+  background-color: #f1f3f4;
+}
+
+.members-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.declined {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/*Search Input*/
+.searchInput {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 2px solid #002977;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+}
+
+/* Action Buttons */
+.action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  margin-right: 4px;
+  transition: all 0.2s ease;
+}
+
+.action-btn.approve {
+  background-color: #5396d1;
+  color: white;
+}
+
+.action-btn.approve:hover {
+  background-color: #002977;
+}
+
+.action-btn.decline {
+  background-color: #dc3545;
+  color: white;
+}
+
+.action-btn.decline:hover {
+  background-color: #c82333;
+}
+
+.send-back-btn {
   position: relative;
 }
 
@@ -107,25 +117,24 @@
   font-weight: 600;
 }
 
-  
-  /* Loading and No Data States */
-  .loading {
-    text-align: center;
-    padding: 40px;
-    font-size: 16px;
-    color: #666;
-  }
-  
-  .no-data {
-    text-align: center;
-    padding: 40px;
-    font-size: 14px;
-    color: #999;
-    font-style: italic;
-  }
+/* Loading and No Data States */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
+}
 
-  /*To decorate hyperlinks if required*/
-  /* .action-link {
+.no-data {
+  text-align: center;
+  padding: 40px;
+  font-size: 14px;
+  color: #999;
+  font-style: italic;
+}
+
+/*To decorate hyperlinks if required*/
+/* .action-link {
     color: #337ab7;
     text-decoration: none;
     font-weight: 600;
@@ -150,39 +159,49 @@
     color: #999;
     font-style: italic;
   } */
-  
-  /* Responsive Design */
-  @media (max-width: 1200px) {
-    .members-table-container {
-      padding: 15px;
-    }
-  
-    .members-table th,
-    .members-table td {
-      padding: 10px 8px;
-      font-size: 12px;
-    }
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .members-table-container {
+    padding: 15px;
   }
-  
-  @media (max-width: 768px) {
-    .members-table-container {
-      padding: 10px;
-      overflow-x: auto;
-    }
-  
-    .members-table {
-      min-width: 800px;
-    }
-  
-    .members-table th,
-    .members-table td {
-      padding: 8px 6px;
-      font-size: 11px;
-    }
-  
-    .action-btn {
-      padding: 4px 8px;
-      font-size: 10px;
-    }
+
+  .members-table th,
+  .members-table td {
+    padding: 10px 8px;
+    font-size: 12px;
   }
-  
+}
+
+@media (max-width: 1170px) {
+  .searchInput {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 2px solid #002977;
+    font-size: 14px;
+    width: 150px;
+    outline: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .members-table-container {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .members-table {
+    min-width: 800px;
+  }
+
+  .members-table th,
+  .members-table td {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}

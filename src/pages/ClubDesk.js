@@ -985,6 +985,7 @@ const ClubDesk = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <input
               type="text"
+              className='searchInput'
               placeholder="Search for member"
               value={searchInput}
               onChange={(e) => {
@@ -1003,14 +1004,6 @@ const ClubDesk = () => {
                   setVerifiedPage(1);
                   setVerifiedSearch(value);
                 }
-              }}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '20px',
-                border: '2px solid #002977',
-                fontSize: '14px',
-                width: '250px',
-                outline: 'none',
               }}
             />
           </div>
