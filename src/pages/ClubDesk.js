@@ -1143,6 +1143,7 @@ const ClubDesk = () => {
                   <th>Mobile</th>
                   {activeTab === 'membersForApproval' && <th>Date Of Birth</th>}
                   <th>Membership</th>
+                  <th>Membership Expiry</th>
                   <th>Licence Front</th>
                   <th>Licence Back</th>
                   <th>Selfie</th>
@@ -1167,6 +1168,7 @@ const ClubDesk = () => {
                           : '-'}
                       </td>
                       <td>{member.packageName || '-'}</td>
+                      <td>{member.ExpiryDate?member.ExpiryDate.substring(0,10).split('-').reverse().join('-'):'-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderImage(member.profile_Image)}</td>

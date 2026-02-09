@@ -241,6 +241,22 @@ const ManualReg = () => {
     return location.pathname === path;
   };
 
+  const updateS2W = async (userId) => {
+    const payload = {
+      userId: userId,
+    }
+    try {
+      await axios.put(`${baseUrl}/user/update-s2w`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } catch (err) {
+        console.error('Error updating S2W:', err);
+    }
+  }
+
   const resetManualReg = () => {
     // Remove stored data
     localStorage.removeItem('manualRegUserData');
@@ -337,7 +353,7 @@ const ManualReg = () => {
           setShowManualPayment(false);
           // optionally close payment section:
           // setS3Visible(false);
-
+          updateS2W(stored.Id);
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
         } else {
@@ -369,7 +385,7 @@ const ManualReg = () => {
       if (res?.data?.thirdPartyData?.Id) {
         toast.success('Payment successful');
         setShowManualPayment(false);
-
+        updateS2W(res?.data?.thirdPartyData?.Id);
         setTimeout(() => navigate('/approvals'), 2000);
         setTimeout(() => resetManualReg(), 4000);
         // optionally close payment section:
@@ -725,6 +741,7 @@ const ManualReg = () => {
 
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
+          updateS2W(verifyPayload.userId);
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
