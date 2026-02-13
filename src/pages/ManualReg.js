@@ -353,7 +353,7 @@ const ManualReg = () => {
           setShowManualPayment(false);
           // optionally close payment section:
           // setS3Visible(false);
-          updateS2W(stored.Id);
+          // updateS2W(stored.Id);
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
         } else {
@@ -385,7 +385,7 @@ const ManualReg = () => {
       if (res?.data?.thirdPartyData?.Id) {
         toast.success('Payment successful');
         setShowManualPayment(false);
-        updateS2W(res?.data?.thirdPartyData?.Id);
+        // updateS2W(res?.data?.thirdPartyData?.Id);
         setTimeout(() => navigate('/approvals'), 2000);
         setTimeout(() => resetManualReg(), 4000);
         // optionally close payment section:
