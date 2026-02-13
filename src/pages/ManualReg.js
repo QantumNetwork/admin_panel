@@ -741,7 +741,7 @@ const ManualReg = () => {
 
           setTimeout(() => navigate('/approvals'), 2000);
           setTimeout(() => resetManualReg(), 4000);
-          updateS2W(verifyPayload.userId);
+          // updateS2W(verifyPayload.userId);
         } else {
           toast.error('Payment failed or cancelled');
           resetManualReg();
