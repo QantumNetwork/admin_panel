@@ -25,6 +25,7 @@ import ClubPackage from "./pages/ClubPackage";
 import MembershipPage from "./pages/MembershipPage";
 import AppSettings from "./pages/AppSettings";
 import PaymentReporting from "./pages/PaymentReporting";
+import Renewals from "./pages/Renewals";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
@@ -89,6 +90,7 @@ function App() {
         <Route path="/app-settings" element={<AppSettings />} />
         <Route path="/payment-reporting" element={<PaymentReporting />} />
         <Route path="/reporting" element={<Reporting />} />
+        <Route path="/renewals" element={<Renewals />} />
       </Routes>
       
     </Router>

@@ -7,6 +7,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
+import { MdRefresh } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
 import 'react-toastify/dist/ReactToastify.css';
@@ -362,6 +363,19 @@ const ClubPackage = () => {
             }`}
           />{' '}
           &nbsp; Payment Reporting
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+          onClick={() => navigate('/renewals')}
+        >
+          <MdRefresh
+            className={`sidebar-icon ${
+              isActive('/renewals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Renewals
         </button>
       </aside>
 

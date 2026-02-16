@@ -1,0 +1,80 @@
+/* ...existing code... */
+
+.main-content {
+  /* ensure content sits to the right of sidebar and centers horizontally */
+  margin-left: 320px; /* adjust if your sidebar width differs */
+  padding: 20px;
+}
+
+.renewal-center {
+  display: flex;
+  /* justify-content: center; */
+  align-items: flex-start;
+  margin-top: 40px;
+  min-height: calc(100vh - 180px);
+}
+
+.renewal-box {
+  background: #f2f2f2;
+  padding: 28px 32px;
+  width: 520px;
+  border-radius: 6px;
+  box-shadow: none;
+  text-align: center;
+}
+
+.renewal-box h3 {
+  margin: 0 0 14px 0;
+  font-size: 16px;
+  font-weight: 700;
+  /* color: #002977; */
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.go-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0b3b6f;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sub-text {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #222;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Responsive tweak */
+@media (max-width: 800px) {
+  .renewal-box {
+    width: 90%;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* ...existing code... */

@@ -8,6 +8,7 @@ import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { MdVerified } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -347,7 +348,9 @@ const MembershipPage = () => {
     } catch (error) {
       console.error('Error creating club package:', error);
       const errorMessage =
-        error.response?.data?.error || error.response?.data?.message || 'Failed to create club package';
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to create club package';
       toast.error(errorMessage);
     }
   };
@@ -556,6 +559,19 @@ const MembershipPage = () => {
             }`}
           />{' '}
           &nbsp; Payment Reporting
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+          onClick={() => navigate('/renewals')}
+        >
+          <MdRefresh
+            className={`sidebar-icon ${
+              isActive('/renewals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Renewals
         </button>
       </aside>
 

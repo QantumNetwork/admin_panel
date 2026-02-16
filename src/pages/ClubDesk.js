@@ -10,6 +10,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { MdVerified } from 'react-icons/md';
+import { MdRefresh } from "react-icons/md";
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/club-desk.css';
@@ -340,7 +341,7 @@ const ClubDesk = () => {
         alt="Image"
         onClick={() => setSelectedImage(field)}
         style={{
-          width: '80px',
+          width: '60px',
           height: '50px',
           objectFit: 'cover',
           borderRadius: '4px',
@@ -359,7 +360,7 @@ const ClubDesk = () => {
         alt="License"
         onClick={() => setSelectedLicense('/no_license.png')}
         style={{
-          width: '80px',
+          width: '60px',
           height: '50px',
           objectFit: 'cover',
           borderRadius: '4px',
@@ -376,7 +377,7 @@ const ClubDesk = () => {
         alt="License"
         onClick={() => setSelectedLicense(field)}
         style={{
-          width: '80px',
+          width: '60px',
           height: '50px',
           objectFit: 'cover',
           borderRadius: '4px',
@@ -724,19 +725,19 @@ const ClubDesk = () => {
     activeTab === 'membersForApproval'
       ? membersPage
       : activeTab === 'waitingPayment'
-      ? paymentsPage
-      : activeTab === 'rejected'
-      ? rejectedPage
-      : verifiedPage;
+        ? paymentsPage
+        : activeTab === 'rejected'
+          ? rejectedPage
+          : verifiedPage;
 
   const currentTotalPages =
     activeTab === 'membersForApproval'
       ? membersTotalPages
       : activeTab === 'waitingPayment'
-      ? paymentsTotalPages
-      : activeTab === 'rejected'
-      ? rejectedTotalPages
-      : verifiedTotalPages;
+        ? paymentsTotalPages
+        : activeTab === 'rejected'
+          ? rejectedTotalPages
+          : verifiedTotalPages;
 
   const handleEditMember = (member) => {
     navigate(
@@ -930,6 +931,19 @@ const ClubDesk = () => {
           />{' '}
           &nbsp; Payment Reporting
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+          onClick={() => navigate('/renewals')}
+        >
+          <MdRefresh
+            className={`sidebar-icon ${
+              isActive('/renewals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Renewals
+        </button>
       </aside>
 
       <div className="sa-filter-buttons">
@@ -985,7 +999,7 @@ const ClubDesk = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <input
               type="text"
-              className='searchInput'
+              className="searchInput"
               placeholder="Search for member"
               value={searchInput}
               onChange={(e) => {
@@ -1143,7 +1157,12 @@ const ClubDesk = () => {
                   <th>Mobile</th>
                   {activeTab === 'membersForApproval' && <th>Date Of Birth</th>}
                   <th>Membership</th>
-                  {activeTab === 'membersForApproval' && <th>Membership Expiry</th>}
+                  {activeTab === 'membersForApproval' && (
+                    <th>Membership Expiry</th>
+                  )}
+                  {activeTab === 'membersForApproval' && (
+                    <th>Card Number</th>
+                  )}
                   <th>Licence Front</th>
                   <th>Licence Back</th>
                   <th>Selfie</th>
@@ -1168,7 +1187,15 @@ const ClubDesk = () => {
                           : '-'}
                       </td>
                       <td>{member.packageName || '-'}</td>
-                      <td>{member.ExpiryDate?member.ExpiryDate.substring(0,10).split('-').reverse().join('-'):'-'}</td>
+                      <td>
+                        {member.ExpiryDate
+                          ? member.ExpiryDate.substring(0, 10)
+                              .split('-')
+                              .reverse()
+                              .join('-')
+                          : '-'}
+                      </td>
+                      <td>{member.CardNumber || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderImage(member.profile_Image)}</td>
