@@ -9,6 +9,7 @@ import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { MdVerified } from 'react-icons/md';
 import { MdRefresh } from 'react-icons/md';
+import { CiSearch } from 'react-icons/ci';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -572,6 +573,19 @@ const MembershipPage = () => {
             }`}
           />{' '}
           &nbsp; Renewals
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          onClick={() => navigate('/member-search')}
+        >
+          <CiSearch
+            className={`sidebar-icon ${
+              isActive('/member-search') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Member Search
         </button>
       </aside>
 

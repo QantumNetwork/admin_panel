@@ -1,0 +1,39 @@
+.content-area{
+  margin-left: 220px; /* same as sidebar width */
+  margin-top: 0px;   /* same as header height */
+  padding: 0px 10px;
+  max-height: 20px;
+  margin-bottom: 90px;
+  background: #f5f6fa;
+  box-sizing: border-box;
+  width: calc(100% - 220px);
+}
+
+/* Search panel above table */
+.search-panel{
+  background: #fff;
+  padding: 14px 18px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+/* Search inputs row */
+.search-row{
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.search-row input{
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid #d1d5db;
+  padding: 0 14px;
+  outline: none;
+  font-size: 14px;
+  width: 180px;
+}
+
+

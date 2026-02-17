@@ -9,6 +9,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { MdVerified } from 'react-icons/md';
+import { CiSearch } from 'react-icons/ci';
 import { MdRefresh } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -1182,13 +1183,26 @@ const Renewals = () => {
           />{' '}
           &nbsp; Renewals
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          onClick={() => navigate('/member-search')}
+        >
+          <CiSearch
+            className={`sidebar-icon ${
+              isActive('/member-search') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Member Search
+        </button>
       </aside>
 
       {member !== 'renewal' && (
         <main className="main-content">
           <div className="renewal-center">
             <div className="renewal-box">
-              <h3>Enter Member's Mobile</h3>
+              <h3>Enter Phone Number</h3>
               <div className="input-row">
                 <input
                   type="text"

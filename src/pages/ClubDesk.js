@@ -11,6 +11,7 @@ import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { MdVerified } from 'react-icons/md';
 import { MdRefresh } from "react-icons/md";
+import { CiSearch } from 'react-icons/ci';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/club-desk.css';
@@ -324,7 +325,7 @@ const ClubDesk = () => {
         alt="Image"
         onClick={() => setSelectedImage('/no_image.png')}
         style={{
-          width: '80px',
+          width: '60px',
           height: '50px',
           objectFit: 'cover',
           borderRadius: '4px',
@@ -944,9 +945,22 @@ const ClubDesk = () => {
           />{' '}
           &nbsp; Renewals
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          onClick={() => navigate('/member-search')}
+        >
+          <CiSearch
+            className={`sidebar-icon ${
+              isActive('/member-search') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Member Search
+        </button>
       </aside>
 
-      <div className="sa-filter-buttons">
+      <div className="sa-filter-buttons-approvals">
         <button
           className={`user-btn ${
             activeTab === 'membersForApproval' ? 'active' : ''

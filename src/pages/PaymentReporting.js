@@ -8,6 +8,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { MdRefresh } from 'react-icons/md';
+import { CiSearch } from 'react-icons/ci';
 import { MdVerified } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -556,17 +557,30 @@ const PaymentReporting = () => {
         </button>
 
         <button
-                  style={{ fontSize: '12px' }}
-                  className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
-                  onClick={() => navigate('/renewals')}
-                >
-                  <MdRefresh
-                    className={`sidebar-icon ${
-                      isActive('/renewals') ? '' : 'navy-icon'
-                    }`}
-                  />{' '}
-                  &nbsp; Renewals
-                </button>
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+          onClick={() => navigate('/renewals')}
+        >
+          <MdRefresh
+            className={`sidebar-icon ${
+              isActive('/renewals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Renewals
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          onClick={() => navigate('/member-search')}
+        >
+          <CiSearch
+            className={`sidebar-icon ${
+              isActive('/member-search') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Member Search
+        </button>
       </aside>
 
       <div className="sa-filter-buttons">
@@ -938,7 +952,7 @@ const PaymentReporting = () => {
                 padding: '6px 0',
                 fontSize: '13px',
                 color: '#4d4d4d',
-                marginBottom: '3px'
+                marginBottom: '3px',
               }}
             >
               {paymentBreakdown.cash.users}

@@ -9,6 +9,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { MdRefresh } from 'react-icons/md';
+import { CiSearch } from 'react-icons/ci';
 import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
@@ -245,18 +246,15 @@ const ManualReg = () => {
   const updateS2W = async (userId) => {
     const payload = {
       userId: userId,
-    }
+    };
     try {
-      await axios.put(`${baseUrl}/user/update-s2w`,
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.put(`${baseUrl}/user/update-s2w`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
     } catch (err) {
-        console.error('Error updating S2W:', err);
+      console.error('Error updating S2W:', err);
     }
-  }
+  };
 
   const resetManualReg = () => {
     // Remove stored data
@@ -1132,17 +1130,30 @@ const ManualReg = () => {
         </button>
 
         <button
-                  style={{ fontSize: '12px' }}
-                  className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
-                  onClick={() => navigate('/renewals')}
-                >
-                  <MdRefresh
-                    className={`sidebar-icon ${
-                      isActive('/renewals') ? '' : 'navy-icon'
-                    }`}
-                  />{' '}
-                  &nbsp; Renewals
-                </button>
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+          onClick={() => navigate('/renewals')}
+        >
+          <MdRefresh
+            className={`sidebar-icon ${
+              isActive('/renewals') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Renewals
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          onClick={() => navigate('/member-search')}
+        >
+          <CiSearch
+            className={`sidebar-icon ${
+              isActive('/member-search') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Member Search
+        </button>
       </aside>
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>

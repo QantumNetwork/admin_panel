@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
@@ -8,13 +8,13 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { CiSearch } from 'react-icons/ci';
+import { MdVerified } from 'react-icons/md';
 import { MdRefresh } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
-import { MdVerified } from 'react-icons/md';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/club-package.css';
+import '../styles/member-search.css';
 
-const ClubPackage = () => {
+const MemberSearch = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const location = useLocation();
@@ -23,19 +23,32 @@ const ClubPackage = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
-  // const [membersForApproval, setMembersForApproval] = useState([]);
-  //   const [declinedMembers, setDeclinedMembers] = useState([]);
+
   const [loading, setLoading] = useState(false);
-  const [confirmPage, setConfirmPage] = useState(false);
+  const [confirmVerify, setConfirmVerify] = useState({
+    open: false,
+    userId: null,
+  });
 
   // API functions
-  // const [activeTab, setActiveTab] = useState('confirm');
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
+
+  const [members, setMembers] = useState([]);
+  const [membersPage, setMembersPage] = useState(1);
+  const [membersLimit, setMembersLimit] = useState(10);
+  const [membersSearch, setMembersSearch] = useState('');
+  const [membersTotalPages, setMembersTotalPages] = useState(1);
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [memberId, setMemberId] = useState('');
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -71,31 +84,6 @@ const ClubPackage = () => {
         return appType;
     }
   };
-
-  // Add this useEffect hook at the beginning of the ClubPackage component, after the state declarations
-  useEffect(() => {
-    const checkExistingMember = async () => {
-      if (!selectedVenue) return;
-
-      try {
-        const response = await axios.get(`${baseUrl}/club-package`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // If member exists, navigate directly to MembershipPage
-        if (response.data?.data?.length > 0) {
-          navigate('/membership');
-        }
-      } catch (error) {
-        console.error('Error checking member status:', error);
-        // Continue showing the ClubPackage form if there's an error
-      }
-    };
-
-    checkExistingMember();
-  }, [selectedVenue, token]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -157,27 +145,78 @@ const ClubPackage = () => {
     }
   };
 
+  //Pagination controls per tab
+  const onPrev = () => {
+    if (membersPage > 1) setMembersPage((p) => p - 1);
+  };
+  const onNext = () => {
+    if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
+  };
+
   const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
-  // const handleLock = async () => {
-  //   try {
-  //     const result = await handleLogout();
-  //     if (result.success) {
-  //       navigate('/dashboard');
-  //     } else {
-  //       toast.error(
-  //         result.message || 'Failed to remove lock. Please try again.'
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handleLock:', error);
-  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
-  //   }
-  // };
+  const fetchMembers = useCallback(async () => {
+    if (!selectedVenue || !token) return;
+
+    // NEW: prevent API call if all filters empty
+    if (!firstName && !lastName && !mobile && !cardNumber && !memberId) {
+      setMembers([]);
+      setMembersTotalPages(1);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const params = {
+        appType: selectedVenue,
+        page: membersPage,
+        limit: membersLimit,
+      };
+
+      if (firstName) params.firstName = firstName;
+      if (lastName) params.lastName = lastName;
+      if (mobile) params.mobile = mobile;
+      if (cardNumber) params.cardNumber = cardNumber;
+      if (memberId) params.bluizeId = memberId;
+
+      const response = await axios.get(`${baseUrl}/user/search`, {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data?.success) {
+        setMembers(response.data.data);
+        setMembersTotalPages(response.data.totalPages || 1);
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+      toast.error('Failed to fetch members');
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    selectedVenue,
+    token,
+    membersPage,
+    membersLimit,
+    firstName,
+    lastName,
+    mobile,
+    cardNumber,
+    memberId,
+    baseUrl,
+  ]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   return (
     <div className="dashboard-container">
@@ -393,69 +432,186 @@ const ClubPackage = () => {
         </button>
       </aside>
 
-      {!confirmPage ? (
-        <main
-          className="club-package-main"
-          role="main"
-          aria-label="Club Package"
-        >
-          <div className="club-package-card">
-            <h1 className="cp-title">Do you wish to add a Club Package?</h1>
-            <p className="cp-subtitle">
-              By adding a Club Package will allow you to add memberships and
-              pricing.
-            </p>
+      <div className="content-area">
+        {/* Search panel placed above the table */}
+        <div className="search-panel">
+          <h3>Search Member</h3>
+          <div className="search-row">
+            <input
+              placeholder="First name"
+              value={firstName}
+              onChange={(e) => {
+                setMembersPage(1);
+                setFirstName(e.target.value);
+              }}
+            />
 
-            <div className="cp-warning">
-              <span className="cp-warning-icon" aria-hidden>
-                !
-              </span>
-              <h2 className="cp-warning-text">
-                DO NOT PROCEED IF YOU ARE NOT SURE
-              </h2>
-              <span className="cp-warning-icon" aria-hidden>
-                !
-              </span>
-            </div>
+            <input
+              placeholder="Last name"
+              value={lastName}
+              onChange={(e) => {
+                setMembersPage(1);
+                setLastName(e.target.value);
+              }}
+            />
 
-            <div className="cp-action">
-              <button
-                className="create-btn"
-                onClick={() => setConfirmPage(true)}
-              >
-                Create Club Package
-              </button>
-            </div>
+            <input
+              placeholder="Mobile / Phone"
+              value={mobile}
+              onChange={(e) => {
+                setMembersPage(1);
+                setMobile(e.target.value);
+              }}
+            />
+
+            <input
+              placeholder="Card #"
+              value={cardNumber}
+              onChange={(e) => {
+                setMembersPage(1);
+                setCardNumber(e.target.value);
+              }}
+            />
+
+            <input
+              placeholder="Member #"
+              value={memberId}
+              onChange={(e) => {
+                setMembersPage(1);
+                setMemberId(e.target.value);
+              }}
+            />
           </div>
-        </main>
-      ) : (
-        <main
-          className="club-package-main"
-          role="main"
-          aria-label="Club Package"
-        >
-          <div className="club-package-card-confirm">
-            <h1 className="cp-title">You are creating a new club package</h1>
+        </div>
+      </div>
 
-            <div className="cp-filter-buttons-confirm">
+      <div className="members-table-container" style={{ marginLeft: '15%'}}>
+        {loading ? (
+          <div className="loading">Loading...</div>
+        ) : (
+          <>
+            <table className="members-table">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Mem ID</th>
+                  <th>Card #</th>
+                  <th>Expiry</th>
+                  <th>Phone</th>
+                  <th>Birthday</th>
+                  <th>Gender</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                  <th>State</th>
+                  <th>Postcode</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!firstName &&
+                !lastName &&
+                !mobile &&
+                !cardNumber &&
+                !memberId ? (
+                  <tr>
+                    <td colSpan="12" className="no-data">
+                      Start typing to search members
+                    </td>
+                  </tr>
+                ) : members.length === 0 ? (
+                  <tr>
+                    <td colSpan="12" className="no-data">
+                      No members found
+                    </td>
+                  </tr>
+                ) : null}
+
+                {members &&
+                  members.map((member) => (
+                    <tr key={member._id}>
+                      <td>{member.GivenNames}</td>
+                      <td>{member.Surname}</td>
+                      <td>{member.BluizeId}</td>
+                      <td>{member.CardNumber}</td>
+                      <td>
+                        {member.ExpiryDate
+                          ? member.ExpiryDate.substring(0, 10)
+                              .split('-')
+                              .reverse()
+                              .join('-')
+                          : ''}
+                      </td>
+                      <td>{member.Mobile}</td>
+                      <td>
+                        {member.DateOfBirth
+                          ? member.DateOfBirth.substring(0, 10)
+                              .split('-')
+                              .reverse()
+                              .join('-')
+                          : ''}
+                      </td>
+                      <td>{member.Gender}</td>
+                      <td>{member.Email}</td>
+                      <td>{member.Address}</td>
+                      <td>{member.State}</td>
+                      <td>{member.PostCode}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                paddingRight: '20px',
+                paddingLeft: '20px',
+              }}
+            >
               <button
-                className="back-btn"
-                onClick={() => navigate('/dashboard')}
+                onClick={onPrev}
+                disabled={membersPage === 1}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor: membersPage === 1 ? '#e0e0e0' : '#002977',
+                  color: membersPage === 1 ? '#999' : 'white',
+                  cursor: membersPage === 1 ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                }}
               >
-                Back
+                ← Previous
               </button>
+              <span style={{ fontWeight: '500', color: '#002977' }}>
+                Page {membersPage} of {membersTotalPages}
+              </span>
               <button
-                className="confirm-btn"
-                onClick={() => navigate('/membership')}
+                onClick={onNext}
+                disabled={membersPage >= membersTotalPages}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  backgroundColor:
+                    membersPage >= membersTotalPages ? '#e0e0e0' : '#002977',
+                  color: membersPage >= membersTotalPages ? '#999' : 'white',
+                  cursor:
+                    membersPage >= membersTotalPages
+                      ? 'not-allowed'
+                      : 'pointer',
+                  fontWeight: '500',
+                }}
               >
-                Confirm
+                Next →
               </button>
             </div>
-          </div>
-        </main>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
-export default ClubPackage;
+export default MemberSearch;

@@ -3,7 +3,7 @@
   padding: 20px;
   /* background-color: #f8f9fa; */
   min-height: 400px;
-  margin-left: 15%;
+  margin-left: 13.8%;
   margin-top: 4%;
 }
 
@@ -19,16 +19,16 @@
 .members-table th {
   background-color: #f2f2f2;
   border-bottom: 1px solid #a09e9e53;
-  padding: 15px 12px;
+  padding: 12px 10px;
   text-align: left;
   font-weight: 600;
   font-size: 14px;
 }
 
 .members-table td {
-  padding: 12px;
+  padding: 10px;
   border-bottom: 1px solid #a09e9e53;
-  font-size: 13px;
+  font-size: 12px;
   color: #333;
 }
 
@@ -38,6 +38,15 @@
 
 .members-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+/*sidebar*/
+.sa-filter-buttons-approvals {
+  position: absolute;
+  top: 123px;
+  left: 15%;
+  display: flex;
+  gap: 20px;
 }
 
 /* Status Badges */
