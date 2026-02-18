@@ -497,6 +497,7 @@ const MemberSearch = () => {
                   <th>Last Name</th>
                   <th>Mem ID</th>
                   <th>Card #</th>
+                  <th>Membership</th>
                   <th>Expiry</th>
                   <th>Phone</th>
                   <th>Birthday</th>
@@ -533,6 +534,7 @@ const MemberSearch = () => {
                       <td>{member.Surname}</td>
                       <td>{member.BluizeId}</td>
                       <td>{member.CardNumber}</td>
+                      <td>{member.MembershipCategory}</td>
                       <td>
                         {member.ExpiryDate
                           ? member.ExpiryDate.substring(0, 10)

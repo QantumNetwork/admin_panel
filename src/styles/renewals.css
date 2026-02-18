@@ -1,6 +1,6 @@
 /* ...existing code... */
 
-.main-content {
+.main-content-renewals {
   /* ensure content sits to the right of sidebar and centers horizontally */
   margin-left: 320px; /* adjust if your sidebar width differs */
   padding: 20px;
@@ -72,7 +72,7 @@
   .renewal-box {
     width: 90%;
   }
-  .main-content {
+  .main-content-renewals {
     margin-left: 0;
   }
 }

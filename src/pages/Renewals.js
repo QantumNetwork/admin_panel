@@ -1199,7 +1199,7 @@ const Renewals = () => {
       </aside>
 
       {member !== 'renewal' && (
-        <main className="main-content">
+        <main className="main-content-renewals">
           <div className="renewal-center">
             <div className="renewal-box">
               <h3>Enter Phone Number</h3>
