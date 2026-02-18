@@ -54,6 +54,8 @@ const PaymentReporting = () => {
   const [memberships, setMemberships] = useState([]);
   const [membershipFilter, setMembershipFilter] = useState('all');
 
+  const [renewalsFilter, setRenewalsFilter] = useState('all');
+
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -82,6 +84,14 @@ const PaymentReporting = () => {
       if (paymentFilter && paymentFilter !== 'all') {
         url += `&paymentType=${paymentFilter}`;
       }
+
+      // renewals filter (NEW CODE)
+      if (renewalsFilter === 'renewals') {
+        url += `&renewType=renew`;
+      } else if (renewalsFilter === 'new') {
+        url += `&renewType=none`;
+      } 
+      // if "all" -> DO NOT append renewType
 
       // date filter
       url += `&dateType=${dateFilter}`;
@@ -176,6 +186,7 @@ const PaymentReporting = () => {
     membersSearch,
     paymentFilter,
     dateFilter,
+    renewalsFilter,
     startDate,
     endDate,
     token,
@@ -744,6 +755,30 @@ const PaymentReporting = () => {
           </div>
         )}
 
+        {activeTab === 'approvedPayments' && (
+          <select
+            value={renewalsFilter}
+            onChange={(e) => {
+              setMembersPage(1);
+              setRenewalsFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '160px',
+              // marginLeft: dateFilter !== 'custom' ? '6%' : '0',
+            }}
+          >
+            {/* Default */}
+            <option value="all">All New and Renewals</option>
+            <option value="new">New Member</option>
+            <option value="renewals">Renewals</option>
+          </select>
+        )}
+
         {activeTab === 'totalsAllPaymentMethods' && (
           <select
             value={membershipFilter}
@@ -758,7 +793,7 @@ const PaymentReporting = () => {
               backgroundColor: '#F2F2F2',
               cursor: 'pointer',
               minWidth: '160px',
-              marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
+              // marginLeft: dateFilter !== 'custom' ? '6%' : '0',
             }}
           >
             {/* Default */}
@@ -788,7 +823,7 @@ const PaymentReporting = () => {
               backgroundColor: '#F2F2F2',
               cursor: 'pointer',
               minWidth: '160px',
-              marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
+              // marginLeft: dateFilter !== 'custom' ? '34%' : '6%',
             }}
           >
             <option value="all">All Payment Types</option>
