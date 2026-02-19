@@ -29,7 +29,7 @@ function MFAVerification() {
             console.log(response.data);
             localStorage.setItem("token", response.data.data.token);
             localStorage.setItem("userEmail", email);
-            localStorage.setItem("userType", response.data.data.type); //can be user/admin/power admin
+            localStorage.setItem("userType", response.data.data.type); //can be user/search/admin/power admin
             localStorage.setItem("appGroup", response.data.data.appType);
             localStorage.setItem("name", response.data.data.name);
             const userAccess = response.data.data.access || [];
@@ -37,6 +37,8 @@ function MFAVerification() {
             localStorage.setItem("access", userAccess);
             if(response.data.data.type === 'power') {
               navigate('/power-admin');
+            } else if(response.data.data.type === 'search') {
+              navigate('/public-member-search');
             } else {
               navigate('/dashboard', { state: { email } });
             }
