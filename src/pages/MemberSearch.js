@@ -501,6 +501,7 @@ const MemberSearch = () => {
                   <th>Expiry</th>
                   <th>Phone</th>
                   <th>Birthday</th>
+                  <th>Join Date</th>
                   <th>Gender</th>
                   <th>Email</th>
                   <th>Address</th>
@@ -552,6 +553,11 @@ const MemberSearch = () => {
                               .join('-')
                           : ''}
                       </td>
+                      <td>{member.DateJoined ? member.DateJoined.substring(0, 10)
+                              .split('-')
+                              .reverse()
+                              .join('-')
+                          : ''}</td>
                       <td>{member.Gender}</td>
                       <td>{member.Email}</td>
                       <td>{member.Address}</td>
