@@ -6,6 +6,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
+import { BsMenuButtonFill } from 'react-icons/bs';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { FaUser } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
@@ -471,6 +472,17 @@ const AppSettings = () => {
           />{' '}
           &nbsp; App Settings
         </button>
+
+        <button
+                  style={{ fontSize: '12px' }}
+                  className={`sidebar-btn ${isActive('/ai-buttons') ? 'active' : ''}`}
+                  onClick={() => navigate('/ai-buttons')}
+                >
+                  <BsMenuButtonFill
+                    className={`sidebar-icon ${isActive('/ai-buttons') ? '' : 'navy-icon'}`}
+                  />{' '}
+                  &nbsp; AI Buttons
+                </button>
           </>
 
         )}

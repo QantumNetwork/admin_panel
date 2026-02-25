@@ -7,6 +7,7 @@ import {
   FaChevronRight,
   FaTrash,
 } from 'react-icons/fa';
+import { BsMenuButtonFill } from 'react-icons/bs';
 import { TiCreditCard } from 'react-icons/ti';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -578,6 +579,19 @@ const AdminCustom = () => {
             }`}
           />{' '}
           &nbsp; App Settings
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/ai-buttons') ? 'active' : ''}`}
+          onClick={() => navigate('/ai-buttons')}
+        >
+          <BsMenuButtonFill
+            className={`sidebar-icon ${
+              isActive('/ai-buttons') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; AI Buttons
         </button>
       </aside>
 

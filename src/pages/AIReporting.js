@@ -38,6 +38,72 @@ const AIReporting = () => {
   const [loadingVenue, setLoadingVenue] = useState(true);
   const [venues, setVenues] = useState([]);
 
+  const [topButtons, setTopButtons] = useState([]);
+const [subButtons, setSubButtons] = useState({});
+const [selectedTop, setSelectedTop] = useState(null);
+const [selectedSub, setSelectedSub] = useState(null);
+
+// ===== FETCH TOP + SUB BUTTONS =====
+  useEffect(() => {
+    const fetchReportingButtons = async () => {
+      try {
+        const mainRes = await axios.get(
+          `${baseUrl}/main-buttons`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const mainButtons = Array.isArray(mainRes.data)
+          ? [...mainRes.data].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+          : [];
+
+        const validTops = [];
+        const subMap = {};
+
+        for (const top of mainButtons) {
+          const subRes = await axios.get(
+            `${baseUrl}/sub-buttons/${top._id}/sub-buttons`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          const subs = Array.isArray(subRes.data)
+            ? subRes.data
+                .filter((s) => s.question?.trim())
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : [];
+
+          if (subs.length > 0) {
+            validTops.push(top);
+            subMap[top._id] = subs;
+          }
+        }
+
+        setTopButtons(validTops);
+        setSubButtons(subMap);
+
+        if (validTops.length > 0) {
+          setSelectedTop(validTops[0]);
+        }
+
+      } catch (err) {
+        console.error('Error loading reporting buttons:', err);
+      }
+    };
+
+    if (token) fetchReportingButtons();
+
+  }, [token]);
+
+  // ===== BALANCE DYNAMICALLY =====
+const currentSubs = selectedTop
+  ? subButtons[selectedTop._id] || []
+  : [];
+
+// Split into two halves dynamically
+const midpoint = Math.ceil(currentSubs.length / 2);
+
+const leftColumn = currentSubs.slice(0, midpoint);
+const rightColumn = currentSubs.slice(midpoint);
+
   const handleNavigation = (path) => {
     if (
       path === '/push-messaging' ||
@@ -167,26 +233,26 @@ const AIReporting = () => {
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
       : isManly
-      ? 'https://mhbcviperaireportingapi.victoriouswater-d292e9e7.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isStarReward
-      ? 'https://aireportingviperapi.wonderfulglacier-1e6957c7.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isQueens
-      ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isHogan
-      ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isBrisbane
-      ? 'https://brisbanebrewingviperapi.graymushroom-2c8b9797.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isCentral
-      ? 'https://centrallanehotelviperapi.grayflower-1f643a2b.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isMontauk
-      ? 'https://montauktavernviperapi.happyhill-26c14243.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isNorth
-      ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isBluewater
-      ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isFlinders
-      ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
-      : null;
+        ? 'https://mhbcviperaireportingapi.victoriouswater-d292e9e7.australiaeast.azurecontainerapps.io/api/airesponse'
+        : isStarReward
+          ? 'https://aireportingviperapi.wonderfulglacier-1e6957c7.australiaeast.azurecontainerapps.io/api/airesponse'
+          : isQueens
+            ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
+            : isHogan
+              ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
+              : isBrisbane
+                ? 'https://brisbanebrewingviperapi.graymushroom-2c8b9797.australiaeast.azurecontainerapps.io/api/airesponse'
+                : isCentral
+                  ? 'https://centrallanehotelviperapi.grayflower-1f643a2b.australiaeast.azurecontainerapps.io/api/airesponse'
+                  : isMontauk
+                    ? 'https://montauktavernviperapi.happyhill-26c14243.australiaeast.azurecontainerapps.io/api/airesponse'
+                    : isNorth
+                      ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
+                      : isBluewater
+                        ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
+                        : isFlinders
+                          ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
+                          : null;
 
     if (!endpoint) {
       Swal.fire({
@@ -401,29 +467,99 @@ const AIReporting = () => {
 
       <main className="ai-content">
         <div className="question-container">
-          <h2 className="question-title">Please ask a question</h2>
-          <div className="input-container">
-            <textarea
-              className="question-input"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Type your question here..."
-              rows={4}
-            />
-            <div className="input-controls">
-              <button className="mic-button" onClick={handleMicButtonClick}>
-                {isListening ? (
-                  <GrMicrophone size={20} color="white" />
-                ) : (
-                  <MdMicOff size={20} color="white" />
-                )}
+          {/* Top Buttons */}
+          <div className="top-buttons-row">
+            {topButtons.map((tb) => (
+              <button
+                key={tb._id}
+                className={`top-btn ${
+                  selectedTop?._id === tb._id ? 'active-btn' : ''
+                }`}
+                onClick={() => {
+                  setSelectedTop(tb);
+                  setSelectedSub(null);
+                  setQuestion('');
+                }}
+              >
+                {tb.title}
               </button>
-
-              <button className="go-button" onClick={handleSubmit}>
-                Go
-              </button>
-            </div>
+            ))}
           </div>
+
+          {/* SUB BUTTONS */}
+          {selectedTop && (
+            <>              <h2 className="question-title">Please ask a question</h2>
+
+            <div className="ai-main-area">
+
+              {/* LEFT */}
+              <div className="column">
+                {leftColumn.map((btn, idx) =>
+                  btn ? (
+                    <button
+                      key={btn._id}
+                      className={`sub-btn ${
+                        selectedSub?._id === btn._id ? 'active-btn' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedSub(btn);
+                        setQuestion(btn.question);
+                      }}
+                    >
+                      {btn.title}
+                    </button>
+                  ) : (
+                    <div key={`empty-left-${idx}`} style={{ height: '40px' }} />
+                  )
+                )}
+              </div>
+              <div className="input-container">
+                <textarea
+                  className="question-input"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Type your question here..."
+                  rows={4}
+                />
+                <div className="input-controls">
+                  <button className="mic-button" onClick={handleMicButtonClick}>
+                    {isListening ? (
+                      <GrMicrophone size={20} color="white" />
+                    ) : (
+                      <MdMicOff size={20} color="white" />
+                    )}
+                  </button>
+
+                  <button className="go-button" onClick={handleSubmit}>
+                    Go
+                  </button>
+                </div>
+              </div>
+
+              {/* RIGHT */}
+              <div className="column">
+                {rightColumn.map((btn, idx) =>
+                  btn ? (
+                    <button
+                      key={btn._id}
+                      className={`sub-btn ${
+                        selectedSub?._id === btn._id ? 'active-btn' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedSub(btn);
+                        setQuestion(btn.question);
+                      }}
+                    >
+                      {btn.title}
+                    </button>
+                  ) : (
+                    <div key={`empty-right-${idx}`} style={{ height: '40px' }} />
+                  )
+                )}
+              </div>
+            </div>
+            </>
+          )}
 
           {loading && <p className="ai-loading">Loading AI response...</p>}
           {responseText && (

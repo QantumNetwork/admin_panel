@@ -28,6 +28,7 @@ import PaymentReporting from "./pages/PaymentReporting";
 import Renewals from "./pages/Renewals";
 import MemberSearch from "./pages/MemberSearch";
 import PublicMemberSearch from "./pages/PublicMemberSearch";
+import AIButtons from "./pages/AIButtons";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
@@ -95,6 +96,7 @@ function App() {
         <Route path="/renewals" element={<Renewals />} />
         <Route path="/member-search" element={<MemberSearch />} />
         <Route path="/public-member-search" element={<PublicMemberSearch />} />
+        <Route path="/ai-buttons" element={<AIButtons />} />
       </Routes>
       
     </Router>

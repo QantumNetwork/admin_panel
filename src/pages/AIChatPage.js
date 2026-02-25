@@ -36,17 +36,12 @@ const AIChatPage = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState(null);
 
-  const handleImageClick = (url) => {
-    setModalImageUrl(url);
-    setShowImageModal(true);
-  };
+  const [topButtons, setTopButtons] = useState([]);
+  const [subButtons, setSubButtons] = useState({});
+  const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedSub, setSelectedSub] = useState(null);
 
-  const handleCloseModal = () => {
-    setShowImageModal(false);
-    setModalImageUrl(null);
-  };
-
-  const userInitial = userEmail.charAt(0).toUpperCase();
+    const userInitial = userEmail.charAt(0).toUpperCase();
   const name = localStorage.getItem('name') || 'user';
   const username = name;
 
@@ -58,6 +53,78 @@ const AIChatPage = () => {
   const [loadingVenue, setLoadingVenue] = useState(true);
   const [venues, setVenues] = useState([]);
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  
+  // ===== FETCH TOP + SUB BUTTONS =====
+    useEffect(() => {
+      const fetchReportingButtons = async () => {
+        try {
+          const mainRes = await axios.get(
+            `${baseUrl}/main-buttons`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+  
+          const mainButtons = Array.isArray(mainRes.data)
+            ? [...mainRes.data].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : [];
+  
+          const validTops = [];
+          const subMap = {};
+  
+          for (const top of mainButtons) {
+            const subRes = await axios.get(
+              `${baseUrl}/sub-buttons/${top._id}/sub-buttons`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+  
+            const subs = Array.isArray(subRes.data)
+              ? subRes.data
+                  .filter((s) => s.question?.trim())
+                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              : [];
+  
+            if (subs.length > 0) {
+              validTops.push(top);
+              subMap[top._id] = subs;
+            }
+          }
+  
+          setTopButtons(validTops);
+          setSubButtons(subMap);
+  
+          if (validTops.length > 0) {
+            setSelectedTop(validTops[0]);
+          }
+  
+        } catch (err) {
+          console.error('Error loading reporting buttons:', err);
+        }
+      };
+  
+      if (token) fetchReportingButtons();
+  
+    }, [token]);
+  
+    // ===== BALANCE DYNAMICALLY =====
+  const currentSubs = selectedTop
+    ? subButtons[selectedTop._id] || []
+    : [];
+  
+  // Split into two halves dynamically
+  const midpoint = Math.ceil(currentSubs.length / 2);
+  
+  const leftColumn = currentSubs.slice(0, midpoint);
+  const rightColumn = currentSubs.slice(midpoint);
+  
+
+  const handleImageClick = (url) => {
+    setModalImageUrl(url);
+    setShowImageModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowImageModal(false);
+    setModalImageUrl(null);
+  };
 
   // Helper to resolve endpoint using your requested one-liner style
   const getEndpoint = () => {
@@ -575,7 +642,50 @@ const AIChatPage = () => {
       </header>
 
       <main className="chat-container">
-        <div className="chat-full-wrapper">
+        {/* Top Buttons */}
+          <div className="top-buttons-row">
+            {topButtons.map((tb) => (
+              <button
+                key={tb._id}
+                className={`top-btn ${
+                  selectedTop?._id === tb._id ? 'active-btn' : ''
+                }`}
+                onClick={() => {
+                  setSelectedTop(tb);
+                  setSelectedSub(null);
+                  setQuestion('');
+                }}
+              >
+                {tb.title}
+              </button>
+            ))}
+          </div>
+
+<div className="ai-main-area-chat">
+
+          {/* LEFT */}
+              <div className="column">
+                {leftColumn.map((btn, idx) =>
+                  btn ? (
+                    <button
+                      key={btn._id}
+                      className={`sub-btn ${
+                        selectedSub?._id === btn._id ? 'active-btn' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedSub(btn);
+                        setQuestion(btn.question);
+                      }}
+                    >
+                      {btn.title}
+                    </button>
+                  ) : (
+                    <div key={`empty-left-${idx}`} style={{ height: '40px' }} />
+                  )
+                )}
+              </div>
+
+              <div className="chat-full-wrapper">
           <div className="chat-wrapper">
             <div className="chat-box" ref={chatBoxRef}>
               {chatHistory.map((msg, idx) => (
@@ -665,6 +775,30 @@ const AIChatPage = () => {
             </div>
           </div>
         </div>
+
+              {/* RIGHT */}
+              <div className="column">
+                {rightColumn.map((btn, idx) =>
+                  btn ? (
+                    <button
+                      key={btn._id}
+                      className={`sub-btn ${
+                        selectedSub?._id === btn._id ? 'active-btn' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedSub(btn);
+                        setQuestion(btn.question);
+                      }}
+                    >
+                      {btn.title}
+                    </button>
+                  ) : (
+                    <div key={`empty-right-${idx}`} style={{ height: '40px' }} />
+                  )
+                )}
+              </div>
+              </div>
+        
         {showImageModal && (
           <div className="image-modal-overlay" onClick={handleCloseModal}>
             <div

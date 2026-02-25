@@ -103,6 +103,12 @@
   gap: 5px;
 }
 
+.ai-main-area-chat {
+  display: flex;
+  width: 70%;
+  gap: 20px;
+}
+
 /* Microphone Button */
 .mic-button-ai-chat {
   width: 50px;

@@ -5,6 +5,7 @@ import { TiCreditCard } from 'react-icons/ti';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
+import { BsMenuButtonFill } from 'react-icons/bs';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -784,6 +785,17 @@ const StandardAdmin = () => {
             }`}
           />{' '}
           &nbsp; App Settings
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/ai-buttons') ? 'active' : ''}`}
+          onClick={() => navigate('/ai-buttons')}
+        >
+          <BsMenuButtonFill
+            className={`sidebar-icon ${isActive('/ai-buttons') ? '' : 'navy-icon'}`}
+          />{' '}
+          &nbsp; AI Buttons
         </button>
       </aside>
 

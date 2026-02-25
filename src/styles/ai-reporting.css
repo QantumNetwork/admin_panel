@@ -42,7 +42,7 @@
 
 .question-container {
     width: 100%;
-    max-width: 700px;
+    /* max-width: 700px; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,14 +52,14 @@
     color: #15254B;
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     text-align: center;
 }
 
 .input-container {
     width: 100%;
     position: relative;
-    margin-top: 10px;
+    /* margin-top: 10px; */
 }
 
 /* .question-input {
@@ -80,14 +80,14 @@
 }
 
 .question-input {
-    width: 70%;
-    height: 108px;
+    width: 100%;
+    height: 120px;
     padding: 15px;
     border: 2px solid #0C285B;
     border-radius: 10px;
     font-size: 16px;
     box-sizing: border-box;
-    margin-left: 102px;
+    /* margin-left: 102px; */
     color: #0C285B;
 }
 
@@ -103,7 +103,7 @@
     cursor: pointer;
     flex-shrink: 0;
     margin-top: 45px;
-    margin-left: 95px;
+    /* margin-left: 95px; */
   }
 
 .microphone-icon {
@@ -119,7 +119,7 @@
     border-radius: 27px;
     cursor: pointer;
     margin-top: 52px;
-    margin-right: 105px;
+    /* margin-right: 105px; */
     font-weight: bold;
     opacity: 1;
 }
@@ -138,6 +138,11 @@
     border: 1px solid #ccc;
     white-space: pre-wrap;
     font-family: monospace;
+}
+
+.ai-main-area {
+    width: 60%;
+    display: flex;
 }
 
 @media screen and (max-width: 1420px) {
