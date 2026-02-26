@@ -98,11 +98,14 @@ const currentSubs = selectedTop
   ? subButtons[selectedTop._id] || []
   : [];
 
-// Split into two halves dynamically
-const midpoint = Math.ceil(currentSubs.length / 2);
+// Preserve ordering
+const leftColumn = currentSubs
+  .filter((btn) => btn.order <= 8)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-const leftColumn = currentSubs.slice(0, midpoint);
-const rightColumn = currentSubs.slice(midpoint);
+const rightColumn = currentSubs
+  .filter((btn) => btn.order > 8)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const handleNavigation = (path) => {
     if (
@@ -472,7 +475,7 @@ const rightColumn = currentSubs.slice(midpoint);
             {topButtons.map((tb) => (
               <button
                 key={tb._id}
-                className={`top-btn ${
+                className={`top-btn-reporting ${
                   selectedTop?._id === tb._id ? 'active-btn' : ''
                 }`}
                 onClick={() => {
@@ -498,7 +501,7 @@ const rightColumn = currentSubs.slice(midpoint);
                   btn ? (
                     <button
                       key={btn._id}
-                      className={`sub-btn ${
+                      className={`sub-btn-reporting ${
                         selectedSub?._id === btn._id ? 'active-btn' : ''
                       }`}
                       onClick={() => {
@@ -542,7 +545,7 @@ const rightColumn = currentSubs.slice(midpoint);
                   btn ? (
                     <button
                       key={btn._id}
-                      className={`sub-btn ${
+                      className={`sub-btn-reporting ${
                         selectedSub?._id === btn._id ? 'active-btn' : ''
                       }`}
                       onClick={() => {

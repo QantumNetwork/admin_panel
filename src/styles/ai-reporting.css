@@ -32,6 +32,55 @@
     position: relative;
 }
 
+.top-btn-reporting {
+  padding: 8px 18px;
+  border: 1px solid #002977;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* Hover only when NOT active */
+.top-btn-reporting:not(.active-btn):hover {
+  background: #e6e6e6;  /* grey */
+}
+
+.top-btn-reporting.active-btn {
+  background: #002977;
+  color: white;
+}
+
+.top-btn-reporting.active-btn:hover {
+  background: #002977;
+  color: white;
+}
+
+/* ================= SUB BUTTONS ================= */
+
+.sub-btn-reporting {
+  padding: 8px 18px;
+  border: 1px solid #002977;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  /* transition: background 0.2s ease; */
+}
+
+/* Hover only when NOT active */
+.sub-btn-reporting:not(.active-btn):hover {
+  background: #e6e6e6;   /* grey */
+}
+
+.sub-btn-reporting.active-btn {
+  background: #002977;
+  color: white;
+}
+
+/* Prevent hover overriding active */
+.sub-btn-reporting.active-btn:hover {
+  background: #002977;
+  color: white;
+}
 /* AI Content Styles */
 .ai-content {
     display: flex;

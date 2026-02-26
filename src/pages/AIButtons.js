@@ -87,7 +87,14 @@ const AIButtons = () => {
       }
 
       setTopButtons(slots);
-      setSelectedTop(slots[0]);
+      // preserve currently selected order
+      if (selectedTop) {
+        const stillSelected = slots.find((b) => b.order === selectedTop.order);
+
+        if (stillSelected) {
+          setSelectedTop(stillSelected);
+        }
+      }
     } catch (err) {
       toast.error('Failed to load top buttons');
     } finally {
@@ -197,13 +204,13 @@ const AIButtons = () => {
   // ===== SELECT HANDLERS =====
   const handleTopClick = (btn) => {
     // If clicking same top again
-  if (selectedTop?.order === btn.order) {
-    if (subButtons.length > 0) {
-      setSelectedSub(subButtons[0]);
-      setEditQuestion(subButtons[0].question || '');
+    if (selectedTop?.order === btn.order) {
+      if (subButtons.length > 0) {
+        setSelectedSub(subButtons[0]);
+        setEditQuestion(subButtons[0].question || '');
+      }
+      return;
     }
-    return;
-  }
     setSelectedTop(btn);
     setSelectedSub(null);
     setTopTitleInput('');
