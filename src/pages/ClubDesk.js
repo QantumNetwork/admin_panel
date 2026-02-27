@@ -74,6 +74,8 @@ const ClubDesk = () => {
   const [verifiedSearch, setVerifiedSearch] = useState('');
   const [verifiedTotalPages, setVerifiedTotalPages] = useState(1);
 
+  const [renewalsFilter, setRenewalsFilter] = useState('all');
+
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
@@ -208,6 +210,7 @@ const ClubDesk = () => {
     dateFilter,
     verifiedLimit,
     verifiedSearch,
+    renewalsFilter,
     startDate,
     endDate,
     token,
@@ -561,6 +564,14 @@ const ClubDesk = () => {
         url += `&fromDate=${startDate}&toDate=${endDate}`;
       }
 
+      // renewals filter (NEW CODE)
+      if (renewalsFilter === 'renewals') {
+        url += `&renewType=renew`;
+      } else if (renewalsFilter === 'new') {
+        url += `&renewType=none`;
+      }
+      // if "all" -> DO NOT append renewType
+ 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -1134,6 +1145,28 @@ const ClubDesk = () => {
               />
             </div>
           )}
+
+          <select
+            value={renewalsFilter}
+            onChange={(e) => {
+              setVerifiedPage(1);
+              setRenewalsFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '180px',
+              // marginLeft: dateFilter !== 'custom' ? '6%' : '0',
+            }}
+          >
+            {/* Default */}
+            <option value="all">All New and Renewals</option>
+            <option value="new">New Member</option>
+            <option value="renewals">Renewals</option>
+          </select>
 
           {/* EXPORT BUTTON — VERIFIED ONLY */}
           <button

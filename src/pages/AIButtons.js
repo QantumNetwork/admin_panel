@@ -288,11 +288,17 @@ const AIButtons = () => {
       if (selectedSub) {
         const titleToUse = subTitleInput.trim() || selectedSub.title;
 
+        const isQuestionEmpty = !editQuestion?.trim();
+
+        const finalTitle = isQuestionEmpty
+          ? `Button ${selectedSub.order}`
+          : titleToUse;
+
         if (selectedSub._id) {
           await axios.put(
             `${baseUrl}/sub-buttons/${selectedSub._id}`,
             {
-              title: titleToUse,
+              title: finalTitle,
               order: selectedSub.order,
               question: editQuestion,
             },

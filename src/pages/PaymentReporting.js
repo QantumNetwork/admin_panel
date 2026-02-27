@@ -211,7 +211,7 @@ const PaymentReporting = () => {
     if (activeTab === 'totalsAllPaymentMethods' && token) {
       fetchTotals();
     }
-  }, [dateFilter, startDate, endDate, membershipFilter, activeTab, token]);
+  }, [dateFilter, startDate, endDate, membershipFilter, renewalsFilter, activeTab, token]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -332,6 +332,14 @@ const PaymentReporting = () => {
       if (membershipFilter !== 'all') {
         url += `&packageId=${membershipFilter}`;
       }
+
+      // renewals filter (NEW CODE)
+      if (renewalsFilter === 'renewals') {
+        url += `&renewType=renew`;
+      } else if (renewalsFilter === 'new') {
+        url += `&renewType=none`;
+      } 
+      // if "all" -> DO NOT append renewType
 
       const res = await axios.get(url, {
         headers: {
@@ -780,6 +788,28 @@ const PaymentReporting = () => {
         )}
 
         {activeTab === 'totalsAllPaymentMethods' && (
+          <>
+          <select
+            value={renewalsFilter}
+            onChange={(e) => {
+              setMembersPage(1);
+              setRenewalsFilter(e.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: '#F2F2F2',
+              cursor: 'pointer',
+              minWidth: '160px',
+              // marginLeft: dateFilter !== 'custom' ? '6%' : '0',
+            }}
+          >
+            {/* Default */}
+            <option value="all">All New and Renewals</option>
+            <option value="new">New Member</option>
+            <option value="renewals">Renewals</option>
+          </select>
           <select
             value={membershipFilter}
             onChange={(e) => {
@@ -806,6 +836,7 @@ const PaymentReporting = () => {
               </option>
             ))}
           </select>
+          </>
         )}
 
         {/* ALL PAYMENT TYPES */}
