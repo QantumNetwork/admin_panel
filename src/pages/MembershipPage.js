@@ -33,6 +33,8 @@ const MembershipPage = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [showRowModal, setShowRowModal] = useState(false);
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   const [membershipRows, setMembershipRows] = useState(() => {
     // If we have data and it's for the selected venue, use it
     if (membershipData && membershipData.appType === selectedVenue) {
@@ -211,8 +213,6 @@ const MembershipPage = () => {
   //     setDaysRemaining(null);
   //   }
   // }, [membershipData, selectedVenue]);
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

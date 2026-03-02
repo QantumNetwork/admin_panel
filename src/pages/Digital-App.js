@@ -42,7 +42,7 @@ const DigitalApp = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const access = localStorage.getItem('access');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(

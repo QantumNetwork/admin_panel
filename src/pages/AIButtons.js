@@ -168,7 +168,6 @@ const AIButtons = () => {
         setLoading(false);
       }
     };
-    const userType = 'admin';
     if (token && userType === 'admin') {
       fetchVenues();
     }

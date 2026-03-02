@@ -92,7 +92,7 @@ function App() {
         <Route path="/membership" element={<MembershipPage />} />
         <Route path="/app-settings" element={<AppSettings />} />
         <Route path="/payment-reporting" element={<PaymentReporting />} />
-        <Route path="/chat" element={<Reporting />} />
+        <Route path="/reporting" element={<Reporting />} />
         <Route path="/renewals" element={<Renewals />} />
         <Route path="/member-search" element={<MemberSearch />} />
         <Route path="/public-member-search" element={<PublicMemberSearch />} />

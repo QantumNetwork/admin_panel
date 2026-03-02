@@ -39,6 +39,8 @@ const Reporting = () => {
     localStorage.getItem('selectedVenue') || ''
   );
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   const [reportingData, setReportingData] = useState([]);
 
   const getAppType = (appType) => {
@@ -135,8 +137,6 @@ const Reporting = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

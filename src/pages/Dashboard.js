@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   const email = localStorage.getItem('userEmail'); // default if missing
   const token = localStorage.getItem('token');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const appGroup = localStorage.getItem('appGroup');
   const location = useLocation();
   const access = localStorage.getItem('access');

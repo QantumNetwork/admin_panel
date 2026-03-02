@@ -45,6 +45,7 @@ const ClubDesk = () => {
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
+  const userType = localStorage.getItem('userType') || 'admin';
 
   // Members (Members for approval) state
   const [members, setMembers] = useState([]);
@@ -87,6 +88,24 @@ const ClubDesk = () => {
       if (membersSearch && membersSearch.trim() !== '')
         url += `&search=${encodeURIComponent(membersSearch.trim())}`;
 
+      // date filter
+      if (dateFilter && dateFilter !== 'all') {
+        url += `&paymentRange=${dateFilter}`;
+      }
+
+      // custom date handling
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
+      }
+
+      // renewals filter (NEW CODE)
+      if (renewalsFilter === 'renewals') {
+        url += `&renewType=renew`;
+      } else if (renewalsFilter === 'new') {
+        url += `&renewType=none`;
+      }
+      // if "all" -> DO NOT append renewType
+
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -103,7 +122,7 @@ const ClubDesk = () => {
     } finally {
       setLoading(false);
     }
-  }, [baseUrl, membersPage, membersLimit, membersSearch, token]);
+  }, [baseUrl, membersPage, membersLimit, membersSearch, token, dateFilter, startDate, endDate, renewalsFilter, token]);
 
   // Fetch payments (waiting payment)
   const fetchPayments = async () => {
@@ -193,7 +212,10 @@ const ClubDesk = () => {
   // Fetch when pages/limits/search change for respective tabs
   useEffect(() => {
     if (activeTab === 'membersForApproval') fetchMembers();
-  }, [membersPage, membersLimit, membersSearch, token]);
+  }, [membersPage, membersLimit, membersSearch, dateFilter, renewalsFilter,
+    startDate,
+    endDate,
+    token]);
 
   useEffect(() => {
     if (activeTab === 'waitingPayment') fetchPayments();
@@ -295,8 +317,6 @@ const ClubDesk = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -1049,7 +1069,7 @@ const ClubDesk = () => {
         </div>
       </div>
 
-      {activeTab === 'verified' && (
+      {(activeTab === 'verified' || activeTab === 'membersForApproval') && (
         <div
           style={{
             display: 'flex',
@@ -1065,7 +1085,7 @@ const ClubDesk = () => {
             <select
               value={dateFilter}
               onChange={(e) => {
-                setVerifiedPage(1);
+                {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
                 setDateFilter(e.target.value);
               }}
               style={{
@@ -1101,7 +1121,7 @@ const ClubDesk = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => {
-                  setVerifiedPage(1);
+                  {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
                   setStartDate(e.target.value);
                 }}
                 style={{
@@ -1132,7 +1152,7 @@ const ClubDesk = () => {
                 type="date"
                 value={endDate}
                 onChange={(e) => {
-                  setVerifiedPage(1);
+                  {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
                   setEndDate(e.target.value);
                 }}
                 style={{
@@ -1149,7 +1169,7 @@ const ClubDesk = () => {
           <select
             value={renewalsFilter}
             onChange={(e) => {
-              setVerifiedPage(1);
+              {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
               setRenewalsFilter(e.target.value);
             }}
             style={{
@@ -1168,7 +1188,9 @@ const ClubDesk = () => {
             <option value="renewals">Renewals</option>
           </select>
 
-          {/* EXPORT BUTTON — VERIFIED ONLY */}
+          {activeTab === 'verified' && (
+            <>
+            {/* EXPORT BUTTON — VERIFIED ONLY */}
           <button
             onClick={handleVerifiedExport}
             style={{
@@ -1185,12 +1207,15 @@ const ClubDesk = () => {
           >
             Export
           </button>
+          </>
+          )}
+          
         </div>
       )}
 
       <div
         className="members-table-container"
-        style={activeTab === 'verified' ? { marginTop: '1.5%' } : {}}
+        style={activeTab === 'verified' || activeTab === 'membersForApproval' ? { marginTop: '1.5%' } : {}}
       >
         {loading ? (
           <div className="loading">Loading...</div>

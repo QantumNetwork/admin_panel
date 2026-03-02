@@ -42,6 +42,8 @@ const Renewals = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
   const appGroup = localStorage.getItem('appGroup');
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   const [loading, setLoading] = useState(false);
   const [confirmVerify, setConfirmVerify] = useState({
     open: false,
@@ -243,8 +245,6 @@ const Renewals = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

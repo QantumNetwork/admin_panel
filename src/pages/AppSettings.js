@@ -27,7 +27,7 @@ const AppSettings = () => {
   const appGroup = localStorage.getItem('appGroup');
   const [menuType, setMenuType] = useState('multiple'); // 'standard' | 'multiple'
   const [offerTypes, setOfferTypes] = useState(['WMLC', 'Fielders']);
-
+  const userType = localStorage.getItem('userType') || 'admin';
   const [venues, setVenues] = useState([]);
 
   const token = localStorage.getItem('token');
@@ -167,8 +167,6 @@ const AppSettings = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

@@ -33,7 +33,7 @@ const SmartIncentives = () => {
   // ────────────────────────────────────────────────────────────────────────
 
   const access = localStorage.getItem('access');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem('token');

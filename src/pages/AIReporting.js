@@ -27,7 +27,7 @@ const AIReporting = () => {
   const name = localStorage.getItem('name') || 'user';
   const username = name;
   const userInitial = email.charAt(0).toUpperCase();
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const token = localStorage.getItem('token');
   const appGroup = localStorage.getItem('appGroup');
   const baseUrl = process.env.REACT_APP_API_BASE_URL;

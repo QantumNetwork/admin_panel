@@ -50,7 +50,7 @@ const PowerAdmin = () => {
   const [loading1, setLoading1] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  const userType = 'admin';
+  const userType = localStorage.getItem('userType') || 'admin';
   const [groupNames, setGroupNames] = useState(['']);
   const [appNames, setAppNames] = useState([]);
   const [showAppDropdown, setShowAppDropdown] = useState(null);

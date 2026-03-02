@@ -24,6 +24,8 @@ const MemberSearch = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   const [loading, setLoading] = useState(false);
   const [confirmVerify, setConfirmVerify] = useState({
     open: false,
@@ -153,7 +155,6 @@ const MemberSearch = () => {
     if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
   };
 
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

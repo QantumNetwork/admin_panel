@@ -57,6 +57,8 @@ const StandardAdmin = () => {
     localStorage.getItem('selectedVenue') || ''
   );
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   const getAppType = (appType) => {
     switch (appType) {
       case 'MaxGaming':
@@ -258,8 +260,6 @@ const StandardAdmin = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   // Dummy data for edit users
   // const dummyUsers = [

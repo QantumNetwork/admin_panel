@@ -30,7 +30,7 @@ const ScheduledSent = () => {
   const email = localStorage.getItem('userEmail') || 'user@example.com';
   const token = localStorage.getItem('token');
   const access = localStorage.getItem('access');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const userInitial = email.charAt(0).toUpperCase();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

@@ -54,7 +54,7 @@ const MarketToMembers = () => {
   const [showSuggestions, setShowSuggestions] = useState({});
 
   const access = localStorage.getItem('access');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const [isReusing, setIsReusing] = useState(false);
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(

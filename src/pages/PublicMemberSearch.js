@@ -20,7 +20,7 @@ const PublicMemberSearch = () => {
 
   // API functions
   //   const [venues, setVenues] = useState([]);
-const userType = localStorage.getItem('userType') || ''; // can be user/search/admin/power admin
+const userType = localStorage.getItem('userType') || 'admin'; // can be user/search/admin/power admin
     const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
       localStorage.getItem('appGroup') || ''

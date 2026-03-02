@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
-import '../styles/ai-reporting.css';
-import '../styles/ai-chat.css';
+// import '../styles/ai-reporting.css';
 import { IoMdSend } from 'react-icons/io';
 import { GrMicrophone } from 'react-icons/gr';
 import { MdMicOff } from 'react-icons/md';
@@ -11,6 +10,8 @@ import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import { handleLogout } from '../utils/api';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../styles/ai-chat.css';
+
 let mediaRecorderRef = null;
 let streamRef = null;
 let stopTimeout = null;
@@ -21,7 +22,7 @@ const AIChatPage = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const { initialChatHistory } = location.state || {};
   const userEmail = localStorage.getItem('userEmail');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const safeHistory = Array.isArray(initialChatHistory)
     ? initialChatHistory
     : [];

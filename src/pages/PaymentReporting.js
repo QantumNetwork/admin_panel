@@ -29,6 +29,8 @@ const PaymentReporting = () => {
     userId: null,
   });
 
+  const userType = localStorage.getItem('userType') || 'admin';
+
   // API functions
   const [activeTab, setActiveTab] = useState('approvedPayments');
   const [venues, setVenues] = useState([]);
@@ -249,8 +251,6 @@ const PaymentReporting = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

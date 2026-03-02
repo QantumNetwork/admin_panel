@@ -36,6 +36,7 @@ const ClubPackage = () => {
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
+  const userType = localStorage.getItem('userType') || 'admin';
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -156,8 +157,6 @@ const ClubPackage = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;

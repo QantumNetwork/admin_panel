@@ -38,6 +38,7 @@ const AdminCustom = () => {
   const email = localStorage.getItem('userEmail'); // default if missing
   const userInitial = email.charAt(0).toUpperCase();
   const appGroup = localStorage.getItem('appGroup');
+  const userType = localStorage.getItem('userType') || 'admin';
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [users, setUsers] = useState([]);
@@ -400,8 +401,6 @@ const AdminCustom = () => {
   const isActive = (path) => {
     return location.pathname === path;
   };
-
-  const userType = 'admin';
 
   const handleLock = async () => {
     try {

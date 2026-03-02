@@ -35,7 +35,7 @@ const ArtGallery = () => {
   const advertType = location.state?.advertType || 'large';
   const isAddingNew = location.state?.isAddingNew || false;
   const access = localStorage.getItem('access');
-  const userType = localStorage.getItem('userType');
+  const userType = localStorage.getItem('userType') || 'admin';
   const [isEditMode, setIsEditMode] = useState(false);
   const textareaRef = useRef(null);
 

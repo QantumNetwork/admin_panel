@@ -38,6 +38,8 @@ const ManualReg = () => {
   const userInitial = email.charAt(0).toUpperCase();
   const [showDropdown, setShowDropdown] = useState(false);
   const appGroup = localStorage.getItem('appGroup');
+
+  const userType = localStorage.getItem('userType') || 'admin';
   // const [membersForApproval, setMembersForApproval] = useState([]);
   //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -236,8 +238,6 @@ const ManualReg = () => {
       toast.error('Failed to update venue');
     }
   };
-
-  const userType = 'admin';
 
   const isActive = (path) => {
     return location.pathname === path;
