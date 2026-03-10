@@ -3234,7 +3234,7 @@ const SpecialOffers = () => {
                     maxHeight: 'none',
                     height: 'auto',
                     overflowY: 'hidden',
-                    paddingBottom: '30px',
+                    paddingBottom: '10px',
                   }
                 : {}
             }
@@ -3398,7 +3398,7 @@ const SpecialOffers = () => {
                             checked={expiryType === 'expiresIn'}
                             onChange={() => handleExpiryChange('expiresIn')}
                           />
-                          <label htmlFor="expiresIn">Expires in</label>
+                          <label htmlFor="expiresIn" style={{whiteSpace: 'nowrap', marginRight: '5px'}}>Expires in</label>
                           <input
                             type="text"
                             placeholder=""
@@ -3652,29 +3652,31 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977' }}
+                          style={{ accentColor: '#002977', marginBottom: '3px' }}
                         />
-                        <span>Add Bonus Points when redeemed</span>
-                      </div>
-
-                      {showBonusWhenRedeemed && (
+                        <span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        {showBonusWhenRedeemed && (
                         <div className="bonus-points-input">
                           <input
                             type="number"
                             value={bonusPoints}
+                            style={{height: '8px', width: '40px', marginTop: '5px'}}
                             onChange={(e) => setBonusPoints(e.target.value)}
                           />
-                          <span>Points</span>
+                          <span style={{fontSize: '14px'}}>Points</span>
                         </div>
                       )}
+                      </div>
+
+                      
                     </div>
                   </div>
 
                   <div className="form-group inline-form-group">
-                    <label>
+                    <label style={{whiteSpace: 'nowrap', marginRight: '8px'}}>
                       <strong>Enter trigger value</strong>
                     </label>
-                    <div style={{ marginBottom: '0' }}>
+                    <div style={{ marginTop: '5px' }}>
                       <input
                         type="text"
                         className="trigger-input"
@@ -3749,12 +3751,23 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977' }}
+                          style={{ accentColor: '#002977', marginBottom: '3px' }}
                         />
-                        <span>Add Bonus Points when redeemed</span>
+<span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            style={{height: '8px', width: '40px', marginTop: '5px'}}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
+                        </div>
+                      )}                        
                       </div>
 
-                      {showBonusWhenRedeemed && (
+                      {/* {showBonusWhenRedeemed && (
                         <div className="bonus-points-input">
                           <input
                             type="number"
@@ -3763,7 +3776,7 @@ const SpecialOffers = () => {
                           />
                           <span>Points</span>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
 
@@ -3903,12 +3916,22 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977' }}
+                          style={{ accentColor: '#002977', marginBottom: '3px' }}
                         />
-                        <span>Add Bonus Points when redeemed</span>
-                      </div>
+<span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            style={{height: '8px', width: '40px', marginTop: '5px'}}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
+                        </div>
+                      )}                      </div>
 
-                      {showBonusWhenRedeemed && (
+                      {/* {showBonusWhenRedeemed && (
                         <div className="bonus-points-input">
                           <input
                             type="number"
@@ -3917,7 +3940,7 @@ const SpecialOffers = () => {
                           />
                           <span>Points</span>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
 

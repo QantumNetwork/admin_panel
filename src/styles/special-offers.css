@@ -549,11 +549,12 @@ input:focus{
 
 .target-market-panel h2 {
   margin: 0 0 0 0;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   text-align: center;
   color: #333;
   /* border-bottom: 1px solid #ddd; */
+  margin-top: '0px';
   padding-bottom: 5px;
 }
 
@@ -790,7 +791,7 @@ input:focus{
 } */
 
 .time-options {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .time-input-row {
@@ -1051,8 +1052,7 @@ border: 1px solid #22ade3;
 .bonus-points-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;      /* keeps text in one line */
+  gap: 4px;
 }
 
 .bonus-points-input {
@@ -1494,7 +1494,7 @@ border: 1px solid #22ade3;
     display: flex;
     align-items: center;
     /* justify-content: space-between; */
-    margin-bottom: 10px !important;
+    margin-bottom: 5px !important;
 }
 
   .target-market-panel .responsive-panel {
