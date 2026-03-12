@@ -144,6 +144,7 @@ const rightColumn = currentSubs
     const isNorth = selectedVenue === 'North';
     const isBluewater = selectedVenue === 'Bluewater';
     const isFlinders = selectedVenue === 'Flinders';
+    const isDrinks = selectedVenue === 'Drinks';
 
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
@@ -167,6 +168,8 @@ const rightColumn = currentSubs
       ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
       : isFlinders
       ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
+      : isDrinks
+      ? 'https://drinkshqviperapi.greenground-e372bb60.australiaeast.azurecontainerapps.io/api/airesponse'
       : null;
 
     return endpoint;
