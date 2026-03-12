@@ -2696,7 +2696,7 @@ const SpecialOffers = () => {
           />
           Special Offers
         </button>
-        {selectedVenue === 'Ace' && (
+        {(selectedVenue === 'Ace' || selectedVenue === 'Manly') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
