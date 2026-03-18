@@ -66,6 +66,8 @@ const MarketToMembers = () => {
 
   const [sendingNow, setSendingNow] = useState(false);
 
+  const [status, setStatus] = useState(null);
+
   const navigate = useNavigate();
 
   const handleSuggestionToggle = (id, state) => {
@@ -292,6 +294,10 @@ const MarketToMembers = () => {
               setJobId(notification.jobId);
             } else {
               setJobId(null);
+          }
+
+          if (notification.status) {
+            setStatus(notification.status);
           }
 
           // Set target market
@@ -925,7 +931,7 @@ const MarketToMembers = () => {
 
     let url = `https://betaapi.s2w.com.au/notification/send-notification`;
 
-    if (jobId !== null && jobId !== undefined && jobId !== '') {
+    if ((jobId !== null && jobId !== undefined && jobId !== '') && status==null) {
       url = `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`;
     }
 
@@ -960,7 +966,7 @@ const MarketToMembers = () => {
         setTimeout(() => setSendingNow(false), 5000);
 
         const response = await fetch(url, {
-          method: jobId ? 'PATCH' : 'POST',
+          method: (jobId && status === null) ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -1075,7 +1081,7 @@ const MarketToMembers = () => {
         // Set sending state and disable button
         setIsSending(true);
         const response = await fetch(url, {
-          method: jobId ? 'PATCH' : 'POST',
+          method: (jobId && status === null) ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',

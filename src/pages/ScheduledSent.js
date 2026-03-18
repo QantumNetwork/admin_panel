@@ -765,7 +765,7 @@ const ScheduledSent = () => {
                       {activeTab === 'completed' ? (
                         <>
                           <div className="ssent-completed-column">
-                            {message.displayType === 'schedule' &&
+                            {message.isScheduled &&
                               message.status === 'completed' && (
                                 <div className="ssent-checkbox-checked">
                                   <FaCheck />
