@@ -60,6 +60,7 @@ const MyBenefits = () => {
     if (savedVenue === 'Bluewater') return 'Deckhand';
     if (savedVenue === 'Flinders') return 'Member';
     if (savedVenue === 'Drinks') return 'Explorer';
+    if (savedVenue === 'Wonthaggi') return 'Valued';
     return 'Platinum Black';
   });
 
@@ -89,6 +90,7 @@ const MyBenefits = () => {
         if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
           return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
+        if (selectedVenue === 'Wonthaggi') return '#090808';
       case 'Staff':
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
           return '#006D88';
@@ -293,7 +295,14 @@ const MyBenefits = () => {
       { value: 'Club', label: 'Club' },
       { value: 'Reserve', label: 'Reserve' },
     ];
-  }
+  } else if(selectedVenue === 'Wonthaggi') {
+    audienceOptions = [
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Gold', label: 'Gold' },
+    ];
+  } 
 
   const email = localStorage.getItem('userEmail');
   const userInitial = email ? email.charAt(0).toUpperCase() : '';
@@ -487,6 +496,8 @@ const MyBenefits = () => {
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+          return 'Wonthaggi Country Club';
       default:
         return appType;
     }

@@ -368,6 +368,8 @@ const AIButtons = () => {
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }

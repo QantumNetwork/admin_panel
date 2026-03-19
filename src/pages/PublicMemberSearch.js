@@ -69,6 +69,8 @@ const userType = localStorage.getItem('userType') || 'admin'; // can be user/sea
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }

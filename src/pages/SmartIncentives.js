@@ -281,6 +281,13 @@ const SmartIncentives = () => {
       { value: 'Club', label: 'Club' },
       { value: 'Reserve', label: 'Reserve' },
     ];
+  } else if(selectedVenue === 'Wonthaggi') {
+    audienceOptions = [
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Gold', label: 'Gold' },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -2377,6 +2384,8 @@ const SmartIncentives = () => {
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }

@@ -90,6 +90,8 @@ const PowerAdmin = () => {
         return 'Flinders';
       case 'Drinks HQ':
         return 'Drinks';
+      case 'Wonthaggi Country Club':
+        return 'Wonthaggi';
       default:
         return appName;
     }
@@ -125,6 +127,8 @@ const PowerAdmin = () => {
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }
@@ -162,6 +166,8 @@ const PowerAdmin = () => {
         return '/flinders.png';
       case 'Drinks':
         return '/drinks.png';
+      case 'Wonthaggi':
+        return '/wonthaggi.png';
       default:
         return appType;
     }
@@ -183,6 +189,7 @@ const PowerAdmin = () => {
     'Bluewater Captains Club',
     'Flinders Street Wharves',
     'Drinks HQ',
+    'Wonthaggi Country Club'
   ];
 
   const handleAddGroup = (index) => {
@@ -357,6 +364,9 @@ const PowerAdmin = () => {
               break;
             case 'Drinks':
               appDisplayNames.push("Drinks HQ");
+              break;
+            case 'Wonthaggi':
+              appDisplayNames.push("Wonthaggi Country Club");
               break;
             default:
               appDisplayNames.push(app);

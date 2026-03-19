@@ -89,6 +89,8 @@ const StandardAdmin = () => {
         return 'Flinders Street Wharves';
       case 'Drinks':
         return 'Drinks HQ';
+      case 'Wonthaggi':
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }
@@ -126,6 +128,8 @@ const StandardAdmin = () => {
         return '/flinders.png';
       case 'Drinks':
         return '/drinks.png';
+      case 'Wonthaggi':
+        return '/wonthaggi.png';
       default:
         return appType;
     }
