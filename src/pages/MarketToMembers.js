@@ -1190,6 +1190,8 @@ const MarketToMembers = () => {
 
   // Handle value change for a specific filter row
   const handleValueChange = async (id, value) => {
+    console.log("Selected value:", value); // 👈 ADD THIS
+
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
         return { ...row, value };
@@ -1200,6 +1202,10 @@ const MarketToMembers = () => {
 
     const row = updatedRows.find((r) => r.id === id);
     if (!row) return;
+
+    if (dateFields.includes(row.field)) {
+    return; // skip API & suggestions
+  }
 
     // Determine API type
     let fieldParam = fieldToApiParam[row.field]
@@ -2026,22 +2032,32 @@ const MarketToMembers = () => {
                         zIndex: showSuggestions[1] ? 1000 : 1,
                       }}
                     >
-                      <input
-                        id="filter-value-1"
-                        className="filter-select-first-value"
-                        style={{ width: '90px' }}
-                        value={filterRows[0].value}
-                        onChange={(e) => handleValueChange(1, e.target.value)}
-                        onFocus={() => handleSuggestionToggle(1, true)}
-                        onBlur={() =>
-                          setTimeout(
-                            () => handleSuggestionToggle(1, false),
-                            150
-                          )
-                        }
-                        autoComplete="off"
-                      />
-                      {showSuggestions[1] && filterRows[0].value && (
+                      {dateFields.includes(filterRows[0].field) ? (
+  <input
+    type="date"
+    id="filter-value-1"
+    className="filter-select-first-value"
+    value={filterRows[0].value}
+    onChange={(e) => handleValueChange(1, e.target.value)}
+    onKeyDown={(e) => e.preventDefault()} // block typing
+    style={{ width: '90px' }}
+  />
+) : (
+  <input
+    id="filter-value-1"
+    className="filter-select-first-value"
+    value={filterRows[0].value}
+    onChange={(e) => handleValueChange(1, e.target.value)}
+    onFocus={() => handleSuggestionToggle(1, true)}
+    onBlur={() =>
+      setTimeout(() => handleSuggestionToggle(1, false), 150)
+    }
+    autoComplete="off"
+    style={{ width: '90px' }}
+  />
+)}
+                      {!dateFields.includes(filterRows[0].field) &&
+showSuggestions[1] && filterRows[0].value && (
                         <div className="suggestions-dropdown">
                           {(filteredOptions[1] || []).map((option, idx) => (
                             <div
@@ -2150,24 +2166,38 @@ const MarketToMembers = () => {
                             zIndex: showSuggestions[row.id] ? 1000 : 1,
                           }}
                         >
-                          <input
-                            id={`filter-value-${row.id}`}
-                            className="filter-select-value"
-                            style={{ width: '90px' }}
-                            value={row.value}
-                            onChange={(e) =>
-                              handleValueChange(row.id, e.target.value)
-                            }
-                            onFocus={() => handleSuggestionToggle(row.id, true)}
-                            onBlur={() =>
-                              setTimeout(
-                                () => handleSuggestionToggle(row.id, false),
-                                150
-                              )
-                            }
-                            autoComplete="off"
-                          />
-                          {showSuggestions[row.id] && (
+                          {dateFields.includes(row.field) ? (
+  <input
+    type="date"
+    id={`filter-value-${row.id}`}
+    className="filter-select-value"
+    style={{ width: '90px' }}
+    value={row.value}
+    onChange={(e) =>
+      handleValueChange(row.id, e.target.value)
+    }
+    onKeyDown={(e) => e.preventDefault()} // 🚫 block typing
+  />
+) : (
+  <input
+    id={`filter-value-${row.id}`}
+    className="filter-select-value"
+    style={{ width: '90px' }}
+    value={row.value}
+    onChange={(e) =>
+      handleValueChange(row.id, e.target.value)
+    }
+    onFocus={() => handleSuggestionToggle(row.id, true)}
+    onBlur={() =>
+      setTimeout(
+        () => handleSuggestionToggle(row.id, false),
+        150
+      )
+    }
+    autoComplete="off"
+  />
+)}
+                          {!dateFields.includes(row.field) && showSuggestions[row.id] && (
                             <div className="suggestions-dropdown">
                               {(filteredOptions[row.id] || []).map(
                                 (option, idx) => (
