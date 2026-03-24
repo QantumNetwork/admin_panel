@@ -399,7 +399,7 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 />
               </div>
 
-              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace' || selectedVenue === 'Manly') && (
+              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'MaxGaming') && (
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}

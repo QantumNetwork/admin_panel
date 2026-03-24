@@ -12,6 +12,8 @@ import { MdVerified } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { MdRefresh } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
+import { useMemo } from 'react';
+
 import {
   Elements,
   CardElement,
@@ -25,10 +27,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
 import '../styles/renewals.css';
 import { FaGalacticSenate } from 'react-icons/fa';
-
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
-  stripeAccount: process.env.REACT_APP_STRIPE_ACCOUNT_ID,
-});
 
 const Renewals = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -150,6 +148,15 @@ const Renewals = () => {
   const [membershipPackages, setMembershipPackages] = useState([]);
   const storedRaw = localStorage.getItem('manualRegUserData');
   const stored = storedRaw ? JSON.parse(storedRaw) : null;
+
+  const stripePromise = useMemo(() => {
+    return loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
+      stripeAccount:
+        selectedVenue === 'MaxGaming'
+          ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
+          : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+    });
+  }, [selectedVenue]);
 
   const getAppType = (appType) => {
     switch (appType) {

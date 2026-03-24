@@ -13,6 +13,8 @@ import { CiSearch } from 'react-icons/ci';
 import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
+import { useMemo } from 'react';
+
 import {
   Elements,
   CardElement,
@@ -24,10 +26,6 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/manual-reg.css';
-
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
-  stripeAccount: process.env.REACT_APP_STRIPE_ACCOUNT_ID,
-});
 
 const ManualReg = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -143,6 +141,15 @@ const ManualReg = () => {
   const [membershipPackages, setMembershipPackages] = useState([]);
   const storedRaw = localStorage.getItem('manualRegUserData');
   const stored = storedRaw ? JSON.parse(storedRaw) : null;
+
+  const stripePromise = useMemo(() => {
+  return loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
+    stripeAccount:
+      selectedVenue === 'MaxGaming'
+        ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
+        : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+  });
+}, [selectedVenue]);
 
   const getAppType = (appType) => {
     switch (appType) {

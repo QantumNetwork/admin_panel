@@ -268,7 +268,11 @@ const MarketToMembers = () => {
           setDescription(notification.description || '');
 
           // Set display type and related fields
-          {notification.isScheduled && notification.scheduledAt ? setDisplayType('schedule') : setDisplayType('immediate')}
+          {
+            notification.isScheduled && notification.scheduledAt
+              ? setDisplayType('schedule')
+              : setDisplayType('immediate');
+          }
           if (notification.isScheduled && notification.scheduledAt) {
             const dateString = notification.scheduledAt.substring(0, 10);
             setSendDate(dateString);
@@ -291,9 +295,9 @@ const MarketToMembers = () => {
           }
 
           if (notification.jobId) {
-              setJobId(notification.jobId);
-            } else {
-              setJobId(null);
+            setJobId(notification.jobId);
+          } else {
+            setJobId(null);
           }
 
           if (notification.status) {
@@ -931,7 +935,12 @@ const MarketToMembers = () => {
 
     let url = `https://betaapi.s2w.com.au/notification/send-notification`;
 
-    if ((jobId !== null && jobId !== undefined && jobId !== '') && status==null) {
+    if (
+      jobId !== null &&
+      jobId !== undefined &&
+      jobId !== '' &&
+      status == null
+    ) {
       url = `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`;
     }
 
@@ -966,7 +975,7 @@ const MarketToMembers = () => {
         setTimeout(() => setSendingNow(false), 5000);
 
         const response = await fetch(url, {
-          method: (jobId && status === null) ? 'PATCH' : 'POST',
+          method: jobId && status === null ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -1081,7 +1090,7 @@ const MarketToMembers = () => {
         // Set sending state and disable button
         setIsSending(true);
         const response = await fetch(url, {
-          method: (jobId && status === null) ? 'PATCH' : 'POST',
+          method: jobId && status === null ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -1190,7 +1199,7 @@ const MarketToMembers = () => {
 
   // Handle value change for a specific filter row
   const handleValueChange = async (id, value) => {
-    console.log("Selected value:", value); // 👈 ADD THIS
+    console.log('Selected value:', value); // 👈 ADD THIS
 
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1204,8 +1213,8 @@ const MarketToMembers = () => {
     if (!row) return;
 
     if (dateFields.includes(row.field)) {
-    return; // skip API & suggestions
-  }
+      return; // skip API & suggestions
+    }
 
     // Determine API type
     let fieldParam = fieldToApiParam[row.field]
@@ -1357,7 +1366,7 @@ const MarketToMembers = () => {
       case 'Drinks':
         return 'Drinks HQ';
       case 'Wonthaggi':
-          return 'Wonthaggi Country Club';
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }
@@ -2033,47 +2042,51 @@ const MarketToMembers = () => {
                       }}
                     >
                       {dateFields.includes(filterRows[0].field) ? (
-  <input
-    type="date"
-    id="filter-value-1"
-    className="filter-select-first-value"
-    value={filterRows[0].value}
-    onChange={(e) => handleValueChange(1, e.target.value)}
-    onKeyDown={(e) => e.preventDefault()} // block typing
-    style={{ width: '90px' }}
-  />
-) : (
-  <input
-    id="filter-value-1"
-    className="filter-select-first-value"
-    value={filterRows[0].value}
-    onChange={(e) => handleValueChange(1, e.target.value)}
-    onFocus={() => handleSuggestionToggle(1, true)}
-    onBlur={() =>
-      setTimeout(() => handleSuggestionToggle(1, false), 150)
-    }
-    autoComplete="off"
-    style={{ width: '90px' }}
-  />
-)}
-                      {!dateFields.includes(filterRows[0].field) &&
-showSuggestions[1] && filterRows[0].value && (
-                        <div className="suggestions-dropdown">
-                          {(filteredOptions[1] || []).map((option, idx) => (
-                            <div
-                              key={idx}
-                              className="suggestion-item"
-                              onMouseDown={(e) => {
-                                e.preventDefault(); // prevents blur before click is processed
-                                handleValueChange(1, option);
-                                handleSuggestionToggle(1, false);
-                              }}
-                            >
-                              {option}
-                            </div>
-                          ))}
-                        </div>
+                        <input
+                          type="date"
+                          id="filter-value-1"
+                          className="filter-select-first-value"
+                          value={filterRows[0].value}
+                          onChange={(e) => handleValueChange(1, e.target.value)}
+                          onKeyDown={(e) => e.preventDefault()} // block typing
+                          style={{ width: '90px' }}
+                        />
+                      ) : (
+                        <input
+                          id="filter-value-1"
+                          className="filter-select-first-value"
+                          value={filterRows[0].value}
+                          onChange={(e) => handleValueChange(1, e.target.value)}
+                          onFocus={() => handleSuggestionToggle(1, true)}
+                          onBlur={() =>
+                            setTimeout(
+                              () => handleSuggestionToggle(1, false),
+                              150
+                            )
+                          }
+                          autoComplete="off"
+                          style={{ width: '90px' }}
+                        />
                       )}
+                      {!dateFields.includes(filterRows[0].field) &&
+                        showSuggestions[1] &&
+                        filterRows[0].value && (
+                          <div className="suggestions-dropdown">
+                            {(filteredOptions[1] || []).map((option, idx) => (
+                              <div
+                                key={idx}
+                                className="suggestion-item"
+                                onMouseDown={(e) => {
+                                  e.preventDefault(); // prevents blur before click is processed
+                                  handleValueChange(1, option);
+                                  handleSuggestionToggle(1, false);
+                                }}
+                              >
+                                {option}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                   <button className="add-filter-btn" onClick={addFilterRow}>
@@ -2167,55 +2180,58 @@ showSuggestions[1] && filterRows[0].value && (
                           }}
                         >
                           {dateFields.includes(row.field) ? (
-  <input
-    type="date"
-    id={`filter-value-${row.id}`}
-    className="filter-select-value"
-    style={{ width: '90px' }}
-    value={row.value}
-    onChange={(e) =>
-      handleValueChange(row.id, e.target.value)
-    }
-    onKeyDown={(e) => e.preventDefault()} // 🚫 block typing
-  />
-) : (
-  <input
-    id={`filter-value-${row.id}`}
-    className="filter-select-value"
-    style={{ width: '90px' }}
-    value={row.value}
-    onChange={(e) =>
-      handleValueChange(row.id, e.target.value)
-    }
-    onFocus={() => handleSuggestionToggle(row.id, true)}
-    onBlur={() =>
-      setTimeout(
-        () => handleSuggestionToggle(row.id, false),
-        150
-      )
-    }
-    autoComplete="off"
-  />
-)}
-                          {!dateFields.includes(row.field) && showSuggestions[row.id] && (
-                            <div className="suggestions-dropdown">
-                              {(filteredOptions[row.id] || []).map(
-                                (option, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="suggestion-item"
-                                    onMouseDown={(e) => {
-                                      e.preventDefault(); // prevents blur before click is processed
-                                      handleValueChange(row.id, option);
-                                      handleSuggestionToggle(row.id, false);
-                                    }}
-                                  >
-                                    {option}
-                                  </div>
+                            <input
+                              type="date"
+                              id={`filter-value-${row.id}`}
+                              className="filter-select-value"
+                              style={{ width: '90px' }}
+                              value={row.value}
+                              onChange={(e) =>
+                                handleValueChange(row.id, e.target.value)
+                              }
+                              onKeyDown={(e) => e.preventDefault()} // 🚫 block typing
+                            />
+                          ) : (
+                            <input
+                              id={`filter-value-${row.id}`}
+                              className="filter-select-value"
+                              style={{ width: '90px' }}
+                              value={row.value}
+                              onChange={(e) =>
+                                handleValueChange(row.id, e.target.value)
+                              }
+                              onFocus={() =>
+                                handleSuggestionToggle(row.id, true)
+                              }
+                              onBlur={() =>
+                                setTimeout(
+                                  () => handleSuggestionToggle(row.id, false),
+                                  150
                                 )
-                              )}
-                            </div>
+                              }
+                              autoComplete="off"
+                            />
                           )}
+                          {!dateFields.includes(row.field) &&
+                            showSuggestions[row.id] && (
+                              <div className="suggestions-dropdown">
+                                {(filteredOptions[row.id] || []).map(
+                                  (option, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="suggestion-item"
+                                      onMouseDown={(e) => {
+                                        e.preventDefault(); // prevents blur before click is processed
+                                        handleValueChange(row.id, option);
+                                        handleSuggestionToggle(row.id, false);
+                                      }}
+                                    >
+                                      {option}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            )}
                         </div>
 
                         <button
