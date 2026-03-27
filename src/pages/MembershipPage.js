@@ -44,6 +44,10 @@ const MembershipPage = () => {
         price: `$${level.price}`,
         proRata: level.proRata,
         renewalDate: level.renewalDate?.split('T')[0] || '',
+
+        earlyBirdStartDate: level.earlyBirdPeriod?.startDate || '',
+        earlyBirdEndDate: level.earlyBirdPeriod?.endDate || '',
+        earlyBirdRenewalDate: level.earlyBirdRenewalDate || '',
       }));
     }
     // Default rows if no data
@@ -54,6 +58,9 @@ const MembershipPage = () => {
         price: '$5',
         proRata: false,
         renewalDate: '',
+        earlyBirdStartDate: '',
+        earlyBirdEndDate: '',
+        earlyBirdRenewalDate: '',
       },
       {
         id: 2,
@@ -61,6 +68,9 @@ const MembershipPage = () => {
         price: '$10',
         proRata: false,
         renewalDate: '',
+        earlyBirdStartDate: '',
+        earlyBirdEndDate: '',
+        earlyBirdRenewalDate: '',
       },
     ];
   });
@@ -101,7 +111,7 @@ const MembershipPage = () => {
       case 'Drinks':
         return 'Drinks HQ';
       case 'Wonthaggi':
-          return 'Wonthaggi Country Club';
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }
@@ -165,8 +175,7 @@ const MembershipPage = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchMembershipData = async () => {
+  const fetchMembershipData = async () => {
       if (!selectedVenue) return;
 
       try {
@@ -188,6 +197,13 @@ const MembershipPage = () => {
               price: `$${level.price}`,
               proRata: level.proRata,
               renewalDate: level.renewalDate?.split('T')[0] || '',
+
+              earlyBirdStartDate:
+                level.earlyBirdPeriod?.startDate?.split('T')[0] || '',
+              earlyBirdEndDate:
+                level.earlyBirdPeriod?.endDate?.split('T')[0] || '',
+              earlyBirdRenewalDate:
+                level.earlyBirdRenewalDate?.split('T')[0] || '',
             })
           );
 
@@ -199,6 +215,7 @@ const MembershipPage = () => {
       }
     };
 
+  useEffect(() => {
     fetchMembershipData();
   }, [selectedVenue, token]);
 
@@ -256,17 +273,22 @@ const MembershipPage = () => {
       membershipRows.length > 0
         ? Math.max(...membershipRows.map((r) => r.id)) + 1
         : 1;
-    setMembershipRows([
-      ...membershipRows,
-      {
-        id: newId,
-        _id: null,
-        name: '',
-        price: '',
-        proRata: false,
-        renewalDate: '',
-      },
-    ]);
+    const newRow = {
+      id: newId,
+      _id: null,
+      name: '',
+      price: '',
+      proRata: false,
+      renewalDate: '',
+      earlyBirdStartDate: '',
+      earlyBirdEndDate: '',
+      earlyBirdRenewalDate: '',
+    };
+
+    setMembershipRows([...membershipRows, newRow]);
+
+    // ✅ ADD THIS
+    setSelectedRowId(newId);
   };
 
   const removeMembershipRow = (id) => {
@@ -304,6 +326,17 @@ const MembershipPage = () => {
             levelObject._id = row._id; // <-- Attach only if exists
           }
 
+          if (row.earlyBirdStartDate && row.earlyBirdEndDate) {
+            levelObject.earlyBirdPeriod = {
+              startDate: row.earlyBirdStartDate,
+              endDate: row.earlyBirdEndDate,
+            };
+          }
+
+          if (row.earlyBirdRenewalDate) {
+            levelObject.earlyBirdRenewalDate = row.earlyBirdRenewalDate;
+          }
+
           return levelObject;
         }),
 
@@ -311,6 +344,7 @@ const MembershipPage = () => {
       };
 
       let response;
+      console.log('md id - ', membershipData?._id);
       if (membershipData && membershipData._id) {
         //PUT req
         // If ID exists, make a PUT request to update
@@ -346,7 +380,7 @@ const MembershipPage = () => {
           toast.success(response.data.message);
         }
 
-        navigate('/membership');
+        await fetchMembershipData();  
       }
     } catch (error) {
       console.error('Error creating club package:', error);
@@ -678,9 +712,7 @@ const MembershipPage = () => {
                           onChange={(e) =>
                             updateMembershipRow(row.id, 'name', e.target.value)
                           }
-                          onFocus={() => {
-                            setSelectedRowId(row.id);
-                          }}
+                          onClick={() => setSelectedRowId(row.id)}
                           style={{
                             width: '100%',
                             padding: '8px',
@@ -696,9 +728,7 @@ const MembershipPage = () => {
                           onChange={(e) =>
                             updateMembershipRow(row.id, 'price', e.target.value)
                           }
-                          onFocus={() => {
-                            setSelectedRowId(row.id);
-                          }}
+                          onClick={() => setSelectedRowId(row.id)}
                           style={{
                             width: '50%',
                             padding: '8px',
@@ -727,9 +757,7 @@ const MembershipPage = () => {
                                 e.target.checked
                               )
                             }
-                            onFocus={() => {
-                              setSelectedRowId(row.id);
-                            }}
+                            onClick={() => setSelectedRowId(row.id)}
                             style={{ accentColor: '#002977' }}
                           />
                           <div>
@@ -851,6 +879,103 @@ const MembershipPage = () => {
                   </div>
                 </div>
               )}
+
+              {/* Early Bird Period */}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Early Bird Period
+                </label>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  <div>
+                    <span style={{ fontSize: '10px' }}>START DATE</span>
+                    <input
+                      type="date"
+                      value={getSelectedRow()?.earlyBirdStartDate || ''}
+                      onChange={(e) =>
+                        updateMembershipRow(
+                          selectedRowId,
+                          'earlyBirdStartDate',
+                          e.target.value
+                        )
+                      }
+                      style={{
+                        width: '140px',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: '10px' }}>END DATE</span>
+                    <input
+                      type="date"
+                      value={getSelectedRow()?.earlyBirdEndDate || ''}
+                      onChange={(e) =>
+                        updateMembershipRow(
+                          selectedRowId,
+                          'earlyBirdEndDate',
+                          e.target.value
+                        )
+                      }
+                      style={{
+                        width: '140px',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Early Bird Renewal Date */}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Early Bird Renewal Date
+                </label>
+
+                <input
+                  type="date"
+                  value={getSelectedRow()?.earlyBirdRenewalDate || ''}
+                  onChange={(e) =>
+                    updateMembershipRow(
+                      selectedRowId,
+                      'earlyBirdRenewalDate',
+                      e.target.value
+                    )
+                  }
+                  style={{
+                    width: '60%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                  }}
+                />
+              </div>
             </section>
           </div>
         ) : null}

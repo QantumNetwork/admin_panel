@@ -1329,7 +1329,7 @@ const ClubDesk = () => {
                       <td>{getFullName(member)}</td>
                       <td>{member.Address || member.address || '-'}</td>
                       <td>{member.Mobile || member.mobile || '-'}</td>
-                      <td>{member.packageName || '-'}</td>
+                      <td>{member.comingPackageName ? member.comingPackageName : member.packageName || '-'}</td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderImage(member.profile_Image)}</td>

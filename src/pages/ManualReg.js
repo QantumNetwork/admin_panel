@@ -332,7 +332,7 @@ const ManualReg = () => {
       Address: formData.Address,
       Suburb: formData.Suburb,
       State: null,
-      amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+      amountPaid: (stored && fromMakePayment && stored.comingPackageId) ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
       currency: 'aud',
       paymentType: selectedPaymentMethod,
       packageId: selectedPkg?._id,
@@ -345,8 +345,12 @@ const ManualReg = () => {
 
     if (fromMakePayment && stored) {
       try {
-        const res = await axios.put(
-          `${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`,
+        let url='`${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`';
+        if(stored.comingPackageId) {
+          url=`${baseUrl}/user/${stored._id}/earlyBird-manual?appType=${selectedVenue}`;
+        }
+        const res = await axios.put(url
+          ,
           payload,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -354,8 +358,7 @@ const ManualReg = () => {
         );
 
         if (
-          res?.data?.message ===
-          'User updated successfully (Reception). Email sent.'
+          res?.data?.success
         ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
@@ -548,11 +551,19 @@ const ManualReg = () => {
     const fetchMembershipPackages = async () => {
       if (!selectedVenue || !userTimeZone) return;
 
+      let url=`${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+            userTimeZone
+          )}`;
+
+      if(fromMakePayment && stored) {
+        if(stored.comingPackageId) {
+          url=`${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
+        }
+      }
+
       try {
         const response = await axios.get(
-          `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
-            userTimeZone
-          )}`,
+          url,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -579,9 +590,11 @@ const ManualReg = () => {
   }, [token, selectedVenue, userTimeZone]);
 
   const handlePay = async () => {
+    console.log('membership pkg - ', membershipPackages);
     const selectedPkg = membershipPackages.find(
       (pkg) => pkg._id === formData.membershipLevel
     );
+    console.log('selected pkg - ', selectedPkg);
 
     if (fromMakePayment && stored) {
       try {
@@ -596,15 +609,21 @@ const ManualReg = () => {
           Address: formData.Address,
           Suburb: formData.Suburb,
           State: null,
-          amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+          amountPaid: (stored && fromMakePayment && stored.comingPackageId) ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
           currency: 'aud',
           packageId: selectedPkg?._id,
           packageName: selectedPkg?.membershipName,
           paymentType: 'card',
         };
 
-        const res = await axios.put(
-          `${baseUrl}/user/${stored._id}/payment?appType=${selectedVenue}`,
+        let url=`${baseUrl}/user/${stored._id}/payment?appType=${selectedVenue}`;
+
+        if(stored.comingPackageId) {
+          url=`${baseUrl}/user/${stored._id}/earlyBird-payment?appType=${selectedVenue}`
+        }
+
+        const res = await axios.put(url
+          ,
           body,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -730,7 +749,15 @@ const ManualReg = () => {
           paymentType: 'card',
         };
 
-        await axios.post(`${baseUrl}/payment/verify-payment`, verifyBody, {
+        let url=`${baseUrl}/payment/verify-payment`;
+
+        if(fromMakePayment && stored) {
+          if(stored.comingPackageId) {
+            url=`${baseUrl}/payment/verify-payment-early`
+          }
+        }
+
+        await axios.post(url, verifyBody, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -1622,26 +1649,30 @@ const ManualReg = () => {
                       />
                     </div>
 
-                    <button
-                      onClick={handlePay}
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        backgroundColor: '#5296D1',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '20px',
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        marginTop: '10px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Pay AUD$
-                      {membershipPackages
-                        .find((pkg) => pkg._id === formData.membershipLevel)
-                        ?.calculatedPrice?.toFixed(2) || '0.00'}
-                    </button>
+<button
+  onClick={handlePay}
+  style={{
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#5296D1',
+    color: 'white',
+    border: 'none',
+    borderRadius: '20px',
+    fontSize: '15px',
+    fontWeight: '600',
+    marginTop: '10px',
+    cursor: 'pointer',
+  }}
+>
+  Pay AUD$
+  {(stored && fromMakePayment && stored.comingPackageId)
+    ? membershipPackages
+        .find((pkg) => pkg._id === formData.membershipLevel)
+        ?.price?.toFixed(2) || '0.00'
+    : membershipPackages
+        .find((pkg) => pkg._id === formData.membershipLevel)
+        ?.calculatedPrice?.toFixed(2) || '0.00'}
+</button>
 
                     {showStripe && clientSecret && (
                       <CardPaymentUI
