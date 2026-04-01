@@ -53,6 +53,7 @@ const Renewals = () => {
   const [venues, setVenues] = useState([]);
   const [mobile, setMobile] = useState('');
   const [renewalData, setRenewalData] = useState([]);
+  const [earlyBird, setEarlyBird] = useState(false);
 
   const token = localStorage.getItem('token');
   const [selectedVenue, setSelectedVenue] = useState(
@@ -60,6 +61,8 @@ const Renewals = () => {
   );
 
   const [userTimeZone, setUserTimeZone] = useState('');
+
+  const [id, setId] = useState('');
 
   // s1 = Register New Member, s2 = Set Membership Level, s3 = Payment Details
   const [s1Visible, setS1Visible] = useState(true); // only s1 shown at start
@@ -287,15 +290,24 @@ const Renewals = () => {
         }
       );
 
+      if(response.data && response.data?.mobile?.user?._id) {
+        setId(response.data?.mobile?.user?._id);
+      }
+
       if (response.data && !response.data.mobile.registered) {
         setMember('new');
       } else {
-        if (response.data.mobile.user.ExpiryDate >= new Date().toISOString()) {
+        if(response.data.mobile.earlyBird===true || response.data.mobile.earlyBird==="true") {
+          setEarlyBird(true);
+        }
+        const expiry = new Date(response.data.mobile.user.ExpiryDate);
+        const now = new Date();
+        if (expiry >= now) {
           setMember('financial');
         } else {
           setMember('renewal');
-          setRenewalData(response.data.mobile.user);
         }
+        setRenewalData(response.data.mobile.user);
       }
     } catch (err) {
       console.error('Error fetching renewal:', err);
@@ -370,31 +382,35 @@ const Renewals = () => {
       Mobile: formData.Mobile,
       Suburb: formData.Suburb,
       State: null,
-      amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+      amountPaid: earlyBird===true ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
       currency: 'aud',
       paymentType: selectedPaymentMethod,
       packageId: selectedPkg?._id,
       packageName: selectedPkg?.membershipName,
-      renewType: 'renew'
+      ...(member === 'renewal' && { renewType: 'renew' }),
     };
 
     // {
     //   selectedVenue === 'Manly' && (payload.type = 'new');
     // }
 
-    if (member === 'renewal') {
+    if (member === 'renewal' || earlyBird===true) {
       try {
+        let url=`${baseUrl}/user/${id}/renewal/manual?appType=${selectedVenue}`;
+        if(earlyBird) {
+          url=`${baseUrl}/user/${id}/earlyBird-manual?appType=${selectedVenue}`;
+        }
         const res = await axios.put(
-          `${baseUrl}/user/${renewalData._id}/renewal/manual?appType=${selectedVenue}`,
+          url,
           payload,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          // {
+          //   headers: { Authorization: `Bearer ${token}` },
+          // }
         );
 
         if (
-          res?.data?.message ===
-          'User updated successfully (Reception). Email sent.'
+          res?.data?.success || res?.data?.message ===
+          'User updated successfully .'
         ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
@@ -587,11 +603,18 @@ const Renewals = () => {
     const fetchMembershipPackages = async () => {
       if (!selectedVenue || !userTimeZone) return;
 
+      let url=`${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+            userTimeZone
+          )}`;
+
+      if(earlyBird) {
+        url=`${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
+        setMembershipPackages([]);
+      }
+
       try {
         const response = await axios.get(
-          `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
-            userTimeZone
-          )}`,
+          url,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -615,14 +638,14 @@ const Renewals = () => {
     };
 
     fetchMembershipPackages();
-  }, [token, selectedVenue, userTimeZone]);
+  }, [token, selectedVenue, userTimeZone, earlyBird]);
 
   const handlePay = async () => {
     const selectedPkg = membershipPackages.find(
       (pkg) => pkg._id === formData.membershipLevel
     );
 
-    if (member === 'renewal') {
+    if (member === 'renewal' || earlyBird===true) {
       try {
         const body = {
           GivenNames: formData.GivenNames,
@@ -635,20 +658,26 @@ const Renewals = () => {
           Suburb: formData.Suburb,
           Mobile: formData.Mobile,
           State: null,
-          amountPaid: selectedPkg?.calculatedPrice * 100 || 0,
+          amountPaid: earlyBird===true ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
           currency: 'aud',
           packageId: selectedPkg?._id,
           packageName: selectedPkg?.membershipName,
           paymentType: 'card',
-          renewType: 'renew'
+          ...(member === 'renewal' && { renewType: 'renew' }),
         };
 
+        let url=`${baseUrl}/user/${id}/renewal/payment?appType=${selectedVenue}`;
+
+        if(earlyBird===true) {
+          url=`${baseUrl}/user/${id}/earlyBird-payment?appType=${selectedVenue}`
+        }
+
         const res = await axios.put(
-          `${baseUrl}/user/${renewalData._id}/renewal/payment?appType=${selectedVenue}`,
+          url,
           body,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          // {
+          //   headers: { Authorization: `Bearer ${token}` },
+          // }
         );
 
         const secret = res.data?.payment?.clientSecret;
@@ -770,7 +799,13 @@ const Renewals = () => {
           paymentType: 'card',
         };
 
-        await axios.post(`${baseUrl}/payment/verify-payment`, verifyBody, {
+        let url=`${baseUrl}/payment/verify-payment`;
+
+        if(earlyBird===true) {
+            url=`${baseUrl}/payment/verify-payment-early`
+        }
+
+        await axios.post(url, verifyBody, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -882,7 +917,7 @@ const Renewals = () => {
 //   }, []);
 
   useEffect(() => {
-    if (member !== 'renewal') return;
+    if (member !== 'renewal' && !earlyBird) return;
 
     // 1️⃣ Section 1 should be filled & locked (like after clicking Next)
     setEditing1(false); // remove Cancel/Next, show EDIT button
@@ -891,7 +926,7 @@ const Renewals = () => {
     // 2️⃣ Section 2 should be visible with EDIT mode enabled
     setS2Visible(true);
     setEditing2(true);
-  }, [member]);
+  }, [member,earlyBird]);
 
   useEffect(() => {
     if (!isEditMode || !user_id || !appType) return;
@@ -967,7 +1002,7 @@ const Renewals = () => {
   };
 
   useEffect(() => {
-    if (member !== 'renewal') return;
+    if (member !== 'renewal' && !earlyBird) return;
 
     setFormData({
       GivenNames: renewalData.GivenNames || '',
@@ -991,7 +1026,7 @@ const Renewals = () => {
       country: 'Australia',
       region: null,
     });
-  }, [member]);
+  }, [member,earlyBird,renewalData]);
 
   return (
     <div className="dashboard-container">
@@ -1207,7 +1242,7 @@ const Renewals = () => {
         </button>
       </aside>
 
-      {member !== 'renewal' && (
+      {(member !== 'renewal' && !earlyBird) && (
         <main className="main-content-renewals">
           <div className="renewal-center">
             <div className="renewal-box">
@@ -1235,7 +1270,7 @@ const Renewals = () => {
                   member.
                 </p>
               )}
-              {member === 'financial' && (
+              {(member === 'financial' && !earlyBird) && (
                 <p className="sub-text">
                   Member is already a financial member. <br />
                   Please have member install Loyalty App or print member card
@@ -1247,7 +1282,7 @@ const Renewals = () => {
         </main>
       )}
 
-      {member === 'renewal' && (
+      {(member === 'renewal' || earlyBird) && (
         <div className="content-wrapper-sa" style={{ top: '120px' }}>
           <section className="new-user-sa" style={{ height: '600px' }}>
             <h2>Register New Member</h2>
@@ -1731,9 +1766,13 @@ const Renewals = () => {
                         }}
                       >
                         Pay AUD$
-                        {membershipPackages
-                          .find((pkg) => pkg._id === formData.membershipLevel)
-                          ?.calculatedPrice?.toFixed(2) || '0.00'}
+                        {earlyBird
+    ? membershipPackages
+        .find((pkg) => pkg._id === formData.membershipLevel)
+        ?.price?.toFixed(2) || '0.00'
+    : membershipPackages
+        .find((pkg) => pkg._id === formData.membershipLevel)
+        ?.calculatedPrice?.toFixed(2) || '0.00'}
                       </button>
 
                       {showStripe && clientSecret && (
