@@ -433,7 +433,7 @@ const Renewals = () => {
 
         if (
           res?.data?.success || res?.data?.message ===
-          'User updated successfully .'
+          'User updated successfully .' || res?.data?.message === "User updated successfully (Reception). Email sent."
         ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
@@ -444,14 +444,14 @@ const Renewals = () => {
           setTimeout(() => resetManualReg(), 4000);
         } else {
           toast.error('Payment failed or cancelled');
-          resetManualReg();
+          // resetManualReg();
         }
 
         return;
       } catch (err) {
         console.error(err);
         toast.error('Failed to update payment');
-        resetManualReg();
+        // resetManualReg();
         return;
       }
     }
@@ -507,8 +507,7 @@ const Renewals = () => {
   const handleNextS1 = async () => {
     // Step forward from Register -> Membership Level
 
-    if (member === 'renewal') {
-      // BOTH FALSE → proceed to section 2
+    if (member === 'renewal' || earlyBird) {
       setS2Visible(true);
       setEditing1(false);
       setEditing2(true);
@@ -838,7 +837,7 @@ const Renewals = () => {
 
         if (result.error) {
           toast.error(result.error.message);
-          resetManualReg();
+          // resetManualReg();
         } else if (
           result.paymentIntent &&
           result.paymentIntent.status === 'succeeded'
@@ -850,13 +849,13 @@ const Renewals = () => {
           // updateS2W(verifyPayload.userId);
         } else {
           toast.error('Payment failed or cancelled');
-          resetManualReg();
+          // resetManualReg();
         }
       } catch (err) {
         setLoading(false);
         console.error(err);
         toast.error('Payment failed');
-        resetManualReg();
+        // resetManualReg();
       }
     };
 

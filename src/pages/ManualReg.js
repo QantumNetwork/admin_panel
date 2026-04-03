@@ -58,6 +58,7 @@ const ManualReg = () => {
   // requirement: at beginning register new member should show Cancel + Next
   const [editing1, setEditing1] = useState(true);
   const [editing2, setEditing2] = useState(false);
+  const [validateUser, setValidateUser] = useState(true);
 
   const [formData, setFormData] = useState({
     Id: '',
@@ -144,13 +145,13 @@ const ManualReg = () => {
   const stored = storedRaw ? JSON.parse(storedRaw) : null;
 
   const stripePromise = useMemo(() => {
-  return loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
-    stripeAccount:
-      selectedVenue === 'MaxGaming'
-        ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
-        : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
-  });
-}, [selectedVenue]);
+    return loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, {
+      stripeAccount:
+        selectedVenue === 'MaxGaming'
+          ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
+          : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+    });
+  }, [selectedVenue]);
 
   const getAppType = (appType) => {
     switch (appType) {
@@ -183,7 +184,7 @@ const ManualReg = () => {
       case 'Drinks':
         return 'Drinks HQ';
       case 'Wonthaggi':
-          return 'Wonthaggi Country Club';
+        return 'Wonthaggi Country Club';
       default:
         return appType;
     }
@@ -333,7 +334,10 @@ const ManualReg = () => {
       Address: formData.Address,
       Suburb: formData.Suburb,
       State: null,
-      amountPaid: (stored && fromMakePayment && stored.comingPackageId) ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
+      amountPaid:
+        stored && fromMakePayment && stored.comingPackageId
+          ? selectedPkg?.price * 100 || 0
+          : selectedPkg?.calculatedPrice * 100 || 0,
       currency: 'aud',
       paymentType: selectedPaymentMethod,
       packageId: selectedPkg?._id,
@@ -346,21 +350,17 @@ const ManualReg = () => {
 
     if (fromMakePayment && stored) {
       try {
-        let url='`${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`';
-        if(stored.comingPackageId) {
-          url=`${baseUrl}/user/${stored._id}/earlyBird-manual?appType=${selectedVenue}`;
+        let url =
+          `${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`;
+        if (stored.comingPackageId) {
+          url = `${baseUrl}/user/${stored._id}/earlyBird-manual?appType=${selectedVenue}`;
         }
-        const res = await axios.put(url
-          ,
-          payload,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.put(url, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (
-          res?.data?.success
-        ) {
+        if (res?.data?.success || res?.data?.message ===
+          'User updated successfully .' || res?.data?.message === "User updated successfully (Reception). Email sent.") {
           toast.success('Payment successful');
           setShowManualPayment(false);
           // optionally close payment section:
@@ -459,48 +459,50 @@ const ManualReg = () => {
       return;
     }
 
-    try {
-      const body = {
-        Mobile: formData.Mobile,
-        Email: formData.Email,
-      };
+    if (validateUser) {
+      try {
+        const body = {
+          Mobile: formData.Mobile,
+          Email: formData.Email,
+        };
 
-      const res = await axios.post(
-        `${baseUrl}/user/check-user?appType=${selectedVenue}`,
-        body,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.post(
+          `${baseUrl}/user/check-user?appType=${selectedVenue}`,
+          body,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const mobileReg = res.data?.mobile?.registered;
+        const emailReg = res.data?.email?.registered;
+
+        // CASE: both registered
+        if (mobileReg && emailReg) {
+          toast.error('Mobile number and Email are already registered');
+          return;
         }
-      );
 
-      const mobileReg = res.data?.mobile?.registered;
-      const emailReg = res.data?.email?.registered;
+        // CASE: mobile registered
+        if (mobileReg) {
+          toast.error('Mobile number is already registered');
+          return;
+        }
 
-      // CASE: both registered
-      if (mobileReg && emailReg) {
-        toast.error('Mobile number and Email are already registered');
-        return;
+        // CASE: email registered
+        if (emailReg) {
+          toast.error('Email is already registered');
+          return;
+        }
+
+        // BOTH FALSE → proceed to section 2
+        setS2Visible(true);
+        setEditing1(false);
+        setEditing2(true);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to validate user');
       }
-
-      // CASE: mobile registered
-      if (mobileReg) {
-        toast.error('Mobile number is already registered');
-        return;
-      }
-
-      // CASE: email registered
-      if (emailReg) {
-        toast.error('Email is already registered');
-        return;
-      }
-
-      // BOTH FALSE → proceed to section 2
-      setS2Visible(true);
-      setEditing1(false);
-      setEditing2(true);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to validate user');
     }
   };
 
@@ -515,6 +517,7 @@ const ManualReg = () => {
     setS3Visible(false);
     setEditing1(true);
     setEditing2(false);
+    setValidateUser(false);
   };
 
   const handleNextS2 = () => {
@@ -552,25 +555,22 @@ const ManualReg = () => {
     const fetchMembershipPackages = async () => {
       if (!selectedVenue || !userTimeZone) return;
 
-      let url=`${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
-            userTimeZone
-          )}`;
+      let url = `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+        userTimeZone
+      )}`;
 
-      if(fromMakePayment && stored) {
-        if(stored.comingPackageId) {
-          url=`${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
+      if (fromMakePayment && stored) {
+        if (stored.comingPackageId) {
+          url = `${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
         }
       }
 
       try {
-        const response = await axios.get(
-          url,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data?.data) {
           setMembershipPackages(response.data.data);
           // Set default membership level if not set
@@ -610,26 +610,25 @@ const ManualReg = () => {
           Address: formData.Address,
           Suburb: formData.Suburb,
           State: null,
-          amountPaid: (stored && fromMakePayment && stored.comingPackageId) ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
+          amountPaid:
+            stored && fromMakePayment && stored.comingPackageId
+              ? selectedPkg?.price * 100 || 0
+              : selectedPkg?.calculatedPrice * 100 || 0,
           currency: 'aud',
           packageId: selectedPkg?._id,
           packageName: selectedPkg?.membershipName,
           paymentType: 'card',
         };
 
-        let url=`${baseUrl}/user/${stored._id}/payment?appType=${selectedVenue}`;
+        let url = `${baseUrl}/user/${stored._id}/payment?appType=${selectedVenue}`;
 
-        if(stored.comingPackageId) {
-          url=`${baseUrl}/user/${stored._id}/earlyBird-payment?appType=${selectedVenue}`
+        if (stored.comingPackageId) {
+          url = `${baseUrl}/user/${stored._id}/earlyBird-payment?appType=${selectedVenue}`;
         }
 
-        const res = await axios.put(url
-          ,
-          body,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.put(url, body, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const secret = res.data?.payment?.clientSecret;
 
@@ -713,7 +712,7 @@ const ManualReg = () => {
           err.response?.data?.Message || err.response?.data
         }`
       );
-      resetManualReg();
+      // resetManualReg();
     }
   };
 
@@ -750,11 +749,11 @@ const ManualReg = () => {
           paymentType: 'card',
         };
 
-        let url=`${baseUrl}/payment/verify-payment`;
+        let url = `${baseUrl}/payment/verify-payment`;
 
-        if(fromMakePayment && stored) {
-          if(stored.comingPackageId) {
-            url=`${baseUrl}/payment/verify-payment-early`
+        if (fromMakePayment && stored) {
+          if (stored.comingPackageId) {
+            url = `${baseUrl}/payment/verify-payment-early`;
           }
         }
 
@@ -768,7 +767,7 @@ const ManualReg = () => {
 
         if (result.error) {
           toast.error(result.error.message);
-          resetManualReg();
+          // resetManualReg();
         } else if (
           result.paymentIntent &&
           result.paymentIntent.status === 'succeeded'
@@ -780,13 +779,13 @@ const ManualReg = () => {
           // updateS2W(verifyPayload.userId);
         } else {
           toast.error('Payment failed or cancelled');
-          resetManualReg();
+          // resetManualReg();
         }
       } catch (err) {
         setLoading(false);
         console.error(err);
         toast.error('Payment failed');
-        resetManualReg();
+        // resetManualReg();
       }
     };
 
@@ -882,7 +881,11 @@ const ManualReg = () => {
   }, [fromMakePayment]);
 
   useEffect(() => {
-    if ((!isEditMode || !user_id || !appType) && (!isRenewMode || !user_id || !appType)) return;
+    if (
+      (!isEditMode || !user_id || !appType) &&
+      (!isRenewMode || !user_id || !appType)
+    )
+      return;
 
     const fetchUser = async () => {
       try {
@@ -951,6 +954,59 @@ const ManualReg = () => {
     } catch (err) {
       console.error(err);
       toast.error('Failed to update profile');
+    }
+  };
+
+  const handleRenewEdit = async () => {
+    try {
+      if (!formData.Id) {
+        toast.error('User ID missing');
+        return;
+      }
+
+      const selectedPkg = membershipPackages.find(
+        (pkg) => pkg._id === formData.membershipLevel
+      );
+
+      const payload = {
+        GivenNames: formData.GivenNames,
+        Surname: formData.Surname,
+        DateOfBirth: formData.DateOfBirth,
+        Email: formData.Email,
+        Mobile: formData.Mobile,
+        Address: formData.Address,
+        Suburb: formData.Suburb,
+        PostCode: formData.PostCode,
+        Gender: formData.Gender,
+
+        MembershipCategory: selectedPkg?.membershipName,
+        ExpiryDate: formData.expiryDate,
+        packageId: selectedPkg?._id,
+      };
+
+      const res = await axios.put(
+        `${baseUrl}/user/updateprofile-s2w?userId=${formData.Id}`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (
+        res?.status === 200 ||
+        res?.data?.message === 'Profile Update Successfully'
+      ) {
+        toast.success(res.data?.message || 'Profile Update Successfully');
+
+        setTimeout(() => {
+          navigate('/member-search');
+        }, 1500);
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to update profile');
     }
   };
 
@@ -1195,7 +1251,11 @@ const ManualReg = () => {
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>
         <section className="new-user-sa" style={{ height: '600px' }}>
-          {(!isEditMode && !isRenewMode) ? <h2>Register New Member</h2> : <h2>Edit Member Details</h2>}         
+          {!isEditMode && !isRenewMode ? (
+            <h2>Register New Member</h2>
+          ) : (
+            <h2>Edit Member Details</h2>
+          )}
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>First name</label>
             <input
@@ -1231,51 +1291,51 @@ const ManualReg = () => {
 
           {isRenewMode && (
             <>
-            <div className="form-group">
-    <label style={{ fontWeight: 'bold' }}>Membership</label>
-    <select
-      name="membershipLevel"
-      value={formData.membershipLevel || ''}
-      onChange={(e) => {
-        const selectedId = e.target.value;
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Membership</label>
+                <select
+                  name="membershipLevel"
+                  value={formData.membershipLevel || ''}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
 
-        const selectedPkg = membershipPackages.find(
-          (pkg) => pkg._id === selectedId
-        );
+                    const selectedPkg = membershipPackages.find(
+                      (pkg) => pkg._id === selectedId
+                    );
 
-        setFormData((prev) => ({
-          ...prev,
-          membershipLevel: selectedId,
-          expiryDate: selectedPkg?.renewalDate || '',
-        }));
-      }}
-      style={{ padding: '5px'}}
-    >
-      {!formData.membershipLevel && (
-        <option value="" disabled>
-          Select from list
-        </option>
-      )}
+                    setFormData((prev) => ({
+                      ...prev,
+                      membershipLevel: selectedId,
+                      expiryDate: selectedPkg?.renewalDate || '',
+                    }));
+                  }}
+                  style={{ padding: '5px' }}
+                >
+                  {!formData.membershipLevel && (
+                    <option value="" disabled>
+                      Select from list
+                    </option>
+                  )}
 
-      {membershipPackages.map((pkg) => (
-        <option key={pkg._id} value={pkg._id}>
-          {pkg.membershipName}
-        </option>
-      ))}
-    </select>
-  </div>
+                  {membershipPackages.map((pkg) => (
+                    <option key={pkg._id} value={pkg._id}>
+                      {pkg.membershipName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-  <div className="form-group">
-    <label style={{ fontWeight: 'bold' }}>Expiry date</label>
-    <input
-      type="date"
-      name="expiryDate"
-      value={formData.expiryDate || ''}
-      onChange={handleInputChange}
-      style={{ padding: '8px' }}
-    />
-  </div>
-  </>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Expiry date</label>
+                <input
+                  type="date"
+                  name="expiryDate"
+                  value={formData.expiryDate || ''}
+                  onChange={handleInputChange}
+                  style={{ padding: '8px' }}
+                />
+              </div>
+            </>
           )}
 
           <div className="form-group">
@@ -1402,7 +1462,7 @@ const ManualReg = () => {
             className="d-flex w-100 justify-content-center"
             style={{ marginTop: '30px' }}
           >
-            {(!isEditMode && !isRenewMode) ? (
+            {!isEditMode && !isRenewMode ? (
               <>
                 {editing1 ? (
                   <>
@@ -1423,7 +1483,10 @@ const ManualReg = () => {
                 )}
               </>
             ) : (
-              <button className="blue-btn" onClick={handleSaveEdit}>
+              <button
+                className="blue-btn"
+                onClick={isRenewMode ? handleRenewEdit : handleSaveEdit}
+              >
                 Save
               </button>
             )}
@@ -1699,30 +1762,30 @@ const ManualReg = () => {
                       />
                     </div>
 
-<button
-  onClick={handlePay}
-  style={{
-    width: '100%',
-    padding: '10px',
-    backgroundColor: '#5296D1',
-    color: 'white',
-    border: 'none',
-    borderRadius: '20px',
-    fontSize: '15px',
-    fontWeight: '600',
-    marginTop: '10px',
-    cursor: 'pointer',
-  }}
->
-  Pay AUD$
-  {(stored && fromMakePayment && stored.comingPackageId)
-    ? membershipPackages
-        .find((pkg) => pkg._id === formData.membershipLevel)
-        ?.price?.toFixed(2) || '0.00'
-    : membershipPackages
-        .find((pkg) => pkg._id === formData.membershipLevel)
-        ?.calculatedPrice?.toFixed(2) || '0.00'}
-</button>
+                    <button
+                      onClick={handlePay}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        backgroundColor: '#5296D1',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '20px',
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        marginTop: '10px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Pay AUD$
+                      {stored && fromMakePayment && stored.comingPackageId
+                        ? membershipPackages
+                            .find((pkg) => pkg._id === formData.membershipLevel)
+                            ?.price?.toFixed(2) || '0.00'
+                        : membershipPackages
+                            .find((pkg) => pkg._id === formData.membershipLevel)
+                            ?.calculatedPrice?.toFixed(2) || '0.00'}
+                    </button>
 
                     {showStripe && clientSecret && (
                       <CardPaymentUI
