@@ -9,6 +9,19 @@
   width: calc(100% - 220px);
 }
 
+.members-table {
+  table-layout: auto; /* or fixed (see below) */
+  width: 100%;
+}
+
+.members-table td:last-child {
+  min-width: 120px;
+}
+
+.members-table td {
+  overflow-wrap: anywhere;
+}
+
 /* Search panel above table */
 .search-panel{
   background: #fff;

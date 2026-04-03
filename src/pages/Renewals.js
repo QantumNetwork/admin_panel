@@ -107,6 +107,12 @@ const Renewals = () => {
   const appType = searchParams.get('appType');
   const isEditMode = searchParams.get('mode') === 'edit';
 
+  const member_search_mobile = searchParams.get('member_search_mobile');
+  const member_search_appType = searchParams.get('member_search_appType');
+  const [loadingRenewal, setLoadingRenewal] = useState(false);
+  console.log('member_search_mobile:', member_search_mobile);
+  console.log('member_search_appType:', member_search_appType);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let sanitizedValue = value;
@@ -279,9 +285,14 @@ const Renewals = () => {
   // };
 
   const fetchRenewal = async () => {
+    let url=`${baseUrl}/user/renew-details/${mobile}?appType=${selectedVenue}`;
+    {(member_search_mobile && member_search_appType) && (
+      url=`${baseUrl}/user/renew-details/${member_search_mobile}?appType=${member_search_appType}`
+    )}
+    setLoadingRenewal(true);
     try {
       const response = await axios.get(
-        `${baseUrl}/user/renew-details/${mobile}?appType=${selectedVenue}`,
+        url,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -311,8 +322,20 @@ const Renewals = () => {
       }
     } catch (err) {
       console.error('Error fetching renewal:', err);
+    } finally {
+      setLoadingRenewal(false);
     }
   };
+
+  useEffect(() => {
+    if(member_search_mobile && member_search_appType) {
+      fetchRenewal();
+    }
+  },[member_search_mobile, member_search_appType]);
+
+  useEffect(() => {
+  console.log('member updated:', member);
+}, [member]);
 
   const resetManualReg = () => {
     // Remove stored data
@@ -1028,6 +1051,10 @@ const Renewals = () => {
     });
   }, [member,earlyBird,renewalData]);
 
+  if (loadingRenewal) {
+    return <div style={{ textAlign: 'center', padding: '20px', marginTop: '80px', fontWeight: 'bold', fontSize: '30px' }}>Loading...</div>; 
+  }
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -1251,7 +1278,7 @@ const Renewals = () => {
                 <input
                   type="text"
                   className="mobile-input"
-                  value={mobile}
+                  value={!member_search_mobile ? mobile : member_search_mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   placeholder="0412 345 678"
                 />

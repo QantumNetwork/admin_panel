@@ -77,6 +77,7 @@ const ClubPackage = () => {
 
   // Add this useEffect hook at the beginning of the ClubPackage component, after the state declarations
   useEffect(() => {
+    setLoading(true);
     const checkExistingMember = async () => {
       if (!selectedVenue) return;
 
@@ -94,6 +95,8 @@ const ClubPackage = () => {
       } catch (error) {
         console.error('Error checking member status:', error);
         // Continue showing the ClubPackage form if there's an error
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -179,6 +182,10 @@ const ClubPackage = () => {
   //     toast.error(error.message || 'Failed to remove lock. Please try again.');
   //   }
   // };
+
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: '20px', marginTop: '80px', fontWeight: 'bold', fontSize: '30px' }}>Loading...</div>; 
+  }
 
   return (
     <div className="dashboard-container">

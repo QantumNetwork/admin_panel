@@ -652,7 +652,7 @@ const rightColumn = currentSubs
 
       <main className="chat-container">
         {/* Top Buttons */}
-          <div className="top-buttons-row">
+          <div className="chat-top-buttons-row">
             {topButtons.map((tb) => (
               <button
                 key={tb._id}

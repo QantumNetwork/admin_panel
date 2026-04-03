@@ -91,6 +91,7 @@ const ManualReg = () => {
   const user_id = searchParams.get('user_id');
   const appType = searchParams.get('appType');
   const isEditMode = searchParams.get('mode') === 'edit';
+  const isRenewMode = searchParams.get('mode') === 'renew';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -881,7 +882,7 @@ const ManualReg = () => {
   }, [fromMakePayment]);
 
   useEffect(() => {
-    if (!isEditMode || !user_id || !appType) return;
+    if ((!isEditMode || !user_id || !appType) && (!isRenewMode || !user_id || !appType)) return;
 
     const fetchUser = async () => {
       try {
@@ -924,7 +925,7 @@ const ManualReg = () => {
     };
 
     fetchUser();
-  }, [isEditMode, user_id, appType]);
+  }, [isEditMode, user_id, appType, isRenewMode]);
 
   const handleSaveEdit = async () => {
     try {
@@ -1194,7 +1195,7 @@ const ManualReg = () => {
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>
         <section className="new-user-sa" style={{ height: '600px' }}>
-          <h2>Register New Member</h2>
+          {(!isEditMode && !isRenewMode) ? <h2>Register New Member</h2> : <h2>Edit Member Details</h2>}         
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>First name</label>
             <input
@@ -1227,6 +1228,55 @@ const ManualReg = () => {
               {...disableIf(editing1)}
             />
           </div>
+
+          {isRenewMode && (
+            <>
+            <div className="form-group">
+    <label style={{ fontWeight: 'bold' }}>Membership</label>
+    <select
+      name="membershipLevel"
+      value={formData.membershipLevel || ''}
+      onChange={(e) => {
+        const selectedId = e.target.value;
+
+        const selectedPkg = membershipPackages.find(
+          (pkg) => pkg._id === selectedId
+        );
+
+        setFormData((prev) => ({
+          ...prev,
+          membershipLevel: selectedId,
+          expiryDate: selectedPkg?.renewalDate || '',
+        }));
+      }}
+      style={{ padding: '5px'}}
+    >
+      {!formData.membershipLevel && (
+        <option value="" disabled>
+          Select from list
+        </option>
+      )}
+
+      {membershipPackages.map((pkg) => (
+        <option key={pkg._id} value={pkg._id}>
+          {pkg.membershipName}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div className="form-group">
+    <label style={{ fontWeight: 'bold' }}>Expiry date</label>
+    <input
+      type="date"
+      name="expiryDate"
+      value={formData.expiryDate || ''}
+      onChange={handleInputChange}
+      style={{ padding: '8px' }}
+    />
+  </div>
+  </>
+          )}
 
           <div className="form-group">
             <label style={{ fontWeight: 'bold' }}>Email</label>
@@ -1350,9 +1400,9 @@ const ManualReg = () => {
           </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '120px' }}
+            style={{ marginTop: '30px' }}
           >
-            {!isEditMode ? (
+            {(!isEditMode && !isRenewMode) ? (
               <>
                 {editing1 ? (
                   <>

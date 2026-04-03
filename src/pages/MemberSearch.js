@@ -221,6 +221,18 @@ const MemberSearch = () => {
     fetchMembers();
   }, [fetchMembers]);
 
+  const handleEditMember = (member) => {
+    navigate(
+      `/manual-reg?user_id=${member._id}&appType=${selectedVenue}&mode=renew`
+    );
+  };
+
+  const handleRenewMember = (member) => {
+    navigate(
+      `/renewals?member_search_mobile=${member.Mobile}&member_search_appType=${selectedVenue}`
+    )
+  }
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -502,6 +514,7 @@ const MemberSearch = () => {
                   <th>Card #</th>
                   <th>Membership</th>
                   <th>Expiry</th>
+                  <th>App</th>
                   <th>Phone</th>
                   <th>Birthday</th>
                   <th>Join Date</th>
@@ -547,6 +560,7 @@ const MemberSearch = () => {
                               .join('-')
                           : ''}
                       </td>
+                      <td>{member.device_token ? 'Yes' : 'No'}</td>
                       <td>{member.Mobile}</td>
                       <td>
                         {member.DateOfBirth
@@ -566,6 +580,71 @@ const MemberSearch = () => {
                       <td>{member.Address}</td>
                       <td>{member.State}</td>
                       <td>{member.PostCode}</td>
+                      <td>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            alignItems: 'center',
+                          }}
+                        >                       
+                          <button
+                            onClick={() => handleEditMember(member)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#002977',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            ✎ Edit
+                          </button>
+                        </div>
+                      </td>
+<td>
+  {(() => {
+    const today = new Date();
+    const expiry = member.ExpiryDate ? new Date(member.ExpiryDate) : null;
+
+    // Normalize time (important)
+    today.setHours(0, 0, 0, 0);
+    if (expiry) expiry.setHours(0, 0, 0, 0);
+
+    if (!member.Mobile) {
+        return <span style={{ fontSize: '12px', color: 'red' }}>Missing phone #</span>;
+    }
+
+    // Case 1: Active membership
+    if (expiry && expiry >= today) {
+      return null; // nothing if mobile exists
+    }
+
+    // Case 2: Expired membership
+    return (
+      <button
+        className="action-btn approve send-back-btn"
+        style={{
+          whiteSpace: 'normal',
+          maxWidth: '150px',
+          padding: '8px 12px',
+          textAlign: 'center',
+          display: 'inline-block',
+          wordBreak: 'break-word',
+        }}
+        onClick={() => handleRenewMember(member)}
+      >
+        <span className="send-back-text">
+          Renew Membership
+        </span>
+      </button>
+    );
+  })()}
+</td>
+
+                      
                     </tr>
                   ))}
               </tbody>
