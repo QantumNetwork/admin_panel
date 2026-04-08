@@ -31,7 +31,6 @@ const MembershipPage = () => {
   const [membershipData, setMembershipData] = useState(null);
   const [userTimeZone, setUserTimeZone] = useState('');
   const [selectedRowId, setSelectedRowId] = useState(null);
-  const [showRowModal, setShowRowModal] = useState(false);
 
   const userType = localStorage.getItem('userType') || 'admin';
 
@@ -45,6 +44,7 @@ const MembershipPage = () => {
         proRata: level.proRata,
         renewalDate: level.renewalDate?.split('T')[0] || '',
 
+        expiryEarlyBirdRenewalDate: level.expiryEarlyBirdRenewalDate || '',
         earlyBirdStartDate: level.earlyBirdPeriod?.startDate || '',
         earlyBirdEndDate: level.earlyBirdPeriod?.endDate || '',
         earlyBirdRenewalDate: level.earlyBirdRenewalDate || '',
@@ -58,6 +58,7 @@ const MembershipPage = () => {
         price: '$5',
         proRata: false,
         renewalDate: '',
+        expiryEarlyBirdRenewalDate: '',
         earlyBirdStartDate: '',
         earlyBirdEndDate: '',
         earlyBirdRenewalDate: '',
@@ -68,6 +69,7 @@ const MembershipPage = () => {
         price: '$10',
         proRata: false,
         renewalDate: '',
+        expiryEarlyBirdRenewalDate: '',
         earlyBirdStartDate: '',
         earlyBirdEndDate: '',
         earlyBirdRenewalDate: '',
@@ -198,6 +200,8 @@ const MembershipPage = () => {
               proRata: level.proRata,
               renewalDate: level.renewalDate?.split('T')[0] || '',
 
+              expiryEarlyBirdRenewalDate:
+                level.expiryEarlyBirdRenewalDate?.split('T')[0] || '',
               earlyBirdStartDate:
                 level.earlyBirdPeriod?.startDate?.split('T')[0] || '',
               earlyBirdEndDate:
@@ -280,6 +284,7 @@ const MembershipPage = () => {
       price: '',
       proRata: false,
       renewalDate: '',
+      expiryEarlyBirdRenewalDate: '',
       earlyBirdStartDate: '',
       earlyBirdEndDate: '',
       earlyBirdRenewalDate: '',
@@ -324,6 +329,10 @@ const MembershipPage = () => {
 
           if (row._id) {
             levelObject._id = row._id; // <-- Attach only if exists
+          }
+
+          if (row.expiryEarlyBirdRenewalDate) {
+            levelObject.expiryEarlyBirdRenewalDate = row.expiryEarlyBirdRenewalDate;
           }
 
           if (row.earlyBirdStartDate && row.earlyBirdEndDate) {
@@ -879,6 +888,38 @@ const MembershipPage = () => {
                   </div>
                 </div>
               )}
+
+              {/*Early Bird Expiry Date*/}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Set Expiry Date for Early Bird 
+                </label>
+
+                <input
+                  type="date"
+                  value={getSelectedRow()?.expiryEarlyBirdRenewalDate || ''}
+                  onChange={(e) =>
+                    updateMembershipRow(
+                      selectedRowId,
+                      'expiryEarlyBirdRenewalDate',
+                      e.target.value
+                    )
+                  }
+                  style={{
+                    width: '60%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                  }}
+                />
+              </div>
 
               {/* Early Bird Period */}
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
