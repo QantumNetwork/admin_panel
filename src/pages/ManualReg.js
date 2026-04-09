@@ -914,6 +914,9 @@ const ManualReg = () => {
           PostCode: u.PostCode || '',
           Gender: u.Gender || '',
           DateOfBirth: u.DateOfBirth ? u.DateOfBirth.substring(0, 10) : '',
+
+          membershipLevel: u.packageId || '',
+          expiryDate: u.ExpiryDate ? u.ExpiryDate.substring(0, 10) : '',
         }));
 
         // 🔒 Edit-only mode
