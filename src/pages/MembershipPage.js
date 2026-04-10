@@ -660,18 +660,18 @@ const MembershipPage = () => {
         {activeTab === 'setMemberLevels' ? (
           <div
             className="content-wrapper-sa"
-            style={{ top: '80px', marginLeft: '20px' }}
+            style={{ top: '60px', marginLeft: '20px' }}
           >
             <section
               className="new-user-sa"
-              style={{ width: '50%', height: '500px' }}
+              style={{ width: '50%', height: '580px' }}
             >
               <h2>Enter Membership Levels & Pricing</h2>
 
               <table
                 style={{
                   width: '100%',
-                  marginTop: '20px',
+                  marginTop: '10px',
                   borderCollapse: 'collapse',
                   tableLayout: 'fixed',
                   fontSize: '12px',
@@ -714,7 +714,7 @@ const MembershipPage = () => {
                 <tbody>
                   {membershipRows.map((row) => (
                     <tr key={row.id}>
-                      <td style={{ padding: '10px' }}>
+                      <td style={{ padding: '10px', paddingBottom: '2px' }}>
                         <input
                           type="text"
                           value={row.name}
@@ -730,7 +730,7 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      <td style={{ padding: '10px', textAlign: 'center' }}>
+                      <td style={{ padding: '10px', paddingBottom: '2px', textAlign: 'center' }}>
                         <input
                           type="text"
                           value={row.price}
@@ -747,7 +747,7 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      <td style={{ padding: '10px' }}>
+                      <td style={{ padding: '10px', paddingBottom: '2px' }}>
                         <div
                           style={{
                             display: 'flex',
@@ -808,7 +808,7 @@ const MembershipPage = () => {
 
             <section
               className="new-user-sa"
-              style={{ height: '500px', width: '40%', fontSize: '12px' }}
+              style={{ height: '580px', width: '40%', fontSize: '12px' }}
             >
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
                 <label
@@ -922,7 +922,7 @@ const MembershipPage = () => {
               </div>
 
               {/* Early Bird Period */}
-              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <div style={{ marginTop: '40px', textAlign: 'center' }}>
                 <label
                   style={{
                     display: 'block',
@@ -987,7 +987,7 @@ const MembershipPage = () => {
               </div>
 
               {/* Early Bird Renewal Date */}
-              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <div style={{ marginTop: '40px', textAlign: 'center' }}>
                 <label
                   style={{
                     display: 'block',
