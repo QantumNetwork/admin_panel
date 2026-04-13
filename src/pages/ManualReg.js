@@ -8,7 +8,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { MdRefresh } from 'react-icons/md';
+import { MdRefresh, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
@@ -185,6 +185,8 @@ const ManualReg = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -350,8 +352,7 @@ const ManualReg = () => {
 
     if (fromMakePayment && stored) {
       try {
-        let url =
-          `${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`;
+        let url = `${baseUrl}/user/${stored._id}/manual?appType=${selectedVenue}`;
         if (stored.comingPackageId) {
           url = `${baseUrl}/user/${stored._id}/earlyBird-manual?appType=${selectedVenue}`;
         }
@@ -359,8 +360,12 @@ const ManualReg = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res?.data?.success || res?.data?.message ===
-          'User updated successfully .' || res?.data?.message === "User updated successfully (Reception). Email sent.") {
+        if (
+          res?.data?.success ||
+          res?.data?.message === 'User updated successfully .' ||
+          res?.data?.message ===
+            'User updated successfully (Reception). Email sent.'
+        ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
           // optionally close payment section:
@@ -1249,6 +1254,19 @@ const ManualReg = () => {
             }`}
           />{' '}
           &nbsp; Member Search
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
         </button>
       </aside>
 

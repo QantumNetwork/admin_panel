@@ -8,7 +8,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { CiSearch } from 'react-icons/ci';
-import { MdVerified } from 'react-icons/md';
+import { MdVerified, MdHistory } from 'react-icons/md';
 import { MdRefresh } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -83,7 +83,9 @@ const MemberSearch = () => {
       case 'Drinks':
         return 'Drinks HQ';
       case 'Wonthaggi':
-          return 'Wonthaggi Country Club';
+        return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -157,7 +159,6 @@ const MemberSearch = () => {
     if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
   };
 
-
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -230,8 +231,8 @@ const MemberSearch = () => {
   const handleRenewMember = (member) => {
     navigate(
       `/renewals?member_search_mobile=${member.Mobile}&member_search_appType=${selectedVenue}`
-    )
-  }
+    );
+  };
 
   return (
     <div className="dashboard-container">
@@ -445,6 +446,19 @@ const MemberSearch = () => {
           />{' '}
           &nbsp; Member Search
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
+        </button>
       </aside>
 
       <div className="content-area">
@@ -500,7 +514,7 @@ const MemberSearch = () => {
         </div>
       </div>
 
-      <div className="members-table-container" style={{ marginLeft: '15%'}}>
+      <div className="members-table-container" style={{ marginLeft: '15%' }}>
         {loading ? (
           <div className="loading">Loading...</div>
         ) : (
@@ -570,11 +584,14 @@ const MemberSearch = () => {
                               .join('-')
                           : ''}
                       </td>
-                      <td>{member.DateJoined ? member.DateJoined.substring(0, 10)
+                      <td>
+                        {member.DateJoined
+                          ? member.DateJoined.substring(0, 10)
                               .split('-')
                               .reverse()
                               .join('-')
-                          : ''}</td>
+                          : ''}
+                      </td>
                       <td>{member.Gender}</td>
                       <td>{member.Email}</td>
                       <td>{member.Address}</td>
@@ -587,7 +604,7 @@ const MemberSearch = () => {
                             gap: '8px',
                             alignItems: 'center',
                           }}
-                        >                       
+                        >
                           <button
                             onClick={() => handleEditMember(member)}
                             style={{
@@ -597,54 +614,58 @@ const MemberSearch = () => {
                               cursor: 'pointer',
                               textDecoration: 'underline',
                               fontSize: '12px',
-                              whiteSpace: 'nowrap'
+                              whiteSpace: 'nowrap',
                             }}
                           >
                             ✎ Edit
                           </button>
                         </div>
                       </td>
-<td>
-  {(() => {
-    const today = new Date();
-    const expiry = member.ExpiryDate ? new Date(member.ExpiryDate) : null;
+                      <td>
+                        {(() => {
+                          const today = new Date();
+                          const expiry = member.ExpiryDate
+                            ? new Date(member.ExpiryDate)
+                            : null;
 
-    // Normalize time (important)
-    today.setHours(0, 0, 0, 0);
-    if (expiry) expiry.setHours(0, 0, 0, 0);
+                          // Normalize time (important)
+                          today.setHours(0, 0, 0, 0);
+                          if (expiry) expiry.setHours(0, 0, 0, 0);
 
-    if (!member.Mobile) {
-        return <span style={{ fontSize: '12px', color: 'red' }}>Missing phone #</span>;
-    }
+                          if (!member.Mobile) {
+                            return (
+                              <span style={{ fontSize: '12px', color: 'red' }}>
+                                Missing phone #
+                              </span>
+                            );
+                          }
 
-    // Case 1: Active membership
-    if (expiry && expiry >= today) {
-      return null; // nothing if mobile exists
-    }
+                          // Case 1: Active membership
+                          if (expiry && expiry >= today) {
+                            return null; // nothing if mobile exists
+                          }
 
-    // Case 2: Expired membership
-    return (
-      <button
-        className="action-btn approve send-back-btn"
-        style={{
-          whiteSpace: 'normal',
-          maxWidth: '150px',
-          padding: '8px 12px',
-          textAlign: 'center',
-          display: 'inline-block',
-          wordBreak: 'break-word',
-        }}
-        onClick={() => handleRenewMember(member)}
-      >
-        <span className="send-back-text">
-          Renew Membership
-        </span>
-      </button>
-    );
-  })()}
-</td>
-
-                      
+                          // Case 2: Expired membership
+                          return (
+                            <button
+                              className="action-btn approve send-back-btn"
+                              style={{
+                                whiteSpace: 'normal',
+                                maxWidth: '150px',
+                                padding: '8px 12px',
+                                textAlign: 'center',
+                                display: 'inline-block',
+                                wordBreak: 'break-word',
+                              }}
+                              onClick={() => handleRenewMember(member)}
+                            >
+                              <span className="send-back-text">
+                                Renew Membership
+                              </span>
+                            </button>
+                          );
+                        })()}
+                      </td>
                     </tr>
                   ))}
               </tbody>

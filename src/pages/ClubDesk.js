@@ -9,8 +9,8 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { MdVerified } from 'react-icons/md';
-import { MdRefresh } from "react-icons/md";
+import { MdVerified, MdHistory } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -122,7 +122,18 @@ const ClubDesk = () => {
     } finally {
       setLoading(false);
     }
-  }, [baseUrl, membersPage, membersLimit, membersSearch, token, dateFilter, startDate, endDate, renewalsFilter, token]);
+  }, [
+    baseUrl,
+    membersPage,
+    membersLimit,
+    membersSearch,
+    token,
+    dateFilter,
+    startDate,
+    endDate,
+    renewalsFilter,
+    token,
+  ]);
 
   // Fetch payments (waiting payment)
   const fetchPayments = async () => {
@@ -183,6 +194,8 @@ const ClubDesk = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -214,10 +227,16 @@ const ClubDesk = () => {
   // Fetch when pages/limits/search change for respective tabs
   useEffect(() => {
     if (activeTab === 'membersForApproval') fetchMembers();
-  }, [membersPage, membersLimit, membersSearch, dateFilter, renewalsFilter,
+  }, [
+    membersPage,
+    membersLimit,
+    membersSearch,
+    dateFilter,
+    renewalsFilter,
     startDate,
     endDate,
-    token]);
+    token,
+  ]);
 
   useEffect(() => {
     if (activeTab === 'waitingPayment') fetchPayments();
@@ -593,7 +612,7 @@ const ClubDesk = () => {
         url += `&renewType=none`;
       }
       // if "all" -> DO NOT append renewType
- 
+
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -991,6 +1010,19 @@ const ClubDesk = () => {
           />{' '}
           &nbsp; Member Search
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
+        </button>
       </aside>
 
       <div className="sa-filter-buttons-approvals">
@@ -1087,7 +1119,11 @@ const ClubDesk = () => {
             <select
               value={dateFilter}
               onChange={(e) => {
-                {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
+                {
+                  activeTab === 'verified'
+                    ? setVerifiedPage(1)
+                    : setMembersPage(1);
+                }
                 setDateFilter(e.target.value);
               }}
               style={{
@@ -1123,7 +1159,11 @@ const ClubDesk = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => {
-                  {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
+                  {
+                    activeTab === 'verified'
+                      ? setVerifiedPage(1)
+                      : setMembersPage(1);
+                  }
                   setStartDate(e.target.value);
                 }}
                 style={{
@@ -1154,7 +1194,11 @@ const ClubDesk = () => {
                 type="date"
                 value={endDate}
                 onChange={(e) => {
-                  {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
+                  {
+                    activeTab === 'verified'
+                      ? setVerifiedPage(1)
+                      : setMembersPage(1);
+                  }
                   setEndDate(e.target.value);
                 }}
                 style={{
@@ -1171,7 +1215,11 @@ const ClubDesk = () => {
           <select
             value={renewalsFilter}
             onChange={(e) => {
-              {activeTab === 'verified' ? setVerifiedPage(1) : setMembersPage(1)};
+              {
+                activeTab === 'verified'
+                  ? setVerifiedPage(1)
+                  : setMembersPage(1);
+              }
               setRenewalsFilter(e.target.value);
             }}
             style={{
@@ -1192,32 +1240,35 @@ const ClubDesk = () => {
 
           {activeTab === 'verified' && (
             <>
-            {/* EXPORT BUTTON — VERIFIED ONLY */}
-          <button
-            onClick={handleVerifiedExport}
-            style={{
-              marginLeft: '80%',
-              padding: '8px 18px',
-              borderRadius: '20px',
-              border: '1px solid #002977',
-              backgroundColor: '#fff',
-              color: '#002977',
-              fontWeight: '600',
-              cursor: 'pointer',
-              height: '36px',
-            }}
-          >
-            Export
-          </button>
-          </>
+              {/* EXPORT BUTTON — VERIFIED ONLY */}
+              <button
+                onClick={handleVerifiedExport}
+                style={{
+                  marginLeft: '80%',
+                  padding: '8px 18px',
+                  borderRadius: '20px',
+                  border: '1px solid #002977',
+                  backgroundColor: '#fff',
+                  color: '#002977',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  height: '36px',
+                }}
+              >
+                Export
+              </button>
+            </>
           )}
-          
         </div>
       )}
 
       <div
         className="members-table-container"
-        style={activeTab === 'verified' || activeTab === 'membersForApproval' ? { marginTop: '1.5%' } : {}}
+        style={
+          activeTab === 'verified' || activeTab === 'membersForApproval'
+            ? { marginTop: '1.5%' }
+            : {}
+        }
       >
         {loading ? (
           <div className="loading">Loading...</div>
@@ -1234,9 +1285,7 @@ const ClubDesk = () => {
                   {activeTab === 'membersForApproval' && (
                     <th>Membership Expiry</th>
                   )}
-                  {activeTab === 'membersForApproval' && (
-                    <th>Card Number</th>
-                  )}
+                  {activeTab === 'membersForApproval' && <th>Card Number</th>}
                   <th>Licence Front</th>
                   <th>Licence Back</th>
                   <th>Selfie</th>
@@ -1329,7 +1378,11 @@ const ClubDesk = () => {
                       <td>{getFullName(member)}</td>
                       <td>{member.Address || member.address || '-'}</td>
                       <td>{member.Mobile || member.mobile || '-'}</td>
-                      <td>{member.comingPackageName ? member.comingPackageName : member.packageName || '-'}</td>
+                      <td>
+                        {member.comingPackageName
+                          ? member.comingPackageName
+                          : member.packageName || '-'}
+                      </td>
                       <td>{renderLicence(member.licence_front)}</td>
                       <td>{renderLicence(member.licence_back)}</td>
                       <td>{renderImage(member.profile_Image)}</td>

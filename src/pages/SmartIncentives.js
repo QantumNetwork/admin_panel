@@ -288,6 +288,25 @@ const SmartIncentives = () => {
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Gold', label: 'Gold' },
     ];
+  } else if (selectedVenue === 'Woollahra') {
+    audienceOptions = [
+      {
+        value: 'Crew',
+        label: 'Crew',
+      },
+      {
+        value: 'Regulars',
+        label: 'Regulars',
+      },
+      {
+        value: 'Club Connect',
+        label: 'Club Connect',
+      },
+      {
+        value: 'Local Legends',
+        label: 'Local Legends',
+      },
+    ];
   } else {
     audienceOptions = [
       { value: 'Staff', label: 'Staff' },
@@ -2386,6 +2405,8 @@ const SmartIncentives = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }

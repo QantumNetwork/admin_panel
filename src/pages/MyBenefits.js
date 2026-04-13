@@ -61,6 +61,7 @@ const MyBenefits = () => {
     if (savedVenue === 'Flinders') return 'Member';
     if (savedVenue === 'Drinks') return 'Explorer';
     if (savedVenue === 'Wonthaggi') return 'Valued';
+    if (savedVenue === 'Woollahra') return 'Regulars'
     return 'Platinum Black';
   });
 
@@ -180,6 +181,14 @@ const MyBenefits = () => {
         return '#23a5ec';
       case 'Corporate':
         return '#b8e90aff';
+      case 'Regulars':
+        return '#eeddc0';
+      case 'Crew':
+        return '#e29a35';
+      case 'Club Connect':
+        return '#c19e14dd';
+      case 'Local Legends':
+        return '#61791b';
       default:
         return '#D4AF37'; // Default gold color
     }
@@ -302,7 +311,26 @@ const MyBenefits = () => {
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Gold', label: 'Gold' },
     ];
-  } 
+  } else if(selectedVenue === 'Woollahra') {
+    audienceOptions = [
+      {
+        value: 'Crew',
+        label: 'Crew',
+      },
+      {
+        value: 'Regulars',
+        label: 'Regulars',
+      },
+      {
+        value: 'Club Connect',
+        label: 'Club Connect',
+      },
+      {
+        value: 'Local Legends',
+        label: 'Local Legends',
+      },
+    ];
+  }
 
   const email = localStorage.getItem('userEmail');
   const userInitial = email ? email.charAt(0).toUpperCase() : '';
@@ -498,6 +526,8 @@ const MyBenefits = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
           return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }

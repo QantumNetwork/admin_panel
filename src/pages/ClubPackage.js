@@ -8,7 +8,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { CiSearch } from 'react-icons/ci';
-import { MdRefresh } from 'react-icons/md';
+import { MdRefresh, MdHistory } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import { MdVerified } from 'react-icons/md';
 import 'react-toastify/dist/ReactToastify.css';
@@ -70,6 +70,8 @@ const ClubPackage = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -184,7 +186,19 @@ const ClubPackage = () => {
   // };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '20px', marginTop: '80px', fontWeight: 'bold', fontSize: '30px' }}>Loading...</div>; 
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '20px',
+          marginTop: '80px',
+          fontWeight: 'bold',
+          fontSize: '30px',
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -398,6 +412,19 @@ const ClubPackage = () => {
             }`}
           />{' '}
           &nbsp; Member Search
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
         </button>
       </aside>
 

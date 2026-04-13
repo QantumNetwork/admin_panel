@@ -9,7 +9,8 @@ import { PiListBulletsFill } from 'react-icons/pi';
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { FaUser } from 'react-icons/fa';
-import { MdVerified } from 'react-icons/md';
+import { MdVerified, MdRefresh, MdHistory } from 'react-icons/md';
+import { CiSearch } from 'react-icons/ci';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -67,6 +68,8 @@ const AppSettings = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -94,44 +97,40 @@ const AppSettings = () => {
   }, [token]);
 
   useEffect(() => {
-  const fetchOfferButtons = async () => {
-    try {
-      const response = await axios.get(
-        `${baseUrl}/offer/button/get`,
-        {
+    const fetchOfferButtons = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/offer/button/get`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+        });
 
-      if (response.data?.success && response.data?.data) {
-        const { menu_Type, filter_Type } = response.data.data;
+        if (response.data?.success && response.data?.data) {
+          const { menu_Type, filter_Type } = response.data.data;
 
-        if (menu_Type === 'standard') {
-          setMenuType('standard');
-          setOfferTypes(['']); // reset
-        } else {
-          setMenuType('multiple');
-          setOfferTypes(
-            Array.isArray(filter_Type) && filter_Type.length
-              ? filter_Type
-              : ['']
-          );
+          if (menu_Type === 'standard') {
+            setMenuType('standard');
+            setOfferTypes(['']); // reset
+          } else {
+            setMenuType('multiple');
+            setOfferTypes(
+              Array.isArray(filter_Type) && filter_Type.length
+                ? filter_Type
+                : ['']
+            );
+          }
         }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message || 'Failed to fetch offer buttons'
+        );
       }
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          'Failed to fetch offer buttons'
-      );
-    }
-  };
+    };
 
-  if (token) {
-    fetchOfferButtons();
-  }
-}, [token]);
+    if (token) {
+      fetchOfferButtons();
+    }
+  }, [token]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -363,130 +362,169 @@ const AppSettings = () => {
       {/* sidebar */}
       <aside className="sidebar-sa">
         {!isAdmin ? (
-<>
-<button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
-          onClick={() => navigate('/approvals')}
-        >
-          <FaUsersRectangle
-            className={`sidebar-icon ${
-              isActive('/approvals') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Approvals
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
-          onClick={() => navigate('/manual-reg')}
-        >
-          <HiOutlinePencilSquare
-            className={`sidebar-icon ${
-              isActive('/manual-reg') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Manual Registration
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/membership') ? 'active' : ''}`}
-          onClick={() => navigate('/membership')}
-        >
-          <PiListBulletsFill
-            className={`sidebar-icon ${
-              isActive('/membership') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Club Package
-        </button>
-
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
-          onClick={() => navigate('/app-settings')}
-        >
-          <FaMobileScreenButton
-            className={`sidebar-icon ${
-              isActive('/app-settings') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; App Settings
-        </button>
-
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${
-            isActive('/payment-reporting') ? 'active' : ''
-          }`}
-          onClick={() => {
-            navigate('/payment-reporting');
-          }}
-        >
-          <MdVerified
-            className={`sidebar-icon ${
-              isActive('/payment-reporting') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Payment Reporting
-        </button>
-</>
-        ):(
           <>
-<button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${
-            isActive('/standard-admin') ? 'active' : ''
-          }`}
-          onClick={() => navigate('/standard-admin')}
-        >
-          <FaUser
-            className={`sidebar-icon ${
-              isActive('/standard-admin') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Users
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/admin-custom') ? 'active' : ''}`}
-          onClick={() => navigate('/admin-custom')}
-        >
-          <TiCreditCard
-            className={`sidebar-icon ${
-              isActive('/admin-custom') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Custom Buttons
-        </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
+              onClick={() => navigate('/approvals')}
+            >
+              <FaUsersRectangle
+                className={`sidebar-icon ${
+                  isActive('/approvals') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Approvals
+            </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
+              onClick={() => navigate('/manual-reg')}
+            >
+              <HiOutlinePencilSquare
+                className={`sidebar-icon ${
+                  isActive('/manual-reg') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Manual Registration
+            </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/membership') ? 'active' : ''}`}
+              onClick={() => navigate('/membership')}
+            >
+              <PiListBulletsFill
+                className={`sidebar-icon ${
+                  isActive('/membership') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Club Package
+            </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
-          onClick={() => navigate('/app-settings', { state: { admin: true } })}
-        >
-          <FaMobileScreenButton
-            className={`sidebar-icon ${
-              isActive('/app-settings') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; App Settings
-        </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+              onClick={() => navigate('/app-settings')}
+            >
+              <FaMobileScreenButton
+                className={`sidebar-icon ${
+                  isActive('/app-settings') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; App Settings
+            </button>
 
-        <button
-                  style={{ fontSize: '12px' }}
-                  className={`sidebar-btn ${isActive('/ai-buttons') ? 'active' : ''}`}
-                  onClick={() => navigate('/ai-buttons')}
-                >
-                  <BsMenuButtonFill
-                    className={`sidebar-icon ${isActive('/ai-buttons') ? '' : 'navy-icon'}`}
-                  />{' '}
-                  &nbsp; AI Buttons
-                </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${
+                isActive('/payment-reporting') ? 'active' : ''
+              }`}
+              onClick={() => {
+                navigate('/payment-reporting');
+              }}
+            >
+              <MdVerified
+                className={`sidebar-icon ${
+                  isActive('/payment-reporting') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Payment Reporting
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+              onClick={() => navigate('/renewals')}
+            >
+              <MdRefresh
+                className={`sidebar-icon ${
+                  isActive('/renewals') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Renewals
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+              onClick={() => navigate('/member-search')}
+            >
+              <CiSearch
+                className={`sidebar-icon ${
+                  isActive('/member-search') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Member Search
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+              onClick={() => navigate('/transaction-history')}
+            >
+              <MdHistory
+                className={`sidebar-icon ${
+                  isActive('/transaction-history') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Transaction History
+            </button>
           </>
+        ) : (
+          <>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${
+                isActive('/standard-admin') ? 'active' : ''
+              }`}
+              onClick={() => navigate('/standard-admin')}
+            >
+              <FaUser
+                className={`sidebar-icon ${
+                  isActive('/standard-admin') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Users
+            </button>
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/admin-custom') ? 'active' : ''}`}
+              onClick={() => navigate('/admin-custom')}
+            >
+              <TiCreditCard
+                className={`sidebar-icon ${
+                  isActive('/admin-custom') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; Custom Buttons
+            </button>
 
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
+              onClick={() =>
+                navigate('/app-settings', { state: { admin: true } })
+              }
+            >
+              <FaMobileScreenButton
+                className={`sidebar-icon ${
+                  isActive('/app-settings') ? '' : 'navy-icon'
+                }`}
+              />{' '}
+              &nbsp; App Settings
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/ai-buttons') ? 'active' : ''}`}
+              onClick={() => navigate('/ai-buttons')}
+            >
+              <BsMenuButtonFill
+                className={`sidebar-icon ${isActive('/ai-buttons') ? '' : 'navy-icon'}`}
+              />{' '}
+              &nbsp; AI Buttons
+            </button>
+          </>
         )}
-        
       </aside>
 
       <main className="special-offers-container">
@@ -529,7 +567,9 @@ const AppSettings = () => {
                         <input
                           type="text"
                           value={type}
-                          onChange={(e) => updateOfferType(index, e.target.value)}
+                          onChange={(e) =>
+                            updateOfferType(index, e.target.value)
+                          }
                         />
 
                         {!isFirst && (

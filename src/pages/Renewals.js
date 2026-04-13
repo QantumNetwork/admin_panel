@@ -8,7 +8,7 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { MdVerified } from 'react-icons/md';
+import { MdVerified, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { MdRefresh } from 'react-icons/md';
 import { loadStripe } from '@stripe/stripe-js';
@@ -199,6 +199,8 @@ const Renewals = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -285,30 +287,32 @@ const Renewals = () => {
   // };
 
   const fetchRenewal = async () => {
-    let url=`${baseUrl}/user/renew-details/${mobile}?appType=${selectedVenue}`;
-    {(member_search_mobile && member_search_appType) && (
-      url=`${baseUrl}/user/renew-details/${member_search_mobile}?appType=${member_search_appType}`
-    )}
+    let url = `${baseUrl}/user/renew-details/${mobile}?appType=${selectedVenue}`;
+    {
+      member_search_mobile &&
+        member_search_appType &&
+        (url = `${baseUrl}/user/renew-details/${member_search_mobile}?appType=${member_search_appType}`);
+    }
     setLoadingRenewal(true);
     try {
-      const response = await axios.get(
-        url,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if(response.data && response.data?.mobile?.user?._id) {
+      if (response.data && response.data?.mobile?.user?._id) {
         setId(response.data?.mobile?.user?._id);
       }
 
       if (response.data && !response.data.mobile.registered) {
         setMember('new');
       } else {
-        if(response.data.mobile.earlyBird===true || response.data.mobile.earlyBird==="true") {
+        if (
+          response.data.mobile.earlyBird === true ||
+          response.data.mobile.earlyBird === 'true'
+        ) {
           setEarlyBird(true);
         }
         const expiry = new Date(response.data.mobile.user.ExpiryDate);
@@ -328,14 +332,14 @@ const Renewals = () => {
   };
 
   useEffect(() => {
-    if(member_search_mobile && member_search_appType) {
+    if (member_search_mobile && member_search_appType) {
       fetchRenewal();
     }
-  },[member_search_mobile, member_search_appType]);
+  }, [member_search_mobile, member_search_appType]);
 
   useEffect(() => {
-  console.log('member updated:', member);
-}, [member]);
+    console.log('member updated:', member);
+  }, [member]);
 
   const resetManualReg = () => {
     // Remove stored data
@@ -405,7 +409,10 @@ const Renewals = () => {
       Mobile: formData.Mobile,
       Suburb: formData.Suburb,
       State: null,
-      amountPaid: earlyBird===true ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
+      amountPaid:
+        earlyBird === true
+          ? selectedPkg?.price * 100 || 0
+          : selectedPkg?.calculatedPrice * 100 || 0,
       currency: 'aud',
       paymentType: selectedPaymentMethod,
       packageId: selectedPkg?._id,
@@ -417,23 +424,25 @@ const Renewals = () => {
     //   selectedVenue === 'Manly' && (payload.type = 'new');
     // }
 
-    if (member === 'renewal' || earlyBird===true) {
+    if (member === 'renewal' || earlyBird === true) {
       try {
-        let url=`${baseUrl}/user/${id}/renewal/manual?appType=${selectedVenue}`;
-        if(earlyBird) {
-          url=`${baseUrl}/user/${id}/earlyBird-manual?appType=${selectedVenue}`;
+        let url = `${baseUrl}/user/${id}/renewal/manual?appType=${selectedVenue}`;
+        if (earlyBird) {
+          url = `${baseUrl}/user/${id}/earlyBird-manual?appType=${selectedVenue}`;
         }
         const res = await axios.put(
           url,
-          payload,
+          payload
           // {
           //   headers: { Authorization: `Bearer ${token}` },
           // }
         );
 
         if (
-          res?.data?.success || res?.data?.message ===
-          'User updated successfully .' || res?.data?.message === "User updated successfully (Reception). Email sent."
+          res?.data?.success ||
+          res?.data?.message === 'User updated successfully .' ||
+          res?.data?.message ===
+            'User updated successfully (Reception). Email sent.'
         ) {
           toast.success('Payment successful');
           setShowManualPayment(false);
@@ -625,24 +634,21 @@ const Renewals = () => {
     const fetchMembershipPackages = async () => {
       if (!selectedVenue || !userTimeZone) return;
 
-      let url=`${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
-            userTimeZone
-          )}`;
+      let url = `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+        userTimeZone
+      )}`;
 
-      if(earlyBird) {
-        url=`${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
+      if (earlyBird) {
+        url = `${baseUrl}/club-package/earlybird?appType=${selectedVenue}`;
         setMembershipPackages([]);
       }
 
       try {
-        const response = await axios.get(
-          url,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data?.data) {
           setMembershipPackages(response.data.data);
           // Set default membership level if not set
@@ -667,7 +673,7 @@ const Renewals = () => {
       (pkg) => pkg._id === formData.membershipLevel
     );
 
-    if (member === 'renewal' || earlyBird===true) {
+    if (member === 'renewal' || earlyBird === true) {
       try {
         const body = {
           GivenNames: formData.GivenNames,
@@ -680,7 +686,10 @@ const Renewals = () => {
           Suburb: formData.Suburb,
           Mobile: formData.Mobile,
           State: null,
-          amountPaid: earlyBird===true ? (selectedPkg?.price * 100 || 0) : (selectedPkg?.calculatedPrice * 100 || 0),
+          amountPaid:
+            earlyBird === true
+              ? selectedPkg?.price * 100 || 0
+              : selectedPkg?.calculatedPrice * 100 || 0,
           currency: 'aud',
           packageId: selectedPkg?._id,
           packageName: selectedPkg?.membershipName,
@@ -688,15 +697,15 @@ const Renewals = () => {
           ...(member === 'renewal' && { renewType: 'renew' }),
         };
 
-        let url=`${baseUrl}/user/${id}/renewal/payment?appType=${selectedVenue}`;
+        let url = `${baseUrl}/user/${id}/renewal/payment?appType=${selectedVenue}`;
 
-        if(earlyBird===true) {
-          url=`${baseUrl}/user/${id}/earlyBird-payment?appType=${selectedVenue}`
+        if (earlyBird === true) {
+          url = `${baseUrl}/user/${id}/earlyBird-payment?appType=${selectedVenue}`;
         }
 
         const res = await axios.put(
           url,
-          body,
+          body
           // {
           //   headers: { Authorization: `Bearer ${token}` },
           // }
@@ -821,10 +830,10 @@ const Renewals = () => {
           paymentType: 'card',
         };
 
-        let url=`${baseUrl}/payment/verify-payment`;
+        let url = `${baseUrl}/payment/verify-payment`;
 
-        if(earlyBird===true) {
-            url=`${baseUrl}/payment/verify-payment-early`
+        if (earlyBird === true) {
+          url = `${baseUrl}/payment/verify-payment-early`;
         }
 
         await axios.post(url, verifyBody, {
@@ -901,42 +910,42 @@ const Renewals = () => {
       : {},
   });
 
-//   useEffect(() => {
-//     if (!stored) return;
+  //   useEffect(() => {
+  //     if (!stored) return;
 
-//     const u = stored;
+  //     const u = stored;
 
-//     // --- REGISTER NEW MEMBER (Section 1) ---
-//     setFormData((prev) => ({
-//       ...prev,
-//       GivenNames: u.GivenNames || '',
-//       Surname: u.Surname || '',
-//       Email: u.Email || '',
-//       Mobile: u.Mobile || '',
-//       Address: u.Address || '',
-//       PostCode: u.PostCode || '',
-//       Suburb: u.Suburb || '',
-//       Gender: u.Gender || '',
-//       DateOfBirth: u.DateOfBirth ? u.DateOfBirth.substring(0, 10) : '',
+  //     // --- REGISTER NEW MEMBER (Section 1) ---
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       GivenNames: u.GivenNames || '',
+  //       Surname: u.Surname || '',
+  //       Email: u.Email || '',
+  //       Mobile: u.Mobile || '',
+  //       Address: u.Address || '',
+  //       PostCode: u.PostCode || '',
+  //       Suburb: u.Suburb || '',
+  //       Gender: u.Gender || '',
+  //       DateOfBirth: u.DateOfBirth ? u.DateOfBirth.substring(0, 10) : '',
 
-//       // --- SET MEMBERSHIP LEVEL (Section 2) ---
-//       membershipLevel: u.packageId || '',
+  //       // --- SET MEMBERSHIP LEVEL (Section 2) ---
+  //       membershipLevel: u.packageId || '',
 
-//       // --- PAYMENT DETAILS (Section 3) ---
-//       cardNumber: u.CardNumber || '',
-//       paymentEmail: u.Email || '',
-//       amountPaid: u.amountPaid || 0,
+  //       // --- PAYMENT DETAILS (Section 3) ---
+  //       cardNumber: u.CardNumber || '',
+  //       paymentEmail: u.Email || '',
+  //       amountPaid: u.amountPaid || 0,
 
-//       // these fields keep current values unless Manual-Payment or card is used
-//       expiryDate: prev.expiryDate,
-//       cvv: prev.cvv,
-//       nameOnCard: prev.nameOnCard,
-//       country: prev.country,
-//       region: prev.region,
-//     }));
+  //       // these fields keep current values unless Manual-Payment or card is used
+  //       expiryDate: prev.expiryDate,
+  //       cvv: prev.cvv,
+  //       nameOnCard: prev.nameOnCard,
+  //       country: prev.country,
+  //       region: prev.region,
+  //     }));
 
-//     setFromMakePayment(true);
-//   }, []);
+  //     setFromMakePayment(true);
+  //   }, []);
 
   useEffect(() => {
     if (member !== 'renewal' && !earlyBird) return;
@@ -948,7 +957,7 @@ const Renewals = () => {
     // 2️⃣ Section 2 should be visible with EDIT mode enabled
     setS2Visible(true);
     setEditing2(true);
-  }, [member,earlyBird]);
+  }, [member, earlyBird]);
 
   useEffect(() => {
     if (!isEditMode || !user_id || !appType) return;
@@ -1048,10 +1057,22 @@ const Renewals = () => {
       country: 'Australia',
       region: null,
     });
-  }, [member,earlyBird,renewalData]);
+  }, [member, earlyBird, renewalData]);
 
   if (loadingRenewal) {
-    return <div style={{ textAlign: 'center', padding: '20px', marginTop: '80px', fontWeight: 'bold', fontSize: '30px' }}>Loading...</div>; 
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '20px',
+          marginTop: '80px',
+          fontWeight: 'bold',
+          fontSize: '30px',
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -1266,9 +1287,22 @@ const Renewals = () => {
           />{' '}
           &nbsp; Member Search
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
+        </button>
       </aside>
 
-      {(member !== 'renewal' && !earlyBird) && (
+      {member !== 'renewal' && !earlyBird && (
         <main className="main-content-renewals">
           <div className="renewal-center">
             <div className="renewal-box">
@@ -1296,7 +1330,7 @@ const Renewals = () => {
                   member.
                 </p>
               )}
-              {(member === 'financial' && !earlyBird) && (
+              {member === 'financial' && !earlyBird && (
                 <p className="sub-text">
                   Member is already a financial member. <br />
                   Please have member install Loyalty App or print member card
@@ -1793,12 +1827,16 @@ const Renewals = () => {
                       >
                         Pay AUD$
                         {earlyBird
-    ? membershipPackages
-        .find((pkg) => pkg._id === formData.membershipLevel)
-        ?.price?.toFixed(2) || '0.00'
-    : membershipPackages
-        .find((pkg) => pkg._id === formData.membershipLevel)
-        ?.calculatedPrice?.toFixed(2) || '0.00'}
+                          ? membershipPackages
+                              .find(
+                                (pkg) => pkg._id === formData.membershipLevel
+                              )
+                              ?.price?.toFixed(2) || '0.00'
+                          : membershipPackages
+                              .find(
+                                (pkg) => pkg._id === formData.membershipLevel
+                              )
+                              ?.calculatedPrice?.toFixed(2) || '0.00'}
                       </button>
 
                       {showStripe && clientSecret && (

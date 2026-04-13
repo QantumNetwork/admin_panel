@@ -91,6 +91,8 @@ const StandardAdmin = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -120,6 +122,8 @@ const StandardAdmin = () => {
         return '/ace.png';
       case 'Queens':
         return '/queens.png';
+      case 'Woollahra':
+        return '/woollahra.png';
       case 'Brisbane':
         return '/brisbane.png';
       case 'Bluewater':

@@ -7,7 +7,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { FaUpload } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
-import { MdVerified } from 'react-icons/md';
+import { MdVerified, MdHistory } from 'react-icons/md';
 import { MdRefresh } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -114,6 +114,8 @@ const MembershipPage = () => {
         return 'Drinks HQ';
       case 'Wonthaggi':
         return 'Wonthaggi Country Club';
+      case 'Woollahra':
+        return 'Woollahra Hotel';
       default:
         return appType;
     }
@@ -178,46 +180,46 @@ const MembershipPage = () => {
   };
 
   const fetchMembershipData = async () => {
-      if (!selectedVenue) return;
+    if (!selectedVenue) return;
 
-      try {
-        const response = await axios.get(`${baseUrl}/club-package`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const response = await axios.get(`${baseUrl}/club-package`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (response.data?.data?.length > 0) {
-          console.log(response.data.data);
-          setMembershipData(response.data.data[0]); // Take the first package if multiple exist
+      if (response.data?.data?.length > 0) {
+        console.log(response.data.data);
+        setMembershipData(response.data.data[0]); // Take the first package if multiple exist
 
-          const rows = response.data.data[0].membershipLevels.map(
-            (level, index) => ({
-              id: index + 1,
-              _id: level._id,
-              name: level.membershipName,
-              price: `$${level.price}`,
-              proRata: level.proRata,
-              renewalDate: level.renewalDate?.split('T')[0] || '',
+        const rows = response.data.data[0].membershipLevels.map(
+          (level, index) => ({
+            id: index + 1,
+            _id: level._id,
+            name: level.membershipName,
+            price: `$${level.price}`,
+            proRata: level.proRata,
+            renewalDate: level.renewalDate?.split('T')[0] || '',
 
-              expiryEarlyBirdRenewalDate:
-                level.expiryEarlyBirdRenewalDate?.split('T')[0] || '',
-              earlyBirdStartDate:
-                level.earlyBirdPeriod?.startDate?.split('T')[0] || '',
-              earlyBirdEndDate:
-                level.earlyBirdPeriod?.endDate?.split('T')[0] || '',
-              earlyBirdRenewalDate:
-                level.earlyBirdRenewalDate?.split('T')[0] || '',
-            })
-          );
+            expiryEarlyBirdRenewalDate:
+              level.expiryEarlyBirdRenewalDate?.split('T')[0] || '',
+            earlyBirdStartDate:
+              level.earlyBirdPeriod?.startDate?.split('T')[0] || '',
+            earlyBirdEndDate:
+              level.earlyBirdPeriod?.endDate?.split('T')[0] || '',
+            earlyBirdRenewalDate:
+              level.earlyBirdRenewalDate?.split('T')[0] || '',
+          })
+        );
 
-          setMembershipRows(rows);
-        }
-      } catch (error) {
-        console.error('Error fetching membership data:', error);
-        toast.error('Failed to load membership data');
+        setMembershipRows(rows);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching membership data:', error);
+      toast.error('Failed to load membership data');
+    }
+  };
 
   useEffect(() => {
     fetchMembershipData();
@@ -332,7 +334,8 @@ const MembershipPage = () => {
           }
 
           if (row.expiryEarlyBirdRenewalDate) {
-            levelObject.expiryEarlyBirdRenewalDate = row.expiryEarlyBirdRenewalDate;
+            levelObject.expiryEarlyBirdRenewalDate =
+              row.expiryEarlyBirdRenewalDate;
           }
 
           if (row.earlyBirdStartDate && row.earlyBirdEndDate) {
@@ -389,7 +392,7 @@ const MembershipPage = () => {
           toast.success(response.data.message);
         }
 
-        await fetchMembershipData();  
+        await fetchMembershipData();
       }
     } catch (error) {
       console.error('Error creating club package:', error);
@@ -632,6 +635,19 @@ const MembershipPage = () => {
           />{' '}
           &nbsp; Member Search
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+          onClick={() => navigate('/transaction-history')}
+        >
+          <MdHistory
+            className={`sidebar-icon ${
+              isActive('/transaction-history') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Transaction History
+        </button>
       </aside>
 
       <div className="navigation-buttons-member">
@@ -730,7 +746,13 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      <td style={{ padding: '10px', paddingBottom: '2px', textAlign: 'center' }}>
+                      <td
+                        style={{
+                          padding: '10px',
+                          paddingBottom: '2px',
+                          textAlign: 'center',
+                        }}
+                      >
                         <input
                           type="text"
                           value={row.price}
@@ -898,7 +920,7 @@ const MembershipPage = () => {
                     fontWeight: 'bold',
                   }}
                 >
-                  Set Expiry Date for Early Bird 
+                  Set Expiry Date for Early Bird
                 </label>
 
                 <input

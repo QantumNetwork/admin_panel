@@ -28,6 +28,7 @@ import PaymentReporting from "./pages/PaymentReporting";
 import Renewals from "./pages/Renewals";
 import MemberSearch from "./pages/MemberSearch";
 import PublicMemberSearch from "./pages/PublicMemberSearch";
+import TransactionHistory from "./pages/TransactionHistory";
 import AIButtons from "./pages/AIButtons";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
@@ -97,6 +98,7 @@ function App() {
         <Route path="/member-search" element={<MemberSearch />} />
         <Route path="/public-member-search" element={<PublicMemberSearch />} />
         <Route path="/ai-buttons" element={<AIButtons />} />
+        <Route path="/transaction-history" element={<TransactionHistory />} />
       </Routes>
       
     </Router>
