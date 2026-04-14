@@ -18,6 +18,7 @@ import { ToastContainer, toast, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/admin-custom.css';
 import Swal from 'sweetalert2';
+import { getAppType } from '../utils/appConstants';
 
 // Custom CSS for form validation
 const errorStyle = {
@@ -147,45 +148,6 @@ const AdminCustom = () => {
   const [selectedVenue, setSelectedVenue] = useState(
     localStorage.getItem('selectedVenue') || ''
   );
-
-  const getAppType = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      case 'North':
-        return 'North Shore Tavern';
-      case 'Hogan':
-        return "Hogan's";
-      case 'Ace':
-        return 'Ace Rewards';
-      case 'Queens':
-        return 'Queens Hotel';
-      case 'Brisbane':
-        return 'Brisbane Brewing Co';
-      case 'Bluewater':
-        return 'Bluewater Captains Club';
-      case 'Flinders':
-        return 'Flinders Street Wharves';
-      case 'Drinks':
-        return 'Drinks HQ';
-      case 'Wonthaggi':
-        return 'Wonthaggi Country Club';
-      case 'Woollahra':
-        return 'Woollahra Hotel';
-      default:
-        return appType;
-    }
-  };
 
   // Fetch buttons when component mounts or when selectedVenue changes
   useEffect(() => {

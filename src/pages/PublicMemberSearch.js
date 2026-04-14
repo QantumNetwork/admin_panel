@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import { getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/member-search.css';
 
@@ -37,46 +38,6 @@ const userType = localStorage.getItem('userType') || 'admin'; // can be user/sea
   const [mobile, setMobile] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [memberId, setMemberId] = useState('');
-
-
-  const getAppType = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      case 'North':
-        return 'North Shore Tavern';
-      case 'Hogan':
-        return "Hogan's";
-      case 'Ace':
-        return 'Ace Rewards';
-      case 'Queens':
-        return 'Queens Hotel';
-      case 'Brisbane':
-        return 'Brisbane Brewing Co';
-      case 'Bluewater':
-        return 'Bluewater Captains Club';
-      case 'Flinders':
-        return 'Flinders Street Wharves';
-      case 'Drinks':
-        return 'Drinks HQ';
-      case 'Wonthaggi':
-        return 'Wonthaggi Country Club';
-      case 'Woollahra':
-        return 'Woollahra Hotel';
-      default:
-        return appType;
-    }
-  };
   
   //Pagination controls per tab
   const onPrev = () => {

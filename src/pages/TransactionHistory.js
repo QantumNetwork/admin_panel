@@ -11,6 +11,7 @@ import { MdRefresh } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { MdVerified, MdHistory } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
+import { getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/payment-reporting.css';
 
@@ -118,45 +119,6 @@ const PaymentReporting = () => {
       toast.error('Failed to fetch members');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getAppType = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      case 'North':
-        return 'North Shore Tavern';
-      case 'Hogan':
-        return "Hogan's";
-      case 'Ace':
-        return 'Ace Rewards';
-      case 'Queens':
-        return 'Queens Hotel';
-      case 'Brisbane':
-        return 'Brisbane Brewing Co';
-      case 'Bluewater':
-        return 'Bluewater Captains Club';
-      case 'Flinders':
-        return 'Flinders Street Wharves';
-      case 'Drinks':
-        return 'Drinks HQ';
-      case 'Wonthaggi':
-        return 'Wonthaggi Country Club';
-      case 'Woollahra':
-        return 'Woollahra Hotel';
-      default:
-        return appType;
     }
   };
 

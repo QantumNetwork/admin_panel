@@ -11,24 +11,25 @@ export const handleLogout = async () => {
     const token = localStorage.getItem('token');
     const response = await axios.delete(`${baseUrl}/api/logout`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
-    
-    if (response.data?.message==="Logged out & locks cleared") {
+
+    if (response.data?.message === 'Logged out & locks cleared') {
       return { success: true };
     } else {
-      return { 
-        success: false, 
-        message: response.data?.message || 'Logout failed' 
+      return {
+        success: false,
+        message: response.data?.message || 'Logout failed',
       };
     }
   } catch (error) {
     console.error('Logout error:', error);
-    return { 
-      success: false, 
-      message: error.response?.data?.message || 'Failed to logout. Please try again.' 
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || 'Failed to logout. Please try again.',
     };
   }
 };
@@ -37,117 +38,135 @@ export const handleLogout = async () => {
 const menuAccessErrors = {};
 
 // Helper to compute a stable toast id per access item
-const getToastId = (accessItem, suffix = '') => `menu-access-${accessItem}${suffix ? `-${suffix}` : ''}`;
+const getToastId = (accessItem, suffix = '') =>
+  `menu-access-${accessItem}${suffix ? `-${suffix}` : ''}`;
 
 export const trackMenuAccess = async (accessItem) => {
   try {
     const baseUrl = process.env.REACT_APP_API_BASE_URL;
     const token = localStorage.getItem('token');
-    
+
     const response = await axios.post(
       `${baseUrl}/menu/enter`,
       { accessItem },
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         // Add timestamp to prevent caching
-        params: { _: new Date().getTime() }
+        params: { _: new Date().getTime() },
       }
     );
-    
-if (response.data?.status === true || response.data?.success === true) {
+
+    if (response.data?.status === true || response.data?.success === true) {
       console.log(response.data.message);
-      localStorage.setItem("accessItem", accessItem);
+      localStorage.setItem('accessItem', accessItem);
       // Clear any error for this menu item on successful access
       if (menuAccessErrors[accessItem]) {
         delete menuAccessErrors[accessItem];
       }
       return { success: true, data: response.data };
     } else {
-      const errorMessage = response.data?.message || 'Failed to track menu access';
+      const errorMessage =
+        response.data?.message || 'Failed to track menu access';
       const now = Date.now();
       const toastId = getToastId(accessItem);
 
       const lastError = menuAccessErrors[accessItem];
-       // Only show error if it's a different message or if it's been more than 5 seconds since the last error
-      if (!lastError || lastError.message !== errorMessage || (now - lastError.timestamp) > 2000) {
+      // Only show error if it's a different message or if it's been more than 5 seconds since the last error
+      if (
+        !lastError ||
+        lastError.message !== errorMessage ||
+        now - lastError.timestamp > 2000
+      ) {
         console.warn('Menu access tracking failed:', errorMessage);
-  toast.error(errorMessage, {
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "light",
-    transition: Slide,
-  });
+        toast.error(errorMessage, {
+          position: 'top-center',
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+          transition: Slide,
+        });
 
-        
         // Update last error for this specific menu item
         menuAccessErrors[accessItem] = {
           message: errorMessage,
-          timestamp: now
+          timestamp: now,
         };
       }
-      return { 
-        success: false, 
-        message: errorMessage
+      return {
+        success: false,
+        message: errorMessage,
       };
     }
   } catch (error) {
-   const errorMessage = error.response?.data?.message || error.response?.data?.response?.message || 'Another User is currently using this Menu, please try later';
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.response?.message ||
+      'Another User is currently using this Menu, please try later';
     const now = Date.now();
     const lastError = menuAccessErrors[accessItem];
-     console.log('=== ERROR TRACKING DEBUG ===');
-  console.log('Access Item:', accessItem);
-  console.log('Error Message:', errorMessage);
-  console.log('Last Error:', lastError);
-  console.log('Current menuAccessErrors:', menuAccessErrors);
-  console.log('Toast container found?', document.querySelector('.Toastify__toast-container'));
-  console.log('Condition check:', {
-    noLastError: !lastError,
-    differentMessage: lastError?.message !== errorMessage,
-    timeElapsed: lastError ? (now - lastError.timestamp) : 'N/A',
-    shouldShow: !lastError || lastError.message !== errorMessage || (now - lastError.timestamp) > 1000
-  });
+    console.log('=== ERROR TRACKING DEBUG ===');
+    console.log('Access Item:', accessItem);
+    console.log('Error Message:', errorMessage);
+    console.log('Last Error:', lastError);
+    console.log('Current menuAccessErrors:', menuAccessErrors);
+    console.log(
+      'Toast container found?',
+      document.querySelector('.Toastify__toast-container')
+    );
+    console.log('Condition check:', {
+      noLastError: !lastError,
+      differentMessage: lastError?.message !== errorMessage,
+      timeElapsed: lastError ? now - lastError.timestamp : 'N/A',
+      shouldShow:
+        !lastError ||
+        lastError.message !== errorMessage ||
+        now - lastError.timestamp > 1000,
+    });
 
-    
     // Only show error if it's a different message or if it's been more than 1 seconds since the last error for this specific menu item
-    if (!lastError || lastError.message !== errorMessage || (now - lastError.timestamp) > 1000) {
-          console.error('✅ SHOWING TOAST - Error tracking menu access:', errorMessage);
+    if (
+      !lastError ||
+      lastError.message !== errorMessage ||
+      now - lastError.timestamp > 1000
+    ) {
+      console.error(
+        '✅ SHOWING TOAST - Error tracking menu access:',
+        errorMessage
+      );
 
       console.error('Error tracking menu access:', errorMessage);
-  toast.error(errorMessage, {
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "light",
-    transition: Slide,
-  });
-      
+      toast.error(errorMessage, {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: 'light',
+        transition: Slide,
+      });
+
       // Update last error for this specific menu item
       menuAccessErrors[accessItem] = {
         message: errorMessage,
-        timestamp: now
+        timestamp: now,
       };
     } else {
-    console.error('❌ NOT SHOWING TOAST - Condition failed');
-
+      console.error('❌ NOT SHOWING TOAST - Condition failed');
     }
-    return { 
-      success: false, 
+    return {
+      success: false,
       message: errorMessage,
-      error: error 
+      error: error,
     };
   }
 };
-
 
 let refreshTimer = null;
 
@@ -158,9 +177,12 @@ export const setupRefreshLock = () => {
   }
 
   // Set up new interval
-  refreshTimer = setInterval(() => {
-    refreshLock();
-  }, 15 * 60 * 1000); // 15 minutes in milliseconds
+  refreshTimer = setInterval(
+    () => {
+      refreshLock();
+    },
+    15 * 60 * 1000
+  ); // 15 minutes in milliseconds
 
   // Initial call
   refreshLock();
@@ -180,20 +202,23 @@ const refreshLock = async () => {
   try {
     const baseUrl = process.env.REACT_APP_API_BASE_URL;
     const token = localStorage.getItem('token');
-    
+
     await axios.patch(
       `${baseUrl}/menu/refresh-lock`,
       { accessItem },
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
     console.log('Refresh lock updated for:', accessItem);
   } catch (error) {
-    console.error('Error refreshing lock:', error.response?.data?.message || error.message);
+    console.error(
+      'Error refreshing lock:',
+      error.response?.data?.message || error.message
+    );
     // Optionally clear the interval on error
     clearRefreshLock();
   }

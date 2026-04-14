@@ -10,6 +10,7 @@ import { logout } from '../utils/auth';
 import axios from 'axios';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
+import { getIconVenue, getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/dashboard.css';
 import '../styles/standard-admin.css';
@@ -99,86 +100,6 @@ const PowerAdmin = () => {
     }
   };
 
-  const getAppNameSummary = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      case 'North':
-        return 'North Shore Tavern';
-      case 'Hogan':
-        return "Hogan's";
-      case 'Ace':
-        return 'Ace Rewards';
-      case 'Queens':
-        return 'Queens Hotel';
-      case 'Brisbane':
-        return 'Brisbane Brewing Co';
-      case 'Bluewater':
-        return 'Bluewater Captains Club';
-      case 'Flinders':
-        return 'Flinders Street Wharves';
-      case 'Drinks':
-        return 'Drinks HQ';
-      case 'Wonthaggi':
-        return 'Wonthaggi Country Club';
-      case 'Woollahra':
-        return 'Woollahra Hotel';
-      default:
-        return appType;
-    }
-  };
-
-  const getIconVenue = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return '/max_gaming.png';
-      case 'Manly':
-        return '/mhbc.png';
-      case 'Montauk':
-        return '/montauk.png';
-      case 'StarReward':
-        return '/star.png';
-      case 'Central':
-        return '/central.png';
-      case 'Sense':
-        return '/star.png';
-      case 'Qantum':
-        return '/qantum.png';
-      case 'North':
-        return '/north.png';
-      case 'Hogan':
-        return '/hogan.png';
-      case 'Woollahra':
-        return '/woollahra.png';
-      case 'Ace':
-        return '/ace.png';
-      case 'Queens':
-        return '/queens.png';
-      case 'Brisbane':
-        return '/brisbane.png';
-      case 'Bluewater':
-        return '/bluewater.png';
-      case 'Flinders':
-        return '/flinders.png';
-      case 'Drinks':
-        return '/drinks.png';
-      case 'Wonthaggi':
-        return '/wonthaggi.png';
-      default:
-        return appType;
-    }
-  };
-
   const appNameList = [
     'Star Reward',
     'Max Gaming',
@@ -197,6 +118,7 @@ const PowerAdmin = () => {
     'Drinks HQ',
     'Wonthaggi Country Club',
     'Woollahra Hotel',
+    'EDP'
   ];
 
   const handleAddGroup = (index) => {
@@ -277,7 +199,7 @@ const PowerAdmin = () => {
   const handleAppInputClick = (index) => {
     // Only show apps that haven't been selected yet
     const selectedAppsSet = new Set(
-      selectedApps.map((app) => getAppNameSummary(app))
+      selectedApps.map((app) => getAppType(app))
     );
     const availableApps = appNameList.filter(
       (app) => !selectedAppsSet.has(app)
@@ -663,7 +585,7 @@ const PowerAdmin = () => {
                       <p key={index} className="connected-item">
                         <img src={getIconVenue(app)} alt="Play Store" />
                         <span className="app-name">
-                          {getAppNameSummary(app)}
+                          {getAppType(app)}
                         </span>
                       </p>
                       //   <div className="connected-item">

@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useRef, act } from 'react';
+import { useState, useEffect, useRef, act } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AppLayout from '../components/AppLayout';
-import Select from 'react-select';
-import { Editor } from '@tinymce/tinymce-react';
 import { uploadFileToS3 } from '../s3/config';
 import { logout } from '../utils/auth';
 import { trackMenuAccess, handleLogout } from '../utils/api';
@@ -24,6 +21,7 @@ import {
 import '../styles/special-offers.css';
 import axios from 'axios';
 import { IoIosArrowDown, IoIosArrowUp, IoMdImage } from 'react-icons/io';
+import { getAppType, getAudienceOptions } from '../utils/appConstants';
 
 const SpecialOffers = () => {
   // track the Audience dropdown container
@@ -172,150 +170,8 @@ const SpecialOffers = () => {
   };
 
   let audienceOptions = [];
-
-  if (selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') {
-    // Options for audience selection
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-    ];
-  } else if (selectedVenue === 'StarReward') {
-    // Options for audience selection
-    audienceOptions = [
-      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
-      { value: 'Star Staff', label: 'Star Staff' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Platinum Black', label: 'Platinum Black' },
-    ];
-  } else if (selectedVenue === 'Manly') {
-    // Options for audience selection
-
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Crewmate', label: 'Crewmate' },
-      { value: 'Lieutenant', label: 'Lieutenant' },
-      { value: 'Commander', label: 'Commander' },
-      { value: 'Captain', label: 'Captain' },
-      { value: 'Commodore', label: 'Commodore' },
-    ];
-  } else if (selectedVenue === 'Hogan') {
-    audienceOptions = [
-      { value: 'Bronze', label: 'Bronze' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Management', label: 'Management' },
-      { value: 'Family', label: 'Family' },
-      { value: 'Directors', label: 'Directors' },
-    ];
-  } else if (selectedVenue === 'North') {
-    audienceOptions = [
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-      // { value: 'Pre Staff', label: 'Pre Staff' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Staff', label: 'Staff' },
-      // { value: 'Valued', label: 'Valued' },
-    ];
-  } else if (selectedVenue === 'Montauk' || selectedVenue === 'Central') {
-    audienceOptions = [
-      { value: 'Premium Member', label: 'Premium Member' },
-      { value: 'Member', label: 'Member' },
-      { value: 'Staff', label: 'Staff' },
-    ];
-  } else if (selectedVenue === 'Ace') {
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Tens', label: 'Tens' },
-      { value: 'Jacks', label: 'Jacks' },
-      { value: 'Queens', label: 'Queens' },
-      { value: 'Kings', label: 'Kings' },
-      { value: 'Ace', label: 'Ace' },
-      { value: 'Ace Plus', label: 'Ace Plus' },
-    ];
-  } else if (selectedVenue === 'Queens') {
-    audienceOptions = [
-      { value: 'Queens', label: 'Queens' },
-      { value: 'Ruby', label: 'Ruby' },
-      { value: 'Emerald', label: 'Emerald' },
-      { value: 'Sapphire', label: 'Sapphire' },
-      { value: 'Diamond', label: 'Diamond' },
-      { value: 'Diamond Plus', label: 'Diamond Plus' },
-      { value: 'Curtis Coast', label: 'Curtis Coast' },
-    ];
-  } else if (selectedVenue === 'Brisbane') {
-    audienceOptions = [
-      { value: 'Brew Crew', label: 'Brew Crew' },
-      { value: 'Member', label: 'Member' },
-      { value: 'Regular', label: 'Regular' },
-      { value: 'Champion', label: 'Champion' },
-      { value: 'Legend', label: 'Legend' },
-    ];
-  } else if (selectedVenue === 'Bluewater') {
-    audienceOptions = [
-      { value: 'Deckhand', label: 'Deckhand' },
-      { value: 'First Mate', label: 'First Mate' },
-      { value: 'Captain', label: 'Captain' },
-      { value: 'Commodore', label: 'Commodore' },
-      { value: 'Admiral', label: 'Admiral' },
-    ];
-  } else if (selectedVenue === 'Flinders') {
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Member', label: 'Member' },
-      { value: 'Corporate', label: 'Corporate' },
-      { value: 'VIP', label: 'VIP' },
-    ];
-  } else if (selectedVenue === 'Drinks') {
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Explorer', label: 'Explorer' },
-      { value: 'Masters', label: 'Masters' },
-      { value: 'Club', label: 'Club' },
-      { value: 'Reserve', label: 'Reserve' },
-    ];
-  } else if(selectedVenue === 'Wonthaggi') {
-    audienceOptions = [
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Platinum', label: 'Platinum' },
-      { value: 'Gold', label: 'Gold' },
-    ];
-  } else if (selectedVenue === 'Woollahra') {
-    audienceOptions = [
-      {
-        value: 'Crew',
-        label: 'Crew',
-      },
-      {
-        value: 'Regulars',
-        label: 'Regulars',
-      },
-      {
-        value: 'Club Connect',
-        label: 'Club Connect',
-      },
-      {
-        value: 'Local Legends',
-        label: 'Local Legends',
-      },
-    ];
-  } else {
-    audienceOptions = [
-      { value: 'Staff', label: 'Staff' },
-      { value: 'Valued', label: 'Valued' },
-      { value: 'Silver', label: 'Silver' },
-      { value: 'Gold', label: 'Gold' },
-      { value: 'Platinum', label: 'Platinum' },
-    ];
-  }
+  
+  audienceOptions = getAudienceOptions(selectedVenue);
 
   // Helper function to get rating level from audience option
   // const getRatingLevelFromAudience = (audienceValue) => {
@@ -2372,45 +2228,6 @@ const SpecialOffers = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [showAudienceDropdown]);
-
-  const getAppType = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      case 'North':
-        return 'North Shore Tavern';
-      case 'Hogan':
-        return "Hogan's";
-      case 'Ace':
-        return 'Ace Rewards';
-      case 'Queens':
-        return 'Queens Hotel';
-      case 'Brisbane':
-        return 'Brisbane Brewing Co';
-      case 'Bluewater':
-        return 'Bluewater Captains Club';
-      case 'Flinders':
-        return 'Flinders Street Wharves';
-      case 'Drinks':
-        return 'Drinks HQ';
-      case 'Wonthaggi':
-        return 'Wonthaggi Country Club';
-      case 'Woollahra':
-        return 'Woollahra Hotel';
-      default:
-        return appType;
-    }
-  };
 
   useEffect(() => {
     const fetchVenues = async () => {

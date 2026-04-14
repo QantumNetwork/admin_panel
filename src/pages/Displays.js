@@ -18,6 +18,7 @@ import { FaMobileAlt } from 'react-icons/fa';
 import { IoPushOutline } from 'react-icons/io5';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
+import { getAppType } from '../utils/appConstants';
 import '../styles/displays.css';
 
 const Displays = () => {
@@ -194,25 +195,6 @@ const Displays = () => {
   const handleNavigation = (path) => {
     // Force a full page reload to ensure proper rendering
     window.location.href = path;
-  };
-
-  const getAppType = (appType) => {
-    switch (appType) {
-      case 'MaxGaming':
-        return 'Max Gaming';
-      case 'Manly':
-        return 'Manly Harbour Boat Club';
-      case 'Montauk':
-        return 'Montauk Tavern';
-      case 'StarReward':
-        return 'Star Reward';
-      case 'Central':
-        return 'Central Lane Hotel';
-      case 'Sense':
-        return 'Sense Of Taste';
-      default:
-        return appType;
-    }
   };
 
   useEffect(() => {
