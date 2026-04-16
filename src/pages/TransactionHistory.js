@@ -7,13 +7,14 @@ import { FaUsersRectangle } from 'react-icons/fa6';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { FaMobileScreenButton } from 'react-icons/fa6';
 import { PiListBulletsFill } from 'react-icons/pi';
-import { MdRefresh } from 'react-icons/md';
+import { MdBorderBottom, MdRefresh } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { MdVerified, MdHistory } from 'react-icons/md';
 import { handleLogout } from '../utils/api';
 import { getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/payment-reporting.css';
+import { set } from 'react-hook-form';
 
 const PaymentReporting = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -42,7 +43,6 @@ const PaymentReporting = () => {
   );
 
   // Members (Members for approval) state
-  const [members, setMembers] = useState([]);
   const [membersPage, setMembersPage] = useState(1);
   const [membersLimit, setMembersLimit] = useState(10);
   const [membersSearch, setMembersSearch] = useState('');
@@ -52,74 +52,49 @@ const PaymentReporting = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [paymentFilter, setPaymentFilter] = useState('all');
-
-  const [memberships, setMemberships] = useState([]);
-  const [membershipFilter, setMembershipFilter] = useState('all');
-
-  const [renewalsFilter, setRenewalsFilter] = useState('all');
-
   // input shown in search bar (applies to active tab)
   const [searchInput, setSearchInput] = useState('');
 
-  const [totalsData, setTotalsData] = useState({
-    totalUsers: 0,
-    totalAmountPaid: 0,
-  });
+  const [transactionHistory, setTransactionHistory] = useState([]);
 
-  const [paymentBreakdown, setPaymentBreakdown] = useState({
-    stripe: { amount: 0, users: 0 },
-    card_by_venue: { amount: 0, users: 0 },
-    cash: { amount: 0, users: 0 },
-    management: { amount: 0, users: 0 },
-  });
-
-  // Fetch members (for approvals)
-  const fetchMembers = async () => {
+  const fetchTransactionHistory = async () => {
     setLoading(true);
     try {
-      let url = `${baseUrl}/user/get/verified?page=${membersPage}`;
-      //search
+      let url = `${baseUrl}/user/update-details?filter=${dateFilter}&page=${membersPage}`;
+
       if (membersSearch && membersSearch.trim() !== '')
         url += `&search=${encodeURIComponent(membersSearch.trim())}`;
-
-      // payment type
-      if (paymentFilter && paymentFilter !== 'all') {
-        url += `&paymentType=${paymentFilter}`;
-      }
-
-      // renewals filter (NEW CODE)
-      if (renewalsFilter === 'renewals') {
-        url += `&renewType=renew`;
-      } else if (renewalsFilter === 'new') {
-        url += `&renewType=none`;
-      }
-      // if "all" -> DO NOT append renewType
-
-      // date filter
-      url += `&dateType=${dateFilter}`;
-
-      // custom date handling
-      if (dateFilter === 'custom' && startDate && endDate) {
-        url += `&fromDate=${startDate}&toDate=${endDate}`;
-      }
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.data && Array.isArray(res.data.users)) {
-        setMembers(res.data.users);
-        setMembersTotalPages(res.data.totalPages || 1);
+
+      if (res?.data && Array.isArray(res.data.data)) {
+        setTransactionHistory(res.data.data);
+        console.log('Transaction history response:', res.data.data);
+        setMembersTotalPages(res.data.totalPages);
       } else {
-        setMembers([]);
+        setTransactionHistory([]);
         setMembersTotalPages(1);
       }
     } catch (err) {
-      console.error('Error fetching members:', err);
-      toast.error('Failed to fetch members');
+      console.error('Error fetching transaction history:', err);
+      toast.error('Failed to fetch transaction history');
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatToBrisbaneTime = (utcString) => {
+    const date = new Date(utcString);
+
+    return date.toLocaleTimeString('en-AU', {
+      timeZone: 'Australia/Brisbane',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
   };
 
   useEffect(() => {
@@ -145,49 +120,9 @@ const PaymentReporting = () => {
     }
   }, [token]);
 
-  // Fetch when pages/limits/search change for respective tabs
   useEffect(() => {
-    if (activeTab === 'approvedPayments') fetchMembers();
-  }, [
-    membersPage,
-    membersLimit,
-    membersSearch,
-    paymentFilter,
-    dateFilter,
-    renewalsFilter,
-    startDate,
-    endDate,
-    token,
-  ]);
-
-  // When switching tabs, sync search input and fetch for that tab
-  useEffect(() => {
-    if (activeTab === 'approvedPayments') {
-      setSearchInput(membersSearch);
-      fetchMembers();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'totalsAllPaymentMethods' && token) {
-      fetchClubPackages();
-    }
-  }, [token, activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'totalsAllPaymentMethods' && token) {
-      fetchTotals();
-    }
-  }, [
-    dateFilter,
-    startDate,
-    endDate,
-    membershipFilter,
-    renewalsFilter,
-    activeTab,
-    token,
-  ]);
+    fetchTransactionHistory();
+  }, [dateFilter, startDate, endDate, membersPage, membersSearch, token]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -230,25 +165,6 @@ const PaymentReporting = () => {
     return location.pathname === path;
   };
 
-  // const handleLock = async () => {
-  //   try {
-  //     const result = await handleLogout();
-  //     if (result.success) {
-  //       navigate('/dashboard');
-  //     } else {
-  //       toast.error(
-  //         result.message || 'Failed to remove lock. Please try again.'
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handleLock:', error);
-  //     toast.error(error.message || 'Failed to remove lock. Please try again.');
-  //   }
-  // };
-
-  const getFullName = (user) =>
-    `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
-
   // Pagination controls per tab
   const onPrev = () => {
     if (activeTab === 'approvedPayments') {
@@ -258,107 +174,6 @@ const PaymentReporting = () => {
   const onNext = () => {
     if (activeTab === 'approvedPayments') {
       if (membersPage < membersTotalPages) setMembersPage((p) => p + 1);
-    }
-  };
-
-  const fetchPaymentType = (type) => {
-    switch (type) {
-      case 'cash':
-        return 'Cash';
-      case 'card_by_venue':
-        return 'Card by Venue';
-      case 'cheque':
-        return 'Cheque';
-      case 'management':
-        return 'Management Approved';
-      case 'card':
-        return 'Stripe';
-      default:
-        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-    }
-  };
-
-  const fetchClubPackages = async () => {
-    try {
-      const res = await axios.get(`${baseUrl}/club-package`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.data?.success && Array.isArray(res.data.data)) {
-        const levels = res.data.data[0]?.membershipLevels || [];
-        setMemberships(levels);
-      }
-    } catch (err) {
-      console.error('Error fetching club packages:', err);
-    }
-  };
-
-  const fetchTotals = async () => {
-    try {
-      let url = `https://betaapi.s2w.com.au/user/get/total?dateType=${dateFilter}`;
-
-      if (dateFilter === 'custom' && startDate && endDate) {
-        url += `&fromDate=${startDate}&toDate=${endDate}`;
-      }
-
-      if (membershipFilter !== 'all') {
-        url += `&packageId=${membershipFilter}`;
-      }
-
-      // renewals filter (NEW CODE)
-      if (renewalsFilter === 'renewals') {
-        url += `&renewType=renew`;
-      } else if (renewalsFilter === 'new') {
-        url += `&renewType=none`;
-      }
-      // if "all" -> DO NOT append renewType
-
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.data?.success) {
-        // totals
-        setTotalsData(res.data.totals);
-
-        // reset breakdown
-        const breakdownMap = {
-          stripe: { amount: 0, users: 0 },
-          card_by_venue: { amount: 0, users: 0 },
-          cash: { amount: 0, users: 0 },
-          management: { amount: 0, users: 0 },
-        };
-
-        res.data.breakdown.forEach((item) => {
-          if (item.paymentType === 'card') {
-            breakdownMap.stripe.amount = item.totalAmountPaid;
-            breakdownMap.stripe.users = item.userCount;
-          }
-
-          if (item.paymentType === 'card_by_venue') {
-            breakdownMap.card_by_venue.amount = item.totalAmountPaid;
-            breakdownMap.card_by_venue.users = item.userCount;
-          }
-
-          if (item.paymentType === 'cash') {
-            breakdownMap.cash.amount = item.totalAmountPaid;
-            breakdownMap.cash.users = item.userCount;
-          }
-
-          if (item.paymentType === 'management') {
-            breakdownMap.management.amount = item.totalAmountPaid;
-            breakdownMap.management.users = item.userCount;
-          }
-        });
-
-        setPaymentBreakdown(breakdownMap);
-      }
-    } catch (err) {
-      console.error('Error fetching totals:', err);
     }
   };
 
@@ -660,72 +475,8 @@ const PaymentReporting = () => {
             <option value="mtd">MTD</option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
-            <option value="last3month">Last 3 Months</option>
-            <option value="custom">Custom</option>
           </select>
         </div>
-
-        {/* START DATE */}
-        {dateFilter === 'custom' && (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '10px',
-                fontWeight: '600',
-                color: '#6b6b6b',
-                marginBottom: '4px',
-              }}
-            >
-              START DATE
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setMembersPage(1);
-                setStartDate(e.target.value);
-              }}
-              style={{
-                padding: '6px 8px',
-                borderRadius: '4px',
-                border: '1px solid #cfcfcf',
-                fontSize: '12px',
-                width: '130px',
-              }}
-            />
-          </div>
-        )}
-
-        {/* END DATE */}
-        {dateFilter === 'custom' && (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label
-              style={{
-                fontSize: '10px',
-                fontWeight: '600',
-                color: '#6b6b6b',
-                marginBottom: '4px',
-              }}
-            >
-              END DATE
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                setMembersPage(1);
-                setEndDate(e.target.value);
-              }}
-              style={{
-                padding: '6px 8px',
-                borderRadius: '4px',
-                border: '1px solid #cfcfcf',
-                fontSize: '12px',
-                width: '130px',
-              }}
-            />
-          </div>
-        )}
       </div>
 
       {activeTab === 'approvedPayments' && (
@@ -738,18 +489,67 @@ const PaymentReporting = () => {
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Suburb</th>
-                    <th>Post Code</th>
-                    <th>Mobile</th>
-                    <th>Email</th>
-                    <th>Membership</th>
-                    <th>Payment Type</th>
-                    <th>Amount Paid</th>
+                    <th>Time</th>
+                    <th>Requester</th>
+                    <th>Member Name</th>
+                    <th>Card ID</th>
+                    <th></th>
+                    <th>Previous</th>
+                    <th>New change</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                  {transactionHistory.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="8"
+                        style={{ textAlign: 'center', padding: '20px' }}
+                      >
+                        No transactions found.
+                      </td>
+                    </tr>
+                  ) : (
+                    transactionHistory.map((transaction) =>
+                      transaction.changes.map((change, index) => (
+                        <tr key={change._id}>
+                          {/* Show these ONLY for first change */}
+                          {index === 0 && (
+                            <>
+                              <td rowSpan={transaction.changes.length}>
+                                {transaction.updatedAt
+                                  ?.substring(0, 10)
+                                  .split('-')
+                                  .reverse()
+                                  .join('-')}
+                              </td>
+
+                              <td rowSpan={transaction.changes.length}>
+                                {formatToBrisbaneTime(transaction.updatedAt)}
+                              </td>
+
+                              <td rowSpan={transaction.changes.length}>
+                                {transaction.updatedBy}
+                              </td>
+
+                              <td rowSpan={transaction.changes.length}>
+                                {transaction.GivenNames}
+                              </td>
+
+                              <td rowSpan={transaction.changes.length}>
+                                {transaction.CardNumber}
+                              </td>
+                            </>
+                          )}
+
+                          {/* These repeat for each change */}
+                          <td>{change.field}</td>
+                          <td>{change.oldValue}</td>
+                          <td>{change.newValue}</td>
+                        </tr>
+                      ))
+                    )
+                  )}
+                </tbody>
               </table>
               <div
                 style={{
@@ -757,7 +557,7 @@ const PaymentReporting = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginTop: '20px',
-                  paddingRight: '20px',
+                  paddingRight: '20px', 
                   paddingLeft: '20px',
                 }}
               >
