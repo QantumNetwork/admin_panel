@@ -62,6 +62,7 @@ const MyBenefits = () => {
   if (venue === 'Wonthaggi') return 'Valued';
   if (venue === 'Woollahra') return 'Regulars';
   if (venue === 'EDP') return 'Silver';
+  if (venue === 'Bob') return 'Valued';
   return 'Platinum Black';
 };
 
@@ -194,6 +195,8 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         return '#c19e14dd';
       case 'Local Legends':
         return '#61791b';
+      case 'Valued':
+        return '#e60a0a';
       default:
         return '#D4AF37'; // Default gold color
     }

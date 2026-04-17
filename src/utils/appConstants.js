@@ -16,6 +16,7 @@ export const getAppType = (appType) => {
     'Drinks': 'Drinks HQ',
     'Wonthaggi': 'Wonthaggi Country Club',
     'Woollahra': 'Woollahra Hotel',
+    'Bob': "Bob's Bulk Booze",
   };
   
   return appTypeMap[appType] || appType;
@@ -41,6 +42,7 @@ export const getIconVenue = (appType) => {
     'Wonthaggi': '/wonthaggi.png',
     'Woollahra': '/woollahra.png',
     'EDP': '/edp.png',
+    'Bob': '/bob.png',
   };
   
   return appIconMap[appType] || appType;
@@ -183,6 +185,9 @@ export const getAudienceOptions = (venueName) => {
         {value: 'Silver', label: 'Silver'},
         {value: 'Gold', label: 'Gold'},
         {value: 'Diamond', label: 'Diamond'}
+    ],
+    'Bob': [
+      {value: 'Valued', label: 'Membership Benefits'},
     ]
   };
 

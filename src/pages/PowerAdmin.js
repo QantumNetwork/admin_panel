@@ -95,6 +95,8 @@ const PowerAdmin = () => {
         return 'Wonthaggi';
       case 'Woollahra Hotel':
         return 'Woollahra';
+      case "Bob's Bulk Booze":
+        return 'Bob';
       default:
         return appName;
     }
@@ -118,7 +120,8 @@ const PowerAdmin = () => {
     'Drinks HQ',
     'Wonthaggi Country Club',
     'Woollahra Hotel',
-    'EDP'
+    'EDP',
+    "Bob's Bulk Booze",
   ];
 
   const handleAddGroup = (index) => {
@@ -299,6 +302,9 @@ const PowerAdmin = () => {
               break;
             case 'Woollahra':
               appDisplayNames.push("Woollahra Hotel");
+              break;
+            case 'Bob':
+              appDisplayNames.push("Bob's Bulk Booze");
               break;
             default:
               appDisplayNames.push(app);
