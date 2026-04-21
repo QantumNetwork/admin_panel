@@ -97,6 +97,8 @@ const PowerAdmin = () => {
         return 'Woollahra';
       case "Bob's Bulk Booze":
         return 'Bob';
+      case 'Sense Of Taste':
+        return 'Sense';
       default:
         return appName;
     }
@@ -122,6 +124,7 @@ const PowerAdmin = () => {
     'Woollahra Hotel',
     'EDP',
     "Bob's Bulk Booze",
+    'Sense Of Taste'
   ];
 
   const handleAddGroup = (index) => {
@@ -305,6 +308,9 @@ const PowerAdmin = () => {
               break;
             case 'Bob':
               appDisplayNames.push("Bob's Bulk Booze");
+              break;
+            case 'Sense':
+              appDisplayNames.push("Sense Of Taste");
               break;
             default:
               appDisplayNames.push(app);

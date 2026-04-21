@@ -17,6 +17,7 @@ export const getAppType = (appType) => {
     'Wonthaggi': 'Wonthaggi Country Club',
     'Woollahra': 'Woollahra Hotel',
     'Bob': "Bob's Bulk Booze",
+    'Sense': 'Sense Of Taste',
   };
   
   return appTypeMap[appType] || appType;
@@ -187,6 +188,9 @@ export const getAudienceOptions = (venueName) => {
         {value: 'Diamond', label: 'Diamond'}
     ],
     'Bob': [
+      {value: 'Valued', label: 'Membership Benefits'},
+    ],
+    'Sense': [
       {value: 'Valued', label: 'Membership Benefits'},
     ]
   };

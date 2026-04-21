@@ -62,7 +62,7 @@ const MyBenefits = () => {
   if (venue === 'Wonthaggi') return 'Valued';
   if (venue === 'Woollahra') return 'Regulars';
   if (venue === 'EDP') return 'Silver';
-  if (venue === 'Bob') return 'Valued';
+  if (venue === 'Bob' || venue === 'Sense') return 'Valued';
   return 'Platinum Black';
 };
 
@@ -93,10 +93,11 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming')
-          return '#FF0000';
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
         if (selectedVenue === 'Wonthaggi') return '#090808';
+        if (selectedVenue === 'Bob') return '#e60a0a';
+        if (selectedVenue === 'Sense') return '#e1ae68';
       case 'Staff':
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
           return '#006D88';
@@ -194,9 +195,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Club Connect':
         return '#c19e14dd';
       case 'Local Legends':
-        return '#61791b';
-      case 'Valued':
-        return '#e60a0a';
+        return '#61791b';        
       default:
         return '#D4AF37'; // Default gold color
     }
