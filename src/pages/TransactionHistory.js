@@ -97,6 +97,20 @@ const PaymentReporting = () => {
     });
   };
 
+  const formatIfDate = (value) => {
+  if (!value) return value;
+
+  const isoRegex = /^\d{4}-\d{2}-\d{2}/;
+
+  if (isoRegex.test(value)) {
+    const date = new Date(value);
+
+    return date.toLocaleDateString('en-GB'); 
+  }
+
+  return value;
+};
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -493,7 +507,7 @@ const PaymentReporting = () => {
                     <th>Requester</th>
                     <th>Member Name</th>
                     <th>Card ID</th>
-                    <th></th>
+                    <th>What changed</th>
                     <th>Previous</th>
                     <th>New change</th>
                   </tr>
@@ -543,8 +557,8 @@ const PaymentReporting = () => {
 
                           {/* These repeat for each change */}
                           <td>{change.field}</td>
-                          <td>{change.oldValue}</td>
-                          <td>{change.newValue}</td>
+                          <td>{formatIfDate(change.oldValue)}</td>
+                          <td>{formatIfDate(change.newValue)}</td>
                         </tr>
                       ))
                     )

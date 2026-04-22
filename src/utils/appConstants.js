@@ -188,7 +188,7 @@ export const getAudienceOptions = (venueName) => {
         {value: 'Diamond', label: 'Diamond'}
     ],
     'Bob': [
-      {value: 'Valued', label: 'Membership Benefits'},
+      {value: 'Valued', label: 'Bobs Valued'},
     ],
     'Sense': [
       {value: 'Valued', label: 'Membership Benefits'},

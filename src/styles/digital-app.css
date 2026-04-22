@@ -157,9 +157,10 @@
     text-align: center;
 }
 .post-card {
-    width: 70%;
-    min-width: 260px;
-    height: 170px;
+    width: 280px;
+    height: 180px;
+    /* aspect-ratio: 16 / 9; */
+    /* height: auto; */
     background: #ddd;
     margin-top: 20px;
     margin-left: 60px;
@@ -513,8 +514,8 @@
 @media screen and (min-width: 1281px) and (max-width: 1480px) {
     .post-card{
         margin-left: 40px;
-        width: 70%; /* Ensure width remains 70% on smaller screens */
-        min-width: 260px; /* Maintain minimum width */
+        /* width: 70%; 
+        min-width: 260px;  */
     }
 }
 
@@ -525,8 +526,8 @@
 
     .post-card{
         margin-left: 32px;
-        width: 70%; /* Ensure width remains 70% on smaller screens */
-        min-width: 260px; /* Maintain minimum width */
+        /* width: 70%; 
+        min-width: 260px;  */
     }
 
     .checkbox-label {
@@ -558,8 +559,8 @@
 @media screen and (max-width: 1225px) {
     .post-card{
         margin-left: 40px;
-        width: 70%; /* Ensure width remains 70% on smaller screens */
-        min-width: 260px; /* Maintain minimum width */
+        /* width: 70%; 
+        min-width: 260px;  */
     }
 
     .current-posts {
@@ -586,6 +587,12 @@
     .digital-app-container .phone-screen {
         min-width: 145px;
         
+    }
+}
+
+@media screen and (max-width: 1050px) {
+    .post-card{
+        margin-left: 0px;
     }
 }
 @media screen and (max-width: 991px) {
