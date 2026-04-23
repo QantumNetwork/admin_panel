@@ -1248,9 +1248,9 @@ const ClubDesk = () => {
                     <th>Membership Expiry</th>
                   )}
                   {activeTab === 'membersForApproval' && <th>Card Number</th>}
-                  <th>Licence Front</th>
-                  <th>Licence Back</th>
-                  <th>Selfie</th>
+                  {activeTab !== 'verified' && <th>Licence Front</th>}
+                  {activeTab !== 'verified' && <th>Licence Back</th>}
+                  {activeTab !== 'verified' && <th>Selfie</th>}
                   {activeTab !== 'verified' && <th>Payment</th>}
                   {activeTab === 'rejected' && <th>Status</th>}
                   <th></th>
@@ -1402,9 +1402,9 @@ const ClubDesk = () => {
                       <td>{member.Address || '-'}</td>
                       <td>{member.Mobile || '-'}</td>
                       <td>{member.packageName || '-'}</td>
-                      <td>{renderLicence(member.licence_front)}</td>
-                      <td>{renderLicence(member.licence_back)}</td>
-                      <td>{renderImage(member.profile_Image)}</td>
+                      {/* <td>{renderLicence(member.licence_front)}</td> */}
+                      {/* <td>{renderLicence(member.licence_back)}</td> */}
+                      {/* <td>{renderImage(member.profile_Image)}</td> */}
                       <td>
                         <div
                           style={{
