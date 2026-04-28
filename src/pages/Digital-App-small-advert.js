@@ -1527,60 +1527,21 @@ const DigitalSmall = () => {
                   automatic_uploads: true,
                   images_reuse_filename: true, // Keeps original filename
                   convert_urls: false, // Prevents TinyMCE from modifying the image URL
-                  images_upload_handler: function (blobInfo, success, failure) {
-                    // Build the form data for Cloudinary
-                    const formData = new FormData();
-                    formData.append('file', blobInfo.blob());
-                    formData.append('upload_preset', 'tinyMCE_uploads'); // Replace with your actual upload preset
+                  images_upload_handler: async (blobInfo) => {
+                    try {
+                      const file = new File(
+                        [blobInfo.blob()],
+                        blobInfo.filename(),
+                        { type: blobInfo.blob().type }
+                      );
 
-                    // IMPORTANT: Return the promise chain!
-                    return fetch(
-                      'https://api.cloudinary.com/v1_1/djxzqns2o/image/upload',
-                      {
-                        method: 'POST',
-                        body: formData,
-                        // headers: {
-                        //   Authorization: token ? `Bearer ${token}` : '',
-                        //   'Content-Type': 'application/json',
-                        // },
-                      }
-                    )
-                      .then((response) => {
-                        // Check if the response is OK; if not, throw an error
-                        if (!response.ok) {
-                          throw new Error(
-                            'Upload failed with status ' + response.status
-                          );
-                        }
-                        return response.json();
-                      })
-                      .then((result) => {
-                        console.log('Cloudinary Upload Result:', result);
-                        if (result.secure_url) {
-                          // Log and call the success callback so TinyMCE can insert the image
-                          console.log('Final Image URL:', result.secure_url);
-                          success({
-                            src: result.secure_url, // Must be a string
-                            alt: '', // Optional alt text
-                            meta: {}, // Optional additional metadata
-                          });
-                        } else {
-                          throw new Error(
-                            'Cloudinary did not return a secure_url'
-                          );
-                        }
-                        // Return data so that the promise chain is maintained
-                        return result.secure_url;
-                      })
-                      .catch((error) => {
-                        console.error('Upload Error:', error);
-                        // If the failure callback exists, call it with the error message
-                        if (typeof failure === 'function') {
-                          failure(error.message);
-                        }
-                        // Also return a rejected promise to maintain the chain
-                        return Promise.reject(error);
-                      });
+                      const s3Url = await uploadFileToS3(file);
+
+                      return s3Url; // IMPORTANT
+                    } catch (error) {
+                      console.error(error);
+                      throw new Error('Image upload failed');
+                    }
                   },
                 }}
               />
