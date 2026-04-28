@@ -39,8 +39,6 @@ const ManualReg = () => {
   const appGroup = localStorage.getItem('appGroup');
 
   const userType = localStorage.getItem('userType') || 'admin';
-  // const [membersForApproval, setMembersForApproval] = useState([]);
-  //   const [declinedMembers, setDeclinedMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showManualPayment, setShowManualPayment] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');

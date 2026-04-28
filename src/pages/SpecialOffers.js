@@ -26,6 +26,8 @@ import { getAppType, getAudienceOptions } from '../utils/appConstants';
 const SpecialOffers = () => {
   // track the Audience dropdown container
   const audienceWrapperRef = useRef(null);
+  // track the Membership dropdown container
+  const membershipWrapperRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const ignoreArtGalleryRestoreRef = useRef(false);
 
@@ -70,6 +72,10 @@ const SpecialOffers = () => {
   });
   const [expiryType, setExpiryType] = useState('never');
   const [expiryDays, setExpiryDays] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+
+  const [membershipExpiryDate, setMembershipExpiryDate] = useState('');
+
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [validDays, setValidDays] = useState({
@@ -121,6 +127,10 @@ const SpecialOffers = () => {
   const [showAudienceDropdown, setShowAudienceDropdown] = useState(false);
   const [isEveryone, setIsEveryone] = useState(false);
 
+  // multi‑select state for Membership (for club renewal vouchers)
+  const [selectedMemberships, setSelectedMemberships] = useState([]);
+  const [showMembershipDropdown, setShowMembershipDropdown] = useState(false);
+
   // --- Add these states near the top with your other useState declarations ---
   const [menuType, setMenuType] = useState(''); // 'standard' or 'multiple'
   const [offerTypes, setOfferTypes] = useState([]); // items coming from filter_Type
@@ -129,6 +139,16 @@ const SpecialOffers = () => {
   // Bonus points UI
   const [showBonusWhenRedeemed, setShowBonusWhenRedeemed] = useState(false);
   const [bonusPoints, setBonusPoints] = useState('null');
+
+  const [joined, setJoined] = useState('before'); // before | after
+  const [offerProceedDate, setOfferProceedDate] = useState('');
+
+  const [userTimeZone, setUserTimeZone] = useState('');
+
+  const [membershipPackages, setMembershipPackages] = useState([]);
+
+  const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
+  const showClubOption = allowedClubVenues.includes(selectedVenue);
 
   const filteredOffers = offers.filter((offer) => {
     if (activeTab !== 'live') return true;
@@ -149,9 +169,20 @@ const SpecialOffers = () => {
     }
   };
 
+  const toggleMembershipDropdown = () => {
+    setShowMembershipDropdown((open) => !open);
+  };
+
   const handleAudienceChange = (value) => {
     // normal multi‑select toggle
     setSelectedAudiences((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
+  const handleMembershipChange = (value) => {
+    // normal multi‑select toggle
+    setSelectedMemberships((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
   };
@@ -170,7 +201,7 @@ const SpecialOffers = () => {
   };
 
   let audienceOptions = [];
-  
+
   audienceOptions = getAudienceOptions(selectedVenue);
 
   // Helper function to get rating level from audience option
@@ -289,6 +320,10 @@ const SpecialOffers = () => {
             setOneTimeUse(false);
             setBonusPoints('null');
             setShowBonusWhenRedeemed(false);
+            setSelectedMemberships([]);
+            setMembershipExpiryDate('');
+            setJoined('before');
+            setOfferProceedDate('');
             return;
           }
 
@@ -320,6 +355,14 @@ const SpecialOffers = () => {
             }
             setAddMode(false);
 
+            setMembershipExpiryDate(offerToSelect.membershipExpiryDate.substring(0, 10)
+                              .split('-')
+                              .join('-') || '');
+            setJoined(offerToSelect.joined || 'before');
+            setOfferProceedDate(offerToSelect.offerProceedDate.substring(0, 10)
+                              .split('-')
+                              .join('-') || '');
+
             // Update trigger value in state only once
             // setTriggerValue(offerToSelect.triggerValue?.toString() || '');
 
@@ -338,6 +381,10 @@ const SpecialOffers = () => {
           setAddMode(false);
           setBonusPoints('null');
           setShowBonusWhenRedeemed(false);
+          setSelectedMemberships([]);
+          setMembershipExpiryDate('');
+          setJoined('before');
+          setOfferProceedDate('');
         }
       } catch (error) {
         console.error('Error fetching offers:', error);
@@ -353,6 +400,58 @@ const SpecialOffers = () => {
     selectedVenue,
     token,
   ]); // Added selectedImageFromGallery to dependencies
+
+  useEffect(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimeZone(tz);
+    localStorage.setItem('userTimeZone', tz); // optional
+  }, []);
+
+  useEffect(() => {
+    const fetchMembershipPackages = async () => {
+      if (!selectedVenue || !userTimeZone || !showClubOption) return;
+
+      let url = `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
+        userTimeZone
+      )}`;
+
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.data?.data) {
+          setMembershipPackages(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching membership packages:', error);
+        toast.error('Failed to load membership packages');
+      }
+    };
+
+    fetchMembershipPackages();
+  }, [token, selectedVenue, userTimeZone, showClubOption]);
+
+  useEffect(() => {
+  if (
+    !selectedOffer ||
+    selectedOffer.voucherType !== 'club' ||
+    membershipPackages.length === 0
+  ) return;
+
+  const ids = membershipPackages
+    .filter((pkg) =>
+      selectedOffer.membership?.some(
+        (m) => m.trim().toLowerCase() === pkg.membershipName.trim().toLowerCase()
+      )
+    )
+    .map((pkg) => pkg._id);
+
+    console.log("Matched IDs:", ids);
+
+  setSelectedMemberships(ids);
+}, [selectedOffer, membershipPackages]);
 
   // useEffect(() => {
   //   // Don't auto-select offers when in add mode
@@ -385,6 +484,7 @@ const SpecialOffers = () => {
       birthday: 'type1',
       new: 'type2',
       standard: 'type3',
+      club: 'type4',
     };
 
     const selectValue = voucherTypeMap[voucherType] || '';
@@ -393,7 +493,9 @@ const SpecialOffers = () => {
         ? 'birthdayOffer'
         : voucherType === 'new'
           ? 'newSignUp'
-          : 'standard';
+          : voucherType === 'standard'
+            ? 'standard'
+            : 'club';
 
     // Update the select element value
     const selectElement = document.querySelector(
@@ -914,6 +1016,7 @@ const SpecialOffers = () => {
         birthday: 'type1',
         new: 'type2',
         standard: 'type3',
+        club: 'type4'
       }[voucherType] || 'type3';
 
     // Set select elements directly - for immediate UI update
@@ -1013,6 +1116,9 @@ const SpecialOffers = () => {
     setUploadedImage(null); // Clear uploaded image
     // Reset trigger value in state
     setTriggerValue('');
+
+    setJoined('before');
+    setOfferProceedDate('');
 
     // Immediately clear trigger input fields - do this first
     const triggerInputs = document.querySelectorAll('.trigger-input');
@@ -1188,37 +1294,6 @@ const SpecialOffers = () => {
     }
   };
 
-  // Compress image to reduce payload size
-  // const compressImage = (dataUrl, maxWidth, maxHeight, quality) => {
-  //   const img = new Image();
-  //   img.onload = () => {
-  //     let width = img.width;
-  //     let height = img.height;
-
-  //     // Calculate new dimensions while maintaining aspect ratio
-  //     if (width > maxWidth) {
-  //       height = Math.round((height * maxWidth) / width);
-  //       width = maxWidth;
-  //     }
-  //     if (height > maxHeight) {
-  //       width = Math.round((width * maxHeight) / height);
-  //       height = maxHeight;
-  //     }
-
-  //     const canvas = document.createElement('canvas');
-  //     canvas.width = width;
-  //     canvas.height = height;
-
-  //     const ctx = canvas.getContext('2d');
-  //     ctx.drawImage(img, 0, 0, width, height);
-
-  //     // Get compressed image data
-  //     const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-  //     setImagePreview(compressedDataUrl);
-  //   };
-  //   img.src = dataUrl;
-  // };
-
   // Handle time input changes
   const handleTimeInputChange = (field, value) => {
     setTimeValid({
@@ -1304,6 +1379,12 @@ const SpecialOffers = () => {
     return true;
   };
 
+  const getSelectedMembershipNames = () => {
+    return membershipPackages
+      .filter((pkg) => selectedMemberships.includes(pkg._id))
+      .map((pkg) => pkg.membershipName);
+  };
+
   // Submit new offer
   const submitNewOffer = async () => {
     // Reset all validation errors
@@ -1350,6 +1431,7 @@ const SpecialOffers = () => {
         type1: 'birthday',
         type2: 'new',
         type3: 'standard',
+        type4: 'club',
       };
 
       const selectedValue = voucherTypeSelect.value;
@@ -1405,6 +1487,10 @@ const SpecialOffers = () => {
       }
     }
 
+    if (voucherTypeValue === 'club' && selectedMemberships.length === 0) {
+      hasValidationErrors = true;
+    }
+
     // Validate trigger value for all voucher types
     if (!triggerValue || triggerValue.trim() === '') {
       setTriggerValueError('Trigger value is required');
@@ -1435,6 +1521,7 @@ const SpecialOffers = () => {
           type1: 'birthday',
           type2: 'new',
           type3: 'standard',
+          type4: 'club',
         };
 
         const selectedValue = voucherTypeSelect.value;
@@ -1563,6 +1650,15 @@ const SpecialOffers = () => {
             },
           };
         }
+      } else if (voucherTypeValue === 'club') {
+          requestBody = {
+            ...requestBody,
+            membership: getSelectedMembershipNames(),
+            membershipExpiryDate,
+            joined,
+            offerProceedDate,
+            oneTimeUse,
+          };
       }
 
       // appears (only if menuType === multiple)
@@ -1743,6 +1839,7 @@ const SpecialOffers = () => {
         type1: 'birthday',
         type2: 'new',
         type3: 'standard',
+        type4: 'club',
       };
 
       const selectedValue = voucherTypeSelect.value;
@@ -1796,6 +1893,10 @@ const SpecialOffers = () => {
         setExpiryDaysError('Please enter a valid number of days');
         hasValidationErrors = true;
       }
+    }
+
+    if (voucherTypeValue === 'club' && selectedMemberships.length === 0) {
+      hasValidationErrors = true;
     }
 
     // Validate trigger value for all voucher types
@@ -1927,6 +2028,15 @@ const SpecialOffers = () => {
             },
           };
         }
+      } else if (voucherTypeValue === 'club') {
+          requestBody = {
+            ...requestBody,
+            membership: getSelectedMembershipNames(),
+            membershipExpiryDate,
+            joined,
+            offerProceedDate,
+            oneTimeUse,
+          };
       }
       // No additional properties needed for birthday voucher type
 
@@ -1965,7 +2075,6 @@ const SpecialOffers = () => {
         const id = toast.success(
           data.message || 'Offer updated successfully!',
           {
-            containerId: 'offerActions',
             containerId: 'offerActions', // ← tie this toast to your single container
             autoClose: false,
             pauseOnHover: false,
@@ -2069,7 +2178,9 @@ const SpecialOffers = () => {
         ? 'birthdayOffer'
         : selectedValue === 'type2'
           ? 'newSignUp'
-          : 'standard'
+          : selectedValue === 'type3'
+            ? 'standard'
+            : 'club'
     );
   };
 
@@ -2228,6 +2339,26 @@ const SpecialOffers = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [showAudienceDropdown]);
+
+  useEffect(() => {
+    const wrapperEl = membershipWrapperRef.current;
+
+    const handleClickOutside = (e) => {
+      // if open and click occurred outside *this* wrapper, close it
+      if (
+        showMembershipDropdown &&
+        wrapperEl &&
+        !wrapperEl.contains(e.target)
+      ) {
+        setShowMembershipDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showMembershipDropdown]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -3106,6 +3237,7 @@ const SpecialOffers = () => {
                     <option value="type1">Birthday Offer</option>
                     <option value="type2">New Sign Up</option>
                     <option value="type3">Standard</option>
+                    {showClubOption && <option value="type4">Club</option>}
                   </select>
                 </div>
               </div>
@@ -3198,6 +3330,230 @@ const SpecialOffers = () => {
                 </div>
               </div>
 
+              {selectedVoucherType === 'club' && (
+                <>
+                  {/* One time use option */}
+                  <div className="day-item">
+                    <input
+                      type="checkbox"
+                      id="oneTimeUse"
+                      name="oneTimeUse"
+                      checked={oneTimeUse}
+                      onChange={() => setOneTimeUse(!oneTimeUse)}
+                    />
+                    <label htmlFor="oneTimeUse">One time use</label>
+                  </div>
+                  <div className="form-group inline-form-group">
+                    <label>
+                      <strong>Membership</strong>
+                    </label>
+                    <div
+                      className="select-wrapper"
+                      style={{ position: 'relative' }}
+                      ref={membershipWrapperRef}
+                    >
+                      <div
+                        className="multiselect-display"
+                        onClick={toggleMembershipDropdown}
+                        style={{
+                          cursor: 'pointer',
+                          lineHeight: '35px',
+                          padding: '0 10px',
+                          fontSize: '13px',
+                          color: '#666',
+                        }}
+                      >
+                        {selectedMemberships.length > 0
+                          ? selectedMemberships.length > 2
+                            ? `${selectedMemberships.length} selected`
+                            : membershipPackages
+                                .filter((o) =>
+                                  selectedMemberships.includes(o._id)
+                                )
+                                .map((o) => o.membershipName)
+                                .join(', ')
+                          : 'Select from list'}
+                      </div>
+
+                      {showMembershipDropdown && (
+                        <div
+                          className="multiselect-options"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            width: '220px',
+                            background: 'white',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            border: '1px solid #ccc',
+                            zIndex: 10,
+                          }}
+                        >
+                          {membershipPackages.map((option) => (
+                            <div
+                              key={option._id}
+                              className="day-item"
+                              style={{
+                                padding: '5px 10px',
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                id={`mem-${option._id}`}
+                                checked={selectedMemberships.includes(
+                                  option._id
+                                )}
+                                onChange={() =>
+                                  handleMembershipChange(option._id)
+                                }
+                              />
+                              <label
+                                htmlFor={`mem-${option._id}`}
+                                style={{ marginLeft: '4px' }}
+                              >
+                                {option.membershipName}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    className="form-group inline-form-group"
+                    style={{ marginTop: '10px' }}
+                  >
+                    <label>
+                      <strong>Enter valid expiry date</strong>
+                    </label>
+                    <input
+                      type="date"
+                      value={membershipExpiryDate}
+                      onChange={(e) => setMembershipExpiryDate(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Joined Before / After */}
+                  <div className="form-group inline-form-group">
+                    <label>
+                      <strong>Valid for members who joined</strong>
+                    </label>
+
+                    <div className="radio-group" style={{ marginTop: '10px' }}>
+                      <input
+                        type="radio"
+                        name="joined"
+                        checked={joined === 'before'}
+                        onChange={() => setJoined('before')}
+                      />
+                      <label>Before</label>
+
+                      <input
+                        type="radio"
+                        name="joined"
+                        checked={joined === 'after'}
+                        onChange={() => setJoined('after')}
+                      />
+                      <label>After</label>
+                    </div>
+                  </div>
+
+                  {/* Process Date */}
+                  <div className="form-group inline-form-group">
+                    <label>
+                      <strong>Offer is to be processed on this date</strong>
+                    </label>
+
+                    <input
+                      type="date"
+                      value={offerProceedDate}
+                      onChange={(e) => setOfferProceedDate(e.target.value)}
+                    />
+                  </div>
+
+                  <small>
+                    The offer is created on this date and only members who meet
+                    this criteria on this date will receive the offer.
+                  </small>
+
+                  {/* Bonus points toggle */}
+                  <div className="form-row bonus-points-row">
+                    <div className="bonus-points-container">
+                      <div
+                        className="bonus-points-toggle"
+                        style={{ marginTop: '20px' }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={showBonusWhenRedeemed}
+                          onChange={(e) =>
+                            setShowBonusWhenRedeemed(e.target.checked)
+                          }
+                          style={{
+                            accentColor: '#002977',
+                            marginBottom: '3px',
+                          }}
+                        />
+                        <span style={{ fontSize: '14px' }}>
+                          Add Bonus Points when redeemed
+                        </span>
+                        {showBonusWhenRedeemed && (
+                          <div className="bonus-points-input">
+                            <input
+                              type="number"
+                              value={bonusPoints}
+                              style={{
+                                height: '8px',
+                                width: '40px',
+                                marginTop: '5px',
+                              }}
+                              onChange={(e) => setBonusPoints(e.target.value)}
+                            />
+                            <span>Points</span>
+                          </div>
+                        )}{' '}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="form-group inline-form-group"
+                    style={{ marginTop: '30px' }}
+                  >
+                    <label>
+                      <strong>Enter trigger value</strong>
+                    </label>
+                    <div style={{ marginBottom: '0' }}>
+                      <input
+                        type="text"
+                        className="trigger-input"
+                        placeholder=""
+                        value={triggerValue}
+                        onChange={(e) => setTriggerValue(e.target.value)}
+                        style={{ height: '25px' }}
+                      />
+                    </div>
+                    {triggerValueError && (
+                      <div
+                        className="error-message"
+                        style={{
+                          color: 'red',
+                          fontSize: '12px',
+                          marginTop: '5px',
+                          marginLeft: '20px',
+                          width: '100%',
+                        }}
+                      >
+                        {triggerValueError}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
               {selectedVoucherType === 'standard' && (
                 <>
                   {/* One time use option */}
@@ -3245,7 +3601,12 @@ const SpecialOffers = () => {
                             checked={expiryType === 'expiresIn'}
                             onChange={() => handleExpiryChange('expiresIn')}
                           />
-                          <label htmlFor="expiresIn" style={{whiteSpace: 'nowrap', marginRight: '5px'}}>Expires in</label>
+                          <label
+                            htmlFor="expiresIn"
+                            style={{ whiteSpace: 'nowrap', marginRight: '5px' }}
+                          >
+                            Expires in
+                          </label>
                           <input
                             type="text"
                             placeholder=""
@@ -3499,28 +3860,35 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977', marginBottom: '3px' }}
+                          style={{
+                            accentColor: '#002977',
+                            marginBottom: '3px',
+                          }}
                         />
-                        <span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        <span style={{ fontSize: '14px' }}>
+                          Add Bonus Points when redeemed
+                        </span>
                         {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            style={{height: '8px', width: '40px', marginTop: '5px'}}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span style={{fontSize: '14px'}}>Points</span>
-                        </div>
-                      )}
+                          <div className="bonus-points-input">
+                            <input
+                              type="number"
+                              value={bonusPoints}
+                              style={{
+                                height: '8px',
+                                width: '40px',
+                                marginTop: '5px',
+                              }}
+                              onChange={(e) => setBonusPoints(e.target.value)}
+                            />
+                            <span style={{ fontSize: '14px' }}>Points</span>
+                          </div>
+                        )}
                       </div>
-
-                      
                     </div>
                   </div>
 
                   <div className="form-group inline-form-group">
-                    <label style={{whiteSpace: 'nowrap', marginRight: '8px'}}>
+                    <label style={{ whiteSpace: 'nowrap', marginRight: '8px' }}>
                       <strong>Enter trigger value</strong>
                     </label>
                     <div style={{ marginTop: '5px' }}>
@@ -3598,20 +3966,29 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977', marginBottom: '3px' }}
+                          style={{
+                            accentColor: '#002977',
+                            marginBottom: '3px',
+                          }}
                         />
-<span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        <span style={{ fontSize: '14px' }}>
+                          Add Bonus Points when redeemed
+                        </span>
                         {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            style={{height: '8px', width: '40px', marginTop: '5px'}}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span>Points</span>
-                        </div>
-                      )}                        
+                          <div className="bonus-points-input">
+                            <input
+                              type="number"
+                              value={bonusPoints}
+                              style={{
+                                height: '8px',
+                                width: '40px',
+                                marginTop: '5px',
+                              }}
+                              onChange={(e) => setBonusPoints(e.target.value)}
+                            />
+                            <span>Points</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* {showBonusWhenRedeemed && (
@@ -3763,20 +4140,30 @@ const SpecialOffers = () => {
                           onChange={(e) =>
                             setShowBonusWhenRedeemed(e.target.checked)
                           }
-                          style={{ accentColor: '#002977', marginBottom: '3px' }}
+                          style={{
+                            accentColor: '#002977',
+                            marginBottom: '3px',
+                          }}
                         />
-<span style={{fontSize: '14px'}}>Add Bonus Points when redeemed</span>
+                        <span style={{ fontSize: '14px' }}>
+                          Add Bonus Points when redeemed
+                        </span>
                         {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            style={{height: '8px', width: '40px', marginTop: '5px'}}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span>Points</span>
-                        </div>
-                      )}                      </div>
+                          <div className="bonus-points-input">
+                            <input
+                              type="number"
+                              value={bonusPoints}
+                              style={{
+                                height: '8px',
+                                width: '40px',
+                                marginTop: '5px',
+                              }}
+                              onChange={(e) => setBonusPoints(e.target.value)}
+                            />
+                            <span>Points</span>
+                          </div>
+                        )}{' '}
+                      </div>
 
                       {/* {showBonusWhenRedeemed && (
                         <div className="bonus-points-input">

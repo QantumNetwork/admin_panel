@@ -436,8 +436,7 @@ const ClubDesk = () => {
   //     setPaymentsPage(1);
   //   }
   // };
-  const handleVerify = async () => {
-    const memberId = confirmVerify.userId;
+  const handleVerify = async (memberId) => {
     if (!memberId) return;
 
     try {
@@ -449,8 +448,8 @@ const ClubDesk = () => {
 
       if (res.status === 200) {
         toast.success('Member Verified successfully!');
-        setConfirmVerify({ open: false, userId: null });
-        fetchMembers();
+        // setConfirmVerify({ open: false, userId: null });
+        setActiveTab('verified');
       } else {
         toast.error('Verification failed. Try again.');
       }
@@ -1302,6 +1301,7 @@ const ClubDesk = () => {
                               cursor: 'pointer',
                               textDecoration: 'underline',
                               fontSize: '12px',
+                              textWrap: 'nowrap',
                             }}
                           >
                             ✖ Rejected
@@ -1315,6 +1315,7 @@ const ClubDesk = () => {
                               cursor: 'pointer',
                               textDecoration: 'underline',
                               fontSize: '12px',
+                              textWrap: 'nowrap',
                             }}
                           >
                             ✎ Edit
@@ -1324,9 +1325,13 @@ const ClubDesk = () => {
                       <td>
                         <button
                           className="action-btn approve"
-                          onClick={() =>
-                            setConfirmVerify({ open: true, userId: member._id })
-                          }
+                          onClick={() => {
+                            // setConfirmVerify({
+                            //   open: false,
+                            //   userId: member._id,
+                            // });
+                            handleVerify(member._id);
+                          }}
                         >
                           Verified
                         </button>
