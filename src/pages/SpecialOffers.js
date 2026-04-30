@@ -355,13 +355,13 @@ const SpecialOffers = () => {
             }
             setAddMode(false);
 
-            setMembershipExpiryDate(offerToSelect.membershipExpiryDate.substring(0, 10)
-                              .split('-')
-                              .join('-') || '');
+            setMembershipExpiryDate(offerToSelect.membershipExpiryDate
+    ? offerToSelect.membershipExpiryDate.split('T')[0]
+    : '');
             setJoined(offerToSelect.joined || 'before');
-            setOfferProceedDate(offerToSelect.offerProceedDate.substring(0, 10)
-                              .split('-')
-                              .join('-') || '');
+            setOfferProceedDate(offerToSelect.offerProceedDate
+    ? offerToSelect.offerProceedDate.split('T')[0]
+    : '');
 
             // Update trigger value in state only once
             // setTriggerValue(offerToSelect.triggerValue?.toString() || '');
@@ -475,6 +475,11 @@ const SpecialOffers = () => {
   //   setDescriptionText(offer.description || '');
   // }
   // }, [activeOfferFilter, filteredOffers, addMode]);
+
+  useEffect(() => {
+    console.log('med - ', membershipExpiryDate);
+    console.log('opd - ', offerProceedDate);
+  },[membershipExpiryDate, offerProceedDate]);
 
   // Helper functions to set target market fields from API data
   const setVoucherTypeFromAPI = (voucherType) => {
@@ -1010,6 +1015,15 @@ const SpecialOffers = () => {
     setBonusPoints(offer.points.toString());
     setShowBonusWhenRedeemed(Boolean(offer.points !== 'null'));
 
+    setMembershipExpiryDate(offer.membershipExpiryDate
+    ? offer.membershipExpiryDate.split('T')[0]
+    : '');
+            setJoined(offer.joined || 'before');
+            setOfferProceedDate(offer.offerProceedDate
+    ? offer.offerProceedDate.split('T')[0]
+    : '');
+
+
     // Map the voucher type to select value
     const voucherTypeSelectValue =
       {
@@ -1117,8 +1131,10 @@ const SpecialOffers = () => {
     // Reset trigger value in state
     setTriggerValue('');
 
+    setMembershipExpiryDate('');
     setJoined('before');
     setOfferProceedDate('');
+    setSelectedMemberships([]);
 
     // Immediately clear trigger input fields - do this first
     const triggerInputs = document.querySelectorAll('.trigger-input');
@@ -1219,15 +1235,6 @@ const SpecialOffers = () => {
 
     console.log('Current selected offer ID:', currentId);
 
-    // Get audience value
-    let ratingLevelValue = '';
-    const ratingLevelSelect = document.querySelector(
-      '.target-market-panel select[name="rating-level"]'
-    );
-    if (ratingLevelSelect) {
-      ratingLevelValue = ratingLevelSelect.value;
-    }
-
     // Get voucher type value
     let voucherTypeValue = '';
     const voucherTypeSelect = document.querySelector(
@@ -1243,7 +1250,8 @@ const SpecialOffers = () => {
       headingText,
       descriptionText,
       voucherTypeValue,
-      ratingLevelValue,
+      selectedAudiences,
+      isEveryone,
       expiryType,
       expiryDays,
       startDate,
@@ -1253,6 +1261,12 @@ const SpecialOffers = () => {
       triggerValue,
       oneTimeUse,
       activeOfferFilter,
+      selectedMemberships,
+      membershipExpiryDate,
+      joined,
+      offerProceedDate,
+      showBonusWhenRedeemed,
+      bonusPoints,
     };
 
     console.log('Sending form values to Art Gallery:', formValues);
@@ -2226,7 +2240,8 @@ const SpecialOffers = () => {
           headingText: savedHeading,
           descriptionText: savedDescription,
           voucherTypeValue,
-          ratingLevelValue,
+          selectedAudiences: savedSelectedAudiences,
+          isEveryone: savedIsEveryone,
           expiryType: savedExpiryType,
           expiryDays: savedExpiryDays,
           startDate: savedStartDate,
@@ -2236,6 +2251,12 @@ const SpecialOffers = () => {
           triggerValue: savedTriggerValue,
           oneTimeUse: savedOneTimeUse,
           activeOfferFilter: savedActiveOfferFilter,
+          selectedMemberships: savedSelectedMemberships,
+          membershipExpiryDate: savedMembershipExpiryDate,
+          joined: savedJoined,
+          offerProceedDate: savedOfferProceedDate,
+          showBonusWhenRedeemed: savedShowBonusWhenRedeemed,
+          bonusPoints: savedBonusPoints,
         } = location.state.formValues;
 
         // Preserve the current offer selection when returning from Art Gallery
@@ -2289,6 +2310,14 @@ const SpecialOffers = () => {
           if (savedTimeValid) setTimeValid(savedTimeValid);
           if (savedTriggerValue) setTriggerValue(savedTriggerValue);
           if (savedOneTimeUse !== undefined) setOneTimeUse(savedOneTimeUse);
+          if (savedSelectedMemberships) setSelectedMemberships(savedSelectedMemberships);
+          if (savedMembershipExpiryDate) setMembershipExpiryDate(savedMembershipExpiryDate);
+          if (savedSelectedAudiences) setSelectedAudiences(savedSelectedAudiences);
+          if (savedIsEveryone !== undefined) setIsEveryone(savedIsEveryone);
+          if (savedJoined) setJoined(savedJoined);
+          if (savedOfferProceedDate) setOfferProceedDate(savedOfferProceedDate);
+          if (savedShowBonusWhenRedeemed !== undefined) setShowBonusWhenRedeemed(savedShowBonusWhenRedeemed);
+          if (showBonusWhenRedeemed && savedBonusPoints !== undefined) setBonusPoints(savedBonusPoints);
 
           // Set select elements - moved into the same setTimeout to ensure order
           // Set voucher type select
@@ -2301,19 +2330,6 @@ const SpecialOffers = () => {
               // Trigger change event
               const event = new Event('change', { bubbles: true });
               voucherTypeSelect.dispatchEvent(event);
-            }
-          }
-
-          // Set rating level select
-          if (ratingLevelValue) {
-            const ratingLevelSelect = document.querySelector(
-              '.target-market-panel select[name="rating-level"]'
-            );
-            if (ratingLevelSelect) {
-              ratingLevelSelect.value = ratingLevelValue;
-              // Trigger change event
-              const event = new Event('change', { bubbles: true });
-              ratingLevelSelect.dispatchEvent(event);
             }
           }
         }, 0);
@@ -3218,7 +3234,6 @@ const SpecialOffers = () => {
             }
           >
             <div
-              className="scrollable-content"
               style={
                 selectedVoucherType === 'standard' ? { overflow: 'hidden' } : {}
               }
@@ -3364,7 +3379,7 @@ const SpecialOffers = () => {
                         }}
                       >
                         {selectedMemberships.length > 0
-                          ? selectedMemberships.length > 2
+                          ? selectedMemberships.length > 1
                             ? `${selectedMemberships.length} selected`
                             : membershipPackages
                                 .filter((o) =>
@@ -3431,7 +3446,8 @@ const SpecialOffers = () => {
                     </label>
                     <input
                       type="date"
-                      value={membershipExpiryDate}
+                      value={membershipExpiryDate || ''}
+                      style={{width: '150px'}}
                       onChange={(e) => setMembershipExpiryDate(e.target.value)}
                     />
                   </div>
@@ -3469,7 +3485,8 @@ const SpecialOffers = () => {
 
                     <input
                       type="date"
-                      value={offerProceedDate}
+                      style={{width: '120px'}}
+                      value={offerProceedDate || ''}
                       onChange={(e) => setOfferProceedDate(e.target.value)}
                     />
                   </div>

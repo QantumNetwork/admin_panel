@@ -127,11 +127,11 @@ input:focus{
   /* max-height: 700px; */
   margin-left: 15px;
   margin-top: 20px;
-  gap: 30px;
+  gap: 20px;
   /* background-color: #f5f5f5; */
   /* max-width: calc(100% - 270px);  */
   
-  width: 96%; /* Ensure it takes full width of its container */
+  width: 98%; /* Ensure it takes full width of its container */
   box-sizing: border-box; /* Include padding and border in the element's width */
   
 }
