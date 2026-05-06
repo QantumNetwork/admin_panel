@@ -21,6 +21,11 @@
   margin-bottom: 30px;
 }
 
+.special-offers-wrapper {
+  display: flex;
+  gap: 40px;
+}
+
 .menu-type-section label {
   display: block;
   margin-bottom: 10px;
@@ -105,7 +110,7 @@
 
 .preview-app-buttons {
   display: grid;
-  grid-template-columns: repeat(5, max-content);
+  grid-template-columns: repeat(3, max-content);
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;

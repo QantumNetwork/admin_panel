@@ -1,64 +1,64 @@
 export const getAppType = (appType) => {
   const appTypeMap = {
-    'MaxGaming': 'Max Gaming',
-    'Manly': 'Manly Harbour Boat Club',
-    'Montauk': 'Montauk Tavern',
-    'StarReward': 'Star Reward',
-    'Central': 'Central Lane Hotel',
-    'Sense': 'Sense Of Taste',
-    'North': 'North Shore Tavern',
-    'Hogan': "Hogan's",
-    'Ace': 'Ace Rewards',
-    'Queens': 'Queens Hotel',
-    'Brisbane': 'Brisbane Brewing Co',
-    'Bluewater': 'Bluewater Captains Club',
-    'Flinders': 'Flinders Street Wharves',
-    'Drinks': 'Drinks HQ',
-    'Wonthaggi': 'Wonthaggi Country Club',
-    'Woollahra': 'Woollahra Hotel',
-    'Bob': "Bob's Bulk Booze",
-    'Sense': 'Sense Of Taste',
+    MaxGaming: 'Max Gaming',
+    Manly: 'Manly Harbour Boat Club',
+    Montauk: 'Montauk Tavern',
+    StarReward: 'Star Reward',
+    Central: 'Central Lane Hotel',
+    Sense: 'Sense Of Taste',
+    North: 'North Shore Tavern',
+    Hogan: "Hogan's",
+    Ace: 'Ace Rewards',
+    Queens: 'Queens Hotel',
+    Brisbane: 'Brisbane Brewing Co',
+    Bluewater: 'Bluewater Captains Club',
+    Flinders: 'Flinders Street Wharves',
+    Drinks: 'Drinks HQ',
+    Wonthaggi: 'Wonthaggi Country Club',
+    Woollahra: 'Woollahra Hotel',
+    Bob: "Bob's Bulk Booze",
+    Sense: 'Sense Of Taste',
   };
-  
+
   return appTypeMap[appType] || appType;
 };
 
 export const getIconVenue = (appType) => {
-    const appIconMap = {
-    'Qantum': '/qantum.png',
-    'MaxGaming': '/max_gaming.png',
-    'Manly': '/mhbc.png',
-    'Montauk': '/montauk.png',
-    'StarReward': '/star.png',
-    'Central': '/central.png',
-    'Sense': '/sense.png',
-    'North': '/north.png',
-    'Hogan': "/hogan.png",
-    'Ace': '/ace.png',
-    'Queens': '/queens.png',
-    'Brisbane': '/brisbane.png',
-    'Bluewater': '/bluewater.png',
-    'Flinders': '/flinders.png',
-    'Drinks': '/drinks.png',
-    'Wonthaggi': '/wonthaggi.png',
-    'Woollahra': '/woollahra.png',
-    'EDP': '/edp.png',
-    'Bob': '/bob.png',
+  const appIconMap = {
+    Qantum: '/qantum.png',
+    MaxGaming: '/max_gaming.png',
+    Manly: '/mhbc.png',
+    Montauk: '/montauk.png',
+    StarReward: '/star.png',
+    Central: '/central.png',
+    Sense: '/sense.png',
+    North: '/north.png',
+    Hogan: '/hogan.png',
+    Ace: '/ace.png',
+    Queens: '/queens.png',
+    Brisbane: '/brisbane.png',
+    Bluewater: '/bluewater.png',
+    Flinders: '/flinders.png',
+    Drinks: '/drinks.png',
+    Wonthaggi: '/wonthaggi.png',
+    Woollahra: '/woollahra.png',
+    EDP: '/edp.png',
+    Bob: '/bob.png',
   };
-  
+
   return appIconMap[appType] || appType;
-}
+};
 
 export const getAudienceOptions = (venueName) => {
   const audienceMap = {
-    'Qantum': [
+    Qantum: [
       { value: 'Staff', label: 'Staff' },
       { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
     ],
-    'MaxGaming': [
+    MaxGaming: [
       // Same as Qantum
       { value: 'Staff', label: 'Staff' },
       { value: 'Valued', label: 'Valued' },
@@ -66,7 +66,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
     ],
-    'StarReward': [
+    StarReward: [
       { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
       { value: 'Star Staff', label: 'Star Staff' },
       { value: 'Valued', label: 'Valued' },
@@ -75,7 +75,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Platinum Black', label: 'Platinum Black' },
     ],
-    'Manly': [
+    Manly: [
       { value: 'Staff', label: 'Staff' },
       { value: 'Crewmate', label: 'Crewmate' },
       { value: 'Lieutenant', label: 'Lieutenant' },
@@ -83,7 +83,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
     ],
-    'Hogan': [
+    Hogan: [
       { value: 'Bronze', label: 'Bronze' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
@@ -93,7 +93,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Family', label: 'Family' },
       { value: 'Directors', label: 'Directors' },
     ],
-    'North': [
+    North: [
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
       // { value: 'Pre Staff', label: 'Pre Staff' },
@@ -101,18 +101,18 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Staff', label: 'Staff' },
       // { value: 'Valued', label: 'Valued' },
     ],
-    'Montauk': [
+    Montauk: [
       { value: 'Premium Member', label: 'Premium Member' },
       { value: 'Member', label: 'Member' },
       { value: 'Staff', label: 'Staff' },
     ],
     //same as Montauk
-    'Central': [
+    Central: [
       { value: 'Premium Member', label: 'Premium Member' },
       { value: 'Member', label: 'Member' },
       { value: 'Staff', label: 'Staff' },
     ],
-    'Ace': [
+    Ace: [
       { value: 'Staff', label: 'Staff' },
       { value: 'Tens', label: 'Tens' },
       { value: 'Jacks', label: 'Jacks' },
@@ -121,7 +121,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Ace', label: 'Ace' },
       { value: 'Ace Plus', label: 'Ace Plus' },
     ],
-    'Queens': [
+    Queens: [
       { value: 'Queens', label: 'Queens' },
       { value: 'Ruby', label: 'Ruby' },
       { value: 'Emerald', label: 'Emerald' },
@@ -130,40 +130,40 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Diamond Plus', label: 'Diamond Plus' },
       { value: 'Curtis Coast', label: 'Curtis Coast' },
     ],
-    'Brisbane': [
+    Brisbane: [
       { value: 'Brew Crew', label: 'Brew Crew' },
       { value: 'Member', label: 'Member' },
       { value: 'Regular', label: 'Regular' },
       { value: 'Champion', label: 'Champion' },
       { value: 'Legend', label: 'Legend' },
     ],
-    'Bluewater': [
+    Bluewater: [
       { value: 'Deckhand', label: 'Deckhand' },
       { value: 'First Mate', label: 'First Mate' },
       { value: 'Captain', label: 'Captain' },
       { value: 'Commodore', label: 'Commodore' },
       { value: 'Admiral', label: 'Admiral' },
     ],
-    'Flinders': [
+    Flinders: [
       { value: 'Staff', label: 'Staff' },
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
-      { value: 'VIP', label: 'VIP' },    
+      { value: 'VIP', label: 'VIP' },
     ],
-    'Drinks': [
+    Drinks: [
       { value: 'Staff', label: 'Staff' },
       { value: 'Explorer', label: 'Explorer' },
       { value: 'Masters', label: 'Masters' },
       { value: 'Club', label: 'Club' },
       { value: 'Reserve', label: 'Reserve' },
     ],
-    'Wonthaggi': [
+    Wonthaggi: [
       { value: 'Valued', label: 'Valued' },
       { value: 'Silver', label: 'Silver' },
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Gold', label: 'Gold' },
     ],
-    'Woollahra': [
+    Woollahra: [
       {
         value: 'Crew',
         label: 'Crew',
@@ -181,26 +181,83 @@ export const getAudienceOptions = (venueName) => {
         label: 'Local Legends',
       },
     ],
-    'EDP': [
-        {value: 'Staff', label: 'Staff'},
-        {value: 'Silver', label: 'Silver'},
-        {value: 'Gold', label: 'Gold'},
-        {value: 'Diamond', label: 'Diamond'}
+    EDP: [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Diamond', label: 'Diamond' },
     ],
-    'Bob': [
-      {value: 'Valued', label: 'Bobs Valued'},
-    ],
-    'Sense': [
-      {value: 'Valued', label: 'Membership Benefits'},
-    ]
+    Bob: [{ value: 'Valued', label: 'Bobs Valued' }],
+    Sense: [{ value: 'Valued', label: 'Membership Benefits' }],
   };
 
   // Return venue-specific options or default
-  return audienceMap[venueName] || [
-    { value: 'Staff', label: 'Staff' },
-    { value: 'Valued', label: 'Valued' },
-    { value: 'Silver', label: 'Silver' },
-    { value: 'Gold', label: 'Gold' },
-    { value: 'Platinum', label: 'Platinum' },
-  ];
+  return (
+    audienceMap[venueName] || [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+    ]
+  );
 };
+
+export const getAudienceStyle = () => ({
+  control: (base) => ({
+    ...base,
+    width: '140px',
+    minHeight: '22px',
+    height: '22px',
+    fontSize: '11px',
+    borderColor: '#ccc',
+    backgroundColor: 'white',
+    borderRadius: '3px',
+    boxShadow: 'none',
+    '&:hover': {
+      borderColor: '#999',
+    },
+  }),
+  option: (provided) => ({
+    ...provided,
+    fontSize: '11px',
+    padding: '6px 8px',
+  }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
+  valueContainer: (base) => ({
+    ...base,
+    padding: '0px 6px',
+    fontSize: '11px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    padding: '0 4px',
+    width: '16px',
+    height: '16px',
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    padding: '0 2px',
+    width: '16px',
+    height: '16px',
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    margin: '0px',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    fontSize: '11px',
+  }),
+  menu: (base) => ({
+    ...base,
+    width: 'auto',
+    minWidth: '140px',
+  }),
+});

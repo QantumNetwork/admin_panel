@@ -419,7 +419,7 @@
 /* Shift UPLOAD and DELETE buttons down */
 .upload-btn {
     position: absolute;
-    top: 600px; /* shifted down */
+    top: 640px; /* shifted down */
     left: 17.5%;
     width: 12%;
     height: 4.5%;
@@ -432,7 +432,7 @@
 }
 .delete-btn {
     position: absolute;
-    top: 600px; /* shifted down */
+    top: 640px; /* shifted down */
     left: 31.5%;
     width: 12%;
     height: 4.5%;
@@ -446,7 +446,7 @@
 /* Add New Promotion (shifted further down so it's outside the current posts area) */
 .add-promotion-btn {
     position: absolute;
-    top: 680px;
+    top: 700px;
     left: 23.7%;
     width: 14.1%;
     height: 4.5%;
@@ -459,7 +459,7 @@
 }
 .edit-btn {
     position: absolute;
-    top: 574px;
+    top: 615px;
     left: 52.8%;
     width: 12%;
     height: 4.5%;

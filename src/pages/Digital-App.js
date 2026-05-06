@@ -16,7 +16,11 @@ import { trackMenuAccess, handleLogout } from '../utils/api';
 import { FaChartPie } from 'react-icons/fa6';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
-import { getAppType, getAudienceOptions } from '../utils/appConstants';
+import {
+  getAppType,
+  getAudienceOptions,
+  getAudienceStyle,
+} from '../utils/appConstants';
 
 import {
   FaCheck,
@@ -84,13 +88,15 @@ const DigitalApp = () => {
   const CustomMultiValue = () => null; // Hides selected values in the input field
 
   const CustomValueContainer = ({ children, ...props }) => {
-    const { getValue } = props;
+    const { getValue, selectProps } = props;
     const selectedOptions = getValue();
+    const totalOptions = selectProps.options?.length || 0;
+
     let displayText = 'None selected';
 
     if (selectedOptions.length > 0) {
       displayText =
-        selectedOptions.length === audienceOptions.length
+        selectedOptions.length === totalOptions
           ? 'All selected'
           : `${selectedOptions.length} selected`;
     }
@@ -149,6 +155,14 @@ const DigitalApp = () => {
   // State for More Information content
   const [moreInfo, setMoreInfo] = useState('');
 
+  // Track if the venue field is being edited in current posts
+  const [isVenueEditing, setIsVenueEditing] = useState(false);
+  // For non-adding-new, venue remains an array of strings (venue dropdown)
+  const [venue, setVenue] = useState([]);
+  const [isAllVenue, setIsAllVenue] = useState(false);
+  const venueSelectRef = useRef(null);
+  const [isVenueMenuOpen, setIsVenueMenuOpen] = useState(false);
+
   // State variables for carousel images
   const [advertImages, setAdvertImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -160,6 +174,33 @@ const DigitalApp = () => {
   const [isFormRestored, setIsFormRestored] = useState(false);
   const [id, setId] = useState('');
   const [publish, setPublish] = useState(false);
+  const [venueOptions, setVenueOptions] = useState([]);
+
+  const [isVenueInitialized, setIsVenueInitialized] = useState(false);
+
+  useEffect(() => {
+    if (
+      selectedVenue !== 'EDP' ||
+      isVenueInitialized ||
+      !venueOptions.length ||
+      !venue.length
+    )
+      return;
+
+    const allSelected =
+      venue.length === venueOptions.length &&
+      venueOptions.every((opt) => venue.includes(opt.value));
+
+    setIsAllVenue(allSelected);
+    setIsVenueInitialized(true);
+  }, [venueOptions,venue,selectedVenue]);
+
+  useEffect(() => {
+  if (selectedVenue !== 'EDP') return;
+
+  setIsVenueInitialized(false);
+  setIsAllVenue(false);
+}, [advertImages, activeImageIndex, selectedVenue]);
 
   // Helper to convert audience (array of strings) into ReactSelect option objects
   // Uses case-insensitive matching.
@@ -169,6 +210,41 @@ const DigitalApp = () => {
       audienceArray.some((aud) => aud.toLowerCase() === opt.value.toLowerCase())
     );
   };
+
+  // Helper to convert venue (array of strings) into ReactSelect option objects
+  const convertVenueToObjects = (venueArray) => {
+    if (!Array.isArray(venueArray)) return [];
+    return venueOptions.filter((opt) =>
+      venueArray.some((ven) => ven.toLowerCase() === opt.value.toLowerCase())
+    );
+  };
+
+  const fetchVenueList = async () => {
+    if (!selectedVenue || selectedVenue !== 'EDP') return;
+
+    try {
+      const res = await axios.get(
+        `${baseUrl}/venue/all?appType=${selectedVenue}`
+      );
+
+      if (res.data?.success) {
+        const formatted = res.data.data.map((v) => ({
+          label: v.name,
+          value: v.name,
+        }));
+
+        setVenueOptions(formatted);
+      }
+    } catch (err) {
+      toast.error('Failed to fetch venues');
+    }
+  };
+
+  useEffect(() => {
+    if (selectedVenue === 'EDP') {
+      fetchVenueList();
+    }
+  }, [selectedVenue]);
 
   useEffect(() => {
     function handleOutsideClick(e) {
@@ -195,6 +271,31 @@ const DigitalApp = () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isAudienceMenuOpen]);
+
+  useEffect(() => {
+    function handleOutsideClick(e) {
+      // Check if the venue menu is open
+      if (isVenueMenuOpen) {
+        // Check if click is outside the select or on the checkbox
+        const isClickInsideSelect =
+          venueSelectRef.current && venueSelectRef.current.contains(e.target);
+        const isClickOnCheckbox =
+          e.target.classList.contains('audience-checkbox') ||
+          (e.target.parentElement &&
+            e.target.parentElement.classList.contains('audience-checkbox'));
+
+        // Close dropdown if click is outside the select or on the checkbox
+        if (!isClickInsideSelect || isClickOnCheckbox) {
+          setIsVenueMenuOpen(false);
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isVenueMenuOpen]);
 
   useEffect(() => {
     if (!isAddingNew) return; // Only proceed if isAddingNew is true
@@ -276,6 +377,19 @@ const DigitalApp = () => {
     }
   }, [isAddingNew, isEveryone]);
 
+  // Disable venue fields when isAddingNew is true and isAllVenue is true
+  useEffect(() => {
+    if (selectedVenue !== 'EDP') return;
+    if (isAddingNew && isAllVenue) {
+      // Force disable the venue input fields
+      const venueFields = document.querySelectorAll('.audience-field');
+      venueFields.forEach((field) => {
+        field.disabled = true;
+        field.classList.add('disabled-field');
+      });
+    }
+  }, [isAddingNew, isAllVenue]);
+
   // On each carousel image change, update the dynamic values from the current API response
   useEffect(() => {
     if (isAddingNew) return;
@@ -286,6 +400,13 @@ const DigitalApp = () => {
       advertImages[activeImageIndex]
     ) {
       const current = advertImages[activeImageIndex];
+
+      // VENUE LOGIC (ONLY FOR EDP)
+      if (selectedVenue === 'EDP') {
+        const currentVenues = current.venueName || [];
+        setVenue(currentVenues);
+      }
+
       setPosition(current.position || '');
 
       // Check if audience is "everyone" or if all options are selected
@@ -352,6 +473,8 @@ const DigitalApp = () => {
           startDate: savedStartDate,
           endDate: savedEndDate,
           moreInfo: savedMoreInfo,
+          isAllVenue: savedIsAllVenue,
+          venue: savedVenue,
           id: savedId,
         } = location.state.formValues;
 
@@ -365,6 +488,9 @@ const DigitalApp = () => {
           setMoreInfo(savedMoreInfo);
           setSavedContent(savedMoreInfo);
         }
+
+        if (savedIsAllVenue !== undefined) setIsAllVenue(savedIsAllVenue);
+        if (savedVenue) setVenue(savedVenue);
         if (savedId) {
           setId(savedId);
           console.log('saved', savedId);
@@ -421,7 +547,9 @@ const DigitalApp = () => {
     setPublish((prevState) => !prevState);
     setIsAddingNew(true);
     setIsEveryone(true); // Set to false by default
+    setIsAllVenue(true);
     setAudience(audienceOptions.map((option) => option.value)); // Start with empty audience
+    setVenue(venueOptions.map((option) => option.value)); // Start with empty venue
     setMoreInfo('');
     setEditorContent(''); // <-- Clears the live editor
     setSavedContent('');
@@ -481,6 +609,59 @@ const DigitalApp = () => {
     }
   };
 
+  // Checkbox for "All venues"
+  const handleVenueCheckboxChange = (e) => {
+    const checked = e.target.checked;
+    console.log('All venues checkbox changed:', checked);
+
+    // This is the key change - only update isAllVenue when the checkbox is clicked
+    setIsAllVenue(checked);
+
+    if (checked) {
+      // When "All venues" is checked, set audience to include all available options
+      setVenue(venueOptions.map((option) => option.value));
+
+      // Force disable the audience input fields
+      const venueFields = document.querySelectorAll('.audience-field');
+      venueFields.forEach((field) => {
+        field.disabled = true;
+        field.classList.add('disabled-field');
+      });
+
+      // Close and disable the audience dropdown if it's open
+      setIsVenueEditing(false);
+      setIsVenueMenuOpen(false);
+
+      // Force update the Select component's disabled state
+      setTimeout(() => {
+        const selectContainer = document.querySelector(
+          '.audience-select-container'
+        );
+        if (selectContainer) {
+          selectContainer.classList.add('disabled-select');
+        }
+      }, 0);
+    } else {
+      // When "All venues" is unchecked, set venues to empty array
+      setVenue([]);
+
+      // Enable the venue input fields
+      const venueFields = document.querySelectorAll('.audience-field');
+      venueFields.forEach((field) => {
+        field.disabled = false;
+        field.classList.remove('disabled-field');
+      });
+
+      // Enable the Select component
+      const selectContainer = document.querySelector(
+        '.audience-select-container'
+      );
+      if (selectContainer) {
+        selectContainer.classList.remove('disabled-select');
+      }
+    }
+  };
+
   // File Upload
   const triggerFileInput = () => {
     const current = advertImages[activeImageIndex];
@@ -515,6 +696,8 @@ const DigitalApp = () => {
       position,
       audience,
       isEveryone,
+      isAllVenue,
+      venue,
       displayType,
       startDate,
       endDate,
@@ -669,6 +852,11 @@ const DigitalApp = () => {
       audience: isEveryone
         ? 'everyone'
         : audience.map((item) => item.value || item),
+
+      ...(selectedVenue === 'EDP' && {
+        venueName: venue,
+      }),
+
       position: position ? Number(position) : 0,
       imageUrl: finalImageUrl,
       htmlContent: finalContent, // Use the finalContent which prioritizes editorContent
@@ -1035,6 +1223,8 @@ const DigitalApp = () => {
                       setActiveImageIndex(0);
                       setIsAddingNew(false);
                       setAudience([]);
+                      setVenue([]);
+                      setIsAllVenue(false);
                       setIsEveryone(false);
 
                       await handleLock();
@@ -1310,64 +1500,7 @@ const DigitalApp = () => {
                         MultiValue: CustomMultiValue,
                         ValueContainer: CustomValueContainer,
                       }}
-                      styles={{
-                        control: (base) => ({
-                          ...base,
-                          width: '140px',
-                          minHeight: '22px',
-                          height: '22px',
-                          fontSize: '11px',
-                          borderColor: '#ccc',
-                          backgroundColor: 'white',
-                          borderRadius: '3px',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            borderColor: '#999',
-                          },
-                        }),
-                        option: (provided) => ({
-                          ...provided,
-                          fontSize: '11px',
-                          padding: '6px 8px',
-                        }),
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 9999,
-                        }),
-                        valueContainer: (base) => ({
-                          ...base,
-                          padding: '0px 6px',
-                          fontSize: '11px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }),
-                        dropdownIndicator: (base) => ({
-                          ...base,
-                          padding: '0 4px',
-                          width: '16px',
-                          height: '16px',
-                        }),
-                        clearIndicator: (base) => ({
-                          ...base,
-                          padding: '0 2px',
-                          width: '16px',
-                          height: '16px',
-                        }),
-                        indicatorSeparator: (base) => ({
-                          ...base,
-                          margin: '0px',
-                        }),
-                        singleValue: (base) => ({
-                          ...base,
-                          fontSize: '11px',
-                        }),
-                        menu: (base) => ({
-                          ...base,
-                          width: 'auto',
-                          minWidth: '140px',
-                        }),
-                      }}
+                      styles={getAudienceStyle()}
                     />
                   </div>
                   <div
@@ -1426,64 +1559,7 @@ const DigitalApp = () => {
                         MultiValue: CustomMultiValue,
                         ValueContainer: CustomValueContainer,
                       }}
-                      styles={{
-                        control: (base) => ({
-                          ...base,
-                          width: '140px',
-                          minHeight: '22px',
-                          height: '22px',
-                          fontSize: '11px',
-                          borderColor: '#ccc',
-                          backgroundColor: 'white',
-                          borderRadius: '3px',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            borderColor: '#999',
-                          },
-                        }),
-                        option: (provided) => ({
-                          ...provided,
-                          fontSize: '11px',
-                          padding: '6px 8px',
-                        }),
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 9999,
-                        }),
-                        valueContainer: (base) => ({
-                          ...base,
-                          padding: '0px 6px',
-                          fontSize: '11px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }),
-                        dropdownIndicator: (base) => ({
-                          ...base,
-                          padding: '0 4px',
-                          width: '16px',
-                          height: '16px',
-                        }),
-                        clearIndicator: (base) => ({
-                          ...base,
-                          padding: '0 2px',
-                          width: '16px',
-                          height: '16px',
-                        }),
-                        indicatorSeparator: (base) => ({
-                          ...base,
-                          margin: '0px',
-                        }),
-                        singleValue: (base) => ({
-                          ...base,
-                          fontSize: '11px',
-                        }),
-                        menu: (base) => ({
-                          ...base,
-                          width: 'auto',
-                          minWidth: '140px',
-                        }),
-                      }}
+                      styles={getAudienceStyle()}
                     />
                   </div>
                   <div
@@ -1504,6 +1580,137 @@ const DigitalApp = () => {
                 </div>
               )}
             </div>
+
+            {selectedVenue === 'EDP' && (
+              <div className="field-row">
+                <label className="field-label">Venues</label>
+                {isAddingNew ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <div
+                      style={{ flex: 1 }}
+                      ref={venueSelectRef}
+                      className={`audience-select-container ${
+                        isAllVenue ? 'disabled-select' : ''
+                      }`}
+                    >
+                      <Select
+                        isMulti
+                        options={venueOptions}
+                        value={convertVenueToObjects(venue)}
+                        onChange={(e) => {
+                          const selectedOptions = Array.isArray(e)
+                            ? e.map((x) => x.value)
+                            : [];
+                          setVenue(selectedOptions);
+
+                          // Only handle the case when selected options are LESS than all options
+                          // and isAllVenue is true - in this case, uncheck the All venues checkbox
+                          if (
+                            selectedOptions.length < venueOptions.length &&
+                            isAllVenue
+                          ) {
+                            setIsAllVenue(false);
+                          }
+                          // Don't automatically set isAllVenue to true when all options are selected manually
+                        }}
+                        isDisabled={isAllVenue}
+                        closeMenuOnSelect={false}
+                        hideSelectedOptions={false}
+                        menuIsOpen={isVenueMenuOpen}
+                        onMenuOpen={() => setIsVenueMenuOpen(true)}
+                        onMenuClose={() => setIsVenueMenuOpen(false)}
+                        components={{
+                          Option: CheckboxOption,
+                          MultiValue: CustomMultiValue,
+                          ValueContainer: CustomValueContainer,
+                        }}
+                        styles={getAudienceStyle()}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        // marginLeft: "10px",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isAllVenue}
+                        onChange={handleVenueCheckboxChange}
+                        className="audience-checkbox"
+                      />
+                      &nbsp;All venues
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div
+                      style={{ flex: 1 }}
+                      ref={venueSelectRef}
+                      className={`audience-select-container ${
+                        isAllVenue ? 'disabled-select' : ''
+                      }`}
+                    >
+                      <Select
+                        isMulti
+                        options={venueOptions}
+                        value={convertVenueToObjects(venue)}
+                        onChange={(e) => {
+                          const selectedOptions = Array.isArray(e)
+                            ? e.map((x) => x.value)
+                            : [];
+                          setVenue(selectedOptions);
+
+                          // Only handle the case when selected options are LESS than all options
+                          // and isAllVenue is true - in this case, uncheck the All venues checkbox
+                          if (
+                            selectedOptions.length < venueOptions.length &&
+                            isAllVenue
+                          ) {
+                            setIsAllVenue(false);
+                          }
+                          // Don't automatically set isAllVenue to true when all options are selected manually
+                        }}
+                        isDisabled={isAllVenue}
+                        closeMenuOnSelect={false}
+                        hideSelectedOptions={false}
+                        menuIsOpen={isVenueMenuOpen}
+                        onMenuOpen={() => setIsVenueMenuOpen(true)}
+                        onMenuClose={() => setIsVenueMenuOpen(false)}
+                        components={{
+                          Option: CheckboxOption,
+                          MultiValue: CustomMultiValue,
+                          ValueContainer: CustomValueContainer,
+                        }}
+                        styles={getAudienceStyle()}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginLeft: '10px',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isAllVenue}
+                        onChange={handleVenueCheckboxChange}
+                        className="audience-checkbox"
+                      />
+                      &nbsp;All venues
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="field-row display-inline">
               <label className="field-label">Display</label>
