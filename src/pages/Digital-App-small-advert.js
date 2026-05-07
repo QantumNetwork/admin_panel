@@ -171,14 +171,14 @@ const DigitalSmall = () => {
       if (
         selectedVenue !== 'EDP' ||
         isVenueInitialized ||
-        !venueOptions.length ||
-        !venue.length
+        !venueOptions.length
       )
         return;
   
       const allSelected =
-        venue.length === venueOptions.length &&
-        venueOptions.every((opt) => venue.includes(opt.value));
+        (venue.length === venueOptions.length &&
+      venueOptions.every((opt) => venue.includes(opt.value))) || 
+      venue.length === 0;
   
       setIsAllVenue(allSelected);
       setIsVenueInitialized(true);
