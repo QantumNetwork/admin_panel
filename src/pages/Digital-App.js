@@ -548,6 +548,9 @@ const DigitalApp = () => {
     setIsAddingNew(true);
     setIsEveryone(true); // Set to false by default
     setIsAllVenue(true);
+    setDisplayType('immediate');
+    setStartDate('');
+    setEndDate('');
     setAudience(audienceOptions.map((option) => option.value)); // Start with empty audience
     setVenue(venueOptions.map((option) => option.value)); // Start with empty venue
     setMoreInfo('');

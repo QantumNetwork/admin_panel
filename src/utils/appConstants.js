@@ -74,6 +74,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Gold', label: 'Gold' },
       { value: 'Platinum', label: 'Platinum' },
       { value: 'Platinum Black', label: 'Platinum Black' },
+      { value: 'Test', label: 'Test' },
     ],
     Manly: [
       { value: 'Staff', label: 'Staff' },
