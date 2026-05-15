@@ -98,18 +98,121 @@ const PaymentReporting = () => {
   };
 
   const formatIfDate = (value) => {
-  if (!value) return value;
+    if (!value) return value;
 
-  const isoRegex = /^\d{4}-\d{2}-\d{2}/;
+    const isoRegex = /^\d{4}-\d{2}-\d{2}/;
 
-  if (isoRegex.test(value)) {
-    const date = new Date(value);
+    if (isoRegex.test(value)) {
+      const date = new Date(value);
 
-    return date.toLocaleDateString('en-GB'); 
-  }
+      return date.toLocaleDateString('en-GB');
+    }
 
-  return value;
-};
+    return value;
+  };
+
+  const exportToCSV = async () => {
+    try {
+      // Fetch ALL filtered transaction data
+      let url = `${baseUrl}/user/update-details?filter=${dateFilter}&page=1&limit=100000`;
+
+      // Search filter
+      if (membersSearch && membersSearch.trim() !== '') {
+        url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+      }
+
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const transactions = res?.data?.data || [];
+
+      // CSV rows
+      const csvRows = [];
+
+      // Header
+      csvRows.push([
+        'Date',
+        'Time',
+        'Requester',
+        'Member Name',
+        'Card ID',
+        'What Changed',
+        'Previous',
+        'New Change',
+      ]);
+
+      // Data
+      transactions.forEach((transaction) => {
+        transaction.changes.forEach((change) => {
+          csvRows.push([
+            transaction.updatedAt
+              ?.substring(0, 10)
+              .split('-')
+              .reverse()
+              .join('-'),
+
+            formatToBrisbaneTime(transaction.updatedAt),
+
+            transaction.updatedBy || '',
+
+            transaction.GivenNames || '',
+
+            transaction.CardNumber || '',
+
+            change.field || '',
+
+            formatIfDate(change.oldValue) || '',
+
+            formatIfDate(change.newValue) || '',
+          ]);
+        });
+      });
+
+      // Clean CSV formatting
+      const formatCSVValue = (value) => {
+        if (value === null || value === undefined) return '';
+
+        const stringValue = String(value);
+
+        if (
+          stringValue.includes(',') ||
+          stringValue.includes('"') ||
+          stringValue.includes('\n')
+        ) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+
+        return stringValue;
+      };
+
+      const csvContent = csvRows
+        .map((row) => row.map(formatCSVValue).join(','))
+        .join('\n');
+
+      // Create CSV file
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      });
+
+      const link = document.createElement('a');
+      const downloadUrl = URL.createObjectURL(blob);
+
+      link.setAttribute('href', downloadUrl);
+      link.setAttribute('download', 'transaction-history.csv');
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success('CSV exported successfully');
+    } catch (err) {
+      console.error('CSV export error:', err);
+      toast.error('Failed to export CSV');
+    }
+  };
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -491,6 +594,23 @@ const PaymentReporting = () => {
             <option value="yesterday">Yesterday</option>
           </select>
         </div>
+
+        <button
+          onClick={exportToCSV}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            backgroundColor: '#f2f2f2',
+            cursor: 'pointer',
+            minWidth: '140px',
+            fontWeight: '500',
+            // height: '36px',
+            marginLeft: '520px'
+          }}
+        >
+          Export as CSV
+        </button>
       </div>
 
       {activeTab === 'approvedPayments' && (
@@ -571,7 +691,7 @@ const PaymentReporting = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginTop: '20px',
-                  paddingRight: '20px', 
+                  paddingRight: '20px',
                   paddingLeft: '20px',
                 }}
               >

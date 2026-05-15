@@ -362,6 +362,152 @@ const PaymentReporting = () => {
     }
   };
 
+  const exportToCSV = async () => {
+    try {
+      let csvRows = [];
+
+      // -----------------------------
+      // APPROVED PAYMENTS TAB
+      // -----------------------------
+      if (activeTab === 'approvedPayments') {
+        // Fetch ALL filtered data
+        let url = `${baseUrl}/user/get/verified?page=1&limit=100000`;
+
+        // search
+        if (membersSearch && membersSearch.trim() !== '') {
+          url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+        }
+
+        // payment type
+        if (paymentFilter && paymentFilter !== 'all') {
+          url += `&paymentType=${paymentFilter}`;
+        }
+
+        // renewals
+        if (renewalsFilter === 'renewals') {
+          url += `&renewType=renew`;
+        } else if (renewalsFilter === 'new') {
+          url += `&renewType=none`;
+        }
+
+        // date
+        url += `&dateType=${dateFilter}`;
+
+        if (dateFilter === 'custom' && startDate && endDate) {
+          url += `&fromDate=${startDate}&toDate=${endDate}`;
+        }
+
+        const res = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const users = res.data?.users || [];
+
+        // CSV HEADER
+        csvRows.push([
+          'Date',
+          'Name',
+          'Address',
+          'Suburb',
+          'Post Code',
+          'Mobile',
+          'Email',
+          'Membership',
+          'Payment Type',
+          'Amount Paid',
+        ]);
+
+        // CSV DATA
+        users.forEach((member) => {
+          csvRows.push([
+            member.lastPaymentAtBrisbane || '',
+            getFullName(member),
+            member.Address || member.address || '',
+            member.Suburb || member.suburb || '',
+            member.PostCode || member.postCode || '',
+            member.Mobile || member.mobile || '',
+            member.Email || member.email || '',
+            member.packageName || '',
+            fetchPaymentType(member.paymentType) || '',
+            member.amountPaid || 0,
+          ]);
+        });
+      }
+
+      // -----------------------------
+      // TOTAL ALL PAYMENT METHODS TAB
+      // -----------------------------
+      if (activeTab === 'totalsAllPaymentMethods') {
+        csvRows.push(['Payment Type', 'Total Payments', 'Total Members']);
+
+        csvRows.push([
+          'Stripe',
+          paymentBreakdown.stripe.amount,
+          paymentBreakdown.stripe.users,
+        ]);
+
+        csvRows.push([
+          'Venue EFTPOS',
+          paymentBreakdown.card_by_venue.amount,
+          paymentBreakdown.card_by_venue.users,
+        ]);
+
+        csvRows.push([
+          'Cash',
+          paymentBreakdown.cash.amount,
+          paymentBreakdown.cash.users,
+        ]);
+
+        csvRows.push([
+          'Mgmt Approved',
+          paymentBreakdown.management.amount,
+          paymentBreakdown.management.users,
+        ]);
+
+        csvRows.push([
+          'TOTAL',
+          totalsData.totalAmountPaid,
+          totalsData.totalUsers,
+        ]);
+      }
+
+      // Convert rows to CSV string
+      const csvContent = csvRows
+        .map((row) => row.map((item) => `"${item}"`).join(','))
+        .join('\n');
+
+      // Create blob
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      });
+
+      // Create download link
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+
+      // Dynamic filename
+      const fileName =
+        activeTab === 'approvedPayments'
+          ? 'approved-payments.csv'
+          : 'payment-summary.csv';
+
+      link.setAttribute('download', fileName);
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success('CSV exported successfully');
+    } catch (err) {
+      console.error('CSV export error:', err);
+      toast.error('Failed to export CSV');
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -851,6 +997,22 @@ const PaymentReporting = () => {
             <option value="management">Mgmt Approved</option>
           </select>
         )}
+
+        <button
+          onClick={exportToCSV}
+          style={{
+            padding: '7px 14px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            backgroundColor: '#f2f2f2',
+            cursor: 'pointer',
+            minWidth: '140px',
+            fontWeight: '500',
+            marginLeft: '320px',
+          }}
+        >
+          Export as CSV
+        </button>
       </div>
 
       {activeTab === 'totalsAllPaymentMethods' && (
