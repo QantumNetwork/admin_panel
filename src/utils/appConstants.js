@@ -18,6 +18,7 @@ export const getAppType = (appType) => {
     Woollahra: 'Woollahra Hotel',
     Bob: "Bob's Bulk Booze",
     Sense: 'Sense Of Taste',
+    Mannum: 'Mannum Club'
   };
 
   return appTypeMap[appType] || appType;
@@ -44,6 +45,7 @@ export const getIconVenue = (appType) => {
     Woollahra: '/woollahra.png',
     EDP: '/edp.png',
     Bob: '/bob.png',
+    Mannum: '/mannum.png'
   };
 
   return appIconMap[appType] || appType;
@@ -188,8 +190,24 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Gold', label: 'Gold' },
       { value: 'Diamond', label: 'Diamond' },
     ],
-    Bob: [{ value: 'Valued', label: 'Bobs Valued' }],
+    Bob: [
+      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
+      { value: 'Star Staff', label: 'Star Staff' },
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Platinum Black', label: 'Platinum Black' },
+      { value: 'Test', label: 'Test' },
+    ],
     Sense: [{ value: 'Valued', label: 'Membership Benefits' }],
+    Mannum: [
+      { value: 'Members', label: 'Members' },
+      { value: 'Testing', label: 'Testing' },
+      { value: 'Cancelled', label: 'Cancelled' },
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Perpetuity', label: 'Perpetuity' },
+    ]
   };
 
   // Return venue-specific options or default

@@ -63,6 +63,7 @@ const MyBenefits = () => {
   if (venue === 'Woollahra') return 'Regulars';
   if (venue === 'EDP') return 'Silver';
   if (venue === 'Bob' || venue === 'Sense') return 'Valued';
+  if (venue === 'Mannum') return 'Members';
   return 'Platinum Black';
 };
 
@@ -93,10 +94,9 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
         if (selectedVenue === 'Qantum') return '#4CAF50';
-        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming') return '#FF0000';
+        if (selectedVenue === 'StarReward' || selectedVenue === 'MaxGaming' || selectedVenue === 'Bob') return '#FF0000';
         if (selectedVenue === 'North') return '#29364a';
         if (selectedVenue === 'Wonthaggi') return '#090808';
-        if (selectedVenue === 'Bob') return '#e60a0a';
         if (selectedVenue === 'Sense') return '#e1ae68';
       case 'Staff':
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
@@ -104,6 +104,9 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Flinders') return '#FF0000';
         if (selectedVenue === 'Drinks') return '#ff00d9';
         if (selectedVenue === 'EDP') return '#067f0a';
+        if (selectedVenue === 'Mannum') return '#4D5E7B';
+        if (selectedVenue === 'Hogan') return '#45d4e1ff';
+        if (selectedVenue === 'Ace') return '#dedadabd';
       case 'Staff Pre 3Mth':
         return '#FF0000';
       case 'Star Staff':
@@ -134,10 +137,6 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Commander':
         return '#C0C0C0';
       case 'Lieutenant':
-        return '#9D5F2D';
-      case 'Staff':
-        if (selectedVenue === 'Hogan') return '#45d4e1ff';
-        if (selectedVenue === 'Ace') return '#dedadabd';
         return '#9D5F2D';
       case 'Crewmate':
         return '#344361';
@@ -196,6 +195,14 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         return '#c19e14dd';
       case 'Local Legends':
         return '#61791b';        
+      case 'Members':
+        if (selectedVenue === 'Mannum') return '#376cc3ff';
+      case 'Testing':
+        if (selectedVenue === 'Mannum') return '#079502';
+      case 'Cancelled':
+        if (selectedVenue === 'Mannum') return '#ff0000';
+      case 'Perpetuity':
+        if (selectedVenue === 'Mannum') return '#D4AF37';
       default:
         return '#D4AF37'; // Default gold color
     }

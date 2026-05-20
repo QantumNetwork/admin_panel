@@ -199,7 +199,7 @@ const MarketToMembers = () => {
                   .toLowerCase()
                   .includes(row.value.toLowerCase())
               )
-              .slice(0, 10);
+              // .slice(0, 10);
           } else if (row.operator === 'Exactly Matches') {
             // For Exactly Matches: exact match at beginning of string
             // Also limit to 10 results
@@ -211,14 +211,15 @@ const MarketToMembers = () => {
                     .toLowerCase()
                     .indexOf(row.value.toLowerCase()) === 0
               )
-              .slice(0, 10);
+              // .slice(0, 10);
           } else {
             // Default for other operators
             // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id].slice(
-              0,
-              10
-            );
+            newFilteredOptions[row.id] = filterValueOptions[row.id]
+            // .slice(
+            //   0,
+            //   10
+            // );
           }
         } else {
           // If no input, don't show any options
