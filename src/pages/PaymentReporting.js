@@ -1008,7 +1008,7 @@ const PaymentReporting = () => {
             cursor: 'pointer',
             minWidth: '140px',
             fontWeight: '500',
-            marginLeft: '320px',
+            marginLeft: dateFilter === 'custom' ? '150px' : '400px'
           }}
         >
           Export as CSV

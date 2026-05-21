@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../styles/payment-reporting.css';
 import { set } from 'react-hook-form';
 
-const PaymentReporting = () => {
+const TransactionHistory = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const location = useLocation();
@@ -64,6 +64,11 @@ const PaymentReporting = () => {
 
       if (membersSearch && membersSearch.trim() !== '')
         url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+
+      // custom date handling
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
+      }
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -119,6 +124,11 @@ const PaymentReporting = () => {
       // Search filter
       if (membersSearch && membersSearch.trim() !== '') {
         url += `&search=${encodeURIComponent(membersSearch.trim())}`;
+      }
+
+      // custom date handling
+      if (dateFilter === 'custom' && startDate && endDate) {
+        url += `&fromDate=${startDate}&toDate=${endDate}`;
       }
 
       const res = await axios.get(url, {
@@ -239,7 +249,7 @@ const PaymentReporting = () => {
 
   useEffect(() => {
     fetchTransactionHistory();
-  }, [dateFilter, startDate, endDate, membersPage, membersSearch, token]);
+  }, [dateFilter, startDate, endDate, membersPage, membersSearch, membersLimit, token]);
 
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
@@ -592,8 +602,72 @@ const PaymentReporting = () => {
             <option value="mtd">MTD</option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
+            <option value="last3month">Last 3 Months</option>
+            <option value="custom">Custom</option>
           </select>
         </div>
+
+        {/* START DATE */}
+        {dateFilter === 'custom' && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: '600',
+                color: '#6b6b6b',
+                marginBottom: '4px',
+              }}
+            >
+              START DATE
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setMembersPage(1);
+                setStartDate(e.target.value);
+              }}
+              style={{
+                padding: '6px 8px',
+                borderRadius: '4px',
+                border: '1px solid #cfcfcf',
+                fontSize: '12px',
+                width: '130px',
+              }}
+            />
+          </div>
+        )}
+
+        {/* END DATE */}
+        {dateFilter === 'custom' && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: '600',
+                color: '#6b6b6b',
+                marginBottom: '4px',
+              }}
+            >
+              END DATE
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setMembersPage(1);
+                setEndDate(e.target.value);
+              }}
+              style={{
+                padding: '6px 8px',
+                borderRadius: '4px',
+                border: '1px solid #cfcfcf',
+                fontSize: '12px',
+                width: '130px',
+              }}
+            />
+          </div>
+        )}
 
         <button
           onClick={exportToCSV}
@@ -606,7 +680,7 @@ const PaymentReporting = () => {
             minWidth: '140px',
             fontWeight: '500',
             // height: '36px',
-            marginLeft: '520px'
+            marginLeft: dateFilter === 'custom' ? '220px' : '550px'
           }}
         >
           Export as CSV
@@ -781,4 +855,4 @@ const PaymentReporting = () => {
   );
 };
 
-export default PaymentReporting;
+export default TransactionHistory;
