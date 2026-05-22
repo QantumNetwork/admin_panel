@@ -132,13 +132,13 @@ input:focus{
   /* max-width: calc(100% - 270px);  */
   
   width: 98%; /* Ensure it takes full width of its container */
+  height: 500px;
   box-sizing: border-box; /* Include padding and border in the element's width */
   
 }
 
 /* Offers Panel */
 .offers-panel {
-  /* width: 320px; */
   width: 26.33%;
   background: transparent 
   linear-gradient(180deg, #070526 0%, #002D72 100%) 
@@ -149,14 +149,7 @@ input:focus{
   overflow: hidden;
   position: relative;
   padding: 40px 20px;
-  height: 100%;
-  min-height: 410px;
-  /* Added box-shadow for depth and separation */
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
-  /* Added white border to create visual separation */
-  /* border: 3px solid white; */
   flex-shrink: 0;
-  max-height: 410px !important;
 }
 
 .offers-list {
@@ -265,19 +258,12 @@ input:focus{
 
 /* Current Post Panel */
 .current-post-panel {
-  /* width: 400px; */
   width: 33.33%;
-  height: 100%;
-  min-height: 475px;
   background: #F2F2F2;
   border-radius: 8px;
   padding: 20px;
   opacity: 1;
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
-  /* border: 3px solid white; */
-  /* flex: 0 0 400px;  */
   overflow-y: auto; /* Allow scrolling if content is too large */
-  max-height: 513px !important;
 }
 
 .current-post-panel h2 {
@@ -530,10 +516,7 @@ input:focus{
 
 /* Target Market Panel */
 .target-market-panel {
-  /* width: 350px; */
   width: 33.33%;
-  height: auto;
-  /* min-height: 475px; */
   background: #F2F2F2;
   border-radius: 8px;
   padding: 20px;
@@ -1259,20 +1242,8 @@ border: 1px solid #22ade3;
   }
 }
 @media screen and (min-width: 1601px) and (max-width: 1660px) {
-  .offers-panel{
-    min-height: 350px;
-    max-height: 460px !important;
-  }
-
   .page-container {
     margin-left: 12px;
-  }
-
-}
-@media screen and (min-width: 1600px) and (max-width: 1601px) {
-  .offers-panel{
-    min-height: 410px;
-    max-height: 410px !important;
   }
 }
 
@@ -1281,10 +1252,10 @@ border: 1px solid #22ade3;
     margin-left: 15px;
   }
 }
-@media screen and (min-width: 1440px) and (max-width: 1534px) {
-  .offers-panel{
-    min-height: 435px;
-    max-height: 435px !important;
+
+@media screen and (max-width: 1400px) {
+  .special-offers-page {
+    height: 550px;
   }
 }
 
@@ -1296,26 +1267,6 @@ border: 1px solid #22ade3;
     max-width: 100%; /* Changed from 1800px to 100% for better responsiveness */
     margin: 0 auto;
     padding-left: calc(150px + 2%); /* Use calc for more responsive padding */
-  }
-  
-  .special-offers-page {
-    /* min-width: 1100px; */
-    max-width: 100%; 
-    display: flex;
-    flex-wrap: nowrap; /* Ensure panels stay in a row */
-    justify-content: flex-start; /* Align panels to the start */
-    gap: 2%; /* Use percentage for responsive gaps */
-    /* overflow: hidden; */
-  }
-  
-  /* Keep panels at fixed minimum widths but allow them to be responsive */
-  .offers-panel {
-    /* min-width: 320px; */
-    /* width: 27.33%; */
-    /* max-width: 400px; */
-    height: 100%;
-    min-height: 410px;
-    max-height: 414px !important;
   }
   
   .current-post-panel {
@@ -1355,11 +1306,15 @@ border: 1px solid #22ade3;
   .page-container {
     overflow: auto;
     overflow-x: hidden;
-    height: auto;
-    padding-left: 140px;
-    width: calc(100% - 20px);
-    max-width: 100%;
-    box-sizing: border-box;
+    padding-left: 160px;
+}
+
+.special-offers-page {
+  height: 580px;
+}
+
+.target-market-panel {
+  width: 40%;
 }
 
 .inline-form-group label {
@@ -1393,19 +1348,7 @@ border: 1px solid #22ade3;
 .current-post-panel {
   max-width: 250px;
 }
-  
-  .special-offers-page {
-    /* flex-direction: column; */
-    flex-direction: row;
-    /* align-items: center; */
-    height: auto;
-    margin-top: 30px;
-    margin-left: 40px; /* Remove left margin to prevent content from being cut off */
-    width: 100%;
-    max-width: 100%; 
-    /* overflow-x: hidden; */
-    gap:20px;
-  }
+
   
   .navigation-buttons {
     /* flex-wrap: wrap; */
@@ -1413,32 +1356,6 @@ border: 1px solid #22ade3;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
-  }
-  
-  /* .nav-tabs {
-    position: static;
-    margin-bottom: 10px;
-    margin-left: 0px;
-  } */
-  
-  /* .publish-button {
-    position: static;
-    margin-left: auto; 
-    margin-right: 20px;
-  } */
-
-  .offers-panel, .current-post-panel, .target-market-panel {
-    /* width: 95%; */
-    margin-bottom: 20px;
-    margin-top: -10px;
-    min-height: 450px;
-    max-height: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    /* flex: none; */
-  }
-  .offers-panel{
-    min-height: 410px;
   }
   
   /* Ensure the offers list is scrollable */

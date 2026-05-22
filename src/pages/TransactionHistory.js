@@ -680,7 +680,7 @@ const TransactionHistory = () => {
             minWidth: '140px',
             fontWeight: '500',
             // height: '36px',
-            marginLeft: dateFilter === 'custom' ? '220px' : '550px'
+            marginLeft: dateFilter === 'custom' ? '220px' : '30%'
           }}
         >
           Export as CSV
