@@ -200,7 +200,17 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Platinum Black', label: 'Platinum Black' },
       { value: 'Test', label: 'Test' },
     ],
-    Sense: [{ value: 'Valued', label: 'Membership Benefits' }],
+    Sense: [
+      { value: 'Staff Pre 3Mth', label: 'Staff Pre 3Mth' },
+      { value: 'Star Staff', label: 'Star Staff' },
+      { value: 'Valued', label: 'Valued' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Platinum Black', label: 'Platinum Black' },
+      { value: 'Test', label: 'Test' },
+    ],
+    // Sense: [{ value: 'Valued', label: 'Membership Benefits' }],
     Mannum: [
       { value: 'Members', label: 'Members' },
       { value: 'Testing', label: 'Testing' },

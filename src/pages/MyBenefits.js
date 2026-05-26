@@ -87,9 +87,12 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Manly') return '#D4AF37'; // Gold color
         if (selectedVenue === 'Bluewater') return '#26AEB1';
       case 'Queens':
+        if (selectedVenue === 'Ace') return '#C0C0C0';
       case 'Silver':
+        if(selectedVenue === 'Sense') return '#e1ae68';
+        return '#C0C0C0';
       case 'Pre Staff':
-        return '#C0C0C0'; // Silver color
+        if(selectedVenue === 'North') return '#C0C0C0'; // Silver color
       case 'Valued':
         if (selectedVenue === 'Montauk') return '#006D88';
         if (selectedVenue === 'Central') return '#FF0000';
@@ -108,9 +111,14 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Hogan') return '#45d4e1ff';
         if (selectedVenue === 'Ace') return '#dedadabd';
       case 'Staff Pre 3Mth':
+        if (selectedVenue === 'Sense') return '#e1ae68';
         return '#FF0000';
       case 'Star Staff':
+        if (selectedVenue === 'Sense') return '#e1ae68';
         return '#FF0000';
+      case 'Gold':
+        if (selectedVenue === 'Sense') return '#e1ae68';
+        return '#D4AF37';
       case 'Explorer':
         return '#9d00ff';
       case 'Masters':
@@ -120,8 +128,10 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Reserve':
         return '#602373';
       case 'Platinum':
+        if (selectedVenue === 'Sense') return '#e1ae68';
         return '#B0B0B0'; // Platinum color
       case 'Platinum Black':
+        if (selectedVenue === 'Sense') return '#e1ae68';
         return '#333333'; // Dark gray/black color
       case 'Premium Member':
         if (selectedVenue === 'Montauk') return '#26AEB1';
