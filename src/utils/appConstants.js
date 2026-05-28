@@ -18,7 +18,8 @@ export const getAppType = (appType) => {
     Woollahra: 'Woollahra Hotel',
     Bob: "Bob's Bulk Booze",
     Sense: 'Sense Of Taste',
-    Mannum: 'Mannum Club'
+    Mannum: 'Mannum Club',
+    Mosaic: 'Mosaic Hotel'
   };
 
   return appTypeMap[appType] || appType;
@@ -45,7 +46,8 @@ export const getIconVenue = (appType) => {
     Woollahra: '/woollahra.png',
     EDP: '/edp.png',
     Bob: '/bob.png',
-    Mannum: '/mannum.png'
+    Mannum: '/mannum.png',
+    Mosaic: '/mosaic.png'
   };
 
   return appIconMap[appType] || appType;
@@ -217,6 +219,13 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Cancelled', label: 'Cancelled' },
       { value: 'Staff', label: 'Staff' },
       { value: 'Perpetuity', label: 'Perpetuity' },
+    ],
+    Mosaic: [
+      { value: 'Bronze', label: 'Bronze' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Gold', label: 'Gold' },
+      { value: 'Testing', label: 'Testing' },
+      { value: 'Cancelled', label: 'Cancelled' },
     ]
   };
 

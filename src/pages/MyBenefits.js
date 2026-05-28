@@ -64,6 +64,7 @@ const MyBenefits = () => {
   if (venue === 'EDP') return 'Silver';
   if (venue === 'Bob' || venue === 'Sense') return 'Valued';
   if (venue === 'Mannum') return 'Members';
+  if (venue === 'Mosaic') return 'Bronze';
   return 'Platinum Black';
 };
 
@@ -209,8 +210,9 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Mannum') return '#376cc3ff';
       case 'Testing':
         if (selectedVenue === 'Mannum') return '#079502';
+        if (selectedVenue === 'Mosaic') return '#073868';
       case 'Cancelled':
-        if (selectedVenue === 'Mannum') return '#ff0000';
+        return '#ff0000';
       case 'Perpetuity':
         if (selectedVenue === 'Mannum') return '#D4AF37';
       default:
