@@ -164,6 +164,8 @@ const Renewals = () => {
       stripeAccount:
         selectedVenue === 'MaxGaming'
           ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
+          : selectedVenue === 'Mannum'
+          ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MANNUM
           : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
     });
   }, [selectedVenue]);

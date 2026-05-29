@@ -214,7 +214,7 @@ export const getAudienceOptions = (venueName) => {
     ],
     // Sense: [{ value: 'Valued', label: 'Membership Benefits' }],
     Mannum: [
-      { value: 'Members', label: 'Members' },
+      { value: 'Member', label: 'Member' },
       { value: 'Testing', label: 'Testing' },
       { value: 'Cancelled', label: 'Cancelled' },
       { value: 'Staff', label: 'Staff' },

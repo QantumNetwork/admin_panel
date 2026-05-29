@@ -63,7 +63,7 @@ const MyBenefits = () => {
   if (venue === 'Woollahra') return 'Regulars';
   if (venue === 'EDP') return 'Silver';
   if (venue === 'Bob' || venue === 'Sense') return 'Valued';
-  if (venue === 'Mannum') return 'Members';
+  if (venue === 'Mannum') return 'Member';
   if (venue === 'Mosaic') return 'Bronze';
   return 'Platinum Black';
 };
@@ -206,7 +206,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         return '#c19e14dd';
       case 'Local Legends':
         return '#61791b';        
-      case 'Members':
+      case 'Member':
         if (selectedVenue === 'Mannum') return '#376cc3ff';
       case 'Testing':
         if (selectedVenue === 'Mannum') return '#079502';
