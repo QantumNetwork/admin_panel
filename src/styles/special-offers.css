@@ -581,6 +581,7 @@ input:focus{
 .select-wrapper {
   position: relative;
   margin-bottom: 10px;
+  z-index: 1;
 }
 
 .select-wrapper select {

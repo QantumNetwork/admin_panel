@@ -44,6 +44,8 @@ const SmartIncentives = () => {
   const [expiresOn, setExpiresOn] = useState('');
   // ────────────────────────────────────────────────────────────────────────
 
+  const [campaignData, setCampaignData] = useState([]);
+
   const [budget, setBudget] = useState('');
   const [unlimitedBudget, setUnlimitedBudget] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -282,6 +284,49 @@ const SmartIncentives = () => {
       setPublishing(false);
     }
   };
+
+    useEffect(() => {
+      const fetchCampaignData = async () => {
+        if(activeTab !== 'activeCampaigns') return; // Only fetch when Active Campaigns tab is selected
+        setLoading(true);
+        try {
+          const response = await axios.get(
+            `${baseUrl}/smart-incentive/all`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.data && response.data.data) {
+            setCampaignData(response.data.data);
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error('Error fetching campaign data:', err);
+          toast.error('Failed to fetch campaign data');
+          setLoading(false);
+        }
+      };
+  
+      fetchCampaignData();
+  
+    }, [token, activeTab]);
+
+    const formatDateWithOffset = (dateString) => {
+  if (!dateString) return '-';
+
+  const date = new Date(dateString);
+
+  // add 10 hours
+  date.setTime(date.getTime() + 10 * 60 * 60 * 1000);
+
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const year = date.getUTCFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 
   return (
     <div className="digital-app-container">
@@ -541,7 +586,7 @@ const SmartIncentives = () => {
         </button>
       </aside>
 
-      <div className="sa-filter-buttons">
+      <div className="sa-filter-buttons" style={{zIndex: 1000}}>
         <button
           className={`user-btn ${
             activeTab === 'createIncentive' ? 'active' : ''
@@ -560,7 +605,8 @@ const SmartIncentives = () => {
         </button>
       </div>
 
-      <div className="content-body">
+      {activeTab==='createIncentive' ? (
+<div className="content-body">
         <div className="content-wrapper-displays">
           <section className="current-posts-display">
             <h2>Choose Smart Incentive</h2>
@@ -927,6 +973,77 @@ const SmartIncentives = () => {
           {publishing ? 'PUBLISHING...' : 'PUBLISH'}{' '}
         </button>
       </div>
+          ) : (
+            <div className="members-table-container-pr">
+          {loading ? (
+            <div className="loading">Loading...</div>
+          ) : (
+            <>
+              <table className="members-table" style={{marginTop: '180px'}}>
+                <thead>
+                  <tr>
+                    <th>Date Created</th>
+                    <th>Created By</th>
+                    <th>Offer Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Trigger Type</th>
+                    <th>Trigger Value</th>
+                    <th>Time Period</th>
+                    <th>Avg Prize</th>
+                    <th>#Incentives Issued</th>
+                    <th>Budget</th>
+                    <th>Value of Incentives Issued</th>
+                    <th>Budget Remaining</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeTab === 'activeCampaigns' && (
+                    <>
+                      {campaignData.length > 0 ? (
+                        campaignData.map((data, index) => (
+                          <tr key={index}>
+                            <td>
+                              {data.createdAt
+                                .substring(0, 10)
+                                .split('-')
+                                .reverse()
+                                .join('-') || '-'}
+                            </td>
+                            <td>{data.createdByName || '-'}</td>
+                            <td>
+                              {data.offerType || '-'}
+                            </td>
+                            <td>
+                              {formatDateWithOffset(data.startDate)}
+                            </td>
+                            <td>{formatDateWithOffset(data.endDate)}</td>
+                            <td>{data.triggerType || '-'}</td>
+                            <td>{data.triggerValue || '-'}</td>
+                            <td>{data.timePeriod || '-'}</td>
+                            <td>{data.incentiveValue || '-'}</td>
+                            <td>{data.totalIssuedCount || '-'}</td>
+                            <td>{data.budget || '-'}</td>
+                            <td>{data.totalIssuedValue || '-'}</td>
+                            <td>{data.budgetRemaining || '-'}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="8" className="no-data">
+                            No members found
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+          )}
+      
     </div>
   );
 };

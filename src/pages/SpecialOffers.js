@@ -3263,7 +3263,7 @@ const SpecialOffers = () => {
                 </label>
                 <div
                   className="select-wrapper"
-                  style={{ position: 'relative' }}
+                  style={{ position: 'relative', zIndex: 1000 }}
                   ref={audienceWrapperRef}
                 >
                   <div
@@ -3303,7 +3303,7 @@ const SpecialOffers = () => {
                         maxHeight: '200px',
                         overflowY: 'auto',
                         border: '1px solid #ccc',
-                        zIndex: 10,
+                        zIndex: 1000,
                       }}
                     >
                       {audienceOptions.map((option) => (
