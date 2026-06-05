@@ -743,7 +743,7 @@ const SmartIncentives = () => {
                           key={option.value}
                           className="day-item"
                           style={{
-                            padding: '5px 10px',
+                            padding: '5px 6px',
                           }}
                         >
                           <input
