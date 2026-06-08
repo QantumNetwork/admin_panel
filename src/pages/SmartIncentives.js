@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ToastContainer, Slide, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';import { useLocation, useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../utils/auth';
 import {
   FaRegStar,
@@ -32,11 +33,11 @@ const SmartIncentives = () => {
   const [showTriggerDropdown, setShowTriggerDropdown] = useState(false);
 
   // ── TRIGGER SETTINGS state ─────────────────────────────────────────────
-  const [selectedIncentive, setSelectedIncentive] = useState('Point Bonus'); // Point Bonus
+  const [selectedIncentive, setSelectedIncentive] = useState(''); // Point Bonus
   const [deliveryMethod, setDeliveryMethod] = useState('Scratch & Win'); // 'Scratch & Win'
   const [triggerBy, setTriggerBy] = useState('turnover');
   const [triggerValue, setTriggerValue] = useState('');
-  const [timePeriod, setTimePeriod] = useState('daily');
+  const [timePeriod, setTimePeriod] = useState('');
   const [scheduleStart, setScheduleStart] = useState('');
   const [scheduleEnd, setScheduleEnd] = useState('');
   const [tempBenefits, setTempBenefits] = useState('');
@@ -69,6 +70,28 @@ const SmartIncentives = () => {
 
   const email = localStorage.getItem('userEmail');
   const userInitial = email ? email.charAt(0).toUpperCase() : '';
+
+  const resetForm = () => {
+  setSelectedIncentive('');
+  setDeliveryMethod('Scratch & Win');
+  setSelectedAudiences([]);
+  setIsEveryone(false);
+
+  setSelectedTrigger('');
+  setTriggerValue('');
+  setTimePeriod('');
+
+  setTempBenefits('');
+
+  setBudget('');
+  setUnlimitedBudget(false);
+
+  setScheduleStart('');
+  setScheduleEnd('');
+
+  setShowAudienceDropdown(false);
+  setShowTriggerDropdown(false);
+};
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -164,6 +187,7 @@ const SmartIncentives = () => {
 
   const handleTriggerChange = (value) => {
     setSelectedTrigger(value);
+    setShowTriggerDropdown(false);
   };
 
   const handleEveryoneChange = (e) => {
@@ -216,6 +240,16 @@ const SmartIncentives = () => {
 
   const handlePublishIncentive = async () => {
     try {
+      if (!selectedIncentive) {
+        toast.error('Please select a smart incentive');
+        return;
+      }
+
+      if (!timePeriod) {
+        toast.error('Please select trigger time period');
+        return;
+      }
+
       if (!isEveryone && selectedAudiences.length === 0) {
         toast.error('Please select at least one audience');
         return;
@@ -249,7 +283,7 @@ const SmartIncentives = () => {
       setPublishing(true);
 
       const payload = {
-        offerType: 'Point Bonus',
+        offerType: selectedIncentive,
         deliveryMethod: 'Scratch & Win',
         audience: isEveryone ? ['everyone'] : selectedAudiences,
         triggerType: selectedTrigger,
@@ -274,6 +308,7 @@ const SmartIncentives = () => {
       );
 
       toast.success('Smart incentive created successfully');
+      setActiveTab('activeCampaigns');
     } catch (error) {
       console.error(error);
 
@@ -285,71 +320,73 @@ const SmartIncentives = () => {
     }
   };
 
-    useEffect(() => {
-      const fetchCampaignData = async () => {
-        if(activeTab !== 'activeCampaigns') return; // Only fetch when Active Campaigns tab is selected
-        setLoading(true);
-        try {
-          const response = await axios.get(
-            `${baseUrl}/smart-incentive/all`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          if (response.data && response.data.data) {
-            setCampaignData(response.data.data);
-            setLoading(false);
-          }
-        } catch (err) {
-          console.error('Error fetching campaign data:', err);
-          toast.error('Failed to fetch campaign data');
+  useEffect(() => {
+    const fetchCampaignData = async () => {
+      if (activeTab !== 'activeCampaigns') return; // Only fetch when Active Campaigns tab is selected
+      setLoading(true);
+      try {
+        const response = await axios.get(`${baseUrl}/smart-incentive/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.data && response.data.data) {
+          setCampaignData(response.data.data);
           setLoading(false);
         }
-      };
-  
-      fetchCampaignData();
-  
-    }, [token, activeTab]);
+      } catch (err) {
+        console.error('Error fetching campaign data:', err);
+        toast.error('Failed to fetch campaign data');
+        setLoading(false);
+      }
+    };
 
-    const formatDateWithOffset = (dateString) => {
-  if (!dateString) return '-';
+    fetchCampaignData();
+  }, [token, activeTab]);
 
-  const date = new Date(dateString);
+  const formatDateWithOffset = (dateString) => {
+    if (!dateString) return '-';
 
-  // add 10 hours
-  date.setTime(date.getTime() + 10 * 60 * 60 * 1000);
+    const date = new Date(dateString);
 
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const year = date.getUTCFullYear();
+    // add 10 hours
+    date.setTime(date.getTime() + 10 * 60 * 60 * 1000);
 
-  return `${day}-${month}-${year}`;
-};
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+  useEffect(()=> {
+    if(activeTab === 'createIncentive') {
+      resetForm();
+    }
+  },[activeTab]);
 
   return (
     <div className="digital-app-container">
       <ToastContainer
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-              transition={Slide}
-              style={{
-                zIndex: 9999,
-                marginTop: '90px',
-                fontSize: '14px',
-                minWidth: '300px',
-                textAlign: 'center',
-              }}
-            />
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+        style={{
+          zIndex: 9999,
+          marginTop: '90px',
+          fontSize: '14px',
+          minWidth: '300px',
+          textAlign: 'center',
+        }}
+      />
       <header className="app-header">
         <div
           className="s2w-logo"
@@ -586,7 +623,7 @@ const SmartIncentives = () => {
         </button>
       </aside>
 
-      <div className="sa-filter-buttons" style={{zIndex: 1000}}>
+      <div className="sa-filter-buttons" style={{ zIndex: 1000 }}>
         <button
           className={`user-btn ${
             activeTab === 'createIncentive' ? 'active' : ''
@@ -605,381 +642,421 @@ const SmartIncentives = () => {
         </button>
       </div>
 
-      {activeTab==='createIncentive' ? (
-<div className="content-body">
-        <div className="content-wrapper-displays">
-          <section className="current-posts-display">
-            <h2>Choose Smart Incentive</h2>
-            <div className="incentive-options">
-              <label className="incentive-option">
-                <input
-                  type="radio"
-                  name="incentive"
-                  value="Point Bonus"
-                  checked={selectedIncentive === 'Point Bonus'}
-                  onChange={(e) => setSelectedIncentive(e.target.value)}
-                  className="incentive-radio"
-                  style={{ accentColor: '#002977' }}
-                />
-                <div className="incentive-image">
-                  <img src="/points_bonus.png" alt="Points Bonus" />
-                </div>
-              </label>
-            </div>
-          </section>
-
-          {/* Display Options */}
-          <div className="display-options-panel responsive-panel">
-            <div className="scrollable-content">
-              <h2>Trigger settings</h2>
-
-              <div
-                className="form-group inline-form-group"
-                style={{ marginBottom: '10px' }}
-              >
-                <label>
-                  <strong>Audience</strong>
-                </label>
-                <div
-                  className="select-wrapper"
-                  style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                    width: '100%',
-                    zIndex: showAudienceDropdown ? 10 : 1,
-                  }}
-                  ref={audienceWrapperRef}
-                >
-                  <div
-                    className="multiselect-display"
-                    onClick={toggleAudienceDropdown}
-                    style={{
-                      cursor: isEveryone ? 'not-allowed' : 'pointer',
-                      lineHeight: '15px',
-                      padding: '0 10px',
-                      fontSize: '13px',
-                      color: isEveryone ? '#999' : '#666',
-                    }}
-                  >
-                    {isEveryone
-                      ? 'All Selected'
-                      : selectedAudiences.length > 0
-                        ? selectedAudiences.length > 2
-                          ? `${selectedAudiences.length} selected`
-                          : audienceOptions
-                              .filter((o) =>
-                                selectedAudiences.includes(o.value)
-                              )
-                              .map((o) => o.label)
-                              .join(', ')
-                        : 'Select from list'}
-                  </div>
-
-                  {showAudienceDropdown && !isEveryone && (
-                    <div
-                      className="multiselect-options"
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        right: 0,
-                        background: 'white',
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                        zIndex: 1000,
-                        display: showAudienceDropdown ? 'block' : 'none',
-                      }}
-                    >
-                      {audienceOptions.map((option) => (
-                        <div
-                          key={option.value}
-                          className="day-item"
-                          style={{
-                            padding: '5px 10px',
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            id={`aud-${option.value}`}
-                            checked={selectedAudiences.includes(option.value)}
-                            onChange={() => handleAudienceChange(option.value)}
-                          />
-                          <label
-                            htmlFor={`aud-${option.value}`}
-                            style={{ marginLeft: '6px' }}
-                          >
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div
-                  className="day-item"
-                  style={{ marginTop: '10px', marginLeft: '5px' }}
-                >
+      {activeTab === 'createIncentive' ? (
+        <div className="content-body">
+          <div className="content-wrapper-displays">
+            <section className="current-posts-display">
+              <h2>Choose Smart Incentive</h2>
+              <div className="incentive-options">
+                <label className="incentive-option">
                   <input
-                    type="checkbox"
-                    id="aud-everyone"
-                    checked={isEveryone}
-                    onChange={handleEveryoneChange}
+                    type="radio"
+                    name="incentive"
+                    value="Point Bonus"
+                    checked={selectedIncentive === 'Point Bonus'}
+                    onChange={(e) => setSelectedIncentive(e.target.value)}
+                    className="incentive-radio"
+                    style={{ accentColor: '#002977' }}
                   />
-                  <label htmlFor="aud-everyone">Everyone</label>
-                </div>
-              </div>
-
-              {/* Trigger by */}
-              <div
-                className="form-group inline-form-group"
-                style={{ marginBottom: '20px' }}
-              >
-                <label>
-                  <strong>Trigger by</strong>
-                </label>
-                <div
-                  className="select-wrapper"
-                  style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                    width: '100%',
-                  }}
-                  ref={triggerWrapperRef}
-                >
-                  <div
-                    className="multiselect-display"
-                    onClick={toggleTriggerDropdown}
-                    style={{
-                      cursor: 'pointer',
-                      lineHeight: '15px',
-                      padding: '0 10px',
-                      fontSize: '13px',
-                      color: '#666',
-                    }}
-                  >
-                    {selectedTrigger
-                      ? triggerOptions.find((o) => o.value === selectedTrigger)
-                          ?.label
-                      : 'Select from list'}
+                  <div className="incentive-image">
+                    <img src="/points_bonus.png" alt="Points Bonus" />
                   </div>
+                </label>
+              </div>
+            </section>
 
-                  {showTriggerDropdown && (
+            {selectedIncentive === 'Point Bonus' && (
+              <>
+                {/* Display Options */}
+                <div className="display-options-panel responsive-panel">
+                  <div className="scrollable-content">
+                    <h2>Trigger settings</h2>
+
                     <div
-                      className="multiselect-options"
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        right: 0,
-                        background: 'white',
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                        zIndex: 1000,
-                        display: showTriggerDropdown ? 'block' : 'none',
-                      }}
+                      className="form-group inline-form-group"
+                      style={{ marginBottom: '10px' }}
                     >
-                      {triggerOptions.map((option) => (
+                      <label>
+                        <strong>Audience</strong>
+                      </label>
+                      <div
+                        className="select-wrapper"
+                        style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '100%',
+                          zIndex: showAudienceDropdown ? 10 : 1,
+                        }}
+                        ref={audienceWrapperRef}
+                      >
                         <div
-                          key={option.value}
-                          className="day-item"
+                          className="multiselect-display"
+                          onClick={toggleAudienceDropdown}
                           style={{
-                            padding: '5px 6px',
+                            cursor: isEveryone ? 'not-allowed' : 'pointer',
+                            lineHeight: '15px',
+                            padding: '0 10px',
+                            fontSize: '13px',
+                            color: isEveryone ? '#999' : '#666',
                           }}
                         >
-                          <input
-                            type="radio"
-                            name="triggerType"
-                            checked={selectedTrigger === option.value}
-                            onChange={() => handleTriggerChange(option.value)}
-                          />
-                          <label
-                            htmlFor={`aud-${option.value}`}
-                            style={{ marginLeft: '6px' }}
-                          >
-                            {option.label}
-                          </label>
+                          {isEveryone
+                            ? 'All Selected'
+                            : selectedAudiences.length > 0
+                              ? selectedAudiences.length > 2
+                                ? `${selectedAudiences.length} selected`
+                                : audienceOptions
+                                    .filter((o) =>
+                                      selectedAudiences.includes(o.value)
+                                    )
+                                    .map((o) => o.label)
+                                    .join(', ')
+                              : 'Select from list'}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Trigger value */}
-              <div className="field-block">
-                <label className="field-label" style={{ marginRight: '45px' }}>
-                  Trigger value
-                </label>
-                <input
-                  type="text"
-                  value={triggerValue}
-                  onChange={(e) => setTriggerValue(e.target.value)}
-                  className="text-input-trigger"
-                />
-              </div>
-
-              {/* Trigger time period */}
-              <div className="field-block" style={{ marginBottom: '50px' }}>
-                <label className="field-label">Trigger time period</label>
-                {/* first row: daily + weekly */}
-                <div className="flex-row" style={{ gap: '10px' }}>
-                  {['daily', 'last 7 days', 'last 14 days', 'last 30 days'].map(
-                    (tp) => (
-                      <label
-                        key={tp}
-                        className="radio-label"
-                        style={{ gap: '0px' }}
+                        {showAudienceDropdown && !isEveryone && (
+                          <div
+                            className="multiselect-options"
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              background: 'white',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              border: '1px solid #ccc',
+                              borderRadius: '4px',
+                              boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                              zIndex: 1000,
+                              display: showAudienceDropdown ? 'block' : 'none',
+                            }}
+                          >
+                            {audienceOptions.map((option) => (
+                              <div
+                                key={option.value}
+                                className="day-item"
+                                style={{
+                                  padding: '5px 10px',
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`aud-${option.value}`}
+                                  checked={selectedAudiences.includes(
+                                    option.value
+                                  )}
+                                  onChange={() =>
+                                    handleAudienceChange(option.value)
+                                  }
+                                />
+                                <label
+                                  htmlFor={`aud-${option.value}`}
+                                  style={{ marginLeft: '6px' }}
+                                >
+                                  {option.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className="day-item"
+                        style={{ marginTop: '10px', marginLeft: '5px' }}
                       >
                         <input
-                          type="radio"
-                          name="timePeriod"
-                          value={getTTPValue(tp)}
-                          checked={timePeriod === tp}
-                          onChange={() => setTimePeriod(tp)}
-                          style={{ accentColor: '#002977' }}
+                          type="checkbox"
+                          id="aud-everyone"
+                          checked={isEveryone}
+                          onChange={handleEveryoneChange}
                         />
-                        <span>{tp.charAt(0).toUpperCase() + tp.slice(1)}</span>
+                        <label htmlFor="aud-everyone">Everyone</label>
+                      </div>
+                    </div>
+
+                    {/* Trigger by */}
+                    <div
+                      className="form-group inline-form-group"
+                      style={{ marginBottom: '20px' }}
+                    >
+                      <label>
+                        <strong>Trigger by</strong>
                       </label>
-                    )
-                  )}
+                      <div
+                        className="select-wrapper"
+                        style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '100%',
+                        }}
+                        ref={triggerWrapperRef}
+                      >
+                        <div
+                          className="multiselect-display"
+                          onClick={toggleTriggerDropdown}
+                          style={{
+                            cursor: 'pointer',
+                            lineHeight: '15px',
+                            padding: '0 10px',
+                            fontSize: '13px',
+                            color: '#666',
+                          }}
+                        >
+                          {selectedTrigger
+                            ? triggerOptions.find(
+                                (o) => o.value === selectedTrigger
+                              )?.label
+                            : 'Select from list'}
+                        </div>
+
+                        {showTriggerDropdown && (
+                          <div
+                            className="multiselect-options"
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              background: 'white',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              border: '1px solid #ccc',
+                              borderRadius: '4px',
+                              // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                              zIndex: 1000,
+                              display: showTriggerDropdown ? 'block' : 'none',
+                            }}
+                          >
+                            {triggerOptions.map((option) => (
+                              <div
+                                key={option.value}
+                                className="day-item"
+                                style={{
+                                  padding: '8px 10px',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => {
+                                  handleTriggerChange(option.value);
+                                  setShowTriggerDropdown(false);
+                                }}
+                              >
+                                {/* <input
+                                  type="radio"
+                                  name="triggerType"
+                                  checked={selectedTrigger === option.value}
+                                  onChange={() =>
+                                    handleTriggerChange(option.value)
+                                  }
+                                /> */}
+                                <label
+                                  htmlFor={`aud-${option.value}`}
+                                  style={{ marginLeft: '6px' }}
+                                >
+                                  {option.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Trigger value */}
+                    <div className="field-block">
+                      <label
+                        className="field-label"
+                        style={{ marginRight: '45px' }}
+                      >
+                        Trigger value
+                      </label>
+                      <input
+                        type="text"
+                        value={triggerValue}
+                        onChange={(e) => setTriggerValue(e.target.value)}
+                        className="text-input-trigger"
+                      />
+                    </div>
+
+                    {/* Trigger time period */}
+                    <div
+                      className="field-block"
+                      style={{ marginBottom: '50px' }}
+                    >
+                      <label className="field-label">Trigger time period</label>
+                      {/* first row: daily + weekly */}
+                      <div className="flex-row" style={{ gap: '10px' }}>
+                        {[
+                          'daily',
+                          'last 7 days',
+                          'last 14 days',
+                          'last 30 days',
+                        ].map((tp) => (
+                          <label
+                            key={tp}
+                            className="radio-label"
+                            style={{ gap: '0px' }}
+                          >
+                            <input
+                              type="radio"
+                              name="timePeriod"
+                              value={getTTPValue(tp)}
+                              checked={timePeriod === tp}
+                              onChange={() => setTimePeriod(tp)}
+                              style={{ accentColor: '#002977' }}
+                            />
+                            <span>
+                              {tp.charAt(0).toUpperCase() + tp.slice(1)}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Points bonus value */}
+                    <div
+                      className="field-block"
+                      style={{ textAlign: 'center', marginBottom: '20px' }}
+                    >
+                      <label className="field-label">
+                        Points bonus value to issue to member
+                      </label>
+
+                      <input
+                        type="text"
+                        value={tempBenefits}
+                        onChange={(e) => setTempBenefits(e.target.value)}
+                        className="text-input-trigger"
+                        placeholder="20,000"
+                      />
+                    </div>
+
+                    {/* Budget */}
+                    <div className="flex-row" style={{ marginBottom: '30px' }}>
+                      <label
+                        className="field-label"
+                        style={{ textWrap: 'nowrap', marginRight: '30px' }}
+                      >
+                        Set budget
+                      </label>
+
+                      <div className="flex-row">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={budget}
+                          disabled={unlimitedBudget}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d*$/.test(value)) {
+                              setBudget(value);
+                            }
+                          }}
+                          className="text-input-trigger"
+                          style={{
+                            width: '80px',
+                            marginBottom: '5px',
+                            marginRight: '10px',
+                            opacity: unlimitedBudget ? 0.5 : 1,
+                          }}
+                        />
+
+                        <label className="day-item">
+                          <input
+                            type="checkbox"
+                            checked={unlimitedBudget}
+                            onChange={(e) =>
+                              setUnlimitedBudget(e.target.checked)
+                            }
+                          />
+                          <span>Unlimited budget</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Start & End incentive */}
+                    <div className="flex-row">
+                      <label
+                        className="field-label"
+                        style={{ textWrap: 'nowrap', marginRight: '90px' }}
+                      >
+                        Start & End incentive
+                      </label>
+
+                      <div className="schedule-row-si">
+                        <div className="date-field">
+                          <label className="date-label">START DATE</label>
+                          <input
+                            type="date"
+                            value={scheduleStart}
+                            onChange={(e) => setScheduleStart(e.target.value)}
+                            className="date-input"
+                          />
+                        </div>
+
+                        <div className="date-field">
+                          <label className="date-label">END DATE</label>
+                          <input
+                            type="date"
+                            value={scheduleEnd}
+                            onChange={(e) => setScheduleEnd(e.target.value)}
+                            className="date-input"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </>
+            )}
+          </div>
 
-              {/* Points bonus value */}
-              <div
-                className="field-block"
-                style={{ textAlign: 'center', marginBottom: '20px' }}
-              >
-                <label className="field-label">
-                  Points bonus value to issue to member
-                </label>
-
-                <input
-                  type="text"
-                  value={tempBenefits}
-                  onChange={(e) => setTempBenefits(e.target.value)}
-                  className="text-input-trigger"
-                  placeholder="20,000"
-                />
-              </div>
-
-              {/* Budget */}
-              <div className="flex-row" style={{ marginBottom: '30px' }}>
-                <label
-                  className="field-label"
-                  style={{ textWrap: 'nowrap', marginRight: '30px' }}
-                >
-                  Set budget
-                </label>
-
-                <div className="flex-row">
-                  <input
-                    type="number"
-                    value={budget}
-                    disabled={unlimitedBudget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    className="text-input-trigger"
-                    style={{
-                      width: '80px',
-                      marginBottom: '5px',
-                      marginRight: '10px',
-                      opacity: unlimitedBudget ? 0.5 : 1,
-                    }}
-                  />
-
-                  <label className="day-item">
+          {selectedIncentive === 'Point Bonus' && (
+            <>
+              {/* Live Smart Incentives Section */}
+              <div className="live-smart-incentives">
+                <h2>Delivery Method</h2>
+                <div className="incentive-options">
+                  <label className="incentive-option">
                     <input
-                      type="checkbox"
-                      checked={unlimitedBudget}
-                      onChange={(e) => setUnlimitedBudget(e.target.checked)}
+                      type="radio"
+                      name="deliveryMethod"
+                      value="Scratch & Win"
+                      checked={deliveryMethod === 'Scratch & Win'}
+                      onChange={(e) => setDeliveryMethod(e.target.value)}
+                      className="incentive-radio"
+                      style={{ accentColor: '#002977' }}
                     />
-                    <span>Unlimited budget</span>
+                    <div>
+                      <img
+                        src="/scratch_and_win.png"
+                        alt="Scratch and Win"
+                        style={{ width: '80%' }}
+                      />
+                    </div>
                   </label>
                 </div>
               </div>
+            </>
+          )}
 
-              {/* Start & End incentive */}
-              <div className="flex-row">
-                <label
-                  className="field-label"
-                  style={{ textWrap: 'nowrap', marginRight: '90px' }}
-                >
-                  Start & End incentive
-                </label>
-
-                <div className="schedule-row-si">
-                  <div className="date-field">
-                    <label className="date-label">START DATE</label>
-                    <input
-                      type="date"
-                      value={scheduleStart}
-                      onChange={(e) => setScheduleStart(e.target.value)}
-                      className="date-input"
-                    />
-                  </div>
-
-                  <div className="date-field">
-                    <label className="date-label">END DATE</label>
-                    <input
-                      type="date"
-                      value={scheduleEnd}
-                      onChange={(e) => setScheduleEnd(e.target.value)}
-                      className="date-input"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* ========== CONTROL BUTTONS ========== */}
+          <button
+            className="publish-displays-btn icon-button"
+            onClick={handlePublishIncentive}
+            disabled={publishing}
+          >
+            <FaCheck className="button-icon" />
+            {publishing ? 'PUBLISHING...' : 'PUBLISH'}{' '}
+          </button>
         </div>
-
-        {/* Live Smart Incentives Section */}
-        <div className="live-smart-incentives">
-          <h2>Delivery Method</h2>
-          <div className="incentive-options">
-            <label className="incentive-option">
-              <input
-                type="radio"
-                name="deliveryMethod"
-                value="Scratch & Win"
-                checked={deliveryMethod === 'Scratch & Win'}
-                onChange={(e) => setDeliveryMethod(e.target.value)}
-                className="incentive-radio"
-                style={{ accentColor: '#002977' }}
-              />
-              <div>
-                <img
-                  src="/scratch_and_win.png"
-                  alt="Scratch and Win"
-                  style={{ width: '80%' }}
-                />
-              </div>
-            </label>
-          </div>
-        </div>
-        {/* ========== CONTROL BUTTONS ========== */}
-        <button
-          className="publish-displays-btn icon-button"
-          onClick={handlePublishIncentive}
-          disabled={publishing}
-        >
-          <FaCheck className="button-icon" />
-          {publishing ? 'PUBLISHING...' : 'PUBLISH'}{' '}
-        </button>
-      </div>
-          ) : (
-            <div className="members-table-container-pr">
+      ) : (
+        <div className="members-table-container-pr">
           {loading ? (
             <div className="loading">Loading...</div>
           ) : (
             <>
-              <table className="members-table" style={{marginTop: '180px'}}>
+              <table className="members-table" style={{ marginTop: '180px' }}>
                 <thead>
                   <tr>
                     <th>Date Created</th>
@@ -991,7 +1068,7 @@ const SmartIncentives = () => {
                     <th>Trigger Value</th>
                     <th>Time Period</th>
                     <th>Avg Prize</th>
-                    <th>#Incentives Issued</th>
+                    <th># Incentives Issued</th>
                     <th>Budget</th>
                     <th>Value of Incentives Issued</th>
                     <th>Budget Remaining</th>
@@ -1011,12 +1088,8 @@ const SmartIncentives = () => {
                                 .join('-') || '-'}
                             </td>
                             <td>{data.createdByName || '-'}</td>
-                            <td>
-                              {data.offerType || '-'}
-                            </td>
-                            <td>
-                              {formatDateWithOffset(data.startDate)}
-                            </td>
+                            <td>{data.offerType || '-'}</td>
+                            <td>{formatDateWithOffset(data.startDate)}</td>
                             <td>{formatDateWithOffset(data.endDate)}</td>
                             <td>{data.triggerType || '-'}</td>
                             <td>{data.triggerValue || '-'}</td>
@@ -1042,8 +1115,7 @@ const SmartIncentives = () => {
             </>
           )}
         </div>
-          )}
-      
+      )}
     </div>
   );
 };
