@@ -72,26 +72,26 @@ const SmartIncentives = () => {
   const userInitial = email ? email.charAt(0).toUpperCase() : '';
 
   const resetForm = () => {
-  setSelectedIncentive('');
-  setDeliveryMethod('Scratch & Win');
-  setSelectedAudiences([]);
-  setIsEveryone(false);
+    setSelectedIncentive('');
+    setDeliveryMethod('Scratch & Win');
+    setSelectedAudiences([]);
+    setIsEveryone(false);
 
-  setSelectedTrigger('');
-  setTriggerValue('');
-  setTimePeriod('');
+    setSelectedTrigger('');
+    setTriggerValue('');
+    setTimePeriod('');
 
-  setTempBenefits('');
+    setTempBenefits('');
 
-  setBudget('');
-  setUnlimitedBudget(false);
+    setBudget('');
+    setUnlimitedBudget(false);
 
-  setScheduleStart('');
-  setScheduleEnd('');
+    setScheduleStart('');
+    setScheduleEnd('');
 
-  setShowAudienceDropdown(false);
-  setShowTriggerDropdown(false);
-};
+    setShowAudienceDropdown(false);
+    setShowTriggerDropdown(false);
+  };
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -190,6 +190,17 @@ const SmartIncentives = () => {
     setShowTriggerDropdown(false);
   };
 
+  let audienceOptions = [];
+
+  audienceOptions = getAudienceOptions(selectedVenue);
+
+  useEffect(() => {
+    if (selectedIncentive === 'Point Bonus') {
+      setIsEveryone(true);
+      setSelectedAudiences(audienceOptions.map((option) => option.value));
+    }
+  }, [selectedIncentive]);
+
   const handleEveryoneChange = (e) => {
     const checked = e.target.checked;
     setIsEveryone(checked);
@@ -202,10 +213,6 @@ const SmartIncentives = () => {
       setSelectedAudiences([]);
     }
   };
-
-  let audienceOptions = [];
-
-  audienceOptions = getAudienceOptions(selectedVenue);
 
   let triggerOptions = [
     { value: 'Turnover', label: 'Turnover' },
@@ -359,11 +366,19 @@ const SmartIncentives = () => {
     return `${day}-${month}-${year}`;
   };
 
-  useEffect(()=> {
-    if(activeTab === 'createIncentive') {
+  useEffect(() => {
+    if (activeTab === 'createIncentive') {
       resetForm();
     }
-  },[activeTab]);
+  }, [activeTab]);
+
+  const pointsDollarValue =
+    tempBenefits && !isNaN(tempBenefits)
+      ? (Number(tempBenefits) / 100).toFixed(2)
+      : '0.00';
+
+  const budgetDollarValue =
+    budget && !isNaN(budget) ? (Number(budget) / 100).toFixed(2) : '0.00';
 
   return (
     <div className="digital-app-container">
@@ -881,7 +896,7 @@ const SmartIncentives = () => {
                     {/* Trigger time period */}
                     <div
                       className="field-block"
-                      style={{ marginBottom: '50px' }}
+                      style={{ marginBottom: '40px' }}
                     >
                       <label className="field-label">Trigger time period</label>
                       {/* first row: daily + weekly */}
@@ -914,12 +929,12 @@ const SmartIncentives = () => {
                     </div>
 
                     {/* Points bonus value */}
-                    <div
-                      className="field-block"
-                      style={{ textAlign: 'center', marginBottom: '20px' }}
-                    >
-                      <label className="field-label">
-                        Points bonus value to issue to member
+                    <div className="flex-row" style={{ marginBottom: '40px' }}>
+                      <label
+                        className="field-label"
+                        style={{ textWrap: 'nowrap', marginRight: '50px' }}
+                      >
+                        Points to Award
                       </label>
 
                       <input
@@ -928,14 +943,37 @@ const SmartIncentives = () => {
                         onChange={(e) => setTempBenefits(e.target.value)}
                         className="text-input-trigger"
                         placeholder="20,000"
+                        style={{ width: '80px' }}
                       />
+
+                      <div style={{ fontSize: '12px' }}>
+                        Points&nbsp;&nbsp;
+                        <strong>$ Value = ${pointsDollarValue}</strong>
+                      </div>
                     </div>
 
                     {/* Budget */}
-                    <div className="flex-row" style={{ marginBottom: '30px' }}>
+                    <div>
+                      <label className="day-item">
+                        <input
+                          type="checkbox"
+                          checked={unlimitedBudget}
+                          onChange={(e) => setUnlimitedBudget(e.target.checked)}
+                        />
+                        <span>No budget</span>
+                      </label>
+                    </div>
+
+                    <div
+                      className="flex-row"
+                      style={{
+                        marginBottom: '30px',
+                        visibility: unlimitedBudget ? 'hidden' : 'visible',
+                      }}
+                    >
                       <label
                         className="field-label"
-                        style={{ textWrap: 'nowrap', marginRight: '30px' }}
+                        style={{ textWrap: 'nowrap', marginRight: '20px' }}
                       >
                         Set budget
                       </label>
@@ -955,22 +993,19 @@ const SmartIncentives = () => {
                           className="text-input-trigger"
                           style={{
                             width: '80px',
-                            marginBottom: '5px',
                             marginRight: '10px',
                             opacity: unlimitedBudget ? 0.5 : 1,
                           }}
                         />
-
-                        <label className="day-item">
-                          <input
-                            type="checkbox"
-                            checked={unlimitedBudget}
-                            onChange={(e) =>
-                              setUnlimitedBudget(e.target.checked)
-                            }
-                          />
-                          <span>Unlimited budget</span>
-                        </label>
+                        <div
+                          style={{
+                            fontSize: '12px',
+                            marginLeft: '5px',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <strong>$ Value = ${budgetDollarValue}</strong>
+                        </div>
                       </div>
                     </div>
 
@@ -1051,12 +1086,12 @@ const SmartIncentives = () => {
           </button>
         </div>
       ) : (
-        <div className="members-table-container-pr">
+        <div className="members-table-container-pr" style={{marginTop: '0%'}}>
           {loading ? (
             <div className="loading">Loading...</div>
           ) : (
             <>
-              <table className="members-table" style={{ marginTop: '180px' }}>
+              <table className="members-table" style={{ marginTop: '160px' }}>
                 <thead>
                   <tr>
                     <th>Date Created</th>
@@ -1068,7 +1103,8 @@ const SmartIncentives = () => {
                     <th>Trigger Value</th>
                     <th>Time Period</th>
                     <th>Avg Prize</th>
-                    <th># Incentives Issued</th>
+                    <th>Incentives Issued</th>
+                    <th>Incentives Redeemed</th>
                     <th>Budget</th>
                     <th>Value of Incentives Issued</th>
                     <th>Budget Remaining</th>
@@ -1095,10 +1131,14 @@ const SmartIncentives = () => {
                             <td>{data.triggerValue || '-'}</td>
                             <td>{data.timePeriod || '-'}</td>
                             <td>{data.incentiveValue || '-'}</td>
+                            <td>{data.applicableUserCount || '-'}</td>
                             <td>{data.totalIssuedCount || '-'}</td>
                             <td>{data.budget || '-'}</td>
                             <td>{data.totalIssuedValue || '-'}</td>
                             <td>{data.budgetRemaining || '-'}</td>
+                            <td>
+                              <button className="action-btn approve" style={{borderRadius: '50px'}}>END INCENTIVE</button>
+                            </td>
                           </tr>
                         ))
                       ) : (
