@@ -239,8 +239,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
 
   // Fix for sidebar navigation - ensure we have the state when navigating
   const handleNavigation = (path) => {
-    // Force a full page reload to ensure proper rendering
-    window.location.href = path;
+    navigate(path);
   };
 
   // Convert level name to the API expected format

@@ -467,8 +467,7 @@ const ArtGallery = () => {
 
   // Fix for sidebar navigation - ensure we have the state when navigating
   const handleNavigation = (path) => {
-    // Force a full page reload to ensure proper rendering
-    window.location.href = path;
+    navigate(path);
   };
 
   // New function to handle selecting an image from gallery

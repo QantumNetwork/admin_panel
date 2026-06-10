@@ -34,9 +34,10 @@ const SmartIncentives = () => {
 
   // ── TRIGGER SETTINGS state ─────────────────────────────────────────────
   const [selectedIncentive, setSelectedIncentive] = useState(''); // Point Bonus
-  const [deliveryMethod, setDeliveryMethod] = useState('Scratch & Win'); // 'Scratch & Win'
+  const [deliveryMethod, setDeliveryMethod] = useState('Scratch & Win');
   const [triggerBy, setTriggerBy] = useState('turnover');
   const [triggerValue, setTriggerValue] = useState('');
+  const [promotionName, setPromotionName] = useState('');
   const [timePeriod, setTimePeriod] = useState('');
   const [scheduleStart, setScheduleStart] = useState('');
   const [scheduleEnd, setScheduleEnd] = useState('');
@@ -46,6 +47,13 @@ const SmartIncentives = () => {
   // ────────────────────────────────────────────────────────────────────────
 
   const [campaignData, setCampaignData] = useState([]);
+  const [expiredData, setExpiredData] = useState([]);
+
+  const [campaignPage, setCampaignPage] = useState(1);
+  const [campaignTotalPages, setCampaignTotalPages] = useState(1);
+  const [expiredPage, setExpiredPage] = useState(1);
+  const [expiredTotalPages, setExpiredTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const [budget, setBudget] = useState('');
   const [unlimitedBudget, setUnlimitedBudget] = useState(false);
@@ -327,18 +335,51 @@ const SmartIncentives = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCampaignData = async () => {
-      if (activeTab !== 'activeCampaigns') return; // Only fetch when Active Campaigns tab is selected
-      setLoading(true);
-      try {
-        const response = await axios.get(`${baseUrl}/smart-incentive/all`, {
+  const fetchCampaignData = async () => {
+    if (activeTab !== 'activeCampaigns') return; // Only fetch when Active Campaigns tab is selected
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${baseUrl}/smart-incentive/all?page=${campaignPage}&limit=${limit}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        }
+      );
+      if (response.data && response.data.data) {
+        setCampaignData(response.data.data);
+        setCampaignTotalPages(response.data.pagination.totalPages);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Error fetching campaign data:', err);
+      toast.error('Failed to fetch campaign data');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaignData();
+  }, [token, activeTab, campaignPage, limit]);
+
+  useEffect(() => {
+    const fetchExpiredData = async () => {
+      if (activeTab !== 'expiredIncentives') return; // Only fetch when Expired Incentives tab is selected
+      setLoading(true);
+
+      try {
+        const response = await axios.get(
+          `${baseUrl}/smart-incentive/inactive-expired?page=${expiredPage}&limit=${limit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response.data && response.data.data) {
-          setCampaignData(response.data.data);
+          setExpiredData(response.data.data);
+          setExpiredTotalPages(response.data.pagination.totalPages);
           setLoading(false);
         }
       } catch (err) {
@@ -348,8 +389,30 @@ const SmartIncentives = () => {
       }
     };
 
-    fetchCampaignData();
-  }, [token, activeTab]);
+    fetchExpiredData();
+  }, [token, activeTab, expiredPage, limit]);
+
+  const handleDeactivateIncentive = async (id) => {
+    try {
+      await axios.patch(
+        `${baseUrl}/smart-incentive/inactive`,
+        { incentiveId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      toast.success('Incentive deactivated successfully');
+
+      // Refresh the active campaigns list after deactivation
+      await fetchCampaignData();
+    } catch (err) {
+      console.error('Error deactivating incentive:', err);
+      toast.error('Failed to deactivate incentive');
+    }
+  };
 
   const formatDateWithOffset = (dateString) => {
     if (!dateString) return '-';
@@ -380,8 +443,32 @@ const SmartIncentives = () => {
   const budgetDollarValue =
     budget && !isNaN(budget) ? (Number(budget) / 100).toFixed(2) : '0.00';
 
+  const currentPage =
+    activeTab === 'activeCampaigns' ? campaignPage : expiredPage;
+  const currentTotalPages =
+    activeTab === 'activeCampaigns' ? campaignTotalPages : expiredTotalPages;
+
+  // Pagination controls per tab
+  const onPrev = () => {
+    if (activeTab === 'activeCampaigns') {
+      if (campaignPage > 1) setCampaignPage((p) => p - 1);
+    } else if (activeTab === 'expiredIncentives') {
+      if (expiredPage > 1) setExpiredPage((p) => p - 1);
+    }
+  };
+  const onNext = () => {
+    if (activeTab === 'activeCampaigns') {
+      if (campaignPage < campaignTotalPages) setCampaignPage((p) => p + 1);
+    } else if (activeTab === 'expiredIncentives') {
+      if (expiredPage < expiredTotalPages) setExpiredPage((p) => p + 1);
+    }
+  };
+
+  const tableData =
+    activeTab === 'activeCampaigns' ? campaignData : expiredData;
+
   return (
-    <div className="digital-app-container">
+    <div className="digital-app-container" style={{ height: '1100px' }}>
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -638,7 +725,7 @@ const SmartIncentives = () => {
         </button>
       </aside>
 
-      <div className="sa-filter-buttons" style={{ zIndex: 1000 }}>
+      <div className="sa-filter-buttons" style={{ zIndex: 1000, left: '16%' }}>
         <button
           className={`user-btn ${
             activeTab === 'createIncentive' ? 'active' : ''
@@ -654,6 +741,14 @@ const SmartIncentives = () => {
           onClick={() => setActiveTab('activeCampaigns')}
         >
           Active Campaigns
+        </button>
+        <button
+          className={`user-btn ${
+            activeTab === 'expiredIncentives' ? 'active' : ''
+          }`}
+          onClick={() => setActiveTab('expiredIncentives')}
+        >
+          Expired Incentives
         </button>
       </div>
 
@@ -677,15 +772,46 @@ const SmartIncentives = () => {
                     <img src="/points_bonus.png" alt="Points Bonus" />
                   </div>
                 </label>
+                <label className="incentive-option">
+                  <input
+                    type="radio"
+                    name="incentive"
+                    value="Kiosk Promotions"
+                    checked={selectedIncentive === 'Kiosk Promotions'}
+                    onChange={(e) => setSelectedIncentive(e.target.value)}
+                    className="incentive-radio"
+                    style={{ accentColor: '#002977' }}
+                  />
+                  <div className="incentive-image">
+                    <img src="/kiosk_promotions.png" alt="Kiosk Promotions" />
+                  </div>
+                </label>
               </div>
             </section>
 
-            {selectedIncentive === 'Point Bonus' && (
+            {selectedIncentive && (
               <>
                 {/* Display Options */}
                 <div className="display-options-panel responsive-panel">
                   <div className="scrollable-content">
                     <h2>Trigger settings</h2>
+
+                    {selectedIncentive === 'Kiosk Promotions' && (
+                      <div className="field-block">
+                        <label
+                          className="field-label"
+                          style={{ marginRight: '23px' }}
+                        >
+                          Promotion name
+                        </label>
+                        <input
+                          type="text"
+                          value={promotionName}
+                          onChange={(e) => setPromotionName(e.target.value)}
+                          className="text-input-trigger"
+                        />
+                      </div>
+                    )}
 
                     <div
                       className="form-group inline-form-group"
@@ -1046,30 +1172,43 @@ const SmartIncentives = () => {
             )}
           </div>
 
-          {selectedIncentive === 'Point Bonus' && (
+          {selectedIncentive && (
             <>
               {/* Live Smart Incentives Section */}
               <div className="live-smart-incentives">
                 <h2>Delivery Method</h2>
                 <div className="incentive-options">
-                  <label className="incentive-option">
-                    <input
-                      type="radio"
-                      name="deliveryMethod"
-                      value="Scratch & Win"
-                      checked={deliveryMethod === 'Scratch & Win'}
-                      onChange={(e) => setDeliveryMethod(e.target.value)}
-                      className="incentive-radio"
-                      style={{ accentColor: '#002977' }}
-                    />
-                    <div>
-                      <img
-                        src="/scratch_and_win.png"
-                        alt="Scratch and Win"
-                        style={{ width: '80%' }}
-                      />
-                    </div>
-                  </label>
+                  {selectedIncentive === 'Point Bonus' ? (
+                    <>
+                      <label className="incentive-option">
+                        <input
+                          type="radio"
+                          name="deliveryMethod"
+                          value="Scratch & Win"
+                          checked={deliveryMethod === 'Scratch & Win'}
+                          onChange={(e) => setDeliveryMethod(e.target.value)}
+                          className="incentive-radio"
+                          style={{ accentColor: '#002977' }}
+                        />
+                        <div>
+                          <img
+                            src="/scratch_and_win.png"
+                            alt="Scratch and Win"
+                            style={{ width: '80%' }}
+                          />
+                        </div>
+                      </label>
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ marginTop: '20px' }}>
+                        This promotion will be sent to your Wymac Kiosk
+                        <br />
+                        <br />
+                        Please select the type of promotion at the kiosk
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </>
@@ -1078,7 +1217,11 @@ const SmartIncentives = () => {
           {/* ========== CONTROL BUTTONS ========== */}
           <button
             className="publish-displays-btn icon-button"
-            onClick={handlePublishIncentive}
+            onClick={() => {
+              if (selectedIncentive === 'Point Bonus') {
+                handlePublishIncentive();
+              }
+            }}
             disabled={publishing}
           >
             <FaCheck className="button-icon" />
@@ -1086,7 +1229,7 @@ const SmartIncentives = () => {
           </button>
         </div>
       ) : (
-        <div className="members-table-container-pr" style={{marginTop: '0%'}}>
+        <div className="members-table-container-pr" style={{ marginTop: '0%' }}>
           {loading ? (
             <div className="loading">Loading...</div>
           ) : (
@@ -1108,13 +1251,15 @@ const SmartIncentives = () => {
                     <th>Budget</th>
                     <th>Value of Incentives Issued</th>
                     <th>Budget Remaining</th>
+                    {activeTab === 'expiredIncentives' && <th>Date Expired</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {activeTab === 'activeCampaigns' && (
+                  {(activeTab === 'activeCampaigns' ||
+                    activeTab === 'expiredIncentives') && (
                     <>
-                      {campaignData.length > 0 ? (
-                        campaignData.map((data, index) => (
+                      {tableData.length > 0 ? (
+                        tableData.map((data, index) => (
                           <tr key={index}>
                             <td>
                               {data.createdAt
@@ -1136,9 +1281,26 @@ const SmartIncentives = () => {
                             <td>{data.budget || '-'}</td>
                             <td>{data.totalIssuedValue || '-'}</td>
                             <td>{data.budgetRemaining || '-'}</td>
-                            <td>
-                              <button className="action-btn approve" style={{borderRadius: '50px'}}>END INCENTIVE</button>
-                            </td>
+                            {activeTab === 'activeCampaigns' && (
+                              <td>
+                                <button
+                                  className="action-btn approve"
+                                  onClick={() =>
+                                    handleDeactivateIncentive(data._id)
+                                  }
+                                  style={{ borderRadius: '50px' }}
+                                >
+                                  END INCENTIVE
+                                </button>
+                              </td>
+                            )}
+                            {activeTab === 'expiredIncentives' && (
+                              <td>
+                                {data.status === 'inactive'
+                                  ? data.inactiveDateBrisbane
+                                  : formatDateWithOffset(data.endDate)}
+                              </td>
+                            )}
                           </tr>
                         ))
                       ) : (
@@ -1152,6 +1314,54 @@ const SmartIncentives = () => {
                   )}
                 </tbody>
               </table>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  paddingRight: '20px',
+                  paddingLeft: '20px',
+                }}
+              >
+                <button
+                  onClick={onPrev}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor: currentPage === 1 ? '#e0e0e0' : '#002977',
+                    color: currentPage === 1 ? '#999' : 'white',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  ← Previous
+                </button>
+                <span style={{ fontWeight: '500', color: '#002977' }}>
+                  Page {currentPage} of {currentTotalPages}
+                </span>
+                <button
+                  onClick={onNext}
+                  disabled={currentPage >= currentTotalPages}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor:
+                      currentPage >= currentTotalPages ? '#e0e0e0' : '#002977',
+                    color: currentPage >= currentTotalPages ? '#999' : 'white',
+                    cursor:
+                      currentPage >= currentTotalPages
+                        ? 'not-allowed'
+                        : 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  Next →
+                </button>
+              </div>
             </>
           )}
         </div>
