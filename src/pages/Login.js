@@ -54,10 +54,11 @@ function Login() {
       );
 
       if (response.data.success) {
-        navigate("/password-verification", { state: { email } });
-      } else {
-        navigate("/signup", { state: { email } });
-      }
+        localStorage.setItem("firstName", response.data.data.admin.firstname);
+        localStorage.setItem("lastName", response.data.data.admin.lastname);
+        localStorage.setItem("email", email);
+        navigate("/password-verification");
+      } 
     } catch (err) {
       console.error("Error verifying email:", err);
       const errorMessage = err.response?.data?.message || err.message || "An unexpected error occurred. Please try again.";

@@ -17,7 +17,7 @@ const PasswordVerification = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const email = location.state?.email || "";
+  const email = localStorage.getItem("email") || "";
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prevState => !prevState); // Ensures state updates correctly

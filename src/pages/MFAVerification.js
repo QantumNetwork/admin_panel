@@ -14,7 +14,7 @@ function MFAVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const email =
-    location.state?.email || "";
+    localStorage.getItem("email") || "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -7,7 +7,7 @@ import "../styles/mfa-setup.css"; // Make sure this file is in your styles folde
 function MFASetup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || "";
+  const email = localStorage.getItem("email") || "";
   const qrCode = location.state?.qrCode || "";
 
   return (

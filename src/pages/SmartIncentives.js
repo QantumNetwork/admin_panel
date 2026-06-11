@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import * as XLSX from 'xlsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../utils/auth';
 import {
@@ -466,6 +467,106 @@ const SmartIncentives = () => {
 
   const tableData =
     activeTab === 'activeCampaigns' ? campaignData : expiredData;
+
+  const formatTriggerType = (type) => {
+    switch (type) {
+      case 'FoodSales':
+        return 'Food Sales';
+      case 'BeverageSales':
+        return 'Beverage Sales';
+      default:
+        return type;
+    }
+  };
+
+  const formatTimePeriod = (type) => {
+    switch (type) {
+      case 'Last7Days':
+        return 'Last 7 Days';
+      case 'Last14Days':
+        return 'Last 14 Days';
+      case 'Last30Days':
+        return 'Last 30 Days';
+      default:
+        return type;
+    }
+  };
+
+  const handleExportApplicableUsers = async (incentiveId) => {
+    try {
+      setLoading(true);
+
+      // First page
+      const firstResponse = await axios.get(
+        `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=1&limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const totalPages = firstResponse.data.pagination.totalPages;
+
+      let allUsers = [...firstResponse.data.data];
+
+      // Fetch remaining pages
+      const requests = [];
+
+      for (let page = 2; page <= totalPages; page++) {
+        requests.push(
+          axios.get(
+            `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=${page}&limit=100`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        );
+      }
+
+      const responses = await Promise.all(requests);
+
+      responses.forEach((res) => {
+        allUsers.push(...res.data.data);
+      });
+
+      // Format for excel
+      const excelData = allUsers.map((user) => ({
+        'Bluize ID': user.BluizeId,
+        'Card Number': user.CardNumber,
+        'First Name': user.GivenNames,
+        'Last Name': user.Surname,
+        Email: user.Email,
+        Mobile: user.Mobile,
+        Address: user.Address,
+        Suburb: user.Suburb,
+        State: user.State,
+        PostCode: user.PostCode,
+        Gender: user.Gender,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+      // Set every column to width 20
+      const numCols = Object.keys(excelData[0]).length;
+      worksheet['!cols'] = Array(numCols).fill({ wch: 15 });
+
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Applicable Members');
+
+      XLSX.writeFile(workbook, `ApplicableMembers_${incentiveId}.xlsx`);
+
+      toast.success('Members exported successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export members');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="digital-app-container" style={{ height: '1100px' }}>
@@ -1272,11 +1373,31 @@ const SmartIncentives = () => {
                             <td>{data.offerType || '-'}</td>
                             <td>{formatDateWithOffset(data.startDate)}</td>
                             <td>{formatDateWithOffset(data.endDate)}</td>
-                            <td>{data.triggerType || '-'}</td>
+                            <td>
+                              {formatTriggerType(data.triggerType) || '-'}
+                            </td>
                             <td>{data.triggerValue || '-'}</td>
-                            <td>{data.timePeriod || '-'}</td>
+                            <td>{formatTimePeriod(data.timePeriod) || '-'}</td>
                             <td>{data.incentiveValue || '-'}</td>
-                            <td>{data.applicableUserCount || '-'}</td>
+                            <td>
+                              {data.applicableUserCount ? (
+                                <span
+                                  onClick={() =>
+                                    handleExportApplicableUsers(data._id)
+                                  }
+                                  style={{
+                                    color: '#002977',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {data.applicableUserCount}
+                                </span>
+                              ) : (
+                                '-'
+                              )}
+                            </td>
                             <td>{data.totalIssuedCount || '-'}</td>
                             <td>{data.budget || '-'}</td>
                             <td>{data.totalIssuedValue || '-'}</td>
@@ -1298,6 +1419,10 @@ const SmartIncentives = () => {
                               <td>
                                 {data.status === 'inactive'
                                   ? data.inactiveDateBrisbane
+                                      .substring(0, 10)
+                                      .split('-')
+                                      .reverse()
+                                      .join('-')
                                   : formatDateWithOffset(data.endDate)}
                               </td>
                             )}
