@@ -16,6 +16,7 @@ import {
   getAppType,
   getAudienceOptions,
   getAudienceStyle,
+  exportToExcel,
 } from '../utils/appConstants';
 import { FaChartPie } from 'react-icons/fa6';
 import axios from 'axios';
@@ -534,6 +535,7 @@ const SmartIncentives = () => {
 
       // Format for excel
       const excelData = allUsers.map((user) => ({
+        Id: user.Id,
         'Bluize ID': user.BluizeId,
         'Card Number': user.CardNumber,
         'First Name': user.GivenNames,
@@ -547,17 +549,11 @@ const SmartIncentives = () => {
         Gender: user.Gender,
       }));
 
-      const worksheet = XLSX.utils.json_to_sheet(excelData);
-
-      // Set every column to width 20
-      const numCols = Object.keys(excelData[0]).length;
-      worksheet['!cols'] = Array(numCols).fill({ wch: 15 });
-
-      const workbook = XLSX.utils.book_new();
-
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Applicable Members');
-
-      XLSX.writeFile(workbook, `ApplicableMembers_${incentiveId}.xlsx`);
+      exportToExcel(
+        excelData,
+        'Applicable Members',
+        `ApplicableMembers_${incentiveId}.xlsx`
+      );
 
       toast.success('Members exported successfully');
     } catch (err) {
@@ -568,6 +564,75 @@ const SmartIncentives = () => {
     }
   };
 
+  const handleExportRedeemedUsers = async (incentiveId) => {
+    try {
+      setLoading(true);
+
+      const firstResponse = await axios.get(
+        `https://betaapi.s2w.com.au/smart-incentive/collected-users/${incentiveId}?page=1&limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const totalPages = firstResponse.data.pagination.totalPages;
+
+      let allUsers = [...firstResponse.data.data];
+
+      const requests = [];
+
+      for (let page = 2; page <= totalPages; page++) {
+        requests.push(
+          axios.get(
+            `https://betaapi.s2w.com.au/smart-incentive/collected-users/${incentiveId}?page=${page}&limit=100`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        );
+      }
+
+      const responses = await Promise.all(requests);
+
+      responses.forEach((res) => {
+        allUsers.push(...res.data.data);
+      });
+
+      const excelData = allUsers.map((user) => ({
+        'Redeemed Date': user?.issuedDateBrisbane ?? '',
+        'Incentive Value': user?.incentiveValue ?? '',
+        Id: user?.Id ?? '',
+        BluizeId: user?.BluizeId ?? '',
+        CardNumber: user?.CardNumber ?? '',
+        GivenNames: user?.GivenNames ?? '',
+        Surname: user?.Surname ?? '',
+        Email: user?.Email ?? '',
+        Mobile: user?.Mobile ?? '',
+        Address: user?.Address ?? '',
+        PostCode: user?.PostCode ?? '',
+        Suburb: user?.Suburb ?? '',
+        State: user?.State ?? '',
+        Gender: user?.Gender ?? '',
+      }));
+
+      exportToExcel(
+        excelData,
+        'Redeemed Members',
+        `RedeemedMembers_${incentiveId}.xlsx`
+      );
+
+      toast.success('Members exported successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export members');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="digital-app-container" style={{ height: '1100px' }}>
       <ToastContainer
@@ -1398,7 +1463,25 @@ const SmartIncentives = () => {
                                 '-'
                               )}
                             </td>
-                            <td>{data.totalIssuedCount || '-'}</td>
+                            <td>
+                              {data.totalIssuedCount ? (
+                                <span
+                                  onClick={() =>
+                                    handleExportRedeemedUsers(data._id)
+                                  }
+                                  style={{
+                                    color: '#002977',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {data.totalIssuedCount}
+                                </span>
+                              ) : (
+                                '-'
+                              )}
+                            </td>
                             <td>{data.budget || '-'}</td>
                             <td>{data.totalIssuedValue || '-'}</td>
                             <td>{data.budgetRemaining || '-'}</td>

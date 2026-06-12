@@ -12,7 +12,7 @@ import {
   FaRegStar,
 } from 'react-icons/fa';
 import { FaChartPie } from 'react-icons/fa6';
-import { getAppType } from '../utils/appConstants';
+import { getAppType, exportToExcel } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Reporting = () => {
@@ -132,8 +132,46 @@ const Reporting = () => {
     };
 
     fetchReportingData();
-
   }, [token, selectedVenue]);
+
+  const handleExportClaimedUsers = async (id) => {
+    try {
+      setLoading(true);
+
+      const firstResponse = await axios.get(
+        `${baseUrl}/offer/${id}/redeemlist`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const allUsers = firstResponse.data?.data?.users || [];
+
+      const excelData = allUsers.map((user) => ({
+        'Redeemed At': user.redemption?.redeemedAt ?? '',
+        id: user.user?.id ?? '',
+        Name: user.user?.name ?? '',
+        Email: user.user?.email ?? '',
+        Mobile: user.user?.mobile ?? '',
+        'Card Number': user.user?.cardNumber ?? '',
+        'Membership Type': user.user?.membershipType ?? '',
+        'Membership Category': user.user?.membershipCategory ?? '',
+        'Status Tier': user.user?.statusTier ?? '',
+        'Points Balance': user.user?.pointsBalance ?? '',
+      }));
+
+      exportToExcel(excelData, 'Claimed Members', `ClaimedMembers_${id}.xlsx`);
+
+      toast.success('Members exported successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export members');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -423,7 +461,25 @@ const Reporting = () => {
                                 .join('-') || '-'}
                             </td>
                             <td>{data.reach || '-'}</td>
-                            <td>{data.claims || '-'}</td>
+                            <td>
+                              {data.claims ? (
+                                <span
+                                  onClick={() =>
+                                    handleExportClaimedUsers(data.id)
+                                  }
+                                  style={{
+                                    color: '#002977',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {data.claims}
+                                </span>
+                              ) : (
+                                '-'
+                              )}
+                            </td>
                             <td>{data.daysActive || '-'}</td>
                             <td>{data.points || '-'}</td>
                             <td>{data.dollarValue || '-'}</td>

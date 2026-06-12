@@ -300,3 +300,26 @@ export const getAudienceStyle = () => ({
     minWidth: '140px',
   }),
 });
+
+import * as XLSX from 'xlsx';
+
+export const exportToExcel = (
+  data,
+  sheetName,
+  fileName,
+  columnWidth = 15
+) => {
+  if (!data || data.length === 0) return;
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  worksheet['!cols'] = Array(Object.keys(data[0]).length).fill({
+    wch: columnWidth,
+  });
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+  XLSX.writeFile(workbook, fileName);
+};
