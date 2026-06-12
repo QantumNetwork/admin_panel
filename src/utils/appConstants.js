@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 export const getAppType = (appType) => {
   const appTypeMap = {
     MaxGaming: 'Max Gaming',
@@ -300,8 +302,6 @@ export const getAudienceStyle = () => ({
     minWidth: '140px',
   }),
 });
-
-import * as XLSX from 'xlsx';
 
 export const exportToExcel = (
   data,
