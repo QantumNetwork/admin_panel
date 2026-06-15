@@ -134,6 +134,48 @@ const Reporting = () => {
     fetchReportingData();
   }, [token, selectedVenue]);
 
+  const handleExportReachedUsers = async (id) => {
+    try {
+      setLoading(true);
+
+      const firstResponse = await axios.get(
+        `${baseUrl}/offer/${id}/reach-users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const allUsers = firstResponse.data?.data || [];
+      console.log('Reached Users:', allUsers);
+
+      const excelData = allUsers.map((user) => ({
+        Id: user?.Id ?? '',
+        'Bluize Id': user?.BluizeId ?? '',
+        'Given Name': user?.GivenNames ?? '',
+        Surname: user?.Surname ?? '',
+        Email: user?.Email ?? '',
+        Mobile: user?.Mobile ?? '',
+        'Card Number': user?.CardNumber ?? '',
+        Address: user?.Address ?? '',
+        'Post Code': user?.PostCode ?? '',
+        Suburb: user?.Suburb ?? '',
+        State: user?.State ?? '',
+        Gender: user?.Gender ?? '',
+      }));
+
+      exportToExcel(excelData, 'Reached Members', `ReachedMembers_${id}.xlsx`);
+
+      toast.success('Members exported successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export members');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleExportClaimedUsers = async (id) => {
     try {
       setLoading(true);
@@ -460,7 +502,25 @@ const Reporting = () => {
                                 .reverse()
                                 .join('-') || '-'}
                             </td>
-                            <td>{data.reach || '-'}</td>
+                            <td>
+                              {data.reach ? (
+                                <span
+                                  onClick={() =>
+                                    handleExportReachedUsers(data.id)
+                                  }
+                                  style={{
+                                    color: '#002977',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {data.reach}
+                                </span>
+                              ) : (
+                                '-'
+                              )}
+                            </td>
                             <td>
                               {data.claims ? (
                                 <span
