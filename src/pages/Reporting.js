@@ -139,7 +139,7 @@ const Reporting = () => {
       setLoading(true);
 
       const firstResponse = await axios.get(
-        `${baseUrl}/offer/${id}/reach-users`,
+        `${baseUrl}/offer/${id}/reach-users?page=1&limit=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -147,8 +147,31 @@ const Reporting = () => {
         }
       );
 
-      const allUsers = firstResponse.data?.data || [];
-      console.log('Reached Users:', allUsers);
+      const totalPages = firstResponse.data.pagination.totalPages;
+
+      let allUsers = [...firstResponse.data.data];
+
+      // Fetch remaining pages
+      const requests = [];
+
+      for (let page = 2; page <= totalPages; page++) {
+        requests.push(
+          axios.get(
+            `${baseUrl}/offer/${id}/reach-users?page=${page}&limit=100`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        );
+      }
+
+      const responses = await Promise.all(requests);
+
+      responses.forEach((res) => {
+        allUsers.push(...res.data.data);
+      });
 
       const excelData = allUsers.map((user) => ({
         Id: user?.Id ?? '',

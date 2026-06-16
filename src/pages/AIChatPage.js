@@ -43,7 +43,7 @@ const AIChatPage = () => {
   const [selectedTop, setSelectedTop] = useState(null);
   const [selectedSub, setSelectedSub] = useState(null);
 
-    const userInitial = userEmail.charAt(0).toUpperCase();
+  const userInitial = userEmail.charAt(0).toUpperCase();
   const name = localStorage.getItem('name') || 'user';
   const username = name;
 
@@ -55,71 +55,65 @@ const AIChatPage = () => {
   const [loadingVenue, setLoadingVenue] = useState(true);
   const [venues, setVenues] = useState([]);
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  
+
   // ===== FETCH TOP + SUB BUTTONS =====
-    useEffect(() => {
-      const fetchReportingButtons = async () => {
-        try {
-          const mainRes = await axios.get(
-            `${baseUrl}/main-buttons`,
+  useEffect(() => {
+    const fetchReportingButtons = async () => {
+      try {
+        const mainRes = await axios.get(`${baseUrl}/main-buttons`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const mainButtons = Array.isArray(mainRes.data)
+          ? [...mainRes.data].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+          : [];
+
+        const validTops = [];
+        const subMap = {};
+
+        for (const top of mainButtons) {
+          const subRes = await axios.get(
+            `${baseUrl}/sub-buttons/${top._id}/sub-buttons`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-  
-          const mainButtons = Array.isArray(mainRes.data)
-            ? [...mainRes.data].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            : [];
-  
-          const validTops = [];
-          const subMap = {};
-  
-          for (const top of mainButtons) {
-            const subRes = await axios.get(
-              `${baseUrl}/sub-buttons/${top._id}/sub-buttons`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-  
-            const subs = Array.isArray(subRes.data)
-              ? subRes.data
-                  .filter((s) => s.question?.trim())
-                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-              : [];
-  
-            if (subs.length > 0) {
-              validTops.push(top);
-              subMap[top._id] = subs;
-            }
-          }
-  
-          setTopButtons(validTops);
-          setSubButtons(subMap);
-  
-          if (validTops.length > 0) {
-            setSelectedTop(validTops[0]);
-          }
-  
-        } catch (err) {
-          console.error('Error loading reporting buttons:', err);
-        }
-      };
-  
-      if (token) fetchReportingButtons();
-  
-    }, [token]);
-  
-    // ===== BALANCE DYNAMICALLY =====
-  const currentSubs = selectedTop
-    ? subButtons[selectedTop._id] || []
-    : [];
-  
-// Preserve ordering
-const leftColumn = currentSubs
-  .filter((btn) => btn.order <= 8)
-  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-const rightColumn = currentSubs
-  .filter((btn) => btn.order > 8)
-  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  
+          const subs = Array.isArray(subRes.data)
+            ? subRes.data
+                .filter((s) => s.question?.trim())
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : [];
+
+          if (subs.length > 0) {
+            validTops.push(top);
+            subMap[top._id] = subs;
+          }
+        }
+
+        setTopButtons(validTops);
+        setSubButtons(subMap);
+
+        if (validTops.length > 0) {
+          setSelectedTop(validTops[0]);
+        }
+      } catch (err) {
+        console.error('Error loading reporting buttons:', err);
+      }
+    };
+
+    if (token) fetchReportingButtons();
+  }, [token]);
+
+  // ===== BALANCE DYNAMICALLY =====
+  const currentSubs = selectedTop ? subButtons[selectedTop._id] || [] : [];
+
+  // Preserve ordering
+  const leftColumn = currentSubs
+    .filter((btn) => btn.order <= 8)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const rightColumn = currentSubs
+    .filter((btn) => btn.order > 8)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const handleImageClick = (url) => {
     setModalImageUrl(url);
@@ -152,32 +146,32 @@ const rightColumn = currentSubs
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
       : isManly
-      ? 'https://mhbcviperaireportingapi.victoriouswater-d292e9e7.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isStarReward
-      ? 'https://aireportingviperapi.wonderfulglacier-1e6957c7.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isQueens
-      ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isHogan
-      ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isBrisbane
-      ? 'https://brisbanebrewingviperapi.graymushroom-2c8b9797.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isCentral
-      ? 'https://centrallanehotelviperapi.grayflower-1f643a2b.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isMontauk
-      ? 'https://montauktavernviperapi.happyhill-26c14243.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isNorth
-      ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isBluewater
-      ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isFlinders
-      ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isDrinks
-      ? 'https://drinkshqviperapi.greenground-e372bb60.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isWoollahra
-      ? 'https://woollahrahotelviperapi.purpleriver-5e2beaca.australiaeast.azurecontainerapps.io/api/airesponse'
-      : isEDP
-      ? 'https://edpviperaireportingapi.thankfulground-1eebdf61.australiaeast.azurecontainerapps.io/api/airesponse'
-      : null;
+        ? 'https://mhbcviperaireportingapi.victoriouswater-d292e9e7.australiaeast.azurecontainerapps.io/api/airesponse'
+        : isStarReward
+          ? 'https://aireportingviperapi.wonderfulglacier-1e6957c7.australiaeast.azurecontainerapps.io/api/airesponse'
+          : isQueens
+            ? 'https://queensgladstoneviperapi.salmonforest-41ebf4b3.australiaeast.azurecontainerapps.io/api/airesponse'
+            : isHogan
+              ? 'https://wellingtonhotelviperapi.greenbay-34e5b870.australiaeast.azurecontainerapps.io/api/airesponse'
+              : isBrisbane
+                ? 'https://brisbanebrewingviperapi.graymushroom-2c8b9797.australiaeast.azurecontainerapps.io/api/airesponse'
+                : isCentral
+                  ? 'https://centrallanehotelviperapi.grayflower-1f643a2b.australiaeast.azurecontainerapps.io/api/airesponse'
+                  : isMontauk
+                    ? 'https://montauktavernviperapi.happyhill-26c14243.australiaeast.azurecontainerapps.io/api/airesponse'
+                    : isNorth
+                      ? 'https://northshoretavernviperapi.victoriousfield-ed93b82c.australiaeast.azurecontainerapps.io/api/airesponse'
+                      : isBluewater
+                        ? 'https://bluewaterbargrillviperapi.happyplant-a0031ba2.australiaeast.azurecontainerapps.io/api/airesponse'
+                        : isFlinders
+                          ? 'https://flindersstreetwharvesviperapi.grayglacier-b50c2543.australiaeast.azurecontainerapps.io/api/airesponse'
+                          : isDrinks
+                            ? 'https://drinkshqviperapi.greenground-e372bb60.australiaeast.azurecontainerapps.io/api/airesponse'
+                            : isWoollahra
+                              ? 'https://woollahrahotelviperapi.purpleriver-5e2beaca.australiaeast.azurecontainerapps.io/api/airesponse'
+                              : isEDP
+                                ? 'https://edpviperaireportingapi.thankfulground-1eebdf61.australiaeast.azurecontainerapps.io/api/airesponse'
+                                : null;
 
     return endpoint;
   };
@@ -215,7 +209,7 @@ const rightColumn = currentSubs
         if (data.type === 'pdf') assistantMsg.fileType = 'pdf';
         else if (data.type === 'excel') assistantMsg.fileType = 'excel';
         else if (data.type === 'graph') assistantMsg.fileType = 'graph';
-
+        else if (data.type === 'export') assistantMsg.fileType = 'excel';
         setChatHistory([...historyToSend, assistantMsg]);
       } else {
         toast.error('AI failed to respond.');
@@ -283,6 +277,7 @@ const rightColumn = currentSubs
         if (data.type === 'pdf') assistantMsg.fileType = 'pdf';
         else if (data.type === 'excel') assistantMsg.fileType = 'excel';
         else if (data.type === 'graph') assistantMsg.fileType = 'graph';
+        else if (data.type === 'export') assistantMsg.fileType = 'excel';
         setChatHistory([...newChat, assistantMsg]);
       } else {
         toast.error('AI failed to respond.');
@@ -389,9 +384,15 @@ const rightColumn = currentSubs
   const handleNavigation = (path) => navigate(path);
 
   const renderAssistantMessage = (msg) => {
-    if (msg.fileType === 'pdf' || msg.fileType === 'excel') {
+    if (
+      msg.fileType === 'pdf' ||
+      msg.fileType === 'excel' ||
+      msg.fileType === 'export'
+    ) {
       const fileUrlMatch = msg.content.match(/https?:\/\/[^\s]+/);
       const url = fileUrlMatch ? fileUrlMatch[0] : null;
+
+      const isExcel = msg.fileType === 'excel' || msg.fileType === 'export';
 
       return (
         <div className="file-message">
@@ -402,12 +403,17 @@ const rightColumn = currentSubs
             rel="noopener noreferrer"
             className="file-link"
           >
-            {msg.fileType === 'pdf' ? (
-              <FaFilePdf className="file-icon" color="red" />
+            {isExcel ? (
+              <FaFileExcel
+                className="file-icon"
+                color="#1D6F42"
+                style={{ marginRight: 3 }}
+              />
             ) : (
-              <FaFileExcel className="file-icon" color="green" />
+              <FaFilePdf className="file-icon" color="red" />
             )}
-            {msg.fileType.toUpperCase()}
+
+            {isExcel ? 'Excel' : 'PDF'}
           </a>
         </div>
       );
@@ -622,162 +628,165 @@ const rightColumn = currentSubs
 
       <main className="chat-container">
         {/* Top Buttons */}
-          <div className="chat-top-buttons-row">
-            {topButtons.map((tb) => (
-              <button
-                key={tb._id}
-                className={`top-btn-reporting ${
-                  selectedTop?._id === tb._id ? 'active-btn' : ''
-                }`}
-                onClick={() => {
-                  setSelectedTop(tb);
-                  setSelectedSub(null);
-                  setQuestion('');
-                }}
-              >
-                {tb.title}
-              </button>
-            ))}
+        <div className="chat-top-buttons-row">
+          {topButtons.map((tb) => (
+            <button
+              key={tb._id}
+              className={`top-btn-reporting ${
+                selectedTop?._id === tb._id ? 'active-btn' : ''
+              }`}
+              onClick={() => {
+                setSelectedTop(tb);
+                setSelectedSub(null);
+                setQuestion('');
+              }}
+            >
+              {tb.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="ai-main-area-chat">
+          {/* LEFT */}
+          <div className="column">
+            {leftColumn.map((btn, idx) =>
+              btn ? (
+                <button
+                  key={btn._id}
+                  className={`sub-btn-reporting ${
+                    selectedSub?._id === btn._id ? 'active-btn' : ''
+                  }`}
+                  onClick={() => {
+                    setSelectedSub(btn);
+                    setQuestion(btn.question);
+                  }}
+                >
+                  {btn.title}
+                </button>
+              ) : (
+                <div key={`empty-left-${idx}`} style={{ height: '40px' }} />
+              )
+            )}
           </div>
 
-<div className="ai-main-area-chat">
-
-          {/* LEFT */}
-              <div className="column">
-                {leftColumn.map((btn, idx) =>
-                  btn ? (
-                    <button
-                      key={btn._id}
-                      className={`sub-btn-reporting ${
-                        selectedSub?._id === btn._id ? 'active-btn' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedSub(btn);
-                        setQuestion(btn.question);
-                      }}
-                    >
-                      {btn.title}
-                    </button>
-                  ) : (
-                    <div key={`empty-left-${idx}`} style={{ height: '40px' }} />
-                  )
-                )}
-              </div>
-
-              <div className="chat-full-wrapper">
-          <div className="chat-wrapper">
-            <div className="chat-box" ref={chatBoxRef}>
-              {chatHistory.map((msg, idx) => (
-                <div key={idx} className={`chat-message ${msg.role}`}>
-                  {msg.role === 'assistant' && (
+          <div className="chat-full-wrapper">
+            <div className="chat-wrapper">
+              <div className="chat-box" ref={chatBoxRef}>
+                {chatHistory.map((msg, idx) => (
+                  <div key={idx} className={`chat-message ${msg.role}`}>
+                    {msg.role === 'assistant' && (
+                      <div className="chat-icon-circle left">
+                        <img
+                          src="/Group.svg"
+                          alt="AI"
+                          className="chat-avatar"
+                        />
+                      </div>
+                    )}
+                    {msg.role === 'assistant' ? (
+                      renderAssistantMessage(msg)
+                    ) : (
+                      <div className="message-bubble">{msg.content}</div>
+                    )}
+                    {msg.role === 'user' && (
+                      <div className="chat-icon-circle right">
+                        <img
+                          src="/question.svg"
+                          alt="User"
+                          className="chat-avatar"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {isTyping && (
+                  <div className="chat-message assistant">
                     <div className="chat-icon-circle left">
                       <img src="/Group.svg" alt="AI" className="chat-avatar" />
                     </div>
-                  )}
-                  {msg.role === 'assistant' ? (
-                    renderAssistantMessage(msg)
-                  ) : (
-                    <div className="message-bubble">{msg.content}</div>
-                  )}
-                  {msg.role === 'user' && (
-                    <div className="chat-icon-circle right">
-                      <img
-                        src="/question.svg"
-                        alt="User"
-                        className="chat-avatar"
-                      />
+                    <div className="message-bubble typing-indicator">
+                      <p>Processing your Request</p> <span></span>
+                      <span></span>
+                      <span></span>
                     </div>
-                  )}
-                </div>
-              ))}
-              {isTyping && (
-                <div className="chat-message assistant">
-                  <div className="chat-icon-circle left">
-                    <img src="/Group.svg" alt="AI" className="chat-avatar" />
                   </div>
-                  <div className="message-bubble typing-indicator">
-                    <p>Processing your Request</p> <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+
+            {/* chat input bar */}
+            <div className="chat-input-bar">
+              <button
+                className="mic-button-ai-chat"
+                onClick={handleMicButtonClick}
+              >
+                {isListening ? (
+                  <GrMicrophone size={20} color="white" />
+                ) : (
+                  <MdMicOff size={20} color="white" />
+                )}
+              </button>
+
+              {/* This hidden input tricks LastPass into thinking autofill is handled */}
+              <input type="text" name="fake-user" style={{ display: 'none' }} />
+              <input
+                type="password"
+                name="fake-password"
+                style={{ display: 'none' }}
+              />
+
+              <div className="chat-input-wrapper">
+                <textarea
+                  name="no-password-here"
+                  autoComplete="off"
+                  data-lpignore="true"
+                  placeholder="Ask your question here or use voice recognition"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Send on Enter (without Shift); newline with Shift+Enter
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  rows={1}
+                  className="chat-textarea"
+                />
+                <button
+                  className="send-icon"
+                  onClick={handleSend}
+                  disabled={loading}
+                >
+                  <IoMdSend size={22} color="#0C285B" />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* chat input bar */}
-          <div className="chat-input-bar">
-            <button
-              className="mic-button-ai-chat"
-              onClick={handleMicButtonClick}
-            >
-              {isListening ? (
-                <GrMicrophone size={20} color="white" />
+          {/* RIGHT */}
+          <div className="column">
+            {rightColumn.map((btn, idx) =>
+              btn ? (
+                <button
+                  key={btn._id}
+                  className={`sub-btn-reporting ${
+                    selectedSub?._id === btn._id ? 'active-btn' : ''
+                  }`}
+                  onClick={() => {
+                    setSelectedSub(btn);
+                    setQuestion(btn.question);
+                  }}
+                >
+                  {btn.title}
+                </button>
               ) : (
-                <MdMicOff size={20} color="white" />
-              )}
-            </button>
-
-            {/* This hidden input tricks LastPass into thinking autofill is handled */}
-            <input type="text" name="fake-user" style={{ display: 'none' }} />
-            <input
-              type="password"
-              name="fake-password"
-              style={{ display: 'none' }}
-            />
-
-            <div className="chat-input-wrapper">
-              <textarea
-                name="no-password-here"
-                autoComplete="off"
-                data-lpignore="true"
-                placeholder="Ask your question here or use voice recognition"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  // Send on Enter (without Shift); newline with Shift+Enter
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                rows={1}
-                className="chat-textarea"
-              />
-              <button
-                className="send-icon"
-                onClick={handleSend}
-                disabled={loading}
-              >
-                <IoMdSend size={22} color="#0C285B" />
-              </button>
-            </div>
+                <div key={`empty-right-${idx}`} style={{ height: '40px' }} />
+              )
+            )}
           </div>
         </div>
 
-              {/* RIGHT */}
-              <div className="column">
-                {rightColumn.map((btn, idx) =>
-                  btn ? (
-                    <button
-                      key={btn._id}
-                      className={`sub-btn-reporting ${
-                        selectedSub?._id === btn._id ? 'active-btn' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedSub(btn);
-                        setQuestion(btn.question);
-                      }}
-                    >
-                      {btn.title}
-                    </button>
-                  ) : (
-                    <div key={`empty-right-${idx}`} style={{ height: '40px' }} />
-                  )
-                )}
-              </div>
-              </div>
-        
         {showImageModal && (
           <div className="image-modal-overlay" onClick={handleCloseModal}>
             <div
