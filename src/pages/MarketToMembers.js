@@ -935,7 +935,7 @@ const MarketToMembers = () => {
 
     const notificationId = searchParams.get('id');
 
-    let url = `https://betaapi.s2w.com.au/notification/send-notification`;
+    let url = `https://api.s2w.com.au/notification/send-notification`;
 
     if (
       jobId !== null &&
@@ -943,7 +943,7 @@ const MarketToMembers = () => {
       jobId !== '' &&
       status == null
     ) {
-      url = `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`;
+      url = `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`;
     }
 
     if (selectedTargetMarket === 'Send to All') {
