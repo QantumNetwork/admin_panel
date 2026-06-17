@@ -935,17 +935,12 @@ const MarketToMembers = () => {
 
     const notificationId = searchParams.get('id');
 
-    let url = `https://api.s2w.com.au/notification/send-notification`;
+    const isUpdate = !!notificationId;
 
-    if (
-      jobId !== null &&
-      jobId !== undefined &&
-      jobId !== '' &&
-      status == null
-    ) {
-      url = `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`;
-    }
-
+    let url = isUpdate && status !== 'completed'
+  ? `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`
+  : `https://api.s2w.com.au/notification/send-notification`;
+  
     if (selectedTargetMarket === 'Send to All') {
       const memberNum = await calculateReachSendToAll();
       console.log('memberNum', memberNum);
@@ -977,7 +972,7 @@ const MarketToMembers = () => {
         setTimeout(() => setSendingNow(false), 5000);
 
         const response = await fetch(url, {
-          method: jobId && status === null ? 'PATCH' : 'POST',
+          method: isUpdate && status !== 'completed' ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',
@@ -1092,7 +1087,7 @@ const MarketToMembers = () => {
         // Set sending state and disable button
         setIsSending(true);
         const response = await fetch(url, {
-          method: jobId && status === null ? 'PATCH' : 'POST',
+          method: isUpdate && status !== 'completed' ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : '',

@@ -147,8 +147,6 @@ const SpecialOffers = () => {
 
   const [membershipPackages, setMembershipPackages] = useState([]);
 
-  const [offerAppears, setOfferAppears] = useState('');
-
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
 
@@ -328,11 +326,6 @@ const SpecialOffers = () => {
             setOfferProceedDate('');
             return;
           }
-
-                      setOfferAppears((offerToSelect.appears || 'ALL').toString().trim().toUpperCase() === 'ALL'
-    ? 'ALL'
-    : offerToSelect.appears);
-
 
           // Only update the selected offer if it's different from the current one
           if (!selectedOffer || selectedOffer._id !== offerToSelect._id) {
@@ -1002,7 +995,6 @@ const SpecialOffers = () => {
     // Set the selected offer
     setSelectedOffer(offer);
     console.log('Selected Offer:', offer);
-    setOfferAppears(offer.appears || 'all');
 
     // Exit add mode if we're in it
     if (addMode) setAddMode(false);
@@ -1958,7 +1950,7 @@ const SpecialOffers = () => {
         ratingLevel: ratingLevelArray,
         image: imageData,
         triggerValue: triggerValue, // Always include trigger value for all voucher types
-        appears: offerAppears,
+        appears: selectedOffer.appears,
       };
 
       if (voucherTypeValue === 'standard') {
@@ -2463,21 +2455,7 @@ const SpecialOffers = () => {
     }
     // Only update the active filter; let the useEffect handle the offer selection
     setActiveOfferFilter(pill);
-
-    const firstOffer = offers.find(
-    (o) =>
-      pill === 'ALL' ||
-      (typeof o.appears === 'string' && o.appears.trim() === pill)
-  );
-
-  if (firstOffer) {
-    pill === 'ALL' ? setOfferAppears('all') : setOfferAppears(firstOffer.appears);
-  }
   };
-
-  const handleCurrentPostPillClick = (pill) => {
-  setOfferAppears(pill);
-};
 
   const handleLock = async () => {
     try {
@@ -2952,9 +2930,9 @@ const SpecialOffers = () => {
                   {menuType === 'multiple' && (
                     <button
                       className={`filter-pill current-post ${
-                        offerAppears === 'all' ? 'active' : ''
+                        activeOfferFilter === 'ALL' ? 'active' : ''
                       }`}
-                      onClick={() => handleCurrentPostPillClick('all')}
+                      onClick={() => handlePillClick('ALL')}
                     >
                       ALL
                     </button>
@@ -2966,9 +2944,9 @@ const SpecialOffers = () => {
                       <button
                         key={`pill-left-${idx}`}
                         className={`filter-pill current-post ${
-                          offerAppears === t ? 'active' : ''
+                          activeOfferFilter === t ? 'active' : ''
                         }`}
-                        onClick={() => handleCurrentPostPillClick(t)}
+                        onClick={() => handlePillClick(t)}
                       >
                         {t}
                       </button>
