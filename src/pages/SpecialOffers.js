@@ -150,6 +150,8 @@ const SpecialOffers = () => {
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
 
+  const [currentPostPill, setCurrentPostPill] = useState('ALL');
+
   const filteredOffers = offers.filter((offer) => {
     if (activeTab !== 'live') return true;
 
@@ -1675,12 +1677,7 @@ const SpecialOffers = () => {
           };
       }
 
-      // appears (only if menuType === multiple)
-      if (menuType === 'multiple' && activeOfferFilter !== 'ALL') {
-        requestBody.appears = activeOfferFilter;
-      } else if (menuType === 'multiple' && activeOfferFilter === 'ALL') {
-        requestBody.appears = 'all';
-      }
+      requestBody.appears=currentPostPill === 'ALL' ? 'all' : currentPostPill;
 
       console.log('activeOfferFilter', activeOfferFilter);
       console.log('menuType', menuType);
@@ -1950,7 +1947,7 @@ const SpecialOffers = () => {
         ratingLevel: ratingLevelArray,
         image: imageData,
         triggerValue: triggerValue, // Always include trigger value for all voucher types
-        appears: selectedOffer.appears,
+        appears: currentPostPill === 'ALL' ? 'all' : currentPostPill,
       };
 
       if (voucherTypeValue === 'standard') {
@@ -2455,7 +2452,13 @@ const SpecialOffers = () => {
     }
     // Only update the active filter; let the useEffect handle the offer selection
     setActiveOfferFilter(pill);
+
+    setCurrentPostPill(pill);
   };
+
+  const handleCurrentPostPillClick = (pill) => {
+  setCurrentPostPill(pill);
+};
 
   const handleLock = async () => {
     try {
@@ -2930,9 +2933,9 @@ const SpecialOffers = () => {
                   {menuType === 'multiple' && (
                     <button
                       className={`filter-pill current-post ${
-                        activeOfferFilter === 'ALL' ? 'active' : ''
+                        currentPostPill === 'ALL' ? 'active' : ''
                       }`}
-                      onClick={() => handlePillClick('ALL')}
+                      onClick={() => handleCurrentPostPillClick('ALL')}
                     >
                       ALL
                     </button>
@@ -2944,9 +2947,9 @@ const SpecialOffers = () => {
                       <button
                         key={`pill-left-${idx}`}
                         className={`filter-pill current-post ${
-                          activeOfferFilter === t ? 'active' : ''
+                          currentPostPill === t ? 'active' : ''
                         }`}
-                        onClick={() => handlePillClick(t)}
+                        onClick={() => handleCurrentPostPillClick(t)}
                       >
                         {t}
                       </button>
