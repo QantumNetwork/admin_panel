@@ -301,7 +301,8 @@ const SmartIncentives = () => {
 
       const payload = {
         offerType: selectedIncentive,
-        deliveryMethod: 'Scratch & Win',
+        deliveryMethod: selectedIncentive === 'Kiosk' ? 'Kiosk' : 'Scratch & Win',
+        ...(selectedIncentive === 'Kiosk' && { promotionName }),
         audience: isEveryone ? ['everyone'] : selectedAudiences,
         triggerType: selectedTrigger,
         timePeriod: getTTPValue(timePeriod),
@@ -942,8 +943,8 @@ const SmartIncentives = () => {
                   <input
                     type="radio"
                     name="incentive"
-                    value="Kiosk Promotions"
-                    checked={selectedIncentive === 'Kiosk Promotions'}
+                    value="Kiosk"
+                    checked={selectedIncentive === 'Kiosk'}
                     onChange={(e) => setSelectedIncentive(e.target.value)}
                     className="incentive-radio"
                     style={{ accentColor: '#002977' }}
@@ -962,7 +963,7 @@ const SmartIncentives = () => {
                   <div className="scrollable-content">
                     <h2>Trigger settings</h2>
 
-                    {selectedIncentive === 'Kiosk Promotions' && (
+                    {selectedIncentive === 'Kiosk' && (
                       <div className="field-block">
                         <label
                           className="field-label"
@@ -1383,11 +1384,7 @@ const SmartIncentives = () => {
           {/* ========== CONTROL BUTTONS ========== */}
           <button
             className="publish-displays-btn icon-button"
-            onClick={() => {
-              if (selectedIncentive === 'Point Bonus') {
-                handlePublishIncentive();
-              }
-            }}
+            onClick={() => handlePublishIncentive()}
             disabled={publishing}
           >
             <FaCheck className="button-icon" />
@@ -1405,6 +1402,8 @@ const SmartIncentives = () => {
                   <tr>
                     <th>Date Created</th>
                     <th>Created By</th>
+                    <th>Promo Name</th>
+                    <th>Promo ID</th>
                     <th>Offer Type</th>
                     <th>Start Date</th>
                     <th>End Date</th>
@@ -1435,6 +1434,8 @@ const SmartIncentives = () => {
                                 .join('-') || '-'}
                             </td>
                             <td>{data.createdByName || '-'}</td>
+                            <td>{data.promotionName || '-'}</td>
+                            <td>{data.promoId || '-'}</td>
                             <td>{data.offerType || '-'}</td>
                             <td>{formatDateWithOffset(data.startDate)}</td>
                             <td>{formatDateWithOffset(data.endDate)}</td>
