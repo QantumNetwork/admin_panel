@@ -306,6 +306,8 @@ input:focus{
 .preview-details {
   flex: 1;
   margin-top: 5px;
+  max-height: 75px;
+  overflow-y: auto;
 }
 
 .preview-details h3 {
@@ -463,7 +465,7 @@ input:focus{
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .media-btn,
@@ -512,6 +514,7 @@ input:focus{
   align-items: flex-start;
   gap: 15px;
   /* box-shadow: 0 1px 3px rgba(0,0,0,0.1); */
+  max-height: 81px;
 }
 
 /* Target Market Panel */

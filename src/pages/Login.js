@@ -144,9 +144,9 @@ function Login() {
             Continue
           </button>
         </form>
-        <p className="signup-text">
+        {/* <p className="signup-text">
           Don't have an account? <a href="#">Sign up</a>
-        </p>
+        </p> */}
       </div>
     </div>
   );

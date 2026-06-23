@@ -207,6 +207,15 @@ const AIChatPage = () => {
       });
 
       const data = await res.json();
+      console.log('AI response:', data);
+
+      if (
+        (data.type === 'export' || data.type === 'excel') &&
+        !data.Airesponse
+      ) {
+        toast.error('No Content received from Viper API.');
+        return;
+      }
       if (data.success && Array.isArray(data.chat_history)) {
         const assistantMsg = data.chat_history[data.chat_history.length - 1];
         if (data.type === 'pdf') assistantMsg.fileType = 'pdf';
@@ -272,6 +281,15 @@ const AIChatPage = () => {
       });
 
       const data = await res.json();
+      console.log('AI response:', data);
+
+      if (
+        (data.type === 'export' || data.type === 'excel') &&
+        !data.Airesponse
+      ) {
+        toast.error('Export generation failed.');
+        return;
+      }
 
       if (data.success && Array.isArray(data.chat_history)) {
         const assistantMsg = data.chat_history[data.chat_history.length - 1];
@@ -396,6 +414,10 @@ const AIChatPage = () => {
       const url = fileUrlMatch ? fileUrlMatch[0] : null;
 
       const isExcel = msg.fileType === 'excel' || msg.fileType === 'export';
+
+      console.log('fileType:', msg.fileType);
+      console.log('content:', msg.content);
+      console.log('extracted url:', url);
 
       return (
         <div className="file-message">
