@@ -300,6 +300,7 @@ const SpecialOffers = () => {
 
             setVoucherType({ value: '', label: 'Select from list' });
             setRatingLevel({ value: '', label: 'Select from list' });
+            setMembershipPackages([]);
             setExpiryType('never');
             setExpiryDays('');
             setStartDate('');
@@ -357,13 +358,17 @@ const SpecialOffers = () => {
             }
             setAddMode(false);
 
-            setMembershipExpiryDate(offerToSelect.membershipExpiryDate
-    ? offerToSelect.membershipExpiryDate.split('T')[0]
-    : '');
+            setMembershipExpiryDate(
+              offerToSelect.membershipExpiryDate
+                ? offerToSelect.membershipExpiryDate.split('T')[0]
+                : ''
+            );
             setJoined(offerToSelect.joined || 'before');
-            setOfferProceedDate(offerToSelect.offerProceedDate
-    ? offerToSelect.offerProceedDate.split('T')[0]
-    : '');
+            setOfferProceedDate(
+              offerToSelect.offerProceedDate
+                ? offerToSelect.offerProceedDate.split('T')[0]
+                : ''
+            );
 
             // Update trigger value in state only once
             // setTriggerValue(offerToSelect.triggerValue?.toString() || '');
@@ -436,24 +441,26 @@ const SpecialOffers = () => {
   }, [token, selectedVenue, userTimeZone, showClubOption]);
 
   useEffect(() => {
-  if (
-    !selectedOffer ||
-    selectedOffer.voucherType !== 'club' ||
-    membershipPackages.length === 0
-  ) return;
-
-  const ids = membershipPackages
-    .filter((pkg) =>
-      selectedOffer.membership?.some(
-        (m) => m.trim().toLowerCase() === pkg.membershipName.trim().toLowerCase()
-      )
+    if (
+      !selectedOffer ||
+      selectedOffer.voucherType !== 'club' ||
+      membershipPackages.length === 0
     )
-    .map((pkg) => pkg._id);
+      return;
 
-    console.log("Matched IDs:", ids);
+    const ids = membershipPackages
+      .filter((pkg) =>
+        selectedOffer.membership?.some(
+          (m) =>
+            m.trim().toLowerCase() === pkg.membershipName.trim().toLowerCase()
+        )
+      )
+      .map((pkg) => pkg._id);
 
-  setSelectedMemberships(ids);
-}, [selectedOffer, membershipPackages]);
+    console.log('Matched IDs:', ids);
+
+    setSelectedMemberships(ids);
+  }, [selectedOffer, membershipPackages]);
 
   // useEffect(() => {
   //   // Don't auto-select offers when in add mode
@@ -481,7 +488,7 @@ const SpecialOffers = () => {
   useEffect(() => {
     console.log('med - ', membershipExpiryDate);
     console.log('opd - ', offerProceedDate);
-  },[membershipExpiryDate, offerProceedDate]);
+  }, [membershipExpiryDate, offerProceedDate]);
 
   // Helper functions to set target market fields from API data
   const setVoucherTypeFromAPI = (voucherType) => {
@@ -1017,14 +1024,13 @@ const SpecialOffers = () => {
     setBonusPoints(offer.points.toString());
     setShowBonusWhenRedeemed(Boolean(offer.points !== 'null'));
 
-    setMembershipExpiryDate(offer.membershipExpiryDate
-    ? offer.membershipExpiryDate.split('T')[0]
-    : '');
-            setJoined(offer.joined || 'before');
-            setOfferProceedDate(offer.offerProceedDate
-    ? offer.offerProceedDate.split('T')[0]
-    : '');
-
+    setMembershipExpiryDate(
+      offer.membershipExpiryDate ? offer.membershipExpiryDate.split('T')[0] : ''
+    );
+    setJoined(offer.joined || 'before');
+    setOfferProceedDate(
+      offer.offerProceedDate ? offer.offerProceedDate.split('T')[0] : ''
+    );
 
     // Map the voucher type to select value
     const voucherTypeSelectValue =
@@ -1032,7 +1038,7 @@ const SpecialOffers = () => {
         birthday: 'type1',
         new: 'type2',
         standard: 'type3',
-        club: 'type4'
+        club: 'type4',
       }[voucherType] || 'type3';
 
     // Set select elements directly - for immediate UI update
@@ -1667,17 +1673,22 @@ const SpecialOffers = () => {
           };
         }
       } else if (voucherTypeValue === 'club') {
-          requestBody = {
-            ...requestBody,
-            membership: getSelectedMembershipNames(),
-            membershipExpiryDate,
-            joined,
-            offerProceedDate,
-            oneTimeUse,
-          };
+        requestBody = {
+          ...requestBody,
+          membership: getSelectedMembershipNames(),
+          membershipExpiryDate,
+          joined,
+          offerProceedDate,
+          oneTimeUse,
+        };
+      } else if (voucherTypeValue === 'birthdayOffer' && showClubOption) {
+        requestBody = {
+          ...requestBody,
+          membership: getSelectedMembershipNames(),
+        }
       }
 
-      requestBody.appears=currentPostPill === 'ALL' ? 'all' : currentPostPill;
+      requestBody.appears = currentPostPill === 'ALL' ? 'all' : currentPostPill;
 
       console.log('activeOfferFilter', activeOfferFilter);
       console.log('menuType', menuType);
@@ -2040,14 +2051,19 @@ const SpecialOffers = () => {
           };
         }
       } else if (voucherTypeValue === 'club') {
-          requestBody = {
-            ...requestBody,
-            membership: getSelectedMembershipNames(),
-            membershipExpiryDate,
-            joined,
-            offerProceedDate,
-            oneTimeUse,
-          };
+        requestBody = {
+          ...requestBody,
+          membership: getSelectedMembershipNames(),
+          membershipExpiryDate,
+          joined,
+          offerProceedDate,
+          oneTimeUse,
+        };
+      } else if (voucherTypeValue === 'birthdayOffer' && showClubOption) {
+        requestBody = {
+          ...requestBody,
+          membership: getSelectedMembershipNames(),
+        }
       }
       // No additional properties needed for birthday voucher type
 
@@ -2307,14 +2323,19 @@ const SpecialOffers = () => {
           if (savedTimeValid) setTimeValid(savedTimeValid);
           if (savedTriggerValue) setTriggerValue(savedTriggerValue);
           if (savedOneTimeUse !== undefined) setOneTimeUse(savedOneTimeUse);
-          if (savedSelectedMemberships) setSelectedMemberships(savedSelectedMemberships);
-          if (savedMembershipExpiryDate) setMembershipExpiryDate(savedMembershipExpiryDate);
-          if (savedSelectedAudiences) setSelectedAudiences(savedSelectedAudiences);
+          if (savedSelectedMemberships)
+            setSelectedMemberships(savedSelectedMemberships);
+          if (savedMembershipExpiryDate)
+            setMembershipExpiryDate(savedMembershipExpiryDate);
+          if (savedSelectedAudiences)
+            setSelectedAudiences(savedSelectedAudiences);
           if (savedIsEveryone !== undefined) setIsEveryone(savedIsEveryone);
           if (savedJoined) setJoined(savedJoined);
           if (savedOfferProceedDate) setOfferProceedDate(savedOfferProceedDate);
-          if (savedShowBonusWhenRedeemed !== undefined) setShowBonusWhenRedeemed(savedShowBonusWhenRedeemed);
-          if (showBonusWhenRedeemed && savedBonusPoints !== undefined) setBonusPoints(savedBonusPoints);
+          if (savedShowBonusWhenRedeemed !== undefined)
+            setShowBonusWhenRedeemed(savedShowBonusWhenRedeemed);
+          if (showBonusWhenRedeemed && savedBonusPoints !== undefined)
+            setBonusPoints(savedBonusPoints);
 
           // Set select elements - moved into the same setTimeout to ensure order
           // Set voucher type select
@@ -2457,8 +2478,8 @@ const SpecialOffers = () => {
   };
 
   const handleCurrentPostPillClick = (pill) => {
-  setCurrentPostPill(pill);
-};
+    setCurrentPostPill(pill);
+  };
 
   const handleLock = async () => {
     try {
@@ -2576,6 +2597,7 @@ const SpecialOffers = () => {
                   setTriggerValue('');
                   setVoucherType({ value: '', label: 'Select from list' });
                   setRatingLevel({ value: '', label: 'Select from list' });
+                  setMembershipPackages([]);
                   setExpiryType('never');
                   setExpiryDays('');
                   setStartDate('');
@@ -3361,85 +3383,90 @@ const SpecialOffers = () => {
                     />
                     <label htmlFor="oneTimeUse">One time use</label>
                   </div>
-                  <div className="form-group inline-form-group">
-                    <label>
-                      <strong>Membership</strong>
-                    </label>
+                </>
+              )}
+
+              {(selectedVoucherType === 'club' ||
+                (selectedVoucherType === 'birthdayOffer' && showClubOption)) && (
+                <div className="form-group inline-form-group">
+                  <label>
+                    <strong>Membership</strong>
+                  </label>
+                  <div
+                    className="select-wrapper"
+                    style={{ position: 'relative' }}
+                    ref={membershipWrapperRef}
+                  >
                     <div
-                      className="select-wrapper"
-                      style={{ position: 'relative' }}
-                      ref={membershipWrapperRef}
+                      className="multiselect-display"
+                      onClick={toggleMembershipDropdown}
+                      style={{
+                        cursor: 'pointer',
+                        lineHeight: '35px',
+                        padding: '0 10px',
+                        fontSize: '13px',
+                        color: '#666',
+                      }}
                     >
+                      {selectedMemberships.length > 0
+                        ? selectedMemberships.length > 1
+                          ? `${selectedMemberships.length} selected`
+                          : membershipPackages
+                              .filter((o) =>
+                                selectedMemberships.includes(o._id)
+                              )
+                              .map((o) => o.membershipName)
+                              .join(', ')
+                        : 'Select from list'}
+                    </div>
+
+                    {showMembershipDropdown && (
                       <div
-                        className="multiselect-display"
-                        onClick={toggleMembershipDropdown}
+                        className="multiselect-options"
                         style={{
-                          cursor: 'pointer',
-                          lineHeight: '35px',
-                          padding: '0 10px',
-                          fontSize: '13px',
-                          color: '#666',
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          width: '220px',
+                          background: 'white',
+                          maxHeight: '200px',
+                          overflowY: 'auto',
+                          border: '1px solid #ccc',
+                          zIndex: 10,
                         }}
                       >
-                        {selectedMemberships.length > 0
-                          ? selectedMemberships.length > 1
-                            ? `${selectedMemberships.length} selected`
-                            : membershipPackages
-                                .filter((o) =>
-                                  selectedMemberships.includes(o._id)
-                                )
-                                .map((o) => o.membershipName)
-                                .join(', ')
-                          : 'Select from list'}
-                      </div>
-
-                      {showMembershipDropdown && (
-                        <div
-                          className="multiselect-options"
-                          style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            width: '220px',
-                            background: 'white',
-                            maxHeight: '200px',
-                            overflowY: 'auto',
-                            border: '1px solid #ccc',
-                            zIndex: 10,
-                          }}
-                        >
-                          {membershipPackages.map((option) => (
-                            <div
-                              key={option._id}
-                              className="day-item"
-                              style={{
-                                padding: '5px 10px',
-                              }}
+                        {membershipPackages.map((option) => (
+                          <div
+                            key={option._id}
+                            className="day-item"
+                            style={{
+                              padding: '5px 10px',
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              id={`mem-${option._id}`}
+                              checked={selectedMemberships.includes(option._id)}
+                              onChange={() =>
+                                handleMembershipChange(option._id)
+                              }
+                            />
+                            <label
+                              htmlFor={`mem-${option._id}`}
+                              style={{ marginLeft: '4px' }}
                             >
-                              <input
-                                type="checkbox"
-                                id={`mem-${option._id}`}
-                                checked={selectedMemberships.includes(
-                                  option._id
-                                )}
-                                onChange={() =>
-                                  handleMembershipChange(option._id)
-                                }
-                              />
-                              <label
-                                htmlFor={`mem-${option._id}`}
-                                style={{ marginLeft: '4px' }}
-                              >
-                                {option.membershipName}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                              {option.membershipName}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-
+                </div>
+              )}
+              {selectedVoucherType === 'club' && (
+                <>
                   <div
                     className="form-group inline-form-group"
                     style={{ marginTop: '10px' }}
@@ -3450,7 +3477,7 @@ const SpecialOffers = () => {
                     <input
                       type="date"
                       value={membershipExpiryDate || ''}
-                      style={{width: '150px'}}
+                      style={{ width: '150px' }}
                       onChange={(e) => setMembershipExpiryDate(e.target.value)}
                     />
                   </div>
@@ -3488,7 +3515,7 @@ const SpecialOffers = () => {
 
                     <input
                       type="date"
-                      style={{width: '120px'}}
+                      style={{ width: '120px' }}
                       value={offerProceedDate || ''}
                       onChange={(e) => setOfferProceedDate(e.target.value)}
                     />
