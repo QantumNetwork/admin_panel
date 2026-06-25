@@ -1681,7 +1681,7 @@ const SpecialOffers = () => {
           offerProceedDate,
           oneTimeUse,
         };
-      } else if (voucherTypeValue === 'birthdayOffer' && showClubOption) {
+      } else if (voucherTypeValue === 'birthday' && showClubOption) {
         requestBody = {
           ...requestBody,
           membership: getSelectedMembershipNames(),
@@ -2059,7 +2059,7 @@ const SpecialOffers = () => {
           offerProceedDate,
           oneTimeUse,
         };
-      } else if (voucherTypeValue === 'birthdayOffer' && showClubOption) {
+      } else if (voucherTypeValue === 'birthday' && showClubOption) {
         requestBody = {
           ...requestBody,
           membership: getSelectedMembershipNames(),
