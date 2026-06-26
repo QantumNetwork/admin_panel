@@ -9,6 +9,7 @@ import { BsMenuButtonFill } from 'react-icons/bs';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import { getAppType, getIconVenue } from '../utils/appConstants';
+import { CiStar } from 'react-icons/ci';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/dashboard.css';
 import '../styles/standard-admin.css';
@@ -725,6 +726,19 @@ const StandardAdmin = () => {
             className={`sidebar-icon ${isActive('/ai-buttons') ? '' : 'navy-icon'}`}
           />{' '}
           &nbsp; AI Buttons
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/status-credits') ? 'active' : ''}`}
+          onClick={() => navigate('/status-credits')}
+        >
+          <CiStar
+            className={`sidebar-icon ${
+              isActive('/status-credits') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Status Credits
         </button>
       </aside>
 

@@ -15,6 +15,7 @@ import axios from 'axios';
 import { logout } from '../utils/auth';
 import { handleLogout } from '../utils/api';
 import { ToastContainer, toast, Slide } from 'react-toastify';
+import { CiStar } from "react-icons/ci";
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/admin-custom.css';
 import Swal from 'sweetalert2';
@@ -557,6 +558,19 @@ const AdminCustom = () => {
             }`}
           />{' '}
           &nbsp; AI Buttons
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/status-credits') ? 'active' : ''}`}
+          onClick={() => navigate('/status-credits')}
+        >
+          <CiStar
+            className={`sidebar-icon ${
+              isActive('/status-credits') ? '' : 'navy-icon'
+            }`}
+          />{' '}
+          &nbsp; Status Credits
         </button>
       </aside>
 

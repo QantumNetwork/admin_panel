@@ -30,6 +30,7 @@ import MemberSearch from "./pages/MemberSearch";
 import PublicMemberSearch from "./pages/PublicMemberSearch";
 import TransactionHistory from "./pages/TransactionHistory";
 import AIButtons from "./pages/AIButtons";
+import StatusCredits from "./pages/StatusCredits";
 import { ToastContainer, Slide } from 'react-toastify';
 import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
@@ -99,6 +100,7 @@ function App() {
         <Route path="/public-member-search" element={<PublicMemberSearch />} />
         <Route path="/ai-buttons" element={<AIButtons />} />
         <Route path="/transaction-history" element={<TransactionHistory />} />
+        <Route path="/status-credits" element={<StatusCredits />} />
       </Routes>
       
     </Router>

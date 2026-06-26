@@ -8,7 +8,7 @@ import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { FaMobileScreenButton } from 'react-icons/fa6';
-import { FaUser } from 'react-icons/fa';
+import { FaUser, FaRegCheckCircle } from 'react-icons/fa';
 import { MdVerified, MdRefresh, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -16,7 +16,7 @@ import { handleLogout } from '../utils/api';
 import { getAppType } from '../utils/appConstants';
 import { CiStar } from 'react-icons/ci';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/app-settings.css';
+import '../styles/status-credits.css';
 
 const AppSettings = () => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -63,71 +63,6 @@ const AppSettings = () => {
     }
   }, [token]);
 
-  const fetchVenueList = async () => {
-    if (!selectedVenue || selectedVenue !== 'EDP') return;
-
-    try {
-      const res = await axios.get(
-        `${baseUrl}/venue/all?appType=${selectedVenue}`
-      );
-
-      if (res.data?.success) {
-        const formatted = res.data.data.map((v) => ({
-          id: v._id,
-          name: v.name,
-        }));
-
-        setVenueOfferTypes(
-          formatted.length ? formatted : [{ id: null, name: '' }]
-        );
-      }
-    } catch (err) {
-      toast.error('Failed to fetch venues');
-    }
-  };
-
-  useEffect(() => {
-    if (!selectedVenue || selectedVenue !== 'EDP') return;
-
-    fetchVenueList();
-  }, [selectedVenue]);
-
-  useEffect(() => {
-    const fetchOfferButtons = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}/offer/button/get`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.data?.success && response.data?.data) {
-          const { menu_Type, filter_Type } = response.data.data;
-
-          if (menu_Type === 'standard') {
-            setMenuType('standard');
-            setOfferTypes(['']); // reset
-          } else {
-            setMenuType('multiple');
-            setOfferTypes(
-              Array.isArray(filter_Type) && filter_Type.length
-                ? filter_Type
-                : ['']
-            );
-          }
-        }
-      } catch (error) {
-        toast.error(
-          error?.response?.data?.message || 'Failed to fetch offer buttons'
-        );
-      }
-    };
-
-    if (token) {
-      fetchOfferButtons();
-    }
-  }, [token]);
-
   const handleVenueChange = async (e) => {
     const newVenue = e.target.value;
     if (!newVenue) return;
@@ -167,126 +102,6 @@ const AppSettings = () => {
 
   const isActive = (path) => {
     return location.pathname === path;
-  };
-
-  const addOfferType = () => {
-    setOfferTypes([...offerTypes, '']);
-  };
-
-  const addVenueOfferType = () => {
-    setVenueOfferTypes([...venueOfferTypes, { id: null, name: '' }]);
-  };
-
-  const removeOfferType = (index) => {
-    setOfferTypes(offerTypes.filter((_, i) => i !== index));
-  };
-
-  const updateOfferType = (index, value) => {
-    const updated = [...offerTypes];
-    updated[index] = value;
-    setOfferTypes(updated);
-  };
-
-  const updateVenueOfferType = (index, value) => {
-    const updated = [...venueOfferTypes];
-    updated[index].name = value;
-    setVenueOfferTypes(updated);
-  };
-
-  const removeVenueOfferType = async (index) => {
-    const item = venueOfferTypes[index];
-
-    // If already saved → call DELETE API
-    if (item.id) {
-      try {
-        await axios.delete(
-          `${baseUrl}/venue/delete?appType=${selectedVenue}&id=${item.id}`
-        );
-        toast.success('Deleted successfully');
-      } catch (err) {
-        toast.error('Delete failed');
-        return;
-      }
-    }
-
-    // Remove from UI
-    setVenueOfferTypes(venueOfferTypes.filter((_, i) => i !== index));
-  };
-
-  const handleVenueUpdate = async () => {
-    if (!selectedVenue || selectedVenue !== 'EDP') return;
-
-    try {
-      const newItems = venueOfferTypes
-        .filter((v) => !v.id && v.name.trim() !== '')
-        .map((v) => v.name);
-
-      const existingItems = venueOfferTypes
-        .filter((v) => v.id && v.name.trim() !== '')
-        .map((v) => ({
-          id: v.id,
-          name: v.name,
-        }));
-
-      // CREATE
-      if (newItems.length) {
-        await axios.post(`${baseUrl}/venue/create`, {
-          appType: selectedVenue,
-          name: newItems,
-        });
-      }
-
-      // UPDATE
-      if (existingItems.length) {
-        await axios.put(`${baseUrl}/venue/update`, {
-          appType: selectedVenue,
-          venues: existingItems,
-        });
-      }
-
-      toast.success('Updated successfully');
-
-      await fetchVenueList();
-    } catch (err) {
-      toast.error('Update failed');
-    }
-  };
-
-  const handleUpdate = async () => {
-    try {
-      const payload =
-        menuType === 'standard'
-          ? {
-              menu_Type: 'standard',
-            }
-          : {
-              menu_Type: 'multiple',
-              filter_Type: offerTypes.filter(
-                (t) => typeof t === 'string' && t !== ''
-              ),
-            };
-
-      const response = await axios.post(
-        `${baseUrl}/offer/button/create`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (response.data?.success) {
-        toast.success(response.data.message || 'Updated successfully');
-      } else {
-        toast.error(response.data?.message || 'Something went wrong');
-      }
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message || 'Failed to update offer buttons'
-      );
-    }
   };
 
   const handleLock = async () => {
@@ -608,178 +423,63 @@ const AppSettings = () => {
       <main className="special-offers-container">
         <div className="special-offers-wrapper">
           <div className="special-offers-card">
-            <h3 className="special-offers-title">Set Special Offers Menu</h3>
+            <h3 className="special-offers-title">
+              Status Credits to Maintain Current Level
+            </h3>
 
-            <div className="menu-type-section" style={{ marginBottom: '50px' }}>
-              <label>
-                <input
-                  type="radio"
-                  name="menuType"
-                  style={{ accentColor: '#002977' }}
-                  checked={menuType === 'standard'}
-                  onChange={() => setMenuType('standard')}
-                />{' '}
-                Standard menu
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="menuType"
-                  style={{ accentColor: '#002977' }}
-                  checked={menuType === 'multiple'}
-                  onChange={() => setMenuType('multiple')}
-                  defaultChecked
-                />{' '}
-                Multiple special offer types
-              </label>
+            <div className="status-credit-table">
+              <div className="status-row">
+                <span className="status-name">Valued</span>
+                <span className="status-value">
+                  30,000 <small>Status Credits</small>
+                </span>
+              </div>
 
-              {menuType === 'multiple' && (
-                <>
-                  {offerTypes.map((type, index) => {
-                    const isFirst = index === 0;
-                    const isLast = index === offerTypes.length - 1;
+              <div className="status-row">
+                <span className="status-name">Silver</span>
+                <span className="status-value">
+                  80,000 <small>Status Credits</small>
+                </span>
+              </div>
 
-                    return (
-                      <div className="offer-type-field" key={index}>
-                        <label>{`Type ${index + 1}`}</label>
-                        <div className="type-input-with-plus">
-                          <input
-                            type="text"
-                            value={type}
-                            onChange={(e) =>
-                              updateOfferType(index, e.target.value)
-                            }
-                          />
+              <div className="status-row">
+                <span className="status-name">Gold</span>
+                <span className="status-value">
+                  150,000 <small>Status Credits</small>
+                </span>
+              </div>
 
-                          {!isFirst && (
-                            <span
-                              className="remove-icon"
-                              onClick={() => removeOfferType(index)}
-                            >
-                              ×
-                            </span>
-                          )}
-
-                          {isLast && (
-                            <span className="add-icon" onClick={addOfferType}>
-                              +
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  <div className="preview-app-section">
-                    <div className="preview-app-label">Preview</div>
-                    <div className="preview-app-buttons">
-                      <button className="active">ALL</button>
-                      {offerTypes.map((offer, idx) => (
-                        <button key={idx}>{offer}</button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+              <div className="status-row">
+                <span className="status-name">Platinum</span>
+                <span className="status-value">
+                  1,000,000 <small>Status Credits</small>
+                </span>
+              </div>
             </div>
 
             <div className="update-btn-app-wrapper">
               <button
                 className="action-btn approve"
                 style={{ width: '30%', marginLeft: '34%', marginTop: '35px' }}
-                onClick={handleUpdate}
+                // onClick={handleUpdate}
               >
-                Update
+                Edit
               </button>
             </div>
           </div>
-
-          {selectedVenue && selectedVenue === 'EDP' && (
-            <div className="special-offers-card">
-              <h3 className="special-offers-title">
-                Advertising Multiple Venues
-              </h3>
-
-              <div
-                className="menu-type-section"
-                style={{ marginBottom: '50px' }}
-              >
-                {/* Venues dropdown */}
-                <div className="offer-type-field">
-                  <label>Venues</label>
-                  <div className="type-input-with-plus">
-                    <select
-                      disabled
-                      style={{
-                        width: '100%',
-                        padding: '8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                        fontSize: '13px',
-                        backgroundColor: '#fff',
-                      }}
-                    >
-                      <option>All Selected</option>
-                      {venueOfferTypes.map((v, i) => (
-                        <option key={i}>{v.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Types list */}
-                {venueOfferTypes.map((type, index) => {
-                  const isFirst = index === 0;
-                  const isLast = index === venueOfferTypes.length - 1;
-
-                  return (
-                    <div className="offer-type-field" key={index}>
-                      <label>{`Venue ${index + 1}`}</label>
-                      <div className="type-input-with-plus">
-                        <input
-                          type="text"
-                          value={type.name}
-                          onChange={(e) =>
-                            updateVenueOfferType(index, e.target.value)
-                          }
-                        />
-
-                        {!isFirst && (
-                          <span
-                            className="remove-icon"
-                            onClick={() => removeVenueOfferType(index)}
-                          >
-                            ×
-                          </span>
-                        )}
-
-                        {isLast && (
-                          <span
-                            className="add-icon"
-                            onClick={addVenueOfferType}
-                          >
-                            +
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="update-btn-app-wrapper">
-                <button
-                  className="action-btn approve"
-                  onClick={handleVenueUpdate}
-                  style={{ width: '30%', marginLeft: '34%' }}
-                >
-                  Update
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </main>
+
+      <button
+        type="submit"
+        className="activate-btn icon-button"
+        style={{ backgroundColor: '#5396D1' }}
+        // disabled={isSubmitting}
+        // onClick={handleSubmit}
+      >
+        <FaRegCheckCircle className="button-icon" />
+        Activate
+      </button>
     </div>
   );
 };
