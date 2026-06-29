@@ -147,6 +147,8 @@ const SpecialOffers = () => {
 
   const [membershipPackages, setMembershipPackages] = useState([]);
 
+  const [showDetails, setShowDetails] = useState(false);
+
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
 
@@ -443,7 +445,8 @@ const SpecialOffers = () => {
   useEffect(() => {
     if (
       !selectedOffer ||
-      selectedOffer.voucherType !== 'club' ||
+      (selectedOffer.voucherType !== 'club' &&
+        selectedOffer.voucherType !== 'birthday') ||
       membershipPackages.length === 0
     )
       return;
@@ -1007,6 +1010,7 @@ const SpecialOffers = () => {
 
     // Exit add mode if we're in it
     if (addMode) setAddMode(false);
+    setShowDetails(true);
 
     // Make sure to set heading and description directly from the offer
     setHeadingText(offer.header || '');
@@ -1133,6 +1137,7 @@ const SpecialOffers = () => {
     setSelectedOffer(null);
 
     setAddMode(true);
+    setShowDetails(true);
     setHeadingText(''); // Clear heading field
     setDescriptionText(''); // Clear description field
     setUploadedImage(null); // Clear uploaded image
@@ -1275,6 +1280,8 @@ const SpecialOffers = () => {
       offerProceedDate,
       showBonusWhenRedeemed,
       bonusPoints,
+      showDetails,
+      currentPostPill,
     };
 
     console.log('Sending form values to Art Gallery:', formValues);
@@ -1685,7 +1692,7 @@ const SpecialOffers = () => {
         requestBody = {
           ...requestBody,
           membership: getSelectedMembershipNames(),
-        }
+        };
       }
 
       requestBody.appears = currentPostPill === 'ALL' ? 'all' : currentPostPill;
@@ -1723,6 +1730,7 @@ const SpecialOffers = () => {
       });
 
       setAddMode(false);
+      setShowDetails(false);
       setSelectedOffer(null);
       setUploadedImage(null);
       // Prevent Art Gallery restoration after creation
@@ -1801,6 +1809,7 @@ const SpecialOffers = () => {
       if (response.status === 200) {
         toast.success('Voucher deleted successfully!');
         setAddMode(false);
+        setShowDetails(false);
         setSelectedOffer(null);
         setUploadedImage(null);
         setDeleteSuccess((prevState) => !prevState);
@@ -2063,7 +2072,7 @@ const SpecialOffers = () => {
         requestBody = {
           ...requestBody,
           membership: getSelectedMembershipNames(),
-        }
+        };
       }
       // No additional properties needed for birthday voucher type
 
@@ -2270,6 +2279,8 @@ const SpecialOffers = () => {
           offerProceedDate: savedOfferProceedDate,
           showBonusWhenRedeemed: savedShowBonusWhenRedeemed,
           bonusPoints: savedBonusPoints,
+          showDetails: savedShowDetails,
+          currentPostPill: savedCurrentPostPill,
         } = location.state.formValues;
 
         // Preserve the current offer selection when returning from Art Gallery
@@ -2336,7 +2347,8 @@ const SpecialOffers = () => {
             setShowBonusWhenRedeemed(savedShowBonusWhenRedeemed);
           if (showBonusWhenRedeemed && savedBonusPoints !== undefined)
             setBonusPoints(savedBonusPoints);
-
+          if (savedShowDetails) setShowDetails(savedShowDetails);
+          if (savedCurrentPostPill) setCurrentPostPill(savedCurrentPostPill);
           // Set select elements - moved into the same setTimeout to ensure order
           // Set voucher type select
           if (voucherTypeValue) {
@@ -2942,740 +2954,1222 @@ const SpecialOffers = () => {
             </button>
           </div>
 
-          {/* Center Panel - Current Post */}
-          <div className="current-post-panel responsive-panel">
-            {activeTab === 'live' && (
-              <div className="offer-filter-row form-row">
-                {menuType === 'multiple' && (
-                  <label>
-                    <strong style={{ color: 'black' }}>Appears</strong>
-                  </label>
+          {showDetails && (
+            <>
+              {/* Center Panel - Current Post */}
+              <div className="current-post-panel responsive-panel">
+                {activeTab === 'live' && (
+                  <div className="offer-filter-row form-row">
+                    {menuType === 'multiple' && (
+                      <label>
+                        <strong style={{ color: 'black' }}>Appears</strong>
+                      </label>
+                    )}
+                    <div className="filter-pills">
+                      {menuType === 'multiple' && (
+                        <button
+                          className={`filter-pill current-post ${
+                            currentPostPill === 'ALL' ? 'active' : ''
+                          }`}
+                          onClick={() => handleCurrentPostPillClick('ALL')}
+                        >
+                          ALL
+                        </button>
+                      )}
+
+                      {/* show other pills only if menuType !== 'standard' */}
+                      {menuType === 'multiple' &&
+                        offerTypes.map((t, idx) => (
+                          <button
+                            key={`pill-left-${idx}`}
+                            className={`filter-pill current-post ${
+                              currentPostPill === t ? 'active' : ''
+                            }`}
+                            onClick={() => handleCurrentPostPillClick(t)}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
                 )}
-                <div className="filter-pills">
-                  {menuType === 'multiple' && (
-                    <button
-                      className={`filter-pill current-post ${
-                        currentPostPill === 'ALL' ? 'active' : ''
-                      }`}
-                      onClick={() => handleCurrentPostPillClick('ALL')}
-                    >
-                      ALL
-                    </button>
-                  )}
 
-                  {/* show other pills only if menuType !== 'standard' */}
-                  {menuType === 'multiple' &&
-                    offerTypes.map((t, idx) => (
-                      <button
-                        key={`pill-left-${idx}`}
-                        className={`filter-pill current-post ${
-                          currentPostPill === t ? 'active' : ''
-                        }`}
-                        onClick={() => handleCurrentPostPillClick(t)}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                </div>
-              </div>
-            )}
+                <h2>Current post</h2>
 
-            <h2>Current post</h2>
+                {addMode ? (
+                  <>
+                    <div className="selected-offer-preview">
+                      <div className="preview-image-container gray-placeholder">
+                        {uploadedImage && (
+                          <img src={uploadedImage} alt="Preview" />
+                        )}
+                      </div>
+                      <div className="preview-details">
+                        <h3>{headingText || 'Heading'}</h3>
+                        <p>{descriptionText || 'Description'}</p>
+                        <span className="view-to-date">Valid to date</span>
+                      </div>
+                    </div>
 
-            {addMode ? (
-              <>
-                <div className="selected-offer-preview">
-                  <div className="preview-image-container gray-placeholder">
-                    {uploadedImage && <img src={uploadedImage} alt="Preview" />}
-                  </div>
-                  <div className="preview-details">
-                    <h3>{headingText || 'Heading'}</h3>
-                    <p>{descriptionText || 'Description'}</p>
-                    <span className="view-to-date">Valid to date</span>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <label>
-                    <strong style={{ color: 'black' }}>Image</strong>
-                    {/* <div className="image-ratio-note">
+                    <div className="form-row">
+                      <label>
+                        <strong style={{ color: 'black' }}>Image</strong>
+                        {/* <div className="image-ratio-note">
                       <span>
                         Recommended <br /> image ratio is 4:3
                       </span>
                     </div> */}
-                  </label>
-                  <div className="wh-bg">
-                    <div className="image-input-container">
-                      <div className="preview-image-container">
-                        {uploadedImage ? (
-                          <img src={uploadedImage} alt="Preview" />
-                        ) : (
-                          <button
-                            className="upload-image-btn"
-                            onClick={handleUploadFromArtGallery}
+                      </label>
+                      <div className="wh-bg">
+                        <div className="image-input-container">
+                          <div className="preview-image-container">
+                            {uploadedImage ? (
+                              <img src={uploadedImage} alt="Preview" />
+                            ) : (
+                              <button
+                                className="upload-image-btn"
+                                onClick={handleUploadFromArtGallery}
+                              >
+                                <IoMdImage /> UPLOAD IMAGE
+                              </button>
+                            )}
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleImageUpload}
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                            />
+                          </div>
+                        </div>
+                        {imageError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                            }}
                           >
-                            <IoMdImage /> UPLOAD IMAGE
-                          </button>
+                            {imageError}
+                          </div>
                         )}
+                      </div>
+                    </div>
+
+                    <div className="form-row">
+                      <label>
+                        <strong>Heading</strong>
+                      </label>
+                      <div className="wh-bg1">
                         <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleImageUpload}
-                          accept="image/*"
-                          style={{ display: 'none' }}
+                          type="text"
+                          value={headingText}
+                          onChange={handleHeadingChange}
+                          placeholder=""
+                          className={headingError ? 'error-input' : ''}
                         />
+                        {headingError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                            }}
+                          >
+                            {headingError}
+                          </div>
+                        )}
                       </div>
                     </div>
-                    {imageError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                        }}
-                      >
-                        {imageError}
-                      </div>
-                    )}
-                  </div>
-                </div>
 
-                <div className="form-row">
-                  <label>
-                    <strong>Heading</strong>
-                  </label>
-                  <div className="wh-bg1">
-                    <input
-                      type="text"
-                      value={headingText}
-                      onChange={handleHeadingChange}
-                      placeholder=""
-                      className={headingError ? 'error-input' : ''}
-                    />
-                    {headingError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                        }}
-                      >
-                        {headingError}
+                    <div className="form-row">
+                      <label>
+                        <strong>Description</strong>
+                      </label>
+                      <div className="wh-bg2">
+                        <textarea
+                          value={descriptionText}
+                          onChange={handleDescriptionChange}
+                          placeholder=""
+                          className={descriptionError ? 'error-input' : ''}
+                        />
+                        {descriptionError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                            }}
+                          >
+                            {descriptionError}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                <div className="form-row">
-                  <label>
-                    <strong>Description</strong>
-                  </label>
-                  <div className="wh-bg2">
-                    <textarea
-                      value={descriptionText}
-                      onChange={handleDescriptionChange}
-                      placeholder=""
-                      className={descriptionError ? 'error-input' : ''}
-                    />
-                    {descriptionError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                        }}
-                      >
-                        {descriptionError}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="media-buttons">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    onChange={handleImageUpload}
-                  />
-                  <button
-                    className="media-btn"
-                    onClick={handleUploadFromArtGallery}
-                  >
-                    <IoMdImage />
-                    UPLOAD IMAGE
-                  </button>
-                  <button
-                    className="delete-post-btn"
-                    onClick={() => setAddMode(false)}
-                  >
-                    <FaTrashAlt /> DELETE POST
-                  </button>
-                </div>
-              </>
-            ) : (
-              selectedOffer && (
-                <>
-                  <div className="selected-offer-preview">
-                    <div className="preview-image-container">
-                      <img
-                        src={uploadedImage || selectedOffer.image}
-                        alt={selectedOffer.header}
+                    <div className="media-buttons">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleImageUpload}
                       />
+                      <button
+                        className="media-btn"
+                        onClick={handleUploadFromArtGallery}
+                      >
+                        <IoMdImage />
+                        UPLOAD IMAGE
+                      </button>
+                      <button
+                        className="delete-post-btn"
+                        onClick={() => setAddMode(false)}
+                      >
+                        <FaTrashAlt /> DELETE POST
+                      </button>
                     </div>
-                    <div className="preview-details">
-                      <h3>{selectedOffer.header}</h3>
-                      <p>{selectedOffer.description}</p>
-                      <span className="view-to-date">
-                        Valid to{' '}
-                        {selectedOffer.expiryDate
-                          ? new Date(selectedOffer.expiryDate)
-                              .toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                              })
-                              .replace(/\//g, '-')
-                          : ''}
-                      </span>
-                    </div>
-                  </div>
+                  </>
+                ) : (
+                  selectedOffer && (
+                    <>
+                      <div className="selected-offer-preview">
+                        <div className="preview-image-container">
+                          <img
+                            src={uploadedImage || selectedOffer.image}
+                            alt={selectedOffer.header}
+                          />
+                        </div>
+                        <div className="preview-details">
+                          <h3>{selectedOffer.header}</h3>
+                          <p>{selectedOffer.description}</p>
+                          <span className="view-to-date">
+                            Valid to{' '}
+                            {selectedOffer.expiryDate
+                              ? new Date(selectedOffer.expiryDate)
+                                  .toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                  })
+                                  .replace(/\//g, '-')
+                              : ''}
+                          </span>
+                        </div>
+                      </div>
 
-                  <div className="form-row">
-                    <label>
-                      <strong style={{ color: 'black' }}> Image</strong>
-                      {/* <div className="image-ratio-note">
+                      <div className="form-row">
+                        <label>
+                          <strong style={{ color: 'black' }}> Image</strong>
+                          {/* <div className="image-ratio-note">
                         <span style={{ color: "black" }}>
                           Recommended <br /> image ratio is 4:3
                         </span>
                       </div> */}
-                    </label>
-                    <div className="wh-bg">
-                      <div className="image-input-container">
-                        <div className="preview-image-container">
-                          <img
-                            src={uploadedImage || selectedOffer.image}
-                            alt="Preview"
-                          />
+                        </label>
+                        <div className="wh-bg">
+                          <div className="image-input-container">
+                            <div className="preview-image-container">
+                              <img
+                                src={uploadedImage || selectedOffer.image}
+                                alt="Preview"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="form-row">
-                    <label>
-                      <strong style={{ color: 'black' }}>Heading</strong>
-                    </label>
-                    <div className="wh-bg1">
-                      <input
-                        type="text"
-                        value={headingText}
-                        onChange={handleHeadingChange}
-                        placeholder=""
-                        className={headingError ? 'error-input' : ''}
-                      />
-                      {headingError && (
-                        <div
-                          className="error-message"
-                          style={{
-                            color: 'red',
-                            fontSize: '12px',
-                            marginTop: '5px',
-                          }}
-                        >
-                          {headingError}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <label>
-                      <strong style={{ color: 'black' }}>Description</strong>
-                    </label>
-                    <div className="wh-bg2">
-                      <textarea
-                        value={descriptionText}
-                        onChange={handleDescriptionChange}
-                        placeholder=""
-                        className={descriptionError ? 'error-input' : ''}
-                      />
-                      {descriptionError && (
-                        <div
-                          className="error-message"
-                          style={{
-                            color: 'red',
-                            fontSize: '12px',
-                            marginTop: '5px',
-                          }}
-                        >
-                          {descriptionError}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="media-buttons">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      onChange={handleImageUpload}
-                    />
-                    <button
-                      className="media-btn"
-                      onClick={handleUploadFromArtGallery}
-                    >
-                      <IoMdImage />
-                      UPLOAD IMAGE
-                    </button>
-                    <button
-                      className="delete-post-btn"
-                      onClick={() => handleDeleteVoucher(selectedOffer._id)}
-                    >
-                      <FaTrashAlt /> DELETE POST
-                    </button>
-                  </div>
-                </>
-              )
-            )}
-          </div>
-
-          {/* Right Panel - Target Market - Modified to match the image */}
-          <div
-            className="target-market-panel responsive-panel"
-            style={
-              selectedVoucherType === 'standard'
-                ? {
-                    maxHeight: 'none',
-                    height: 'auto',
-                    overflowY: 'hidden',
-                    paddingBottom: '10px',
-                  }
-                : {}
-            }
-          >
-            <div
-              style={
-                selectedVoucherType === 'standard' ? { overflow: 'hidden' } : {}
-              }
-            >
-              <h2>Target market</h2>
-
-              <div className="form-group inline-form-group">
-                <label>
-                  <strong>Voucher type</strong>
-                </label>
-                <div className="select-wrapper">
-                  <select defaultValue="" onChange={handleVoucherTypeChange}>
-                    <option value="" disabled>
-                      Select from list
-                    </option>
-                    <option value="type1">Birthday Offer</option>
-                    <option value="type2">New Sign Up</option>
-                    <option value="type3">Standard</option>
-                    {showClubOption && <option value="type4">Club</option>}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group inline-form-group">
-                <label>
-                  <strong>Audience</strong>
-                </label>
-                <div
-                  className="select-wrapper"
-                  style={{ position: 'relative', zIndex: 1000 }}
-                  ref={audienceWrapperRef}
-                >
-                  <div
-                    className="multiselect-display"
-                    onClick={toggleAudienceDropdown}
-                    style={{
-                      cursor: isEveryone ? 'not-allowed' : 'pointer',
-                      lineHeight: '35px',
-                      padding: '0 10px',
-                      fontSize: '13px',
-                      color: isEveryone ? '#999' : '#666',
-                    }}
-                  >
-                    {isEveryone
-                      ? 'All Selected'
-                      : selectedAudiences.length > 0
-                        ? selectedAudiences.length > 2
-                          ? `${selectedAudiences.length} selected`
-                          : audienceOptions
-                              .filter((o) =>
-                                selectedAudiences.includes(o.value)
-                              )
-                              .map((o) => o.label)
-                              .join(', ')
-                        : 'Select from list'}
-                  </div>
-
-                  {showAudienceDropdown && !isEveryone && (
-                    <div
-                      className="multiselect-options"
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        right: 0,
-                        background: 'white',
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        border: '1px solid #ccc',
-                        zIndex: 1000,
-                      }}
-                    >
-                      {audienceOptions.map((option) => (
-                        <div
-                          key={option.value}
-                          className="day-item"
-                          style={{
-                            padding: '5px 10px',
-                          }}
-                        >
+                      <div className="form-row">
+                        <label>
+                          <strong style={{ color: 'black' }}>Heading</strong>
+                        </label>
+                        <div className="wh-bg1">
                           <input
-                            type="checkbox"
-                            id={`aud-${option.value}`}
-                            checked={selectedAudiences.includes(option.value)}
-                            onChange={() => handleAudienceChange(option.value)}
+                            type="text"
+                            value={headingText}
+                            onChange={handleHeadingChange}
+                            placeholder=""
+                            className={headingError ? 'error-input' : ''}
                           />
-                          <label
-                            htmlFor={`aud-${option.value}`}
-                            style={{ marginLeft: '6px' }}
-                          >
-                            {option.label}
-                          </label>
+                          {headingError && (
+                            <div
+                              className="error-message"
+                              style={{
+                                color: 'red',
+                                fontSize: '12px',
+                                marginTop: '5px',
+                              }}
+                            >
+                              {headingError}
+                            </div>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div
-                  className="day-item"
-                  style={{ marginTop: '10px', marginLeft: '5px' }}
-                >
-                  <input
-                    type="checkbox"
-                    id="aud-everyone"
-                    checked={isEveryone}
-                    onChange={handleEveryoneChange}
-                  />
-                  <label htmlFor="aud-everyone">Everyone</label>
-                </div>
+                      </div>
+
+                      <div className="form-row">
+                        <label>
+                          <strong style={{ color: 'black' }}>
+                            Description
+                          </strong>
+                        </label>
+                        <div className="wh-bg2">
+                          <textarea
+                            value={descriptionText}
+                            onChange={handleDescriptionChange}
+                            placeholder=""
+                            className={descriptionError ? 'error-input' : ''}
+                          />
+                          {descriptionError && (
+                            <div
+                              className="error-message"
+                              style={{
+                                color: 'red',
+                                fontSize: '12px',
+                                marginTop: '5px',
+                              }}
+                            >
+                              {descriptionError}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="media-buttons">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={handleImageUpload}
+                        />
+                        <button
+                          className="media-btn"
+                          onClick={handleUploadFromArtGallery}
+                        >
+                          <IoMdImage />
+                          UPLOAD IMAGE
+                        </button>
+                        <button
+                          className="delete-post-btn"
+                          onClick={() => handleDeleteVoucher(selectedOffer._id)}
+                        >
+                          <FaTrashAlt /> DELETE POST
+                        </button>
+                      </div>
+                    </>
+                  )
+                )}
               </div>
 
-              {selectedVoucherType === 'club' && (
-                <>
-                  {/* One time use option */}
-                  <div className="day-item">
-                    <input
-                      type="checkbox"
-                      id="oneTimeUse"
-                      name="oneTimeUse"
-                      checked={oneTimeUse}
-                      onChange={() => setOneTimeUse(!oneTimeUse)}
-                    />
-                    <label htmlFor="oneTimeUse">One time use</label>
-                  </div>
-                </>
-              )}
+              {/* Right Panel - Target Market - Modified to match the image */}
+              <div
+                className="target-market-panel responsive-panel"
+                style={
+                  selectedVoucherType === 'standard'
+                    ? {
+                        maxHeight: 'none',
+                        height: 'auto',
+                        overflowY: 'hidden',
+                        paddingBottom: '10px',
+                      }
+                    : {}
+                }
+              >
+                <div
+                  style={
+                    selectedVoucherType === 'standard'
+                      ? { overflow: 'hidden' }
+                      : {}
+                  }
+                >
+                  <h2>Target market</h2>
 
-              {(selectedVoucherType === 'club' ||
-                (selectedVoucherType === 'birthdayOffer' && showClubOption)) && (
-                <div className="form-group inline-form-group">
-                  <label>
-                    <strong>Membership</strong>
-                  </label>
-                  <div
-                    className="select-wrapper"
-                    style={{ position: 'relative' }}
-                    ref={membershipWrapperRef}
-                  >
-                    <div
-                      className="multiselect-display"
-                      onClick={toggleMembershipDropdown}
-                      style={{
-                        cursor: 'pointer',
-                        lineHeight: '35px',
-                        padding: '0 10px',
-                        fontSize: '13px',
-                        color: '#666',
-                      }}
-                    >
-                      {selectedMemberships.length > 0
-                        ? selectedMemberships.length > 1
-                          ? `${selectedMemberships.length} selected`
-                          : membershipPackages
-                              .filter((o) =>
-                                selectedMemberships.includes(o._id)
-                              )
-                              .map((o) => o.membershipName)
-                              .join(', ')
-                        : 'Select from list'}
+                  <div className="form-group inline-form-group">
+                    <label>
+                      <strong>Voucher type</strong>
+                    </label>
+                    <div className="select-wrapper">
+                      <select
+                        defaultValue=""
+                        onChange={handleVoucherTypeChange}
+                      >
+                        <option value="" disabled>
+                          Select from list
+                        </option>
+                        <option value="type1">Birthday Offer</option>
+                        <option value="type2">New Sign Up</option>
+                        <option value="type3">Standard</option>
+                        {showClubOption && <option value="type4">Club</option>}
+                      </select>
                     </div>
+                  </div>
 
-                    {showMembershipDropdown && (
+                  <div className="form-group inline-form-group">
+                    <label>
+                      <strong>Audience</strong>
+                    </label>
+                    <div
+                      className="select-wrapper"
+                      style={{ position: 'relative', zIndex: 1000 }}
+                      ref={audienceWrapperRef}
+                    >
                       <div
-                        className="multiselect-options"
+                        className="multiselect-display"
+                        onClick={toggleAudienceDropdown}
                         style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          right: 0,
-                          width: '220px',
-                          background: 'white',
-                          maxHeight: '200px',
-                          overflowY: 'auto',
-                          border: '1px solid #ccc',
-                          zIndex: 10,
+                          cursor: isEveryone ? 'not-allowed' : 'pointer',
+                          lineHeight: '35px',
+                          padding: '0 10px',
+                          fontSize: '13px',
+                          color: isEveryone ? '#999' : '#666',
                         }}
                       >
-                        {membershipPackages.map((option) => (
+                        {isEveryone
+                          ? 'All Selected'
+                          : selectedAudiences.length > 0
+                            ? selectedAudiences.length > 2
+                              ? `${selectedAudiences.length} selected`
+                              : audienceOptions
+                                  .filter((o) =>
+                                    selectedAudiences.includes(o.value)
+                                  )
+                                  .map((o) => o.label)
+                                  .join(', ')
+                            : 'Select from list'}
+                      </div>
+
+                      {showAudienceDropdown && !isEveryone && (
+                        <div
+                          className="multiselect-options"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            background: 'white',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            border: '1px solid #ccc',
+                            zIndex: 1000,
+                          }}
+                        >
+                          {audienceOptions.map((option) => (
+                            <div
+                              key={option.value}
+                              className="day-item"
+                              style={{
+                                padding: '5px 10px',
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                id={`aud-${option.value}`}
+                                checked={selectedAudiences.includes(
+                                  option.value
+                                )}
+                                onChange={() =>
+                                  handleAudienceChange(option.value)
+                                }
+                              />
+                              <label
+                                htmlFor={`aud-${option.value}`}
+                                style={{ marginLeft: '6px' }}
+                              >
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      className="day-item"
+                      style={{ marginTop: '10px', marginLeft: '5px' }}
+                    >
+                      <input
+                        type="checkbox"
+                        id="aud-everyone"
+                        checked={isEveryone}
+                        onChange={handleEveryoneChange}
+                      />
+                      <label htmlFor="aud-everyone">Everyone</label>
+                    </div>
+                  </div>
+
+                  {selectedVoucherType === 'club' && (
+                    <>
+                      {/* One time use option */}
+                      <div className="day-item">
+                        <input
+                          type="checkbox"
+                          id="oneTimeUse"
+                          name="oneTimeUse"
+                          checked={oneTimeUse}
+                          onChange={() => setOneTimeUse(!oneTimeUse)}
+                        />
+                        <label htmlFor="oneTimeUse">One time use</label>
+                      </div>
+                    </>
+                  )}
+
+                  {(selectedVoucherType === 'club' ||
+                    (selectedVoucherType === 'birthdayOffer' &&
+                      showClubOption)) && (
+                    <div className="form-group inline-form-group">
+                      <label>
+                        <strong>Membership</strong>
+                      </label>
+                      <div
+                        className="select-wrapper"
+                        style={{ position: 'relative' }}
+                        ref={membershipWrapperRef}
+                      >
+                        <div
+                          className="multiselect-display"
+                          onClick={toggleMembershipDropdown}
+                          style={{
+                            cursor: 'pointer',
+                            lineHeight: '35px',
+                            padding: '0 10px',
+                            fontSize: '13px',
+                            color: '#666',
+                          }}
+                        >
+                          {selectedMemberships.length > 0
+                            ? selectedMemberships.length > 1
+                              ? `${selectedMemberships.length} selected`
+                              : membershipPackages
+                                  .filter((o) =>
+                                    selectedMemberships.includes(o._id)
+                                  )
+                                  .map((o) => o.membershipName)
+                                  .join(', ')
+                            : 'Select from list'}
+                        </div>
+
+                        {showMembershipDropdown && (
                           <div
-                            key={option._id}
-                            className="day-item"
+                            className="multiselect-options"
                             style={{
-                              padding: '5px 10px',
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              width: '220px',
+                              background: 'white',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              border: '1px solid #ccc',
+                              zIndex: 10,
                             }}
+                          >
+                            {membershipPackages.map((option) => (
+                              <div
+                                key={option._id}
+                                className="day-item"
+                                style={{
+                                  padding: '5px 10px',
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`mem-${option._id}`}
+                                  checked={selectedMemberships.includes(
+                                    option._id
+                                  )}
+                                  onChange={() =>
+                                    handleMembershipChange(option._id)
+                                  }
+                                />
+                                <label
+                                  htmlFor={`mem-${option._id}`}
+                                  style={{ marginLeft: '4px' }}
+                                >
+                                  {option.membershipName}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {selectedVoucherType === 'club' && (
+                    <>
+                      <div
+                        className="form-group inline-form-group"
+                        style={{ marginTop: '10px' }}
+                      >
+                        <label>
+                          <strong>Enter valid expiry date</strong>
+                        </label>
+                        <input
+                          type="date"
+                          value={membershipExpiryDate || ''}
+                          style={{ width: '150px' }}
+                          onChange={(e) =>
+                            setMembershipExpiryDate(e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* Joined Before / After */}
+                      <div className="form-group inline-form-group">
+                        <label>
+                          <strong>Valid for members who joined</strong>
+                        </label>
+
+                        <div
+                          className="radio-group"
+                          style={{ marginTop: '10px' }}
+                        >
+                          <input
+                            type="radio"
+                            name="joined"
+                            checked={joined === 'before'}
+                            onChange={() => setJoined('before')}
+                          />
+                          <label>Before</label>
+
+                          <input
+                            type="radio"
+                            name="joined"
+                            checked={joined === 'after'}
+                            onChange={() => setJoined('after')}
+                          />
+                          <label>After</label>
+                        </div>
+                      </div>
+
+                      {/* Process Date */}
+                      <div className="form-group inline-form-group">
+                        <label>
+                          <strong>Offer is to be processed on this date</strong>
+                        </label>
+
+                        <input
+                          type="date"
+                          style={{ width: '120px' }}
+                          value={offerProceedDate || ''}
+                          onChange={(e) => setOfferProceedDate(e.target.value)}
+                        />
+                      </div>
+
+                      <small>
+                        The offer is created on this date and only members who
+                        meet this criteria on this date will receive the offer.
+                      </small>
+
+                      {/* Bonus points toggle */}
+                      <div className="form-row bonus-points-row">
+                        <div className="bonus-points-container">
+                          <div
+                            className="bonus-points-toggle"
+                            style={{ marginTop: '20px' }}
                           >
                             <input
                               type="checkbox"
-                              id={`mem-${option._id}`}
-                              checked={selectedMemberships.includes(option._id)}
-                              onChange={() =>
-                                handleMembershipChange(option._id)
+                              checked={showBonusWhenRedeemed}
+                              onChange={(e) =>
+                                setShowBonusWhenRedeemed(e.target.checked)
                               }
-                            />
-                            <label
-                              htmlFor={`mem-${option._id}`}
-                              style={{ marginLeft: '4px' }}
-                            >
-                              {option.membershipName}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              {selectedVoucherType === 'club' && (
-                <>
-                  <div
-                    className="form-group inline-form-group"
-                    style={{ marginTop: '10px' }}
-                  >
-                    <label>
-                      <strong>Enter valid expiry date</strong>
-                    </label>
-                    <input
-                      type="date"
-                      value={membershipExpiryDate || ''}
-                      style={{ width: '150px' }}
-                      onChange={(e) => setMembershipExpiryDate(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Joined Before / After */}
-                  <div className="form-group inline-form-group">
-                    <label>
-                      <strong>Valid for members who joined</strong>
-                    </label>
-
-                    <div className="radio-group" style={{ marginTop: '10px' }}>
-                      <input
-                        type="radio"
-                        name="joined"
-                        checked={joined === 'before'}
-                        onChange={() => setJoined('before')}
-                      />
-                      <label>Before</label>
-
-                      <input
-                        type="radio"
-                        name="joined"
-                        checked={joined === 'after'}
-                        onChange={() => setJoined('after')}
-                      />
-                      <label>After</label>
-                    </div>
-                  </div>
-
-                  {/* Process Date */}
-                  <div className="form-group inline-form-group">
-                    <label>
-                      <strong>Offer is to be processed on this date</strong>
-                    </label>
-
-                    <input
-                      type="date"
-                      style={{ width: '120px' }}
-                      value={offerProceedDate || ''}
-                      onChange={(e) => setOfferProceedDate(e.target.value)}
-                    />
-                  </div>
-
-                  <small>
-                    The offer is created on this date and only members who meet
-                    this criteria on this date will receive the offer.
-                  </small>
-
-                  {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
-                    <div className="bonus-points-container">
-                      <div
-                        className="bonus-points-toggle"
-                        style={{ marginTop: '20px' }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={showBonusWhenRedeemed}
-                          onChange={(e) =>
-                            setShowBonusWhenRedeemed(e.target.checked)
-                          }
-                          style={{
-                            accentColor: '#002977',
-                            marginBottom: '3px',
-                          }}
-                        />
-                        <span style={{ fontSize: '14px' }}>
-                          Add Bonus Points when redeemed
-                        </span>
-                        {showBonusWhenRedeemed && (
-                          <div className="bonus-points-input">
-                            <input
-                              type="number"
-                              value={bonusPoints}
                               style={{
-                                height: '8px',
-                                width: '40px',
-                                marginTop: '5px',
+                                accentColor: '#002977',
+                                marginBottom: '3px',
                               }}
-                              onChange={(e) => setBonusPoints(e.target.value)}
                             />
-                            <span>Points</span>
+                            <span style={{ fontSize: '14px' }}>
+                              Add Bonus Points when redeemed
+                            </span>
+                            {showBonusWhenRedeemed && (
+                              <div className="bonus-points-input">
+                                <input
+                                  type="number"
+                                  value={bonusPoints}
+                                  style={{
+                                    height: '8px',
+                                    width: '40px',
+                                    marginTop: '5px',
+                                  }}
+                                  onChange={(e) =>
+                                    setBonusPoints(e.target.value)
+                                  }
+                                />
+                                <span>Points</span>
+                              </div>
+                            )}{' '}
                           </div>
-                        )}{' '}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className="form-group inline-form-group"
-                    style={{ marginTop: '30px' }}
-                  >
-                    <label>
-                      <strong>Enter trigger value</strong>
-                    </label>
-                    <div style={{ marginBottom: '0' }}>
-                      <input
-                        type="text"
-                        className="trigger-input"
-                        placeholder=""
-                        value={triggerValue}
-                        onChange={(e) => setTriggerValue(e.target.value)}
-                        style={{ height: '25px' }}
-                      />
-                    </div>
-                    {triggerValueError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                          marginLeft: '20px',
-                          width: '100%',
-                        }}
-                      >
-                        {triggerValueError}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {selectedVoucherType === 'standard' && (
-                <>
-                  {/* One time use option */}
-                  <div className="day-item">
-                    <input
-                      type="checkbox"
-                      id="oneTimeUse"
-                      name="oneTimeUse"
-                      checked={oneTimeUse}
-                      onChange={() => setOneTimeUse(!oneTimeUse)}
-                    />
-                    <label htmlFor="oneTimeUse">One time use</label>
-                  </div>
-
-                  <div className="form-group expiry-section">
-                    <label>
-                      <strong>Expiry</strong>
-                    </label>
-                    <div className="expiry-options">
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '20px',
-                        }}
-                      >
-                        <div className="radio-group" style={{ margin: 0 }}>
-                          <input
-                            type="radio"
-                            id="never"
-                            name="expiry"
-                            value="never"
-                            checked={expiryType === 'never'}
-                            onChange={() => handleExpiryChange('never')}
-                          />
-                          <label htmlFor="never">Never</label>
                         </div>
+                      </div>
 
-                        <div className="expiry-row" style={{ margin: 0 }}>
-                          <input
-                            type="radio"
-                            id="expiresIn"
-                            name="expiry"
-                            value="expiresIn"
-                            checked={expiryType === 'expiresIn'}
-                            onChange={() => handleExpiryChange('expiresIn')}
-                          />
-                          <label
-                            htmlFor="expiresIn"
-                            style={{ whiteSpace: 'nowrap', marginRight: '5px' }}
-                          >
-                            Expires in
-                          </label>
+                      <div
+                        className="form-group inline-form-group"
+                        style={{ marginTop: '30px' }}
+                      >
+                        <label>
+                          <strong>Enter trigger value</strong>
+                        </label>
+                        <div style={{ marginBottom: '0' }}>
                           <input
                             type="text"
+                            className="trigger-input"
                             placeholder=""
-                            className="days-input"
-                            value={expiryDays}
-                            onChange={(e) => setExpiryDays(e.target.value)}
+                            value={triggerValue}
+                            onChange={(e) => setTriggerValue(e.target.value)}
+                            style={{ height: '25px' }}
                           />
-                          <span>days</span>
+                        </div>
+                        {triggerValueError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                              marginLeft: '20px',
+                              width: '100%',
+                            }}
+                          >
+                            {triggerValueError}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {selectedVoucherType === 'standard' && (
+                    <>
+                      {/* One time use option */}
+                      <div className="day-item">
+                        <input
+                          type="checkbox"
+                          id="oneTimeUse"
+                          name="oneTimeUse"
+                          checked={oneTimeUse}
+                          onChange={() => setOneTimeUse(!oneTimeUse)}
+                        />
+                        <label htmlFor="oneTimeUse">One time use</label>
+                      </div>
+
+                      <div className="form-group expiry-section">
+                        <label>
+                          <strong>Expiry</strong>
+                        </label>
+                        <div className="expiry-options">
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '20px',
+                            }}
+                          >
+                            <div className="radio-group" style={{ margin: 0 }}>
+                              <input
+                                type="radio"
+                                id="never"
+                                name="expiry"
+                                value="never"
+                                checked={expiryType === 'never'}
+                                onChange={() => handleExpiryChange('never')}
+                              />
+                              <label htmlFor="never">Never</label>
+                            </div>
+
+                            <div className="expiry-row" style={{ margin: 0 }}>
+                              <input
+                                type="radio"
+                                id="expiresIn"
+                                name="expiry"
+                                value="expiresIn"
+                                checked={expiryType === 'expiresIn'}
+                                onChange={() => handleExpiryChange('expiresIn')}
+                              />
+                              <label
+                                htmlFor="expiresIn"
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  marginRight: '5px',
+                                }}
+                              >
+                                Expires in
+                              </label>
+                              <input
+                                type="text"
+                                placeholder=""
+                                className="days-input"
+                                value={expiryDays}
+                                onChange={(e) => setExpiryDays(e.target.value)}
+                              />
+                              <span>days</span>
+                            </div>
+                          </div>
+                          {expiryDaysError && (
+                            <div
+                              className="error-message"
+                              style={{
+                                color: 'red',
+                                fontSize: '12px',
+                                marginTop: '5px',
+                              }}
+                            >
+                              {expiryDaysError}
+                            </div>
+                          )}
+
+                          <div className="expiry-row dates-row">
+                            <div className="validFrom-label">
+                              <input
+                                type="radio"
+                                id="validFrom"
+                                name="expiry"
+                                value="validFrom"
+                                checked={expiryType === 'validFrom'}
+                                onChange={() => handleExpiryChange('validFrom')}
+                              />
+                              <label htmlFor="validFrom">Valid from</label>
+                            </div>
+                            <div className="time-input-fields">
+                              <div className="time-field">
+                                <label>START DATE</label>
+                                <input
+                                  type="date"
+                                  className="time-input"
+                                  value={startDate}
+                                  onChange={(e) =>
+                                    handleDateChange('start', e.target.value)
+                                  }
+                                  onClick={(e) => {
+                                    // Ensure expiry type is set to validFrom when clicking on date input
+                                    if (expiryType !== 'validFrom') {
+                                      setExpiryType('validFrom');
+
+                                      // Also select the validFrom radio
+                                      const validFromRadio =
+                                        document.getElementById('validFrom');
+                                      if (validFromRadio) {
+                                        validFromRadio.checked = true;
+                                      }
+                                    }
+                                  }}
+                                  disabled={expiryType !== 'validFrom'}
+                                />
+                              </div>
+                              <div className="time-field">
+                                <label>END DATE</label>
+                                <input
+                                  type="date"
+                                  className="time-input"
+                                  value={endDate}
+                                  onChange={(e) =>
+                                    handleDateChange('end', e.target.value)
+                                  }
+                                  onClick={(e) => {
+                                    // Ensure expiry type is set to validFrom when clicking on date input
+                                    if (expiryType !== 'validFrom') {
+                                      setExpiryType('validFrom');
+
+                                      // Also select the validFrom radio
+                                      const validFromRadio =
+                                        document.getElementById('validFrom');
+                                      if (validFromRadio) {
+                                        validFromRadio.checked = true;
+                                      }
+                                    }
+                                  }}
+                                  disabled={expiryType !== 'validFrom'}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {dateError && (
+                            <div
+                              className="error-message"
+                              style={{
+                                color: 'red',
+                                fontSize: '12px',
+                                marginTop: '5px',
+                              }}
+                            >
+                              {dateError}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      {expiryDaysError && (
-                        <div
-                          className="error-message"
+
+                      <div className="form-group days-section">
+                        <label>
+                          <strong>Valid on Days of the Week</strong>
+                        </label>
+                        <div className="days-options">
+                          <div className="days-selector">
+                            <div className="day-item">
+                              <input
+                                type="checkbox"
+                                id="everyday"
+                                name="everyday"
+                                checked={validDays.everyday}
+                                onChange={() => handleDayChange('everyday')}
+                              />
+                              <label
+                                htmlFor="everyday"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleDayChange('everyday');
+                                }}
+                              >
+                                Everyday
+                              </label>
+                            </div>
+                            {[
+                              'Mon',
+                              'Tue',
+                              'Wed',
+                              'Thu',
+                              'Fri',
+                              'Sat',
+                              'Sun',
+                            ].map((day) => (
+                              <div key={day} className="day-item">
+                                <input
+                                  type="checkbox"
+                                  id={day.toLowerCase()}
+                                  name={day.toLowerCase()}
+                                  checked={validDays[day.toLowerCase()]}
+                                  onChange={() =>
+                                    handleDayChange(day.toLowerCase())
+                                  }
+                                  disabled={validDays.everyday}
+                                />
+                                <label
+                                  htmlFor={day.toLowerCase()}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (!validDays.everyday) {
+                                      handleDayChange(day.toLowerCase());
+                                    }
+                                  }}
+                                  style={{
+                                    opacity: validDays.everyday ? 0.5 : 1,
+                                  }}
+                                >
+                                  {day}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        {validDaysError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                            }}
+                          >
+                            {validDaysError}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="form-group time-section">
+                        <label>
+                          <strong>Valid on follow Time</strong>
+                        </label>
+                        <div className="time-options">
+                          <div className="radio-group">
+                            <input
+                              type="radio"
+                              id="allTimes"
+                              name="time"
+                              value="allTimes"
+                              checked={timeValid.allTimes}
+                              onChange={() => handleTimeChange('allTimes')}
+                            />
+                            <label htmlFor="allTimes">All times</label>
+                          </div>
+                          <div className="time-inputs inline-form-group">
+                            <div className="time-input-row">
+                              <input
+                                type="radio"
+                                id="onlyBetween"
+                                name="time"
+                                value="onlyBetween"
+                                checked={!timeValid.allTimes}
+                                onChange={() => handleTimeChange('onlyBetween')}
+                              />
+                              <label htmlFor="onlyBetween">Only between</label>
+                            </div>
+                            <div className="time-input-fields">
+                              <div className="time-field">
+                                <label>START TIME</label>
+                                <input
+                                  type="time"
+                                  className="time-input"
+                                  value={timeValid.start}
+                                  onChange={(e) =>
+                                    handleTimeInputChange(
+                                      'start',
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={timeValid.allTimes}
+                                />
+                              </div>
+                              <div className="time-field">
+                                <label>END TIME</label>
+                                <input
+                                  type="time"
+                                  className="time-input"
+                                  value={timeValid.end}
+                                  onChange={(e) =>
+                                    handleTimeInputChange('end', e.target.value)
+                                  }
+                                  disabled={timeValid.allTimes}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {timeError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                            }}
+                          >
+                            {timeError}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Bonus points toggle */}
+                      <div className="form-row bonus-points-row">
+                        <div className="bonus-points-container">
+                          <div className="bonus-points-toggle">
+                            <input
+                              type="checkbox"
+                              checked={showBonusWhenRedeemed}
+                              onChange={(e) =>
+                                setShowBonusWhenRedeemed(e.target.checked)
+                              }
+                              style={{
+                                accentColor: '#002977',
+                                marginBottom: '3px',
+                              }}
+                            />
+                            <span style={{ fontSize: '14px' }}>
+                              Add Bonus Points when redeemed
+                            </span>
+                            {showBonusWhenRedeemed && (
+                              <div className="bonus-points-input">
+                                <input
+                                  type="number"
+                                  value={bonusPoints}
+                                  style={{
+                                    height: '8px',
+                                    width: '40px',
+                                    marginTop: '5px',
+                                  }}
+                                  onChange={(e) =>
+                                    setBonusPoints(e.target.value)
+                                  }
+                                />
+                                <span style={{ fontSize: '14px' }}>Points</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="form-group inline-form-group">
+                        <label
+                          style={{ whiteSpace: 'nowrap', marginRight: '8px' }}
+                        >
+                          <strong>Enter trigger value</strong>
+                        </label>
+                        <div style={{ marginTop: '5px' }}>
+                          <input
+                            type="text"
+                            className="trigger-input"
+                            placeholder=""
+                            value={triggerValue}
+                            onChange={(e) => setTriggerValue(e.target.value)}
+                            style={{ height: '25px' }}
+                          />
+                        </div>
+                        {triggerValueError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                              marginLeft: '20px',
+                              width: '100%',
+                            }}
+                          >
+                            {triggerValueError}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {selectedVoucherType === 'birthdayOffer' && (
+                    <>
+                      <div style={{ marginTop: '50px' }}>
+                        <p
                           style={{
-                            color: 'red',
-                            fontSize: '12px',
-                            marginTop: '5px',
+                            fontWeight: 'bold',
+                            marginBottom: '10px',
+                            textAlign: 'center',
                           }}
                         >
-                          {expiryDaysError}
+                          PLEASE NOTE
+                        </p>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '15px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Birthday offers will appear in the member's account on{' '}
+                          <br />
+                          the 1st day of the member's birth month.
+                        </p>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '30px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          The vouchers will automatically remove themselves{' '}
+                          <br />
+                          at the end of that month.
+                        </p>
+                      </div>
+
+                      {/* Bonus points toggle */}
+                      <div className="form-row bonus-points-row">
+                        <div className="bonus-points-container">
+                          <div className="bonus-points-toggle">
+                            <input
+                              type="checkbox"
+                              checked={showBonusWhenRedeemed}
+                              onChange={(e) =>
+                                setShowBonusWhenRedeemed(e.target.checked)
+                              }
+                              style={{
+                                accentColor: '#002977',
+                                marginBottom: '3px',
+                              }}
+                            />
+                            <span style={{ fontSize: '14px' }}>
+                              Add Bonus Points when redeemed
+                            </span>
+                            {showBonusWhenRedeemed && (
+                              <div className="bonus-points-input">
+                                <input
+                                  type="number"
+                                  value={bonusPoints}
+                                  style={{
+                                    height: '8px',
+                                    width: '40px',
+                                    marginTop: '5px',
+                                  }}
+                                  onChange={(e) =>
+                                    setBonusPoints(e.target.value)
+                                  }
+                                />
+                                <span>Points</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
                         </div>
-                      )}
+                      )} */}
+                        </div>
+                      </div>
+
+                      <div
+                        className="form-group inline-form-group"
+                        style={{ marginTop: '100px' }}
+                      >
+                        <label>
+                          <strong>Enter trigger value</strong>
+                        </label>
+                        <div style={{ marginBottom: '0' }}>
+                          <input
+                            type="text"
+                            className="trigger-input"
+                            placeholder=""
+                            value={triggerValue}
+                            onChange={(e) => setTriggerValue(e.target.value)}
+                            style={{ height: '25px' }}
+                          />
+                        </div>
+                        {triggerValueError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                              marginLeft: '20px',
+                              width: '100%',
+                            }}
+                          >
+                            {triggerValueError}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {selectedVoucherType === 'newSignUp' && (
+                    <>
+                      <div className="form-group expiry-section">
+                        <label>
+                          <strong>Expiry</strong>
+                        </label>
+                        <div className="expiry-options">
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '20px',
+                            }}
+                          >
+                            <div className="radio-group" style={{ margin: 0 }}>
+                              <input
+                                type="radio"
+                                id="never"
+                                name="expiry"
+                                value="never"
+                                checked={expiryType === 'never'}
+                                onChange={() => handleExpiryChange('never')}
+                              />
+                              <label htmlFor="never">Never</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
                       <div className="expiry-row dates-row">
                         <div className="validFrom-label">
@@ -3699,20 +4193,6 @@ const SpecialOffers = () => {
                               onChange={(e) =>
                                 handleDateChange('start', e.target.value)
                               }
-                              onClick={(e) => {
-                                // Ensure expiry type is set to validFrom when clicking on date input
-                                if (expiryType !== 'validFrom') {
-                                  setExpiryType('validFrom');
-
-                                  // Also select the validFrom radio
-                                  const validFromRadio =
-                                    document.getElementById('validFrom');
-                                  if (validFromRadio) {
-                                    validFromRadio.checked = true;
-                                  }
-                                }
-                              }}
-                              disabled={expiryType !== 'validFrom'}
                             />
                           </div>
                           <div className="time-field">
@@ -3724,543 +4204,123 @@ const SpecialOffers = () => {
                               onChange={(e) =>
                                 handleDateChange('end', e.target.value)
                               }
-                              onClick={(e) => {
-                                // Ensure expiry type is set to validFrom when clicking on date input
-                                if (expiryType !== 'validFrom') {
-                                  setExpiryType('validFrom');
-
-                                  // Also select the validFrom radio
-                                  const validFromRadio =
-                                    document.getElementById('validFrom');
-                                  if (validFromRadio) {
-                                    validFromRadio.checked = true;
-                                  }
-                                }
-                              }}
-                              disabled={expiryType !== 'validFrom'}
                             />
                           </div>
                         </div>
                       </div>
-                      {dateError && (
-                        <div
-                          className="error-message"
+
+                      <div style={{ marginTop: '40px' }}>
+                        <p
                           style={{
-                            color: 'red',
-                            fontSize: '12px',
-                            marginTop: '5px',
+                            fontWeight: 'bold',
+                            marginBottom: '10px',
+                            textAlign: 'center',
                           }}
                         >
-                          {dateError}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                          PLEASE NOTE
+                        </p>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '30px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Any new member will receive this offer on signing up{' '}
+                          <br />
+                          for the 1st time.
+                        </p>
+                      </div>
 
-                  <div className="form-group days-section">
-                    <label>
-                      <strong>Valid on Days of the Week</strong>
-                    </label>
-                    <div className="days-options">
-                      <div className="days-selector">
-                        <div className="day-item">
+                      {/* Bonus points toggle */}
+                      <div className="form-row bonus-points-row">
+                        <div className="bonus-points-container">
+                          <div className="bonus-points-toggle">
+                            <input
+                              type="checkbox"
+                              checked={showBonusWhenRedeemed}
+                              onChange={(e) =>
+                                setShowBonusWhenRedeemed(e.target.checked)
+                              }
+                              style={{
+                                accentColor: '#002977',
+                                marginBottom: '3px',
+                              }}
+                            />
+                            <span style={{ fontSize: '14px' }}>
+                              Add Bonus Points when redeemed
+                            </span>
+                            {showBonusWhenRedeemed && (
+                              <div className="bonus-points-input">
+                                <input
+                                  type="number"
+                                  value={bonusPoints}
+                                  style={{
+                                    height: '8px',
+                                    width: '40px',
+                                    marginTop: '5px',
+                                  }}
+                                  onChange={(e) =>
+                                    setBonusPoints(e.target.value)
+                                  }
+                                />
+                                <span>Points</span>
+                              </div>
+                            )}{' '}
+                          </div>
+
+                          {/* {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
                           <input
-                            type="checkbox"
-                            id="everyday"
-                            name="everyday"
-                            checked={validDays.everyday}
-                            onChange={() => handleDayChange('everyday')}
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
                           />
-                          <label
-                            htmlFor="everyday"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleDayChange('everyday');
+                          <span>Points</span>
+                        </div>
+                      )} */}
+                        </div>
+                      </div>
+
+                      <div
+                        className="form-group inline-form-group"
+                        style={{ marginTop: '60px' }}
+                      >
+                        <label>
+                          <strong>Enter trigger value</strong>
+                        </label>
+                        <div style={{ marginBottom: '0' }}>
+                          <input
+                            type="text"
+                            className="trigger-input"
+                            placeholder=""
+                            value={triggerValue}
+                            onChange={(e) => setTriggerValue(e.target.value)}
+                            style={{ height: '25px' }}
+                          />
+                        </div>
+                        {triggerValueError && (
+                          <div
+                            className="error-message"
+                            style={{
+                              color: 'red',
+                              fontSize: '12px',
+                              marginTop: '5px',
+                              marginLeft: '20px',
+                              width: '100%',
                             }}
                           >
-                            Everyday
-                          </label>
-                        </div>
-                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
-                          (day) => (
-                            <div key={day} className="day-item">
-                              <input
-                                type="checkbox"
-                                id={day.toLowerCase()}
-                                name={day.toLowerCase()}
-                                checked={validDays[day.toLowerCase()]}
-                                onChange={() =>
-                                  handleDayChange(day.toLowerCase())
-                                }
-                                disabled={validDays.everyday}
-                              />
-                              <label
-                                htmlFor={day.toLowerCase()}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (!validDays.everyday) {
-                                    handleDayChange(day.toLowerCase());
-                                  }
-                                }}
-                                style={{
-                                  opacity: validDays.everyday ? 0.5 : 1,
-                                }}
-                              >
-                                {day}
-                              </label>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                    {validDaysError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                        }}
-                      >
-                        {validDaysError}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="form-group time-section">
-                    <label>
-                      <strong>Valid on follow Time</strong>
-                    </label>
-                    <div className="time-options">
-                      <div className="radio-group">
-                        <input
-                          type="radio"
-                          id="allTimes"
-                          name="time"
-                          value="allTimes"
-                          checked={timeValid.allTimes}
-                          onChange={() => handleTimeChange('allTimes')}
-                        />
-                        <label htmlFor="allTimes">All times</label>
-                      </div>
-                      <div className="time-inputs inline-form-group">
-                        <div className="time-input-row">
-                          <input
-                            type="radio"
-                            id="onlyBetween"
-                            name="time"
-                            value="onlyBetween"
-                            checked={!timeValid.allTimes}
-                            onChange={() => handleTimeChange('onlyBetween')}
-                          />
-                          <label htmlFor="onlyBetween">Only between</label>
-                        </div>
-                        <div className="time-input-fields">
-                          <div className="time-field">
-                            <label>START TIME</label>
-                            <input
-                              type="time"
-                              className="time-input"
-                              value={timeValid.start}
-                              onChange={(e) =>
-                                handleTimeInputChange('start', e.target.value)
-                              }
-                              disabled={timeValid.allTimes}
-                            />
-                          </div>
-                          <div className="time-field">
-                            <label>END TIME</label>
-                            <input
-                              type="time"
-                              className="time-input"
-                              value={timeValid.end}
-                              onChange={(e) =>
-                                handleTimeInputChange('end', e.target.value)
-                              }
-                              disabled={timeValid.allTimes}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {timeError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                        }}
-                      >
-                        {timeError}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
-                    <div className="bonus-points-container">
-                      <div className="bonus-points-toggle">
-                        <input
-                          type="checkbox"
-                          checked={showBonusWhenRedeemed}
-                          onChange={(e) =>
-                            setShowBonusWhenRedeemed(e.target.checked)
-                          }
-                          style={{
-                            accentColor: '#002977',
-                            marginBottom: '3px',
-                          }}
-                        />
-                        <span style={{ fontSize: '14px' }}>
-                          Add Bonus Points when redeemed
-                        </span>
-                        {showBonusWhenRedeemed && (
-                          <div className="bonus-points-input">
-                            <input
-                              type="number"
-                              value={bonusPoints}
-                              style={{
-                                height: '8px',
-                                width: '40px',
-                                marginTop: '5px',
-                              }}
-                              onChange={(e) => setBonusPoints(e.target.value)}
-                            />
-                            <span style={{ fontSize: '14px' }}>Points</span>
+                            {triggerValueError}
                           </div>
                         )}
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="form-group inline-form-group">
-                    <label style={{ whiteSpace: 'nowrap', marginRight: '8px' }}>
-                      <strong>Enter trigger value</strong>
-                    </label>
-                    <div style={{ marginTop: '5px' }}>
-                      <input
-                        type="text"
-                        className="trigger-input"
-                        placeholder=""
-                        value={triggerValue}
-                        onChange={(e) => setTriggerValue(e.target.value)}
-                        style={{ height: '25px' }}
-                      />
-                    </div>
-                    {triggerValueError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                          marginLeft: '20px',
-                          width: '100%',
-                        }}
-                      >
-                        {triggerValueError}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {selectedVoucherType === 'birthdayOffer' && (
-                <>
-                  <div style={{ marginTop: '50px' }}>
-                    <p
-                      style={{
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      PLEASE NOTE
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '13px',
-                        color: '#666',
-                        marginBottom: '15px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Birthday offers will appear in the member's account on{' '}
-                      <br />
-                      the 1st day of the member's birth month.
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '13px',
-                        color: '#666',
-                        marginBottom: '30px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      The vouchers will automatically remove themselves <br />
-                      at the end of that month.
-                    </p>
-                  </div>
-
-                  {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
-                    <div className="bonus-points-container">
-                      <div className="bonus-points-toggle">
-                        <input
-                          type="checkbox"
-                          checked={showBonusWhenRedeemed}
-                          onChange={(e) =>
-                            setShowBonusWhenRedeemed(e.target.checked)
-                          }
-                          style={{
-                            accentColor: '#002977',
-                            marginBottom: '3px',
-                          }}
-                        />
-                        <span style={{ fontSize: '14px' }}>
-                          Add Bonus Points when redeemed
-                        </span>
-                        {showBonusWhenRedeemed && (
-                          <div className="bonus-points-input">
-                            <input
-                              type="number"
-                              value={bonusPoints}
-                              style={{
-                                height: '8px',
-                                width: '40px',
-                                marginTop: '5px',
-                              }}
-                              onChange={(e) => setBonusPoints(e.target.value)}
-                            />
-                            <span>Points</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span>Points</span>
-                        </div>
-                      )} */}
-                    </div>
-                  </div>
-
-                  <div
-                    className="form-group inline-form-group"
-                    style={{ marginTop: '100px' }}
-                  >
-                    <label>
-                      <strong>Enter trigger value</strong>
-                    </label>
-                    <div style={{ marginBottom: '0' }}>
-                      <input
-                        type="text"
-                        className="trigger-input"
-                        placeholder=""
-                        value={triggerValue}
-                        onChange={(e) => setTriggerValue(e.target.value)}
-                        style={{ height: '25px' }}
-                      />
-                    </div>
-                    {triggerValueError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                          marginLeft: '20px',
-                          width: '100%',
-                        }}
-                      >
-                        {triggerValueError}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {selectedVoucherType === 'newSignUp' && (
-                <>
-                  <div className="form-group expiry-section">
-                    <label>
-                      <strong>Expiry</strong>
-                    </label>
-                    <div className="expiry-options">
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '20px',
-                        }}
-                      >
-                        <div className="radio-group" style={{ margin: 0 }}>
-                          <input
-                            type="radio"
-                            id="never"
-                            name="expiry"
-                            value="never"
-                            checked={expiryType === 'never'}
-                            onChange={() => handleExpiryChange('never')}
-                          />
-                          <label htmlFor="never">Never</label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="expiry-row dates-row">
-                    <div className="validFrom-label">
-                      <input
-                        type="radio"
-                        id="validFrom"
-                        name="expiry"
-                        value="validFrom"
-                        checked={expiryType === 'validFrom'}
-                        onChange={() => handleExpiryChange('validFrom')}
-                      />
-                      <label htmlFor="validFrom">Valid from</label>
-                    </div>
-                    <div className="time-input-fields">
-                      <div className="time-field">
-                        <label>START DATE</label>
-                        <input
-                          type="date"
-                          className="time-input"
-                          value={startDate}
-                          onChange={(e) =>
-                            handleDateChange('start', e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="time-field">
-                        <label>END DATE</label>
-                        <input
-                          type="date"
-                          className="time-input"
-                          value={endDate}
-                          onChange={(e) =>
-                            handleDateChange('end', e.target.value)
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: '40px' }}>
-                    <p
-                      style={{
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      PLEASE NOTE
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '13px',
-                        color: '#666',
-                        marginBottom: '30px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Any new member will receive this offer on signing up{' '}
-                      <br />
-                      for the 1st time.
-                    </p>
-                  </div>
-
-                  {/* Bonus points toggle */}
-                  <div className="form-row bonus-points-row">
-                    <div className="bonus-points-container">
-                      <div className="bonus-points-toggle">
-                        <input
-                          type="checkbox"
-                          checked={showBonusWhenRedeemed}
-                          onChange={(e) =>
-                            setShowBonusWhenRedeemed(e.target.checked)
-                          }
-                          style={{
-                            accentColor: '#002977',
-                            marginBottom: '3px',
-                          }}
-                        />
-                        <span style={{ fontSize: '14px' }}>
-                          Add Bonus Points when redeemed
-                        </span>
-                        {showBonusWhenRedeemed && (
-                          <div className="bonus-points-input">
-                            <input
-                              type="number"
-                              value={bonusPoints}
-                              style={{
-                                height: '8px',
-                                width: '40px',
-                                marginTop: '5px',
-                              }}
-                              onChange={(e) => setBonusPoints(e.target.value)}
-                            />
-                            <span>Points</span>
-                          </div>
-                        )}{' '}
-                      </div>
-
-                      {/* {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span>Points</span>
-                        </div>
-                      )} */}
-                    </div>
-                  </div>
-
-                  <div
-                    className="form-group inline-form-group"
-                    style={{ marginTop: '60px' }}
-                  >
-                    <label>
-                      <strong>Enter trigger value</strong>
-                    </label>
-                    <div style={{ marginBottom: '0' }}>
-                      <input
-                        type="text"
-                        className="trigger-input"
-                        placeholder=""
-                        value={triggerValue}
-                        onChange={(e) => setTriggerValue(e.target.value)}
-                        style={{ height: '25px' }}
-                      />
-                    </div>
-                    {triggerValueError && (
-                      <div
-                        className="error-message"
-                        style={{
-                          color: 'red',
-                          fontSize: '12px',
-                          marginTop: '5px',
-                          marginLeft: '20px',
-                          width: '100%',
-                        }}
-                      >
-                        {triggerValueError}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {!addMode && (

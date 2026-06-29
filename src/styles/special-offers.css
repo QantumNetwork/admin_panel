@@ -57,9 +57,10 @@ input:focus{
 }
 
 .btn-sp-offer{
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   margin-top: 10px;
+  margin-left: 130px;
 }
 
 .live-offers-btn {
@@ -1367,13 +1368,13 @@ border: 1px solid #22ade3;
     overflow-y: auto;
   }
   
-  .add-offer-button {
+  /* .add-offer-button {
     position: static;
     width: 180px;
     bottom: auto;
     left: auto;
     margin: 20px auto;
-  }
+  } */
 }
 
 @media  screen and (min-width: 768px) and (max-width: 1095px) {
