@@ -404,7 +404,6 @@ const SpecialOffers = () => {
   }, [
     activeTab,
     deleteSuccess,
-    location.state?.selectedImageFromGallery,
     activeOfferFilter,
     selectedVenue,
     token,
@@ -1285,6 +1284,8 @@ const SpecialOffers = () => {
     };
 
     console.log('Sending form values to Art Gallery:', formValues);
+
+    ignoreArtGalleryRestoreRef.current = false;
 
     // Navigate to art gallery with state using react-router navigate
     navigate('/art-gallery', {
@@ -2365,8 +2366,9 @@ const SpecialOffers = () => {
         }, 0);
       }
 
+      ignoreArtGalleryRestoreRef.current = true
       // Clear location state to avoid reapplying when component re-renders
-      window.history.replaceState({}, document.title, window.location.pathname);
+      navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, addMode, offers]);
 
