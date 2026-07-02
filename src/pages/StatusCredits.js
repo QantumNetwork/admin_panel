@@ -30,8 +30,42 @@ const AppSettings = () => {
   const [menuType, setMenuType] = useState('multiple'); // 'standard' | 'multiple'
   const [offerTypes, setOfferTypes] = useState(['WMLC', 'Fielders']);
   const userType = localStorage.getItem('userType') || 'admin';
-  const isAdmin = userType === "admin";
+  const isAdmin = userType === 'admin';
   const [venues, setVenues] = useState([]);
+
+  const [statusCredits, setStatusCredits] = useState([
+    {
+      id: 1,
+      key: 'Valued',
+      value: '',
+      nextLevel: true,
+      statusCredit: true,
+    },
+    {
+      id: 2,
+      key: 'Silver',
+      value: '',
+      nextLevel: true,
+      statusCredit: true,
+    },
+    {
+      id: 3,
+      key: 'Gold',
+      value: '',
+      nextLevel: true,
+      statusCredit: true,
+    },
+    {
+      id: 4,
+      key: 'Platinum',
+      value: '',
+      nextLevel: true,
+      statusCredit: true,
+    },
+  ]);
+
+  const [isSaved, setIsSaved] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const [venueOfferTypes, setVenueOfferTypes] = useState([
     { id: null, name: '' },
@@ -117,6 +151,74 @@ const AppSettings = () => {
     } catch (error) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
+  const handleValueChange = (id, value) => {
+    setStatusCredits((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, value } : item))
+    );
+  };
+
+  const toggleCheckbox = (id, field) => {
+    setStatusCredits((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, [field]: !item[field] } : item
+      )
+    );
+  };
+
+  const handleSaveEdit = () => {
+    if (isSaved) {
+      // Edit mode
+      setIsSaved(false);
+      return;
+    }
+
+    const hasEmpty = statusCredits.some(
+      (item) => item.value === '' || item.value === null
+    );
+
+    if (hasEmpty) {
+      toast.error('Please enter status credits for all levels.');
+      return;
+    }
+
+    setIsSaved(true);
+    toast.success('Status credits saved successfully.');
+  };
+
+  const handlePublish = async () => {
+    if (!isSaved) {
+      toast.error('Please save before publishing.');
+      return;
+    }
+
+    try {
+      setIsPublishing(true);
+
+      const payload = {
+        settings: statusCredits.map((item) => ({
+          key: item.key,
+          value: Number(item.value),
+          nextLevel: item.nextLevel,
+          statusCredit: item.statusCredit,
+        })),
+      };
+
+      await axios.post(`${baseUrl}/status-tier/create`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success('Status credits published successfully.');
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || 'Failed to publish status credits.'
+      );
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -422,48 +524,92 @@ const AppSettings = () => {
 
       <main className="special-offers-container">
         <div className="special-offers-wrapper">
-          <div className="special-offers-card">
+          <div className="special-offers-card" style={{ width: '650px' }}>
             <h3 className="special-offers-title">
               Status Credits to Maintain Current Level
             </h3>
 
             <div className="status-credit-table">
-              <div className="status-row">
-                <span className="status-name">Valued</span>
-                <span className="status-value">
-                  30,000 <small>Status Credits</small>
+              <div className="status-header">
+                <span></span>
+
+                <span></span>
+
+                <span className="status-col-header">
+                  Do not display
+                  <br />
+                  next level
+                </span>
+
+                <span className="status-col-header">
+                  Do not display
+                  <br />
+                  Status Credits
                 </span>
               </div>
 
-              <div className="status-row">
-                <span className="status-name">Silver</span>
-                <span className="status-value">
-                  80,000 <small>Status Credits</small>
-                </span>
-              </div>
+              {statusCredits.map((item) => (
+                <div className="status-row" key={item.id}>
+                  <span className="status-name">{item.key}</span>
 
-              <div className="status-row">
-                <span className="status-name">Gold</span>
-                <span className="status-value">
-                  150,000 <small>Status Credits</small>
-                </span>
-              </div>
+                  <span className="status-value">
+                    {!isSaved ? (
+                      <input
+                        type="number"
+                        className="status-credit-input"
+                        value={item.value}
+                        onChange={(e) =>
+                          handleValueChange(item.id, e.target.value)
+                        }
+                      />
+                    ) : (
+                      <>
+                        {
+                          <span className="credit-value">
+                            {Number(item.value).toLocaleString()}
+                          </span>
+                        }
+                      </>
+                    )}
+                    <small> Status Credits</small>
+                  </span>
 
-              <div className="status-row">
-                <span className="status-name">Platinum</span>
-                <span className="status-value">
-                  1,000,000 <small>Status Credits</small>
-                </span>
-              </div>
+                  <label className="custom-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={!item.nextLevel}
+                      disabled={isSaved}
+                      onChange={() => toggleCheckbox(item.id, 'nextLevel')}
+                    />
+
+                    <span className="checkmark"></span>
+                  </label>
+
+                  <label className="custom-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={!item.statusCredit}
+                      disabled={isSaved}
+                      onChange={() => toggleCheckbox(item.id, 'statusCredit')}
+                    />
+
+                    <span className="checkmark"></span>
+                  </label>
+                </div>
+              ))}
             </div>
 
             <div className="update-btn-app-wrapper">
               <button
                 className="action-btn approve"
-                style={{ width: '30%', marginLeft: '34%', marginTop: '35px' }}
-                // onClick={handleUpdate}
+                style={{
+                  width: '30%',
+                  marginLeft: '34%',
+                  marginTop: '35px',
+                }}
+                onClick={handleSaveEdit}
               >
-                Edit
+                {isSaved ? 'Edit' : 'Save'}
               </button>
             </div>
           </div>
@@ -471,11 +617,11 @@ const AppSettings = () => {
       </main>
 
       <button
-        type="submit"
+        type="button"
         className="activate-btn icon-button"
         style={{ backgroundColor: '#5396D1' }}
-        // disabled={isSubmitting}
-        // onClick={handleSubmit}
+        onClick={handlePublish}
+        disabled={isPublishing}
       >
         <FaRegCheckCircle className="button-icon" />
         Activate

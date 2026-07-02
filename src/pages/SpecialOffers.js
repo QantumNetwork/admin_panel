@@ -407,7 +407,7 @@ const SpecialOffers = () => {
     activeOfferFilter,
     selectedVenue,
     token,
-  ]); // Added selectedImageFromGallery to dependencies
+  ]); 
 
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -3581,7 +3581,7 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px' }}>
+                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -3591,7 +3591,7 @@ const SpecialOffers = () => {
                                   value={bonusPoints}
                                   style={{
                                     height: '8px',
-                                    width: '40px',
+                                    width: '70px',
                                     marginTop: '5px',
                                   }}
                                   onChange={(e) =>
@@ -3607,7 +3607,7 @@ const SpecialOffers = () => {
 
                       <div
                         className="form-group inline-form-group"
-                        style={{ marginTop: '30px' }}
+                        style={{ marginTop: '50px' }}
                       >
                         <label>
                           <strong>Enter trigger value</strong>
@@ -3880,7 +3880,7 @@ const SpecialOffers = () => {
                           <strong>Valid on follow Time</strong>
                         </label>
                         <div className="time-options">
-                          <div className="radio-group">
+                          <div className="radio-group" style={{marginBottom: '0px'}}>
                             <input
                               type="radio"
                               id="allTimes"
@@ -3963,7 +3963,7 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px' }}>
+                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -3973,7 +3973,7 @@ const SpecialOffers = () => {
                                   value={bonusPoints}
                                   style={{
                                     height: '8px',
-                                    width: '40px',
+                                    width: '70px',
                                     marginTop: '5px',
                                   }}
                                   onChange={(e) =>
@@ -4074,7 +4074,7 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px' }}>
+                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -4084,7 +4084,7 @@ const SpecialOffers = () => {
                                   value={bonusPoints}
                                   style={{
                                     height: '8px',
-                                    width: '40px',
+                                    width: '70px',
                                     marginTop: '5px',
                                   }}
                                   onChange={(e) =>
@@ -4111,7 +4111,7 @@ const SpecialOffers = () => {
 
                       <div
                         className="form-group inline-form-group"
-                        style={{ marginTop: '100px' }}
+                        style={{ marginTop: '80px' }}
                       >
                         <label>
                           <strong>Enter trigger value</strong>
@@ -4250,7 +4250,7 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px' }}>
+                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -4260,7 +4260,7 @@ const SpecialOffers = () => {
                                   value={bonusPoints}
                                   style={{
                                     height: '8px',
-                                    width: '40px',
+                                    width: '70px',
                                     marginTop: '5px',
                                   }}
                                   onChange={(e) =>
@@ -4287,7 +4287,7 @@ const SpecialOffers = () => {
 
                       <div
                         className="form-group inline-form-group"
-                        style={{ marginTop: '60px' }}
+                        style={{ marginTop: '80px' }}
                       >
                         <label>
                           <strong>Enter trigger value</strong>

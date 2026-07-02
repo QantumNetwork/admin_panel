@@ -28,3 +28,75 @@
     color: #888;
     margin-left: 4px;
 }
+
+.status-header,
+.status-row {
+    display: grid;
+    grid-template-columns: 1.0fr 1.8fr 1fr 1fr;
+    align-items: center;
+    column-gap: 20px;
+    width: 100%;
+}
+
+.status-col-header {
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+    text-align: center;
+}
+
+.status-credit-input{
+width:120px;
+padding:8px;
+border:1px solid #ccc;
+border-radius:5px;
+font-size:12px;
+}
+
+.credit-value {
+    display: inline-block;
+    width: 40px;      /* adjust as needed */
+    text-align: right; /* or right if preferred */
+    font-weight: 500;
+}
+
+.custom-checkbox{
+display:flex;
+justify-content:center;
+cursor:pointer;
+}
+
+.custom-checkbox input{
+display:none;
+}
+
+.checkmark{
+width:20px;
+height:20px;
+border:2px solid #ccc;
+border-radius:3px;
+background:#fff;
+position:relative;
+transition:.2s;
+}
+
+.custom-checkbox input:checked+.checkmark{
+background:#1f4fa4;
+border-color:#1f4fa4;
+}
+
+.custom-checkbox input:checked+.checkmark::after{
+content:"✕";
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-52%);
+color:#fff;
+font-size:12px;
+font-weight:bold;
+}
+
+.custom-checkbox input:disabled+.checkmark{
+cursor:not-allowed;
+opacity:.8;
+}

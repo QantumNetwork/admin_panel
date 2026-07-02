@@ -535,13 +535,13 @@ input:focus{
 }
 
 .target-market-panel h2 {
-  margin: 0 0 0 0;
   font-size: 14px;
   font-weight: bold;
   text-align: center;
   color: #333;
+  margin-top: 0px;
+  margin-bottom: 0px;
   /* border-bottom: 1px solid #ddd; */
-  margin-top: '0px';
   padding-bottom: 5px;
 }
 
@@ -887,9 +887,9 @@ input:focus{
   font-size: 14px;
 }
 
-.validFrom-label {
+/* .validFrom-label {
   margin-top: 10px;
-}
+} */
 
 /* .bonus-pts {
   margin-top: 6px;
