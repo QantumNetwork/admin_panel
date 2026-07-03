@@ -13,7 +13,7 @@ import { MdVerified, MdRefresh, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
-import { getAppType } from '../utils/appConstants';
+import { getAppType, getAudienceOptions } from '../utils/appConstants';
 import { CiStar } from 'react-icons/ci';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/status-credits.css';
@@ -33,36 +33,7 @@ const AppSettings = () => {
   const isAdmin = userType === 'admin';
   const [venues, setVenues] = useState([]);
 
-  const [statusCredits, setStatusCredits] = useState([
-    {
-      id: 1,
-      key: 'Valued',
-      value: '',
-      nextLevel: true,
-      statusCredit: true,
-    },
-    {
-      id: 2,
-      key: 'Silver',
-      value: '',
-      nextLevel: true,
-      statusCredit: true,
-    },
-    {
-      id: 3,
-      key: 'Gold',
-      value: '',
-      nextLevel: true,
-      statusCredit: true,
-    },
-    {
-      id: 4,
-      key: 'Platinum',
-      value: '',
-      nextLevel: true,
-      statusCredit: true,
-    },
-  ]);
+  const [statusCredits, setStatusCredits] = useState([]);
 
   const [isSaved, setIsSaved] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -137,6 +108,53 @@ const AppSettings = () => {
   const isActive = (path) => {
     return location.pathname === path;
   };
+
+const buildStatusCredits = (venue, settings = []) => {
+  const audienceOptions = getAudienceOptions(venue) || [];
+
+  return audienceOptions.map((option, index) => {
+    const saved = settings.find((item) => item.key === option.value);
+
+    return {
+      id: index + 1,
+      key: option.value,
+      value: saved?.value ?? 0,
+      nextLevel: saved?.nextLevel ?? true,
+      statusCredit: saved?.statusCredit ?? true,
+    };
+  });
+};
+
+//get api
+useEffect(() => {
+  if (!selectedVenue) return;
+
+  const fetchStatusCredits = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/status-tier/getAll`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const settings = response.data?.data?.settings || [];
+
+      setStatusCredits(buildStatusCredits(selectedVenue, settings));
+      setIsSaved(settings.length > 0);
+    } catch (err) {
+      console.error('Error fetching status credits:', err);
+
+      // If nothing exists yet, just show default audience levels
+      setStatusCredits(buildStatusCredits(selectedVenue));
+      setIsSaved(false);
+    }
+  };
+
+  fetchStatusCredits();
+}, [selectedVenue]);
 
   const handleLock = async () => {
     try {
@@ -522,9 +540,9 @@ const AppSettings = () => {
         )}
       </aside>
 
-      <main className="special-offers-container">
+      <main className="special-offers-container" style={{marginTop: '30px'}}>
         <div className="special-offers-wrapper">
-          <div className="special-offers-card" style={{ width: '650px' }}>
+          <div className="special-offers-card" style={{ width: '700px' }}>
             <h3 className="special-offers-title">
               Status Credits to Maintain Current Level
             </h3>
