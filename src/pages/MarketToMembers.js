@@ -79,6 +79,8 @@ const MarketToMembers = () => {
     }
   };
 
+  const booleanFields = ['Retail', 'On Premise', 'Gaming'];
+
   // Fields that require API call when selected
   const apiCallFields = [
     'Date Of Birth',
@@ -192,30 +194,29 @@ const MarketToMembers = () => {
           if (row.operator === 'Contains') {
             // For Contains: substring match anywhere in the string (existing behavior)
             // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id]
-              .filter((option) =>
+            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+              (option) =>
                 option
                   .toString()
                   .toLowerCase()
                   .includes(row.value.toLowerCase())
-              )
-              // .slice(0, 10);
+            );
+            // .slice(0, 10);
           } else if (row.operator === 'Exactly Matches') {
             // For Exactly Matches: exact match at beginning of string
             // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id]
-              .filter(
-                (option) =>
-                  option
-                    .toString()
-                    .toLowerCase()
-                    .indexOf(row.value.toLowerCase()) === 0
-              )
-              // .slice(0, 10);
+            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+              (option) =>
+                option
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(row.value.toLowerCase()) === 0
+            );
+            // .slice(0, 10);
           } else {
             // Default for other operators
             // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id]
+            newFilteredOptions[row.id] = filterValueOptions[row.id];
             // .slice(
             //   0,
             //   10
@@ -937,10 +938,11 @@ const MarketToMembers = () => {
 
     const isUpdate = !!notificationId;
 
-    let url = isUpdate && status !== 'completed'
-  ? `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`
-  : `https://api.s2w.com.au/notification/send-notification`;
-  
+    let url =
+      isUpdate && status !== 'completed'
+        ? `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`
+        : `https://api.s2w.com.au/notification/send-notification`;
+
     if (selectedTargetMarket === 'Send to All') {
       const memberNum = await calculateReachSendToAll();
       console.log('memberNum', memberNum);
@@ -1144,11 +1146,24 @@ const MarketToMembers = () => {
     // Update the filter row with the new field
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
-        return { ...row, field, value: '' };
+        return {
+          ...row,
+          field,
+          value: '',
+          operator: dateFields.includes(field) ? 'Exactly Matches' : 'Contains',
+        };
       }
       return row;
     });
     setFilterRows(updatedRows);
+
+    if (booleanFields.includes(field)) {
+      setFilterValueOptions((prev) => ({
+        ...prev,
+        [id]: ['True', 'False'],
+      }));
+      return;
+    }
 
     // Check which API endpoint to use based on field type
     if (apiCallFields.includes(field) || newApiCallFields.includes(field)) {
@@ -1304,7 +1319,8 @@ const MarketToMembers = () => {
   ];
 
   const dateOperatorOptions = [
-    ...defaultOperatorOptions,
+    { value: 'Exactly Matches', label: 'Exactly Matches' },
+    { value: 'Is not', label: 'Is not' },
     { value: 'Is before', label: 'Is before' },
     { value: 'Is after', label: 'Is after' },
   ];
@@ -2011,6 +2027,24 @@ const MarketToMembers = () => {
                           onKeyDown={(e) => e.preventDefault()} // block typing
                           style={{ width: '90px' }}
                         />
+                      ) : booleanFields.includes(filterRows[0].field) ? (
+                        <Select
+                          options={[
+                            { value: 'True', label: 'True' },
+                            { value: 'False', label: 'False' },
+                          ]}
+                          value={
+                            filterRows[0].value
+                              ? {
+                                  value: filterRows[0].value,
+                                  label: filterRows[0].value,
+                                }
+                              : null
+                          }
+                          onChange={(opt) => handleValueChange(1, opt.value)}
+                          styles={selectStyles}
+                          isSearchable={false}
+                        />
                       ) : (
                         <input
                           id="filter-value-1"
@@ -2029,6 +2063,7 @@ const MarketToMembers = () => {
                         />
                       )}
                       {!dateFields.includes(filterRows[0].field) &&
+                        !booleanFields.includes(filterRows[0].field) &&
                         showSuggestions[1] &&
                         filterRows[0].value && (
                           <div className="suggestions-dropdown">
@@ -2151,6 +2186,26 @@ const MarketToMembers = () => {
                               }
                               onKeyDown={(e) => e.preventDefault()} // 🚫 block typing
                             />
+                          ) : booleanFields.includes(row.field) ? (
+                            <Select
+                              options={[
+                                { value: 'True', label: 'True' },
+                                { value: 'False', label: 'False' },
+                              ]}
+                              value={
+                                row.value
+                                  ? {
+                                      value: row.value,
+                                      label: row.value,
+                                    }
+                                  : null
+                              }
+                              onChange={(opt) =>
+                                handleValueChange(row.id, opt.value)
+                              }
+                              styles={selectStyles}
+                              isSearchable={false}
+                            />
                           ) : (
                             <input
                               id={`filter-value-${row.id}`}
@@ -2173,6 +2228,7 @@ const MarketToMembers = () => {
                             />
                           )}
                           {!dateFields.includes(row.field) &&
+                            !booleanFields.includes(row.field) &&
                             showSuggestions[row.id] && (
                               <div className="suggestions-dropdown">
                                 {(filteredOptions[row.id] || []).map(
