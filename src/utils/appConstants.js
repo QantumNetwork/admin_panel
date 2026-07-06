@@ -156,6 +156,12 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Member', label: 'Member' },
       { value: 'Corporate', label: 'Corporate' },
       { value: 'VIP', label: 'VIP' },
+      { value: 'Bronze', label: 'Bronze'},
+      { value: 'Silver', label: 'Silver'},
+      { value: 'Gold', label: 'Gold'},
+      { value: 'Platinum', label: 'Platinum'},
+      { value: 'Locals', label: 'Locals'},
+      { value: 'Test', label: 'Test'}
     ],
     Drinks: [
       { value: 'Staff', label: 'Staff' },
@@ -262,7 +268,7 @@ export const getAudienceStyle = () => ({
   option: (provided) => ({
     ...provided,
     fontSize: '11px',
-    padding: '6px 8px',
+    padding: '3px 4px',
   }),
   menuPortal: (base) => ({
     ...base,

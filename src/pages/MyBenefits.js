@@ -105,7 +105,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Staff':
         if (selectedVenue === 'Montauk' || selectedVenue === 'Central')
           return '#006D88';
-        if (selectedVenue === 'Flinders') return '#FF0000';
+        if (selectedVenue === 'Flinders') return '#1d7d95ff';
         if (selectedVenue === 'Drinks') return '#ff00d9';
         if (selectedVenue === 'EDP') return '#067f0a';
         if (selectedVenue === 'Mannum') return '#4D5E7B';
@@ -141,7 +141,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Montauk') return '#344361';
         if (selectedVenue === 'Central') return '#602373';
         if (selectedVenue === 'Brisbane') return '#376cc3ff';
-        if (selectedVenue === 'Flinders') return '#1d7d95ff';
+        if (selectedVenue === 'Flinders') return '#462919';
       case 'Commodore':
         if (selectedVenue === 'Manly') return '#B0B0B0';
         if (selectedVenue === 'Bluewater') return '#333333';
@@ -197,7 +197,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Admiral':
         return '#23a5ec';
       case 'Corporate':
-        return '#b8e90aff';
+        return '#F4C9B5';
       case 'Regulars':
         return '#eeddc0';
       case 'Crew':
@@ -215,6 +215,10 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         return '#ff0000';
       case 'Perpetuity':
         if (selectedVenue === 'Mannum') return '#D4AF37';
+      case 'Test':
+        return '#ff0000';
+      case 'Locals':
+        return '#717B50';
       default:
         return '#D4AF37'; // Default gold color
     }
