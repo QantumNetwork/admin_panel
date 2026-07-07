@@ -24,17 +24,27 @@ import { IoIosArrowDown, IoIosArrowUp, IoMdImage } from 'react-icons/io';
 import { getAppType, getAudienceOptions } from '../utils/appConstants';
 
 const SpecialOffers = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // track the Audience dropdown container
   const audienceWrapperRef = useRef(null);
   // track the Membership dropdown container
   const membershipWrapperRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const ignoreArtGalleryRestoreRef = useRef(false);
+  // Always-current mirror of addMode/offers for use inside async callbacks
+  // (fetch resolutions, effects) where a stale closure would otherwise
+  // clobber state that changed while the async work was in flight.
+  // Seeded from location.state for the same remount-race reasons as the
+  // addMode state itself (see below) — otherwise there's a brief window
+  // right after remount where this ref reads false even though we're
+  // actually returning from Art Gallery in add-mode.
+  const addModeRef = useRef(location.state?.isAddingNew ?? false);
+  const offersRef = useRef([]);
 
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
-  const location = useLocation();
-  const navigate = useNavigate();
   // Default to 'A' if userInitial is not provided
   // Get email from localStorage or use a default
   const email = localStorage.getItem('userEmail');
@@ -47,11 +57,37 @@ const SpecialOffers = () => {
 
   const [activeTab, setActiveTab] = useState('live');
 
-  // State to track whether we're in "add new offer" mode
-  const [addMode, setAddMode] = useState(false);
+  // State to track whether we're in "add new offer" mode.
+  // Seeded directly from location.state (rather than defaulting to false
+  // and correcting it later in an effect) because this component is
+  // unmounted/remounted on the /art-gallery round trip. If we defaulted to
+  // false here, there would be a real window — between mount and the
+  // restore effect running — where addMode is incorrectly false and the
+  // very first offers fetch could see it, auto-select an offer, and lock
+  // in the wrong value before the restore effect gets a chance to correct it.
+  const [addMode, setAddMode] = useState(
+    () => location.state?.isAddingNew ?? false
+  );
+  // Wrapper that updates addModeRef synchronously alongside the state
+  // update. Relying only on a useEffect to sync the ref leaves a window
+  // (until the next render commits) where async work resolving in that
+  // window would still see a stale addModeRef value. Every addMode update
+  // in this file goes through this wrapper so the ref is always accurate
+  // the instant addMode is set, not just after the next render.
+  const updateAddMode = (value) => {
+    addModeRef.current = value;
+    setAddMode(value);
+  };
+  useEffect(() => {
+    addModeRef.current = addMode;
+  }, [addMode]);
 
-  // State for image upload
-  const [uploadedImage, setUploadedImage] = useState(null);
+  // State for image upload. Seeded from location.state for the same reason
+  // as addMode above — avoids a null flash on the very first render after
+  // returning from Art Gallery.
+  const [uploadedImage, setUploadedImage] = useState(
+    () => location.state?.selectedImageFromGallery ?? null
+  );
   // const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef(null);
 
@@ -134,7 +170,15 @@ const SpecialOffers = () => {
   // --- Add these states near the top with your other useState declarations ---
   const [menuType, setMenuType] = useState(''); // 'standard' or 'multiple'
   const [offerTypes, setOfferTypes] = useState([]); // items coming from filter_Type
-  const [activeOfferFilter, setActiveOfferFilter] = useState('ALL'); // currently selected pill
+  const [activeOfferFilter, setActiveOfferFilter] = useState(
+    // Seeded from location.state instead of defaulting to 'ALL' and fixing
+    // it up later in an effect. This component unmounts/remounts on the
+    // /art-gallery round trip, and the default-then-correct approach left
+    // a window where the very first offers fetch ran with 'ALL', selected
+    // an ALL-scoped offer, and reset addMode — before the correct pill
+    // could be restored.
+    () => location.state?.formValues?.activeOfferFilter ?? 'ALL'
+  ); // currently selected pill
 
   // Bonus points UI
   const [showBonusWhenRedeemed, setShowBonusWhenRedeemed] = useState(false);
@@ -152,7 +196,9 @@ const SpecialOffers = () => {
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
 
-  const [currentPostPill, setCurrentPostPill] = useState('ALL');
+  const [currentPostPill, setCurrentPostPill] = useState(
+    () => location.state?.formValues?.currentPostPill ?? 'ALL'
+  );
 
   const filteredOffers = offers.filter((offer) => {
     if (activeTab !== 'live') return true;
@@ -252,9 +298,20 @@ const SpecialOffers = () => {
 
         // Update offers list
         setOffers(vouchers);
+        offersRef.current = vouchers;
 
         // Skip further processing if we're returning from Art Gallery with an image
         if (location.state?.selectedImageFromGallery) {
+          return;
+        }
+
+        // Skip auto-selecting/deselecting an offer if the user is currently
+        // in "add new offer" mode. This fetch may have been triggered by an
+        // unrelated background refresh (e.g. clicking a filter pill) that
+        // resolves *after* the user has already clicked "Add New Offer" —
+        // without this guard, the code below would call setAddMode(false)
+        // and stomp on the add-mode the user just entered.
+        if (addModeRef.current) {
           return;
         }
 
@@ -358,7 +415,7 @@ const SpecialOffers = () => {
                 ? setShowBonusWhenRedeemed(true)
                 : setShowBonusWhenRedeemed(false);
             }
-            setAddMode(false);
+            updateAddMode(false);
 
             setMembershipExpiryDate(
               offerToSelect.membershipExpiryDate
@@ -387,7 +444,7 @@ const SpecialOffers = () => {
           setTriggerValue('');
           setSelectedAudiences([]);
           setIsEveryone(false);
-          setAddMode(false);
+          updateAddMode(false);
           setBonusPoints('null');
           setShowBonusWhenRedeemed(false);
           setSelectedMemberships([]);
@@ -1008,7 +1065,7 @@ const SpecialOffers = () => {
     console.log('Selected Offer:', offer);
 
     // Exit add mode if we're in it
-    if (addMode) setAddMode(false);
+    if (addMode) updateAddMode(false);
     setShowDetails(true);
 
     // Make sure to set heading and description directly from the offer
@@ -1135,7 +1192,7 @@ const SpecialOffers = () => {
     // Set selectedOffer to null to disconnect from any existing offer data
     setSelectedOffer(null);
 
-    setAddMode(true);
+    updateAddMode(true);
     setShowDetails(true);
     setHeadingText(''); // Clear heading field
     setDescriptionText(''); // Clear description field
@@ -1726,11 +1783,17 @@ const SpecialOffers = () => {
       const data = await response.json();
       console.log('API Response:', data);
 
-      toast.success('Offer submitted successfully!', {
+      if(data?.success) {
+        toast.success('Offer submitted successfully!', {
         containerId: 'offerActions',
       });
+      } else {
+        toast.error(data.message, {
+        containerId: 'offerActions',
+        });
+      }
 
-      setAddMode(false);
+      updateAddMode(false);
       setShowDetails(false);
       setSelectedOffer(null);
       setUploadedImage(null);
@@ -1809,7 +1872,7 @@ const SpecialOffers = () => {
 
       if (response.status === 200) {
         toast.success('Voucher deleted successfully!');
-        setAddMode(false);
+        updateAddMode(false);
         setShowDetails(false);
         setSelectedOffer(null);
         setUploadedImage(null);
@@ -2180,7 +2243,7 @@ const SpecialOffers = () => {
           }, 100);
         }
 
-        setAddMode(false);
+        updateAddMode(false);
         setSelectedOffer(null);
         setUploadedImage(null);
         // Prevent Art Gallery restoration after creation
@@ -2240,6 +2303,14 @@ const SpecialOffers = () => {
     ) {
       return;
     }
+
+    // Set this synchronously, before any state updates below, so that if
+    // this effect is re-entered (e.g. triggered again by a state update
+    // this same run causes, before react-router has finished clearing
+    // location.state) we don't reprocess the same gallery payload a second
+    // time and re-apply a now-stale isAddingNew/addMode value.
+    ignoreArtGalleryRestoreRef.current = true;
+
     // Check if we're coming back from Art Gallery with an image
     if (location.state?.selectedImageFromGallery) {
       const imageUrl = location.state.selectedImageFromGallery;
@@ -2248,7 +2319,7 @@ const SpecialOffers = () => {
 
       // Preserve addMode state if it was set when navigating to Art Gallery
       if (location.state.isAddingNew !== undefined) {
-        setAddMode(location.state.isAddingNew);
+        updateAddMode(location.state.isAddingNew);
       }
 
       // If we have form values from Art Gallery, restore them
@@ -2291,7 +2362,7 @@ const SpecialOffers = () => {
             (offer) => offer._id === id
           );
 
-          if (existingOffer && !addMode) {
+          if (existingOffer && !addModeRef.current) {
             // Update the found offer with the new image
             setSelectedOffer({
               ...existingOffer,
@@ -2303,7 +2374,7 @@ const SpecialOffers = () => {
             // setHeadingText(savedHeading || "");
             // setDescriptionText(savedDescription || "");
           }
-        } else if (selectedOffer && !addMode) {
+        } else if (selectedOffer && !addModeRef.current) {
           // If no ID in formValues but we have a selectedOffer, just update its image
           setSelectedOffer({
             ...selectedOffer,
@@ -2366,11 +2437,18 @@ const SpecialOffers = () => {
         }, 0);
       }
 
-      ignoreArtGalleryRestoreRef.current = true
       // Clear location state to avoid reapplying when component re-renders
+      // (ignoreArtGalleryRestoreRef was already set at the top of this
+      // effect, before any state updates were made)
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state, addMode, offers]);
+    // Intentionally depends only on location.state: addMode/offers are read
+    // via refs (addModeRef/offersRef) or closure. Including addMode or
+    // offers here caused this effect to re-fire on unrelated background
+    // updates (e.g. a refetch changing the offers array reference) while
+    // location.state hadn't been cleared yet, re-applying a stale
+    // isAddingNew value and flipping addMode unexpectedly.
+  }, [location.state]);
 
   useEffect(() => {
     const wrapperEl = audienceWrapperRef.current;
@@ -2792,7 +2870,7 @@ const SpecialOffers = () => {
               onClick={() => {
                 setActiveTab('live');
                 setSelectedOffer(null);
-                setAddMode(false);
+                updateAddMode(false);
                 setHeadingText('');
                 setDescriptionText('');
                 setUploadedImage(null);
@@ -2817,7 +2895,7 @@ const SpecialOffers = () => {
               onClick={() => {
                 setActiveTab('expired');
                 setSelectedOffer(null);
-                setAddMode(false);
+                updateAddMode(false);
                 setHeadingText('');
                 setDescriptionText('');
                 setUploadedImage(null);
@@ -3128,7 +3206,7 @@ const SpecialOffers = () => {
                       </button>
                       <button
                         className="delete-post-btn"
-                        onClick={() => setAddMode(false)}
+                        onClick={() => updateAddMode(false)}
                       >
                         <FaTrashAlt /> DELETE POST
                       </button>
