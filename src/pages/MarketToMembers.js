@@ -135,6 +135,30 @@ const MarketToMembers = () => {
     'Drink Category': 'DrinkCategory',
   };
 
+  const onlyIsOperatorOptions = [{ value: 'Is', label: 'Is' }];
+
+  const ageOperatorOptions = [
+    { value: 'Is exactly', label: 'Is exactly' },
+    { value: 'Is not', label: 'Is not' },
+    { value: 'Is younger than', label: 'Is younger than' },
+    {
+      value: 'Is older than and including',
+      label: 'Is older than and including',
+    },
+  ];
+
+  const postcodeOperatorOptions = [
+    { value: 'Is less than', label: 'Is less than' },
+    { value: 'Is more than', label: 'Is more than' },
+    { value: 'Is not', label: 'Is not' },
+  ];
+
+  const pointsBalanceOperatorOptions = [
+    { value: 'Is', label: 'Is' },
+    { value: 'Greater than', label: 'Greater than' },
+    { value: 'Less than', label: 'Less than' },
+  ];
+
   // Get email from localStorage or use a default
   const email = localStorage.getItem('userEmail') || 'user@example.com';
   const userInitial = email.charAt(0).toUpperCase();
@@ -1143,6 +1167,21 @@ const MarketToMembers = () => {
 
   // Handle field change and make API call if needed
   const handleFieldChange = async (id, field) => {
+    let defaultOperator = 'Contains';
+
+    if (dateFields.includes(field)) {
+      defaultOperator = 'Exactly Matches';
+    } else if (field === 'Age') {
+      defaultOperator = 'Is exactly';
+    } else if (field === 'Postcode') {
+      defaultOperator = 'Is less than';
+    } else if (field === 'Points Balance') {
+      defaultOperator = 'Is';
+    } else if (
+      ['Retail', 'On Premise', 'Gaming', 'Location Brand'].includes(field)
+    ) {
+      defaultOperator = 'Is';
+    }
     // Update the filter row with the new field
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1150,7 +1189,7 @@ const MarketToMembers = () => {
           ...row,
           field,
           value: '',
-          operator: dateFields.includes(field) ? 'Exactly Matches' : 'Contains',
+          operator: defaultOperator,
         };
       }
       return row;
@@ -1327,6 +1366,31 @@ const MarketToMembers = () => {
 
   const dateFields = ['Date Of Birth', 'Last Visit Date', 'Date Joined'];
 
+  //helper function
+  const getOperatorOptions = (field) => {
+    if (dateFields.includes(field)) {
+      return dateOperatorOptions;
+    }
+
+    if (field === 'Age') {
+      return ageOperatorOptions;
+    }
+
+    if (field === 'Postcode') {
+      return postcodeOperatorOptions;
+    }
+
+    if (field === 'Points Balance') {
+      return pointsBalanceOperatorOptions;
+    }
+
+    if (['Retail', 'On Premise', 'Gaming', 'Location Brand'].includes(field)) {
+      return onlyIsOperatorOptions;
+    }
+
+    return defaultOperatorOptions;
+  };
+
   const selectStyles = {
     control: (base) => ({
       ...base,
@@ -1334,8 +1398,13 @@ const MarketToMembers = () => {
       backgroundColor: 'white',
       fontSize: '10px',
     }),
+    menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
     menu: (base) => ({
       ...base,
+      zIndex: 9999,
       backgroundColor: 'white',
     }),
     option: (base, state) => ({
@@ -1509,6 +1578,8 @@ const MarketToMembers = () => {
                   minWidth: '200px',
                 }}
                 value={selectedVenue}
+                menuPortalTarget={document.body}
+menuPosition="fixed"
                 onChange={async (e) => {
                   const selectedValue = e.target.value;
                   if (!selectedValue) return;
@@ -1971,9 +2042,11 @@ const MarketToMembers = () => {
                                 )
                           }
                           onChange={(opt) => handleFieldChange(1, opt.value)}
+                          menuPortalTarget={document.body}
+menuPosition="fixed"
                           styles={selectStyles}
                           isSearchable={false}
-                          menuPlacement="auto"
+                          menuPlacement="bottom"
                           menuShouldScrollIntoView
                           placeholder="Select Category"
                         />
@@ -1982,20 +2055,10 @@ const MarketToMembers = () => {
                     <div className="filter-operator">
                       <div style={{ width: '90px' }}>
                         <Select
-                          options={
-                            dateFields.includes(filterRows[0].field)
-                              ? dateOperatorOptions
-                              : defaultOperatorOptions
-                          }
-                          value={
-                            dateFields.includes(filterRows[0].field)
-                              ? dateOperatorOptions.find(
-                                  (o) => o.value === filterRows[0].operator
-                                )
-                              : defaultOperatorOptions.find(
-                                  (o) => o.value === filterRows[0].operator
-                                )
-                          }
+                          options={getOperatorOptions(filterRows[0].field)}
+                          value={getOperatorOptions(filterRows[0].field).find(
+                            (o) => o.value === filterRows[0].operator
+                          )}
                           onChange={(opt) => {
                             setFilterRows((rs) =>
                               rs.map((r) =>
@@ -2005,8 +2068,10 @@ const MarketToMembers = () => {
                           }}
                           styles={selectStyles}
                           isSearchable={false}
-                          menuPlacement="auto"
+                          menuPlacement="bottom"
                           menuShouldScrollIntoView
+                          menuPortalTarget={document.body}
+menuPosition="fixed"
                         />
                       </div>
                     </div>
@@ -2044,6 +2109,8 @@ const MarketToMembers = () => {
                           onChange={(opt) => handleValueChange(1, opt.value)}
                           styles={selectStyles}
                           isSearchable={false}
+                          menuPortalTarget={document.body}
+menuPosition="fixed"
                         />
                       ) : (
                         <input
@@ -2095,6 +2162,8 @@ const MarketToMembers = () => {
                         <div className="filter-condition">
                           <select
                             className="filter-select-first"
+                            menuPortalTarget={document.body}
+menuPosition="fixed"
                             value={
                               row.type && row.type.toUpperCase() === 'OR'
                                 ? 'OR'
@@ -2129,29 +2198,21 @@ const MarketToMembers = () => {
                               }
                               styles={selectStyles}
                               isSearchable={false}
-                              menuPlacement="auto"
+                              menuPlacement="bottom"
                               menuShouldScrollIntoView
                               placeholder="Select Category"
+                              menuPortalTarget={document.body}
+menuPosition="fixed"
                             />
                           </div>
                         </div>
                         <div className="filter-operator">
                           <div style={{ width: '90px' }}>
                             <Select
-                              options={
-                                dateFields.includes(row.field)
-                                  ? dateOperatorOptions
-                                  : defaultOperatorOptions
-                              }
-                              value={
-                                dateFields.includes(row.field)
-                                  ? dateOperatorOptions.find(
-                                      (o) => o.value === row.operator
-                                    )
-                                  : defaultOperatorOptions.find(
-                                      (o) => o.value === row.operator
-                                    )
-                              }
+                              options={getOperatorOptions(row.field)}
+                              value={getOperatorOptions(row.field).find(
+                                (o) => o.value === row.operator
+                              )}
                               onChange={(opt) => {
                                 const updated = filterRows.map((r) =>
                                   r.id === row.id
@@ -2162,8 +2223,10 @@ const MarketToMembers = () => {
                               }}
                               styles={selectStyles}
                               isSearchable={false}
-                              menuPlacement="auto"
+                              menuPlacement="bottom"
                               menuShouldScrollIntoView
+                              menuPortalTarget={document.body}
+menuPosition="fixed"
                             />
                           </div>
                         </div>
@@ -2205,6 +2268,8 @@ const MarketToMembers = () => {
                               }
                               styles={selectStyles}
                               isSearchable={false}
+                              menuPortalTarget={document.body}
+menuPosition="fixed"
                             />
                           ) : (
                             <input

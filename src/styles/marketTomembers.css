@@ -400,6 +400,15 @@
     font-size: 10px;
 }
 
+.section-card {
+    position: relative;
+    z-index: 1;
+}
+
+.section-card:has(.suggestions-dropdown) {
+    z-index: 100;
+}
+
 .filter-select-first {
     padding: 8px;
     border: 1px solid #ccc;
