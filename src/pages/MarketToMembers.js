@@ -135,6 +135,27 @@ const MarketToMembers = () => {
     'Drink Category': 'DrinkCategory',
   };
 
+  const onlyIsOperatorOptions = [{ value: 'exact', label: 'is' }];
+
+  const ageOperatorOptions = [
+    { value: 'is same', label: 'Is exactly' },
+    { value: 'IsNot', label: 'Is not' },
+    { value: 'is younger', label: 'Is younger than' },
+    { value: 'is older', label: 'Is older than and including' },
+  ];
+
+  const postcodeOperatorOptions = [
+    { value: 'is less than', label: 'Is less than' },
+    { value: 'is more than', label: 'Is more than' },
+    { value: 'IsNot', label: 'Is not' },
+  ];
+
+  const pointsBalanceOperatorOptions = [
+    { value: 'is', label: 'Is' },
+    { value: 'greater than', label: 'Greater than' },
+    { value: 'less than', label: 'Less than' },
+  ];
+
   // Get email from localStorage or use a default
   const email = localStorage.getItem('userEmail') || 'user@example.com';
   const userInitial = email.charAt(0).toUpperCase();
@@ -359,7 +380,14 @@ const MarketToMembers = () => {
                     filter.match === 'exact' ||
                     filter.match === 'exactly matches'
                   ) {
-                    matchOperator = 'Exactly Matches';
+                    if (
+        ['Retail', 'On Premise', 'Gaming', 'Location Brand']
+            .includes(fieldName)
+    ) {
+        matchOperator = 'exact';
+    } else {
+        matchOperator = 'Exactly Matches';
+    }
                   } else if (
                     filter.match === 'isBefore' ||
                     filter.match === 'is before'
@@ -374,10 +402,38 @@ const MarketToMembers = () => {
                     filter.match === 'IsNot' ||
                     filter.match === 'is not'
                   ) {
-                    matchOperator = 'Is not';
+                    if (fieldName === 'Age' || fieldName === 'Postcode') {
+        matchOperator = 'IsNot';
+    } else {
+        matchOperator = 'Is not';
+    }
                   } else {
                     matchOperator = 'Contains';
                   }
+
+                  if (filter.match === 'is same')
+    matchOperator = 'is same';
+
+if (filter.match === 'is younger')
+    matchOperator = 'is younger';
+
+if (filter.match === 'is older')
+    matchOperator = 'is older';
+
+if (filter.match === 'is less than')
+    matchOperator = 'is less than';
+
+if (filter.match === 'is more than')
+    matchOperator = 'is more than';
+
+if (filter.match === 'is')
+    matchOperator = 'is';
+
+if (filter.match === 'greater than')
+    matchOperator = 'greater than';
+
+if (filter.match === 'less than')
+    matchOperator = 'less than';
 
                   return {
                     id: index + 1,
@@ -940,8 +996,8 @@ const MarketToMembers = () => {
 
     let url =
       isUpdate && status !== 'completed'
-        ? `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`
-        : `https://betaapi.s2w.com.au/notification/send-notification`;
+        ? `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`
+        : `https://api.s2w.com.au/notification/send-notification`;
 
     if (selectedTargetMarket === 'Send to All') {
       const memberNum = await calculateReachSendToAll();
@@ -1143,6 +1199,41 @@ const MarketToMembers = () => {
 
   // Handle field change and make API call if needed
   const handleFieldChange = async (id, field) => {
+    let defaultOperator = 'Contains';
+
+    if (dateFields.includes(field)) {
+      defaultOperator = 'Exactly Matches';
+    } else if (field === 'Age') {
+      defaultOperator = 'is same';
+    } else if (field === 'Postcode') {
+      defaultOperator = 'is less than';
+    } else if (field === 'Points Balance') {
+      defaultOperator = 'is';
+    } else if (
+      ['Retail', 'On Premise', 'Gaming', 'Location Brand'].includes(field)
+    ) {
+      defaultOperator = 'exact';
+    }
+
+    let match = 'contains';
+
+switch (defaultOperator) {
+  case 'Exactly Matches':
+    match = 'exact';
+    break;
+  case 'Contains':
+    match = 'contains';
+    break;
+  case 'Is before':
+    match = 'isBefore';
+    break;
+  case 'Is after':
+    match = 'isAfter';
+    break;
+  default:
+    // New operators already store backend values
+    match = defaultOperator;
+}
     // Update the filter row with the new field
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1150,7 +1241,7 @@ const MarketToMembers = () => {
           ...row,
           field,
           value: '',
-          operator: dateFields.includes(field) ? 'Exactly Matches' : 'Contains',
+          operator: defaultOperator,
         };
       }
       return row;
@@ -1180,8 +1271,8 @@ const MarketToMembers = () => {
 
         // Determine which API endpoint to use
         const apiEndpoint = newApiCallFields.includes(field)
-          ? `${baseUrl}/notification/getnew?type=${fieldParam}&match=contains&search=`
-          : `${baseUrl}/notification/getusernew?type=${fieldParam}&match=contains&search=`;
+          ? `${baseUrl}/notification/getnew?type=${fieldParam}&match=${match}&search=`
+          : `${baseUrl}/notification/getusernew?type=${fieldParam}&match=${match}&search=`;
 
         const response = await fetch(apiEndpoint, {
           headers: {
@@ -1233,19 +1324,17 @@ const MarketToMembers = () => {
       ? fieldToApiParam[row.field]
       : row.field.replace(/ /g, '');
 
-    // Convert operator to API match param
-    let match =
-      row.operator === 'Exactly Matches'
-        ? 'exact'
-        : row.operator === 'Contains'
-          ? 'contains'
-          : row.operator === 'Is not'
-            ? 'IsNot'
-            : row.operator === 'Is before'
-              ? 'isBefore'
-              : row.operator === 'Is after'
-                ? 'isAfter'
-                : 'contains';
+    let match = row.operator;
+
+    if (match === 'Exactly Matches') {
+      match = 'exact';
+    } else if (match === 'Contains') {
+      match = 'contains';
+    } else if (match === 'Is before') {
+      match = 'isBefore';
+    } else if (match === 'Is after') {
+      match = 'isAfter';
+    }
 
     if (!value || value.length < 1) {
       setFilteredOptions((prev) => ({ ...prev, [id]: [] }));
@@ -1327,6 +1416,31 @@ const MarketToMembers = () => {
 
   const dateFields = ['Date Of Birth', 'Last Visit Date', 'Date Joined'];
 
+  //helper function
+  const getOperatorOptions = (field) => {
+    if (dateFields.includes(field)) {
+      return dateOperatorOptions;
+    }
+
+    if (field === 'Age') {
+      return ageOperatorOptions;
+    }
+
+    if (field === 'Postcode') {
+      return postcodeOperatorOptions;
+    }
+
+    if (field === 'Points Balance') {
+      return pointsBalanceOperatorOptions;
+    }
+
+    if (['Retail', 'On Premise', 'Gaming', 'Location Brand'].includes(field)) {
+      return onlyIsOperatorOptions;
+    }
+
+    return defaultOperatorOptions;
+  };
+
   const selectStyles = {
     control: (base) => ({
       ...base,
@@ -1335,9 +1449,9 @@ const MarketToMembers = () => {
       fontSize: '10px',
     }),
     menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999,
-  }),
+      ...base,
+      zIndex: 9999,
+    }),
     menu: (base) => ({
       ...base,
       zIndex: 9999,
@@ -1515,7 +1629,7 @@ const MarketToMembers = () => {
                 }}
                 value={selectedVenue}
                 menuPortalTarget={document.body}
-menuPosition="absolute"
+                menuPosition="fixed"
                 onChange={async (e) => {
                   const selectedValue = e.target.value;
                   if (!selectedValue) return;
@@ -1978,11 +2092,11 @@ menuPosition="absolute"
                                 )
                           }
                           onChange={(opt) => handleFieldChange(1, opt.value)}
+                          menuPortalTarget={document.body}
+                          menuPosition="absolute"
                           styles={selectStyles}
                           isSearchable={false}
                           menuPlacement="bottom"
-                          menuPortalTarget={document.body}
-menuPosition="absolute"
                           menuShouldScrollIntoView
                           placeholder="Select Category"
                         />
@@ -1991,22 +2105,10 @@ menuPosition="absolute"
                     <div className="filter-operator">
                       <div style={{ width: '90px' }}>
                         <Select
-                          options={
-                            dateFields.includes(filterRows[0].field)
-                              ? dateOperatorOptions
-                              : defaultOperatorOptions
-                          }
-                          menuPortalTarget={document.body}
-menuPosition="absolute"
-                          value={
-                            dateFields.includes(filterRows[0].field)
-                              ? dateOperatorOptions.find(
-                                  (o) => o.value === filterRows[0].operator
-                                )
-                              : defaultOperatorOptions.find(
-                                  (o) => o.value === filterRows[0].operator
-                                )
-                          }
+                          options={getOperatorOptions(filterRows[0].field)}
+                          value={getOperatorOptions(filterRows[0].field).find(
+                            (o) => o.value === filterRows[0].operator
+                          )}
                           onChange={(opt) => {
                             setFilterRows((rs) =>
                               rs.map((r) =>
@@ -2018,6 +2120,8 @@ menuPosition="absolute"
                           isSearchable={false}
                           menuPlacement="bottom"
                           menuShouldScrollIntoView
+                          menuPortalTarget={document.body}
+                          menuPosition="absolute"
                         />
                       </div>
                     </div>
@@ -2056,7 +2160,7 @@ menuPosition="absolute"
                           styles={selectStyles}
                           isSearchable={false}
                           menuPortalTarget={document.body}
-menuPosition="absolute"
+                          menuPosition="absolute"
                         />
                       ) : (
                         <input
@@ -2108,13 +2212,13 @@ menuPosition="absolute"
                         <div className="filter-condition">
                           <select
                             className="filter-select-first"
+                            menuPortalTarget={document.body}
+                            menuPosition="fixed"
                             value={
                               row.type && row.type.toUpperCase() === 'OR'
                                 ? 'OR'
                                 : 'AND'
                             }
-                            menuPortalTarget={document.body}
-menuPosition="absolute"
                             onChange={(e) => {
                               const updated = filterRows.map((r) =>
                                 r.id === row.id
@@ -2132,8 +2236,6 @@ menuPosition="absolute"
                           <div style={{ width: '110px' }}>
                             <Select
                               options={fieldOptions}
-                              menuPortalTarget={document.body}
-menuPosition="absolute"
                               value={
                                 row.field === 'Select Category'
                                   ? null
@@ -2149,28 +2251,18 @@ menuPosition="absolute"
                               menuPlacement="bottom"
                               menuShouldScrollIntoView
                               placeholder="Select Category"
+                              menuPortalTarget={document.body}
+                              menuPosition="absolute"
                             />
                           </div>
                         </div>
                         <div className="filter-operator">
                           <div style={{ width: '90px' }}>
                             <Select
-                              options={
-                                dateFields.includes(row.field)
-                                  ? dateOperatorOptions
-                                  : defaultOperatorOptions
-                              }
-                              menuPortalTarget={document.body}
-menuPosition="absolute"
-                              value={
-                                dateFields.includes(row.field)
-                                  ? dateOperatorOptions.find(
-                                      (o) => o.value === row.operator
-                                    )
-                                  : defaultOperatorOptions.find(
-                                      (o) => o.value === row.operator
-                                    )
-                              }
+                              options={getOperatorOptions(row.field)}
+                              value={getOperatorOptions(row.field).find(
+                                (o) => o.value === row.operator
+                              )}
                               onChange={(opt) => {
                                 const updated = filterRows.map((r) =>
                                   r.id === row.id
@@ -2183,6 +2275,8 @@ menuPosition="absolute"
                               isSearchable={false}
                               menuPlacement="bottom"
                               menuShouldScrollIntoView
+                              menuPortalTarget={document.body}
+                              menuPosition="absolute"
                             />
                           </div>
                         </div>
@@ -2219,13 +2313,13 @@ menuPosition="absolute"
                                     }
                                   : null
                               }
-                              menuPortalTarget={document.body}
-menuPosition="absolute"
                               onChange={(opt) =>
                                 handleValueChange(row.id, opt.value)
                               }
                               styles={selectStyles}
                               isSearchable={false}
+                              menuPortalTarget={document.body}
+                              menuPosition="fixed"
                             />
                           ) : (
                             <input
