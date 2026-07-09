@@ -996,8 +996,8 @@ if (filter.match === 'less than')
 
     let url =
       isUpdate && status !== 'completed'
-        ? `https://api.s2w.com.au/notification/update-notification?id=${notificationId}`
-        : `https://api.s2w.com.au/notification/send-notification`;
+        ? `https://betaapi.s2w.com.au/notification/update-notification?id=${notificationId}`
+        : `https://betaapi.s2w.com.au/notification/send-notification`;
 
     if (selectedTargetMarket === 'Send to All') {
       const memberNum = await calculateReachSendToAll();
