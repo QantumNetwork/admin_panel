@@ -7,14 +7,19 @@ import { logout } from '../utils/auth';
 import { IoIosSend } from 'react-icons/io';
 import axios from 'axios';
 import Select from 'react-select';
+import { MultiSelect } from 'primereact/multiselect';
 import { useState, useEffect, useRef } from 'react';
 import { uploadFileToS3 } from '../s3/config';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { trackMenuAccess, handleLogout } from '../utils/api';
-import { getAppType } from '../utils/appConstants';
+import { getAppType, getAudienceOptions } from '../utils/appConstants';
+import { components } from 'react-select';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 import 'react-clock/dist/Clock.css';
 
 import '../styles/marketTomembers.css';
@@ -68,6 +73,8 @@ const MarketToMembers = () => {
   const [sendingNow, setSendingNow] = useState(false);
 
   const [status, setStatus] = useState(null);
+
+  const [searchText, setSearchText] = useState({});
 
   const navigate = useNavigate();
 
@@ -156,6 +163,26 @@ const MarketToMembers = () => {
     { value: 'less than', label: 'Less than' },
   ];
 
+  const ratingTierOperatorOptions = [
+    {
+      value: 'is any of',
+      label: 'is any of',
+    },
+  ];
+
+  const SELECT_ALL_OPTION = {
+    value: '__ALL__',
+    label: 'Select all',
+  };
+
+  const booleanOptions = [
+    { value: 'True', label: 'True' },
+    { value: 'False', label: 'False' },
+    { value: 'None', label: 'None' },
+  ];
+
+  const multiSelectFields = ['Rating Tier', 'State', 'Venue'];
+
   // Get email from localStorage or use a default
   const email = localStorage.getItem('userEmail') || 'user@example.com';
   const userInitial = email.charAt(0).toUpperCase();
@@ -166,6 +193,10 @@ const MarketToMembers = () => {
     const newFilteredOptions = {};
 
     filterRows.forEach((row) => {
+      if (multiSelectFields.includes(row.field)) {
+        newFilteredOptions[row.id] = filterValueOptions[row.id] || [];
+        return;
+      }
       if (apiCallFields.includes(row.field) && filterValueOptions[row.id]) {
         // If there's user input, filter the options
         if (row.value && row.value.length > 0) {
@@ -381,13 +412,17 @@ const MarketToMembers = () => {
                     filter.match === 'exactly matches'
                   ) {
                     if (
-        ['Retail', 'On Premise', 'Gaming', 'Location Brand']
-            .includes(fieldName)
-    ) {
-        matchOperator = 'exact';
-    } else {
-        matchOperator = 'Exactly Matches';
-    }
+                      [
+                        'Retail',
+                        'On Premise',
+                        'Gaming',
+                        'Location Brand',
+                      ].includes(fieldName)
+                    ) {
+                      matchOperator = 'exact';
+                    } else {
+                      matchOperator = 'Exactly Matches';
+                    }
                   } else if (
                     filter.match === 'isBefore' ||
                     filter.match === 'is before'
@@ -403,43 +438,48 @@ const MarketToMembers = () => {
                     filter.match === 'is not'
                   ) {
                     if (fieldName === 'Age' || fieldName === 'Postcode') {
-        matchOperator = 'IsNot';
-    } else {
-        matchOperator = 'Is not';
-    }
+                      matchOperator = 'IsNot';
+                    } else {
+                      matchOperator = 'Is not';
+                    }
                   } else {
-                    matchOperator = 'Contains';
+                    if (filter.match === 'is any of') {
+                      matchOperator = 'is any of';
+                    } else {
+                      matchOperator = 'Contains';
+                    }
                   }
 
-                  if (filter.match === 'is same')
-    matchOperator = 'is same';
+                  if (filter.match === 'is same') matchOperator = 'is same';
 
-if (filter.match === 'is younger')
-    matchOperator = 'is younger';
+                  if (filter.match === 'is younger')
+                    matchOperator = 'is younger';
 
-if (filter.match === 'is older')
-    matchOperator = 'is older';
+                  if (filter.match === 'is older') matchOperator = 'is older';
 
-if (filter.match === 'is less than')
-    matchOperator = 'is less than';
+                  if (filter.match === 'is less than')
+                    matchOperator = 'is less than';
 
-if (filter.match === 'is more than')
-    matchOperator = 'is more than';
+                  if (filter.match === 'is more than')
+                    matchOperator = 'is more than';
 
-if (filter.match === 'is')
-    matchOperator = 'is';
+                  if (filter.match === 'is') matchOperator = 'is';
 
-if (filter.match === 'greater than')
-    matchOperator = 'greater than';
+                  if (filter.match === 'greater than')
+                    matchOperator = 'greater than';
 
-if (filter.match === 'less than')
-    matchOperator = 'less than';
+                  if (filter.match === 'less than') matchOperator = 'less than';
 
                   return {
                     id: index + 1,
                     field: fieldName,
                     operator: matchOperator,
-                    value: filter.market || '',
+                    value: multiSelectFields.includes(fieldName)
+                      ? (filter.market || []).map((item) => ({
+                          value: item,
+                          label: item,
+                        }))
+                      : filter.market || '',
                     type: filter.type || 'none', // Store the filter type (none, OR, NOT)
                     options: [],
                   };
@@ -452,6 +492,17 @@ if (filter.match === 'less than')
               newFilterRows.forEach(async (row) => {
                 if (row.field !== 'Select Category') {
                   try {
+                    if (row.field === 'Rating Tier') {
+                      const options = getAudienceOptions(selectedVenue);
+
+                      setFilterValueOptions((prev) => ({
+                        ...prev,
+                        [row.id]: options,
+                      }));
+
+                      return;
+                    }
+
                     // Format the field for the API query parameter
                     let fieldParam;
 
@@ -480,7 +531,12 @@ if (filter.match === 'less than')
                       // Update the options for this specific filter row WITHOUT changing its value
                       setFilterValueOptions((prev) => ({
                         ...prev,
-                        [row.id]: data,
+                        [row.id]: multiSelectFields.includes(row.field)
+                          ? data.map((item) => ({
+                              value: item,
+                              label: item,
+                            }))
+                          : data,
                       }));
                     }
                   } catch (error) {
@@ -577,10 +633,20 @@ if (filter.match === 'less than')
 
         if (Array.isArray(data)) {
           // Update the options for this specific filter row
-          setFilterValueOptions((prev) => ({
-            ...prev,
-            [1]: data,
-          }));
+          if (multiSelectFields.includes(initialField)) {
+            setFilterValueOptions((prev) => ({
+              ...prev,
+              [1]: data.map((item) => ({
+                value: item,
+                label: item,
+              })),
+            }));
+          } else {
+            setFilterValueOptions((prev) => ({
+              ...prev,
+              [1]: data,
+            }));
+          }
         }
       } catch (error) {
         console.error(
@@ -737,8 +803,10 @@ if (filter.match === 'less than')
         return {
           type: type,
           category: category,
-          market: row.value,
-          match: match,
+          market: multiSelectFields.includes(row.field)
+            ? row.value.map((item) => item.value)
+            : row.value,
+          match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
 
@@ -852,8 +920,10 @@ if (filter.match === 'less than')
         return {
           type: type,
           category: category,
-          market: row.value,
-          match: match,
+          market: multiSelectFields.includes(row.field)
+            ? row.value.map((item) => item.value)
+            : row.value,
+          match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
 
@@ -1112,8 +1182,10 @@ if (filter.match === 'less than')
         return {
           type: type,
           category: category,
-          market: row.value,
-          match: match,
+          market: multiSelectFields.includes(row.field)
+            ? row.value.map((item) => item.value)
+            : row.value,
+          match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
 
@@ -1217,23 +1289,23 @@ if (filter.match === 'less than')
 
     let match = 'contains';
 
-switch (defaultOperator) {
-  case 'Exactly Matches':
-    match = 'exact';
-    break;
-  case 'Contains':
-    match = 'contains';
-    break;
-  case 'Is before':
-    match = 'isBefore';
-    break;
-  case 'Is after':
-    match = 'isAfter';
-    break;
-  default:
-    // New operators already store backend values
-    match = defaultOperator;
-}
+    switch (defaultOperator) {
+      case 'Exactly Matches':
+        match = 'exact';
+        break;
+      case 'Contains':
+        match = 'contains';
+        break;
+      case 'Is before':
+        match = 'isBefore';
+        break;
+      case 'Is after':
+        match = 'isAfter';
+        break;
+      default:
+        // New operators already store backend values
+        match = defaultOperator;
+    }
     // Update the filter row with the new field
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1246,12 +1318,40 @@ switch (defaultOperator) {
       }
       return row;
     });
-    setFilterRows(updatedRows);
+    if (multiSelectFields.includes(field)) {
+      setFilterRows((prev) =>
+        prev.map((row) =>
+          row.id === id
+            ? {
+                ...row,
+                field,
+                operator: 'is any of',
+                value: [],
+              }
+            : row
+        )
+      );
 
+      if (field === 'Rating Tier') {
+        const options = getAudienceOptions(selectedVenue);
+
+        setFilterValueOptions((prev) => ({
+          ...prev,
+          [id]: options,
+        }));
+
+        return;
+      }
+
+      // Continue only for State & Venue
+    }
+    if (!multiSelectFields.includes(field)) {
+      setFilterRows(updatedRows);
+    }
     if (booleanFields.includes(field)) {
       setFilterValueOptions((prev) => ({
         ...prev,
-        [id]: ['True', 'False'],
+        [id]: ['True', 'False', 'None'],
       }));
       return;
     }
@@ -1267,6 +1367,10 @@ switch (defaultOperator) {
           fieldParam = fieldToApiParam[field];
         } else {
           fieldParam = field.replace(/ /g, '');
+        }
+
+        if (multiSelectFields.includes(field)) {
+          match = 'is any of';
         }
 
         // Determine which API endpoint to use
@@ -1287,7 +1391,12 @@ switch (defaultOperator) {
           // Update the options for this specific filter row
           setFilterValueOptions((prev) => ({
             ...prev,
-            [id]: data,
+            [id]: multiSelectFields.includes(field)
+              ? data.map((item) => ({
+                  value: item,
+                  label: item,
+                }))
+              : data,
           }));
 
           // Keep the filter value field blank, don't pre-populate with the first item
@@ -1314,6 +1423,9 @@ switch (defaultOperator) {
 
     const row = updatedRows.find((r) => r.id === id);
     if (!row) return;
+    if (multiSelectFields.includes(row.field)) {
+      return;
+    }
 
     if (dateFields.includes(row.field)) {
       return; // skip API & suggestions
@@ -1357,7 +1469,20 @@ switch (defaultOperator) {
       const data = await response.json();
 
       if (Array.isArray(data)) {
-        setFilterValueOptions((prev) => ({ ...prev, [id]: data }));
+        if (multiSelectFields.includes(row.field)) {
+          setFilterValueOptions((prev) => ({
+            ...prev,
+            [id]: data.map((item) => ({
+              value: item,
+              label: item,
+            })),
+          }));
+        } else {
+          setFilterValueOptions((prev) => ({
+            ...prev,
+            [id]: data,
+          }));
+        }
         setFilteredOptions((prev) => ({ ...prev, [id]: data }));
       }
     } catch (err) {
@@ -1430,6 +1555,10 @@ switch (defaultOperator) {
       return postcodeOperatorOptions;
     }
 
+    if (multiSelectFields.includes(field)) {
+      return ratingTierOperatorOptions;
+    }
+
     if (field === 'Points Balance') {
       return pointsBalanceOperatorOptions;
     }
@@ -1454,6 +1583,8 @@ switch (defaultOperator) {
     }),
     menu: (base) => ({
       ...base,
+      width: '180px',
+      minWidth: '180px',
       zIndex: 9999,
       backgroundColor: 'white',
     }),
@@ -1518,6 +1649,43 @@ switch (defaultOperator) {
       console.error('Error in handleLock:', error);
       toast.error(error.message || 'Failed to remove lock. Please try again.');
     }
+  };
+
+  const CheckboxOption = (props) => {
+    const { isSelected, label, value } = props;
+
+    return (
+      <components.Option {...props}>
+        {value !== '__ALL__' && (
+          <input
+            type="checkbox"
+            checked={isSelected}
+            readOnly
+            style={{ marginRight: 8 }}
+          />
+        )}
+        {label}
+      </components.Option>
+    );
+  };
+
+  const MultiValue = (props) => {
+    const values = props.selectProps.value || [];
+
+    if (props.index > 0) return null;
+
+    return (
+      <div
+        style={{
+          marginLeft: 6,
+          fontSize: 12,
+          color: '#444',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {values.length} selected
+      </div>
+    );
   };
 
   return (
@@ -2144,10 +2312,7 @@ switch (defaultOperator) {
                         />
                       ) : booleanFields.includes(filterRows[0].field) ? (
                         <Select
-                          options={[
-                            { value: 'True', label: 'True' },
-                            { value: 'False', label: 'False' },
-                          ]}
+                          options={booleanOptions}
                           value={
                             filterRows[0].value
                               ? {
@@ -2161,6 +2326,21 @@ switch (defaultOperator) {
                           isSearchable={false}
                           menuPortalTarget={document.body}
                           menuPosition="absolute"
+                        />
+                      ) : multiSelectFields.includes(filterRows[0].field) ? (
+                        <MultiSelect
+                          value={filterRows[0].value}
+                          options={filterValueOptions[1] || []}
+                          optionLabel="label"
+                          onChange={(e) => handleValueChange(1, e.value)}
+                          filter
+                          showSelectAll
+                          maxSelectedLabels={0}
+                          selectedItemsLabel="{0} selected"
+                          placeholder="Select item(s)"
+                          style={{
+                            width: '140px',
+                          }}
                         />
                       ) : (
                         <input
@@ -2181,6 +2361,7 @@ switch (defaultOperator) {
                       )}
                       {!dateFields.includes(filterRows[0].field) &&
                         !booleanFields.includes(filterRows[0].field) &&
+                        !multiSelectFields.includes(filterRows[0].field) &&
                         showSuggestions[1] &&
                         filterRows[0].value && (
                           <div className="suggestions-dropdown">
@@ -2301,10 +2482,7 @@ switch (defaultOperator) {
                             />
                           ) : booleanFields.includes(row.field) ? (
                             <Select
-                              options={[
-                                { value: 'True', label: 'True' },
-                                { value: 'False', label: 'False' },
-                              ]}
+                              options={booleanOptions}
                               value={
                                 row.value
                                   ? {
@@ -2320,6 +2498,23 @@ switch (defaultOperator) {
                               isSearchable={false}
                               menuPortalTarget={document.body}
                               menuPosition="fixed"
+                            />
+                          ) : multiSelectFields.includes(row.field) ? (
+                            <MultiSelect
+                              value={row.value}
+                              options={filterValueOptions[row.id]}
+                              optionLabel="label"
+                              onChange={(e) =>
+                                handleValueChange(row.id, e.value)
+                              }
+                              filter
+                              showSelectAll
+                              maxSelectedLabels={0}
+                              selectedItemsLabel="{0} selected"
+                              placeholder="Select item(s)"
+                              style={{
+                                width: '140px',
+                              }}
                             />
                           ) : (
                             <input
@@ -2344,6 +2539,7 @@ switch (defaultOperator) {
                           )}
                           {!dateFields.includes(row.field) &&
                             !booleanFields.includes(row.field) &&
+                            !multiSelectFields.includes(row.field) &&
                             showSuggestions[row.id] && (
                               <div className="suggestions-dropdown">
                                 {(filteredOptions[row.id] || []).map(

@@ -2244,6 +2244,7 @@ const SpecialOffers = () => {
         }
 
         updateAddMode(false);
+        setShowDetails(false);
         setSelectedOffer(null);
         setUploadedImage(null);
         // Prevent Art Gallery restoration after creation

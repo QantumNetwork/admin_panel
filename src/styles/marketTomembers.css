@@ -154,6 +154,20 @@
     min-width: 320px;
 }
 
+/* Override PrimeReact global box-sizing */
+html,
+body,
+#root,
+.app-container,
+.main-content {
+    box-sizing: content-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
 .section-title {
     font-size: 18px;
     margin-bottom: 20px;
@@ -161,6 +175,33 @@
     text-align: center;
 }
 
+.p-multiselect-panel {
+    width: 320px !important;   /* adjust as needed */
+    max-width: calc(100vw - 20px) !important;
+    position: fixed;
+}
+
+.p-multiselect-items-wrapper {
+    max-height: 450px !important;   /* default is around 200-250px */
+}
+
+.p-multiselect-item {
+    min-height: 30px;
+    padding: 2px 4px !important;
+    font-size: 15px;
+}
+
+.p-multiselect-filter {
+    height: 10px;
+}
+
+.p-component {
+    font-size: 10px;
+}
+
+.p-multiselect .p-multiselect-label {
+    padding: 0.5rem 0.3rem;
+}
 /* Current Post Section */
 .post-content-container {
     background-color: white;
