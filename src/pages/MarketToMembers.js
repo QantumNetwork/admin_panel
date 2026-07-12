@@ -475,11 +475,8 @@ const MarketToMembers = () => {
                     field: fieldName,
                     operator: matchOperator,
                     value: multiSelectFields.includes(fieldName)
-                      ? (filter.market || []).map((item) => ({
-                          value: item,
-                          label: item,
-                        }))
-                      : filter.market || '',
+  ? (filter.market || [])
+  : filter.market || '',
                     type: filter.type || 'none', // Store the filter type (none, OR, NOT)
                     options: [],
                   };
@@ -803,9 +800,7 @@ const MarketToMembers = () => {
         return {
           type: type,
           category: category,
-          market: multiSelectFields.includes(row.field)
-            ? row.value.map((item) => item.value)
-            : row.value,
+          market: row.value,
           match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
@@ -920,12 +915,12 @@ const MarketToMembers = () => {
         return {
           type: type,
           category: category,
-          market: multiSelectFields.includes(row.field)
-            ? row.value.map((item) => item.value)
-            : row.value,
+          market: row.value,
           match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
+
+      console.log(filterRows);
 
       const requestBody = {
         heading: heading,
@@ -1182,9 +1177,7 @@ const MarketToMembers = () => {
         return {
           type: type,
           category: category,
-          market: multiSelectFields.includes(row.field)
-            ? row.value.map((item) => item.value)
-            : row.value,
+          market: row.value,
           match: multiSelectFields.includes(row.field) ? 'is any of' : match,
         };
       });
@@ -1412,6 +1405,12 @@ const MarketToMembers = () => {
   // Handle value change for a specific filter row
   const handleValueChange = async (id, value) => {
     console.log('Selected value:', value); // 👈 ADD THIS
+    console.log(
+    "Field:",
+    filterRows.find((r) => r.id === id)?.field,
+    "Selected value:",
+    value
+);
 
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -2328,6 +2327,9 @@ const MarketToMembers = () => {
                           menuPosition="absolute"
                         />
                       ) : multiSelectFields.includes(filterRows[0].field) ? (
+                        <>
+                            {console.log("filterValueOptions[1] =", filterValueOptions[1])}
+
                         <MultiSelect
                           value={filterRows[0].value}
                           options={filterValueOptions[1] || []}
@@ -2341,7 +2343,9 @@ const MarketToMembers = () => {
                           style={{
                             width: '140px',
                           }}
+                          appendTo={document.body}
                         />
+                        </>
                       ) : (
                         <input
                           id="filter-value-1"
@@ -2478,7 +2482,7 @@ const MarketToMembers = () => {
                               onChange={(e) =>
                                 handleValueChange(row.id, e.target.value)
                               }
-                              onKeyDown={(e) => e.preventDefault()} // 🚫 block typing
+                              onKeyDown={(e) => e.preventDefault()} 
                             />
                           ) : booleanFields.includes(row.field) ? (
                             <Select
@@ -2515,6 +2519,7 @@ const MarketToMembers = () => {
                               style={{
                                 width: '140px',
                               }}
+                              appendTo={document.body}
                             />
                           ) : (
                             <input

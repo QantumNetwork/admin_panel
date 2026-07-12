@@ -178,7 +178,7 @@ body,
 .p-multiselect-panel {
     width: 320px !important;   /* adjust as needed */
     max-width: calc(100vw - 20px) !important;
-    position: fixed;
+    z-index: 9999 !important;
 }
 
 .p-multiselect-items-wrapper {
