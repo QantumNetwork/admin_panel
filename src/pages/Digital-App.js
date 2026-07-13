@@ -476,6 +476,7 @@ const DigitalApp = () => {
           isAllVenue: savedIsAllVenue,
           venue: savedVenue,
           id: savedId,
+          editorContent: savedEditorContent,
         } = location.state.formValues;
 
         if (savedPosition) setPosition(savedPosition);
@@ -488,6 +489,8 @@ const DigitalApp = () => {
           setMoreInfo(savedMoreInfo);
           setSavedContent(savedMoreInfo);
         }
+
+        if (savedEditorContent) setEditorContent(savedEditorContent);
 
         if (savedIsAllVenue !== undefined) setIsAllVenue(savedIsAllVenue);
         if (savedVenue) setVenue(savedVenue);
@@ -705,6 +708,7 @@ const DigitalApp = () => {
       startDate,
       endDate,
       moreInfo,
+      editorContent,
       id: tempId || id,
     };
 
@@ -1028,30 +1032,19 @@ const DigitalApp = () => {
       fetchVenues();
     }
   }, [token]);
-  const parsePromotionText = (rawText) => {
-    if (!rawText) return '';
+const parsePromotionText = (rawText) => {
+  if (!rawText) return '';
 
-    // If the text contains HTML tags, return it as is
-    if (/<[a-z][\s\S]*>/i.test(rawText)) {
-      return rawText;
-    }
+  // If backend already returns HTML, use it directly
+  if (/<[a-z][\s\S]*>/i.test(rawText)) {
+    return rawText;
+  }
 
-    try {
-      // Decode Unicode and keep all special characters safe
-      const decoded = decodeURIComponent(
-        JSON.parse(`"${rawText.replace(/"/g, '\\"')}"`)
-          .split('')
-          .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
-          .join('')
-      );
-
-      // Replace all \n with two <br /> tags for double space
-      return decoded.replace(/\n/g, '<br />');
-    } catch (err) {
-      console.error('Failed to parse promotion text:', err);
-      return rawText.replace(/\n/g, '<br />');
-    }
-  };
+  // Convert new lines to HTML line breaks
+  return rawText
+    .replace(/\r\n/g, '\n')
+    .replace(/\n/g, '<br />');
+};
 
   const handleCardClick = async (accessItem, navigateTo) => {
     try {
@@ -1361,7 +1354,7 @@ const DigitalApp = () => {
               className="post-image"
               style={{
                 background:
-                  isAddingNew || (!isAddingNew && advertImages.length == 0)
+                  isAddingNew || (!isAddingNew && advertImages.length === 0)
                     ? 'transparent linear-gradient(180deg, #203366 0%, #0758A7 100%) 0% 0% no-repeat padding-box'
                     : '#bbb',
                 position: 'relative',
@@ -1779,6 +1772,11 @@ const DigitalApp = () => {
               paddingBottom: '1rem',
             }}
           >
+            {console.log(
+  "Rendering Editor section",
+  "isAddingNew:", isAddingNew,
+  "isEditing:", isEditing
+)}
             {isAddingNew || isEditing ? (
               <Editor
                 apiKey="w4ovbh419s7ro991pcvugbe4jg7r7h7xq33ai8n5mdsk1yqu"

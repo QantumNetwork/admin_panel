@@ -47,7 +47,7 @@
 .market-to-members-btn {
     position: absolute;
     top: 28px;
-    left: 45%;
+    left: 46%;
     width: 14.4%;
     height: 46px;
     border: 2px solid #999999;
@@ -337,7 +337,7 @@
     margin-left: 36px;
     width: 100%;
     overflow: hidden;
-    min-width: 112px;
+    min-width: 70px;
     /* max-width: 106px; */
   }
   
@@ -518,7 +518,7 @@
     pointer-events: none;
 }
 
-@media screen and (min-width: 1601px) {
+@media screen and (min-width: 1801px) {
     .phone-screen-small {
         margin-left: 33px;
         width: 100%;
@@ -528,25 +528,39 @@
     }
 }
 
-@media screen and (max-width: 1600px) {
+@media screen and (min-width: 1701px) and (max-width: 1800px) {
     .phone-screen-small {
-       
-        left: 0;
+        margin-left: 35px;
         width: 100%;
-        max-width: 106px;
+        max-width: 135px;
         height: auto;
-        top: 47.3%;
-        margin-left: 28px;
     }
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (min-width: 1601px) and (max-width: 1700px) {
     .phone-screen-small {
+        margin-left: 33px;
         width: 100%;
-        max-width: 99px;
-        top: 47.7%;
-        margin-left: 26px;
-        min-width: auto;
+        max-width: 126px;
+        height: auto;
+    }
+}
+
+@media screen and (min-width: 1501px) and (max-width: 1600px) {
+    .phone-screen-small {
+       margin-left: 30px;
+        width: 100%;
+        max-width: 119px;
+        height: auto;
+    }
+}
+
+@media screen and (min-width: 1401px) and (max-width: 1500px) {
+    .phone-screen-small {
+        margin-left: 25px;
+        width: 100%;
+        max-width: 110px;
+        height: auto;
     }
 
     .post-card-small {
@@ -575,10 +589,22 @@
     }
 }
 
+@media screen and (min-width: 1301px) and (max-width: 1400px) {
+    .phone-screen-small {
+        margin-left: 25px;
+        width: 100%;
+        max-width: 105px;
+        height: auto;
+    }
+
+    .post-details {
+        margin-left: 20px;
+    }
+}
 /* 
   ========== SCALING FOR < 1280PX ==========
 */
-@media screen and (max-width: 1280px) {
+@media screen and (max-width: 1300px) {
     .post-details {
         margin-left: 0px;
     }
@@ -589,8 +615,8 @@
     }
 
     .phone-screen-small {
-        max-width: 89px;
-        margin-left: 23px;
+        max-width: 95px;
+        margin-left: 26px;
     }
 
     .post-card-small{
@@ -627,8 +653,8 @@
     }
 
     .phone-screen-small {
-        max-width: 84px;
-        margin-left: 21px;
+        max-width: 88px;
+        margin-left: 22px;
     }
     .post-details {
         margin-left: 0px;

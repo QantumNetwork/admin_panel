@@ -466,6 +466,7 @@ const DigitalSmall = () => {
           isAllVenue: savedIsAllVenue,
           venue: savedVenue,
           id: savedId,
+          editorContent: savedEditorContent,
         } = location.state.formValues;
 
         if (savedPosition) setPosition(savedPosition);
@@ -478,6 +479,8 @@ const DigitalSmall = () => {
           setSavedContent(savedMoreInfo);
           setMoreInfo(savedMoreInfo);
         }
+
+        if (savedEditorContent) setEditorContent(savedEditorContent);
 
           if (savedIsAllVenue !== undefined) setIsAllVenue(savedIsAllVenue);
           if (savedVenue) setVenue(savedVenue);
@@ -649,6 +652,7 @@ const DigitalSmall = () => {
       startDate,
       endDate,
       moreInfo,
+      editorContent,
       id: tempId || id,
     };
 
@@ -1709,7 +1713,7 @@ const DigitalSmall = () => {
         </section>
 
         {/* MORE INFORMATION SECTION */}
-        <section className="more-info">
+        <section className="more-info-small">
           <h2>More Information</h2>
           <div
             style={{

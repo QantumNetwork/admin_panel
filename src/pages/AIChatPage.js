@@ -143,6 +143,7 @@ const AIChatPage = () => {
     const isWoollahra = selectedVenue === 'Woollahra';
     const isEDP = selectedVenue === 'EDP';
     const isMosaic = selectedVenue === 'Mosaic';
+    const isBob = selectedVenue === 'Bob';
 
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
@@ -174,7 +175,9 @@ const AIChatPage = () => {
                                 ? 'https://edpviperaireportingapi.thankfulground-1eebdf61.australiaeast.azurecontainerapps.io/api/airesponse'
                                 : isMosaic
                                   ? 'https://mosaichotelviperapi.whitebush-141b5257.australiaeast.azurecontainerapps.io/api/airesponse'
-                                  : null;
+                                  : isBob
+                                    ? 'https://bobsbulkboozeviperapi.icydune-145d42ab.australiaeast.azurecontainerapps.io/api/airesponse'
+                                    : null;
 
     return endpoint;
   };
