@@ -33,6 +33,7 @@ const AIChatPage = () => {
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
   const chatBoxRef = useRef(null);
 
   const [showImageModal, setShowImageModal] = useState(false);
@@ -182,7 +183,7 @@ const AIChatPage = () => {
     return endpoint;
   };
 
-  const sendToAI = async (historyToSend) => {
+  const sendToAI = async (historyToSend, isInitialization = false) => {
     const lastUserMessage = historyToSend[historyToSend.length - 1];
     const trimmed = lastUserMessage?.content?.trim?.() || '';
     if (!trimmed) return;
@@ -218,7 +219,9 @@ const AIChatPage = () => {
         else if (data.type === 'excel') assistantMsg.fileType = 'excel';
         else if (data.type === 'graph') assistantMsg.fileType = 'graph';
         else if (data.type === 'export') assistantMsg.fileType = 'excel';
-        setChatHistory([...historyToSend, assistantMsg]);
+        if (!isInitialization) {
+  setChatHistory([...historyToSend, assistantMsg]);
+}
       } else {
         toast.error('AI failed to respond.');
       }
@@ -228,18 +231,41 @@ const AIChatPage = () => {
     } finally {
       setIsTyping(false);
       setLoading(false);
+
+      if (isInitialization) {
+        setInitialLoading(false);
+    }
     }
   };
 
   useEffect(() => {
     const shouldSendInitialPrompt =
-      chatHistory.length === 1 && chatHistory[0].role === 'user';
+        chatHistory.length === 1 &&
+        chatHistory[0].role === "user";
 
     if (shouldSendInitialPrompt) {
-      sendToAI(chatHistory);
+        setInitialLoading(true);
+        sendToAI(chatHistory);
+        return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    if (chatHistory.length === 0) {
+        setInitialLoading(true);
+
+        sendToAI(
+            [
+                {
+                    role: "user",
+                    content: "Hi",
+                },
+            ],
+            true
+        );
+
+        return;
+    }
+
+}, []);
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -498,6 +524,15 @@ const AIChatPage = () => {
   //     toast.error(error.message || 'Failed to remove lock. Please try again.');
   //   }
   // };
+
+  if (initialLoading) {
+  return (
+    <div className="ai-chat-loading">
+      <div className="loader" />
+      <p>Firing up your AI assistant...</p>
+    </div>
+  );
+}
 
   return (
     <div className="digital-app-container">

@@ -92,6 +92,7 @@ const ManualReg = () => {
   const appType = searchParams.get('appType');
   const isEditMode = searchParams.get('mode') === 'edit';
   const isRenewMode = searchParams.get('mode') === 'renew';
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -149,8 +150,8 @@ const ManualReg = () => {
         selectedVenue === 'MaxGaming'
           ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
           : selectedVenue === 'Mannum'
-          ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MANNUM
-          : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+            ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MANNUM
+            : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
     });
   }, [selectedVenue]);
 
@@ -902,6 +903,10 @@ const ManualReg = () => {
 
   const handleSaveEdit = async () => {
     try {
+      if (isSaving) return;
+
+      setIsSaving(true);
+
       const payload = {
         Id: formData.Id,
         GivenNames: formData.GivenNames,
@@ -923,12 +928,18 @@ const ManualReg = () => {
       setTimeout(() => navigate('/approvals'), 1500);
     } catch (err) {
       console.error(err);
+      setIsSaving(false);
+
       toast.error('Failed to update profile');
     }
   };
 
   const handleRenewEdit = async () => {
     try {
+      if (isSaving) return;
+
+      setIsSaving(true);
+
       if (!formData.Id) {
         toast.error('User ID missing');
         return;
@@ -976,6 +987,7 @@ const ManualReg = () => {
       }
     } catch (err) {
       console.error(err);
+      setIsSaving(false);
       toast.error(err.response?.data?.message || 'Failed to update profile');
     }
   };
@@ -1469,6 +1481,11 @@ const ManualReg = () => {
               <button
                 className="blue-btn"
                 onClick={isRenewMode ? handleRenewEdit : handleSaveEdit}
+                disabled={isSaving}
+                style={{
+                  opacity: isSaving ? 0.6 : 1,
+                  cursor: isSaving ? 'not-allowed' : 'pointer',
+                }}
               >
                 Save
               </button>
