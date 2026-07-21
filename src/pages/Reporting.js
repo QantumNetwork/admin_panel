@@ -414,7 +414,7 @@ const Reporting = () => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly') && (
+        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
