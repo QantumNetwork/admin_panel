@@ -81,11 +81,12 @@ function MFAVerification() {
 
         {/* Input Field */}
         <form onSubmit={handleSubmit}>
-          <label className="input-label">Enter code</label>
+          <label className="input-label" style={{textAlign: 'center'}}>Enter code</label>
           <div className="input-container">
             <input
               type="text"
               placeholder="Enter OTP"
+              style={{textAlign: 'center', width: '150px', padding: '15px'}}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               required
@@ -101,7 +102,7 @@ function MFAVerification() {
         </form>
 
         {/* Back to Sign In */}
-        <a href='/'><p className="back-link">Back to sign in</p></a>
+        <a href='/'><p className="back-link" style={{textAlign: 'center'}}>Back to sign in</p></a>
       </div>
     </div>
   );
