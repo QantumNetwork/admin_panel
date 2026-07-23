@@ -178,7 +178,7 @@ const MarketToMembers = () => {
   const booleanOptions = [
     { value: 'True', label: 'True' },
     { value: 'False', label: 'False' },
-    { value: 'None', label: 'None' },
+    // { value: 'None', label: 'None' },
   ];
 
   const multiSelectFields = ['Rating Tier', 'State', 'Venue'];
@@ -1344,7 +1344,7 @@ const MarketToMembers = () => {
     if (booleanFields.includes(field)) {
       setFilterValueOptions((prev) => ({
         ...prev,
-        [id]: ['True', 'False', 'None'],
+        [id]: ['True', 'False'],
       }));
       return;
     }
