@@ -637,7 +637,7 @@ useEffect(() => {
       <button
         type="button"
         className="activate-btn icon-button"
-        style={{ backgroundColor: '#5396D1' }}
+        style={{ backgroundColor: '#5396D1', marginLeft: '80px' }}
         onClick={handlePublish}
         disabled={isPublishing}
       >
