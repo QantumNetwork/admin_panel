@@ -2,7 +2,8 @@
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="date"],
-.form-group input[type="number"] {
+.form-group input[type="number"],
+.form-group select {
   width: 100%;
   padding: 6px;
   border: 1px solid #ddd;
@@ -11,6 +12,9 @@
   margin-bottom: 8px;
 }
 
+.form-group input[type="radio"] {
+    accent-color: #002977;
+}
 /* Remove the inline style from the street address input */
 .form-group input[type="text"][name="street"] {
   margin-bottom: 8px;

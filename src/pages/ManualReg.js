@@ -1245,7 +1245,7 @@ const ManualReg = () => {
       </aside>
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>
-        <section className="new-user-sa" style={{ height: '600px' }}>
+        <section className="new-user-sa" style={{ height: '610px' }}>
           {!isEditMode && !isRenewMode ? (
             <h2>Register New Member</h2>
           ) : (
@@ -1304,7 +1304,7 @@ const ManualReg = () => {
                       expiryDate: selectedPkg?.renewalDate || '',
                     }));
                   }}
-                  style={{ padding: '5px' }}
+                  // style={{ padding: '5px' }}
                 >
                   {!formData.membershipLevel && (
                     <option value="" disabled>
@@ -1455,7 +1455,7 @@ const ManualReg = () => {
           </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '30px' }}
+            style={{ marginTop: '95px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>
@@ -1494,7 +1494,7 @@ const ManualReg = () => {
         </section>
 
         {s2Visible && (
-          <section className="new-user-sa" style={{ height: '600px' }}>
+          <section className="new-user-sa" style={{ height: '610px' }}>
             <h2>Set Membership Level</h2>
             <div className="form-group">
               <select
@@ -1536,10 +1536,11 @@ const ManualReg = () => {
               <div
                 style={{
                   width: '86%',
+                  marginLeft: '20px',
                   background: 'white',
                   padding: '25px',
                   borderRadius: '10px',
-                  marginTop: '160px',
+                  marginTop: '100px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                   textAlign: 'center',
                 }}
@@ -1547,7 +1548,7 @@ const ManualReg = () => {
                 <p
                   style={{
                     fontSize: '15px',
-                    marginBottom: '25px',
+                    marginBottom: '53px',
                     color: '#555',
                     lineHeight: '20px',
                   }}
@@ -1609,7 +1610,7 @@ const ManualReg = () => {
 
             <div
               className="d-flex w-100 justify-content-center"
-              style={{ marginTop: !showConfirmMembership ? '430px' : '70px' }}
+              style={{ marginTop: !showConfirmMembership ? '390px' : '70px' }}
             >
               {editing2 ? (
                 <>
@@ -1631,7 +1632,7 @@ const ManualReg = () => {
 
         {s3Visible && (
           <Elements stripe={stripePromise}>
-            <section className="connected-sa" style={{ height: '600px' }}>
+            <section className="connected-sa" style={{ height: '610px' }}>
               {!showManualPayment ? (
                 <>
                   <h2>Payment Details</h2>

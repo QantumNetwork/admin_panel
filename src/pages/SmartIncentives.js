@@ -1392,12 +1392,12 @@ const SmartIncentives = () => {
           </button>
         </div>
       ) : (
-        <div className="members-table-container-pr" style={{ marginTop: '0%' }}>
+        <div className="members-table-container-si" style={{ marginTop: '0%' }}>
           {loading ? (
             <div className="loading">Loading...</div>
           ) : (
             <>
-              <table className="members-table" style={{ marginTop: '160px' }}>
+              <table className="members-table-si" style={{ marginTop: '160px' }}>
                 <thead>
                   <tr>
                     <th>Date Created</th>
@@ -1489,7 +1489,7 @@ const SmartIncentives = () => {
                             {activeTab === 'activeCampaigns' && (
                               <td>
                                 <button
-                                  className="action-btn approve"
+                                  className="action-btn-endsi approve"
                                   onClick={() =>
                                     handleDeactivateIncentive(data._id)
                                   }
