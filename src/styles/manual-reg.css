@@ -3,7 +3,7 @@
 .form-group input[type="email"],
 .form-group input[type="date"],
 .form-group input[type="number"],
-.form-group select {
+.form-group select.mr-select {
   width: 100%;
   padding: 6px;
   border: 1px solid #ddd;
@@ -48,6 +48,9 @@
   font-size: 11px;
   }
 
+  .save-s1-btn {
+  margin-top: 0 !important;
+}
     .cancel-btn {
     margin-bottom: 0;
     margin-top: 20px;

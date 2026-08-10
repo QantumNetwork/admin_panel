@@ -692,7 +692,7 @@ const MembershipPage = () => {
                 <tbody>
                   {membershipRows.map((row) => (
                     <tr key={row.id}>
-                      <td style={{ padding: '10px', paddingBottom: '2px' }}>
+                      <td style={{ padding: '6px', paddingBottom: '1px' }}>
                         <input
                           type="text"
                           value={row.name}
@@ -702,7 +702,7 @@ const MembershipPage = () => {
                           onClick={() => setSelectedRowId(row.id)}
                           style={{
                             width: '100%',
-                            padding: '8px',
+                            padding: '6px',
                             border: '1px solid #ddd',
                             borderRadius: '4px',
                           }}
@@ -710,8 +710,8 @@ const MembershipPage = () => {
                       </td>
                       <td
                         style={{
-                          padding: '10px',
-                          paddingBottom: '2px',
+                          padding: '6px',
+                          paddingBottom: '1px',
                           textAlign: 'center',
                         }}
                       >
@@ -724,14 +724,14 @@ const MembershipPage = () => {
                           onClick={() => setSelectedRowId(row.id)}
                           style={{
                             width: '50%',
-                            padding: '8px',
+                            padding: '6px',
                             textAlign: 'center',
                             border: '1px solid #ddd',
                             borderRadius: '4px',
                           }}
                         />
                       </td>
-                      <td style={{ padding: '10px', paddingBottom: '2px' }}>
+                      <td style={{ padding: '6px', paddingBottom: '1px'}}>
                         <div
                           style={{
                             display: 'flex',

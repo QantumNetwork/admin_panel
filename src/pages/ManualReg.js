@@ -1290,6 +1290,7 @@ const ManualReg = () => {
                 <label style={{ fontWeight: 'bold' }}>Membership</label>
                 <select
                   name="membershipLevel"
+                  className="mr-select"
                   value={formData.membershipLevel || ''}
                   onChange={(e) => {
                     const selectedId = e.target.value;
@@ -1455,7 +1456,7 @@ const ManualReg = () => {
           </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: '95px' }}
+            style={{ marginTop: (!isEditMode && !isRenewMode) ? '95px' : '50px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>
@@ -1479,7 +1480,7 @@ const ManualReg = () => {
               </>
             ) : (
               <button
-                className="blue-btn"
+                className="blue-btn save-s1-btn"
                 onClick={isRenewMode ? handleRenewEdit : handleSaveEdit}
                 disabled={isSaving}
                 style={{
@@ -1501,7 +1502,7 @@ const ManualReg = () => {
                 name="membershipLevel"
                 value={formData.membershipLevel || ''}
                 onChange={handleInputChange}
-                className="membershipLevel"
+                className="membershipLevel mr-select"
                 {...disableIf(editing2)}
                 style={{
                   width: '100%',
@@ -1610,7 +1611,7 @@ const ManualReg = () => {
 
             <div
               className="d-flex w-100 justify-content-center"
-              style={{ marginTop: !showConfirmMembership ? '390px' : '70px' }}
+              style={{ marginTop: !showConfirmMembership ? '390px' : '76px' }}
             >
               {editing2 ? (
                 <>
@@ -1730,6 +1731,7 @@ const ManualReg = () => {
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
+                        className="mr-select"
                         style={{
                           width: '100%',
                           padding: '5px',
