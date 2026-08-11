@@ -480,7 +480,7 @@ const ForcedAppUpdates = () => {
               <p className="update-option-description-fau">
                 This update message forces the
                 <br />
-                user to update the app and the app cannot
+                user to update and the app cannot
                 <br />
                 be used until the update occurs.
               </p>
