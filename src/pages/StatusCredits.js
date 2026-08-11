@@ -8,6 +8,7 @@ import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { IoDownloadOutline } from 'react-icons/io5';
 import { FaUser, FaRegCheckCircle } from 'react-icons/fa';
 import { MdVerified, MdRefresh, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
@@ -109,52 +110,49 @@ const AppSettings = () => {
     return location.pathname === path;
   };
 
-const buildStatusCredits = (venue, settings = []) => {
-  const audienceOptions = getAudienceOptions(venue) || [];
+  const buildStatusCredits = (venue, settings = []) => {
+    const audienceOptions = getAudienceOptions(venue) || [];
 
-  return audienceOptions.map((option, index) => {
-    const saved = settings.find((item) => item.key === option.value);
+    return audienceOptions.map((option, index) => {
+      const saved = settings.find((item) => item.key === option.value);
 
-    return {
-      id: index + 1,
-      key: option.value,
-      value: saved?.value ?? 0,
-      nextLevel: saved?.nextLevel ?? true,
-      statusCredit: saved?.statusCredit ?? true,
-    };
-  });
-};
+      return {
+        id: index + 1,
+        key: option.value,
+        value: saved?.value ?? 0,
+        nextLevel: saved?.nextLevel ?? true,
+        statusCredit: saved?.statusCredit ?? true,
+      };
+    });
+  };
 
-//get api
-useEffect(() => {
-  if (!selectedVenue) return;
+  //get api
+  useEffect(() => {
+    if (!selectedVenue) return;
 
-  const fetchStatusCredits = async () => {
-    try {
-      const response = await axios.get(
-        `${baseUrl}/status-tier/getAll`,
-        {
+    const fetchStatusCredits = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/status-tier/getAll`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+        });
 
-      const settings = response.data?.data?.settings || [];
+        const settings = response.data?.data?.settings || [];
 
-      setStatusCredits(buildStatusCredits(selectedVenue, settings));
-      setIsSaved(settings.length > 0);
-    } catch (err) {
-      console.error('Error fetching status credits:', err);
+        setStatusCredits(buildStatusCredits(selectedVenue, settings));
+        setIsSaved(settings.length > 0);
+      } catch (err) {
+        console.error('Error fetching status credits:', err);
 
-      // If nothing exists yet, just show default audience levels
-      setStatusCredits(buildStatusCredits(selectedVenue));
-      setIsSaved(false);
-    }
-  };
+        // If nothing exists yet, just show default audience levels
+        setStatusCredits(buildStatusCredits(selectedVenue));
+        setIsSaved(false);
+      }
+    };
 
-  fetchStatusCredits();
-}, [selectedVenue]);
+    fetchStatusCredits();
+  }, [selectedVenue]);
 
   const handleLock = async () => {
     try {
@@ -536,11 +534,22 @@ useEffect(() => {
               />{' '}
               &nbsp; Status Credits
             </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/forced-app-updates') ? 'active' : ''}`}
+              onClick={() => navigate('/forced-app-updates')}
+            >
+              <IoDownloadOutline
+                className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
+              />
+              &nbsp; Forced App Updates
+            </button>
           </>
         )}
       </aside>
 
-      <main className="special-offers-container" style={{marginTop: '30px'}}>
+      <main className="special-offers-container" style={{ marginTop: '30px' }}>
         <div className="special-offers-wrapper">
           <div className="special-offers-card" style={{ width: '700px' }}>
             <h3 className="special-offers-title">

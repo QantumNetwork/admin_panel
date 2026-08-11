@@ -1,0 +1,402 @@
+/* =========================================================
+   Forced App Updates page
+   Layout tuned to match the supplied 1275 x 616 reference.
+   ========================================================= */
+
+.content-wrapper-fau {
+  position: absolute;
+  top: 140px;
+  left: 250px;
+  width: calc(100% - 317px);
+  height: 500px;
+  display: grid;
+  grid-template-columns: minmax(300px, 323px) minmax(500px, 1fr);
+  column-gap: 59px;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.customer-button-section-fau,
+.preview-section-fau {
+  background: #f3f3f3;
+  border-radius: 6px;
+  box-sizing: border-box;
+  height: 484px;
+}
+
+.customer-button-section-fau {
+  width: 100%;
+  padding: 20px 20px;
+}
+
+.preview-section-fau {
+  width: 100%;
+  position: relative;
+  padding: 20px 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.customer-button-section-fau h2,
+.preview-section-fau h2 {
+  margin: 0;
+  color: #111;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* -------------------------
+   Current live versions
+   ------------------------- */
+.fau-form {
+  width: 100%;
+  margin-top: 25px;
+}
+
+.fau-form .form-group-fau {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.fau-form .form-group-fau label {
+  flex: 0 0 91px;
+  width: 91px;
+  font-size: 14px;
+  line-height: 18px;
+  color: #222;
+  font-weight: 400;
+}
+
+/* Version input */
+.fau-form .form-group-fau input[type='text'] {
+  width: 112px;
+  height: 28px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 2px;
+  background: #fff;
+  color: #555;
+  font-size: 12px;
+  text-align: right;
+  outline: none;
+}
+
+/* Build input */
+.fau-form .form-group-fau input[type='number'] {
+  width: 59px;
+  height: 28px;
+  margin-left: 12px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 2px;
+  background: #fff;
+  color: #555;
+  font-size: 12px;
+  text-align: right;
+  outline: none;
+}
+
+/* Remove number input arrows */
+.fau-form .form-group-fau input[type='number']::-webkit-inner-spin-button,
+.fau-form .form-group-fau input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.fau-form .form-group-fau input:focus {
+  box-shadow: 0 0 0 1px #5396d1;
+}
+
+/* version / build headings */
+.fau-input-headings {
+  display: flex;
+  margin-left: 91px;
+  margin-bottom: 5px;
+  gap: 15px;
+}
+
+.fau-input-headings span {
+  color: #555;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 400;
+}
+
+.fau-input-headings span:first-child {
+  width: 112px;
+}
+
+.fau-input-headings span:last-child {
+  width: 59px;
+}
+/* -------------------------
+   Update message choices
+   ------------------------- */
+.update-message-options-fau {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 27px;
+  margin-top: 28px;
+}
+
+.update-message-option-fau {
+  position: relative;
+  width: 255px;
+  min-width: 0;
+  padding: 24px 0 0;
+  border: 0;
+  background: transparent;
+  color: #333;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  border-radius: 15px;
+  outline: none;
+}
+
+.update-message-option-fau.selected-fau {
+  /* height: 336px; */
+  border: 2px solid #62a9e2;
+  /* padding-top: 24px; */
+  background-color: white;
+}
+
+/* .update-message-option-fau:not(.selected-fau) {
+  height: 336px;
+} */
+
+.update-message-option-fau:hover .app-update-card-fau {
+  transform: translateY(-1px);
+}
+
+.selection-check-fau {
+  position: absolute;
+  z-index: 4;
+  top: -19px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #5396d1;
+  color: #fff;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 1px rgba(83, 150, 209, 0.05);
+}
+
+.app-update-card-fau {
+  width: 202px;
+  height: 230px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 20px 13px 12px;
+  border-radius: 15px;
+  background: #073687;
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+
+.update-card-icon-fau {
+  position: relative;
+  width: 42px;
+  height: 38px;
+  margin: 0 auto 8px;
+  box-sizing: border-box;
+}
+
+.update-card-icon-fau span {
+  display: block;
+  font-size: 39px;
+  line-height: 38px;
+  font-family: Arial, sans-serif;
+  font-weight: 400;
+}
+
+.update-card-icon-fau b {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.update-card-title-fau {
+  font-size: 24px;
+  line-height: 25px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.update-card-description-fau {
+  margin: 28px 0 13px;
+  font-size: 9px;
+  line-height: 12px;
+  color: #fff;
+}
+
+.update-card-actions-fau {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* .update-card-actions-fau.force-actions-fau {
+  margin-top: 23px;
+} */
+
+.update-now-pill-fau {
+  min-width: 101px;
+  height: 33px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+  padding: 0 10px;
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.update-option-description-fau {
+  margin: 17px 0 0;
+  color: #666;
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* -------------------------
+   Save button
+   ------------------------- */
+.fau-save-button {
+  position: absolute;
+  left: 50%;
+  top: 85%;
+  transform: translateX(-50%);
+  width: 142px;
+  height: 39px;
+  min-height: 39px;
+  padding: 0;
+  border: 0;
+  border-radius: 21px;
+  background: #5396d1 !important;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.fau-save-button:hover:not(:disabled) {
+  background: #4b8dc7 !important;
+}
+
+.fau-save-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Header positioning used by this page. */
+.fau-header-center {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fau-admin-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  color: #002977;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.fau-venue-wrapper {
+  position: absolute;
+  right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fau-venue-label {
+  color: #002977;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* -------------------------
+   Responsive behaviour
+   ------------------------- */
+@media (min-width: 1700px) {
+    .content-wrapper-fau {
+        left: 300px;
+    }
+}
+@media (max-width: 1100px) {
+  .content-wrapper-fau {
+    left: 220px;
+    width: calc(100% - 245px);
+    column-gap: 25px;
+  }
+
+  .customer-button-section-fau {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .update-message-options-fau {
+    gap: 8px;
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 990px) {
+  .content-wrapper-fau {
+    position: relative;
+    top: auto;
+    left: auto;
+    /* width: calc(100% - 30px); */
+    height: auto;
+    margin: 25px 150px;
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
+
+  .customer-button-section-fau,
+  .preview-section-fau {
+    height: auto;
+    min-height: 400px;
+  }
+
+  .preview-section-fau {
+    min-height: 520px;
+  }
+}

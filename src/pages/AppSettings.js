@@ -8,6 +8,7 @@ import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { IoDownloadOutline } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { MdVerified, MdRefresh, MdHistory } from 'react-icons/md';
 import { CiSearch } from 'react-icons/ci';
@@ -30,7 +31,7 @@ const AppSettings = () => {
   const [menuType, setMenuType] = useState('multiple'); // 'standard' | 'multiple'
   const [offerTypes, setOfferTypes] = useState(['WMLC', 'Fielders']);
   const userType = localStorage.getItem('userType') || 'admin';
-  const isAdmin = userType === "admin";
+  const isAdmin = userType === 'admin';
   const [venues, setVenues] = useState([]);
 
   const [venueOfferTypes, setVenueOfferTypes] = useState([
@@ -600,6 +601,17 @@ const AppSettings = () => {
                 }`}
               />{' '}
               &nbsp; Status Credits
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/forced-app-updates') ? 'active' : ''}`}
+              onClick={() => navigate('/forced-app-updates')}
+            >
+              <IoDownloadOutline
+                className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
+              />
+              &nbsp; Forced App Updates
             </button>
           </>
         )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaRegCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { IoDownloadOutline } from 'react-icons/io5';
 import { TiCreditCard } from 'react-icons/ti';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -739,6 +740,17 @@ const StandardAdmin = () => {
             }`}
           />{' '}
           &nbsp; Status Credits
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/forced-app-updates') ? 'active' : ''}`}
+          onClick={() => navigate('/forced-app-updates')}
+        >
+          <IoDownloadOutline
+            className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
+          />
+          &nbsp; Forced App Updates
         </button>
       </aside>
 

@@ -36,6 +36,7 @@ import { useEffect } from 'react';
 import { setupRefreshLock, clearRefreshLock } from './utils/api';
 import Reporting from "./pages/Reporting";
 import 'react-toastify/dist/ReactToastify.css';
+import ForcedAppUpdates from "./pages/ForcedAppUpdates";
 
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
         <Route path="/ai-buttons" element={<AIButtons />} />
         <Route path="/transaction-history" element={<TransactionHistory />} />
         <Route path="/status-credits" element={<StatusCredits />} />
+        <Route path="/forced-app-updates" element={<ForcedAppUpdates />} />
       </Routes>
       
     </Router>

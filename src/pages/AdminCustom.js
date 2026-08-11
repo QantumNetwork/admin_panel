@@ -10,12 +10,13 @@ import {
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { TiCreditCard } from 'react-icons/ti';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { IoDownloadOutline } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { handleLogout } from '../utils/api';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import { CiStar } from "react-icons/ci";
+import { CiStar } from 'react-icons/ci';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/admin-custom.css';
 import Swal from 'sweetalert2';
@@ -571,6 +572,17 @@ const AdminCustom = () => {
             }`}
           />{' '}
           &nbsp; Status Credits
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/forced-app-updates') ? 'active' : ''}`}
+          onClick={() => navigate('/forced-app-updates')}
+        >
+          <IoDownloadOutline
+            className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
+          />
+          &nbsp; Forced App Updates
         </button>
       </aside>
 
