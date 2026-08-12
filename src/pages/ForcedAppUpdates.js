@@ -28,13 +28,13 @@ const ForcedAppUpdates = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [IOSVersion, setIOSVersion] = useState('2.5.0');
-  const [IOSBuild, setIOSBuild] = useState('48');
+  const [IOSVersion, setIOSVersion] = useState('');
+  const [IOSBuild, setIOSBuild] = useState('');
 
-  const [AndroidVersion, setAndroidVersion] = useState('2.5.0');
-  const [AndroidBuild, setAndroidBuild] = useState('48');
+  const [AndroidVersion, setAndroidVersion] = useState('');
+  const [AndroidBuild, setAndroidBuild] = useState('');
 
-  const [selectedMessage, setSelectedMessage] = useState('later-fau');
+  const [selectedMessage, setSelectedMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = localStorage.getItem('token');
@@ -96,6 +96,57 @@ const ForcedAppUpdates = () => {
     }
   };
 
+  useEffect(() => {
+  const fetchAppVersions = async () => {
+    // We currently only support Ace Rewards
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming') {
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${baseUrl}/app-versions/${selectedVenue}/latest`
+      );
+
+      if (response.data?.success && response.data?.data) {
+        const { android, ios } = response.data.data;
+
+        // Populate iOS fields
+        setIOSVersion(ios?.latest_version || '');
+        setIOSBuild(
+          ios?.latest_build !== undefined
+            ? String(ios.latest_build)
+            : ''
+        );
+
+        // Populate Android fields
+        setAndroidVersion(android?.latest_version || '');
+        setAndroidBuild(
+          android?.latest_build !== undefined
+            ? String(android.latest_build)
+            : ''
+        );
+
+        // Both platforms currently use the same force_update value
+        if (android?.force_update || ios?.force_update) {
+          setSelectedMessage('force-fau');
+        } else {
+          setSelectedMessage('later-fau');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching app versions:', error);
+
+      // toast.error(
+      //   error.response?.data?.message ||
+      //   'Failed to fetch current app versions.'
+      // );
+    }
+  };
+
+  fetchAppVersions();
+}, [selectedVenue, baseUrl]);
+
   const isActive = (path) => location.pathname === path;
 
   const handleLock = async () => {
@@ -118,9 +169,9 @@ const ForcedAppUpdates = () => {
     e.preventDefault();
 
     // Only Ace Rewards can currently save app versions
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum' ) {
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming') {
       toast.error(
-        'App version updates are currently available only for Ace Rewards and Qantum apps.'
+        'App version updates unavailable on this account'
       );
       return;
     }
