@@ -96,7 +96,6 @@ const PasswordVerification = () => {
 
         <div className="bottom-links">
           <a href="#">Forgot password?</a>
-          <a href="#">Verify with something else</a>
           <a href="/">Back to sign in</a>
         </div>
       </div>
