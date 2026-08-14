@@ -99,7 +99,7 @@ const ForcedAppUpdates = () => {
   useEffect(() => {
   const fetchAppVersions = async () => {
     // We currently only support Ace Rewards
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP') {
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic') {
       return;
     }
 
@@ -169,7 +169,7 @@ const ForcedAppUpdates = () => {
     e.preventDefault();
 
     // Only Ace Rewards can currently save app versions
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP') {
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic') {
       toast.error(
         'App version updates unavailable on this account'
       );

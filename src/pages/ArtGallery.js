@@ -832,7 +832,7 @@ const ArtGallery = () => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming'  || selectedVenue === 'Hogan' || selectedVenue === 'EDP' || selectedVenue === 'Flinders') && (
+        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming'  || selectedVenue === 'Hogan' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
