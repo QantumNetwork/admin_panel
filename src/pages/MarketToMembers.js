@@ -76,6 +76,8 @@ const MarketToMembers = () => {
 
   const [searchText, setSearchText] = useState({});
 
+  const fieldRequestRef = useRef({});
+
   const navigate = useNavigate();
 
   const handleSuggestionToggle = (id, state) => {
@@ -243,42 +245,53 @@ const MarketToMembers = () => {
       // Handle get API endpoint (newApiCallFields)
       if (newApiCallFields.includes(row.field) && filterValueOptions[row.id]) {
         if (row.value && row.value.length > 0) {
-          if (row.operator === 'Contains') {
-            // For Contains: substring match anywhere in the string (existing behavior)
-            // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
-              (option) =>
-                option
-                  .toString()
-                  .toLowerCase()
-                  .includes(row.value.toLowerCase())
-            );
-            // .slice(0, 10);
-          } else if (row.operator === 'Exactly Matches') {
-            // For Exactly Matches: exact match at beginning of string
-            // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
-              (option) =>
-                option
-                  .toString()
-                  .toLowerCase()
-                  .indexOf(row.value.toLowerCase()) === 0
-            );
-            // .slice(0, 10);
-          } else {
-            // Default for other operators
-            // Also limit to 10 results
-            newFilteredOptions[row.id] = filterValueOptions[row.id];
-            // .slice(
-            //   0,
-            //   10
-            // );
-          }
-        } else {
-          // If no input, don't show any options
-          newFilteredOptions[row.id] = [];
+          // Convert both string options and { value, label } options
+    // into a string for filtering/rendering.
+    const getOptionText = (option) =>
+      typeof option === 'object' && option !== null
+        ? option.label
+        : option;
+
+    if (row.operator === 'Contains') {
+      // For Contains: substring match anywhere in the string
+      newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+        (option) => {
+          const optionText = getOptionText(option);
+
+          return optionText
+            ?.toString()
+            .toLowerCase()
+            .includes(row.value.toLowerCase());
         }
-      }
+      );
+
+    } else if (row.operator === 'Exactly Matches') {
+      // For Exactly Matches: match from the beginning of the string
+      newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+        (option) => {
+          const optionText = getOptionText(option);
+
+          return optionText
+            ?.toString()
+            .toLowerCase()
+            .indexOf(row.value.toLowerCase()) === 0;
+        }
+      );
+
+    } else {
+      newFilteredOptions[row.id] =
+        filterValueOptions[row.id].map((option) =>
+          typeof option === 'object' && option !== null
+            ? option.label
+            : option
+        );
+    }
+
+  } else {
+    // If no input, don't show any options
+    newFilteredOptions[row.id] = [];
+  }
+}
     });
 
     setFilteredOptions(newFilteredOptions);
@@ -1264,6 +1277,24 @@ const MarketToMembers = () => {
 
   // Handle field change and make API call if needed
   const handleFieldChange = async (id, field) => {
+    const requestId = (fieldRequestRef.current[id] || 0) + 1;
+    fieldRequestRef.current[id] = requestId;
+
+    // Clear data belonging to the previous field
+  setFilterValueOptions((prev) => ({
+    ...prev,
+    [id]: [],
+  }));
+
+  setFilteredOptions((prev) => ({
+    ...prev,
+    [id]: [],
+  }));
+
+  setShowSuggestions((prev) => ({
+    ...prev,
+    [id]: false,
+  }));
     let defaultOperator = 'Contains';
 
     if (dateFields.includes(field)) {
@@ -1381,6 +1412,9 @@ const MarketToMembers = () => {
         const data = await response.json();
 
         if (Array.isArray(data)) {
+          if (requestId !== fieldRequestRef.current[id]) {
+    return;
+}
           // Update the options for this specific filter row
           setFilterValueOptions((prev) => ({
             ...prev,
@@ -1404,13 +1438,27 @@ const MarketToMembers = () => {
 
   // Handle value change for a specific filter row
   const handleValueChange = async (id, value) => {
-    console.log('Selected value:', value); // 👈 ADD THIS
-    console.log(
-    "Field:",
-    filterRows.find((r) => r.id === id)?.field,
-    "Selected value:",
-    value
-);
+    const requestId = (fieldRequestRef.current[id] || 0) + 1;
+
+fieldRequestRef.current[id] = requestId;
+
+// Clear suggestions from the previous search immediately
+setFilteredOptions((prev) => ({
+  ...prev,
+  [id]: [],
+}));
+
+setFilterValueOptions((prev) => ({
+  ...prev,
+  [id]: [],
+}));
+//     console.log('Selected value:', value); // 👈 ADD THIS
+//     console.log(
+//     "Field:",
+//     filterRows.find((r) => r.id === id)?.field,
+//     "Selected value:",
+//     value
+// );
 
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1468,6 +1516,9 @@ const MarketToMembers = () => {
       const data = await response.json();
 
       if (Array.isArray(data)) {
+        if (requestId !== fieldRequestRef.current[id]) {
+    return;
+}
         if (multiSelectFields.includes(row.field)) {
           setFilterValueOptions((prev) => ({
             ...prev,
@@ -2379,7 +2430,7 @@ const MarketToMembers = () => {
                                   handleSuggestionToggle(1, false);
                                 }}
                               >
-                                {option}
+                                {typeof option === 'object' ? option.label : option}
                               </div>
                             ))}
                           </div>
@@ -2558,7 +2609,7 @@ const MarketToMembers = () => {
                                         handleSuggestionToggle(row.id, false);
                                       }}
                                     >
-                                      {option}
+                                      {typeof option === 'object' ? option.label : option}
                                     </div>
                                   )
                                 )}
