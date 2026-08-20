@@ -1,54 +1,74 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { IoIosContact } from "react-icons/io";
+import React, { useState } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { IoIosContact } from 'react-icons/io';
 import axios from 'axios';
-import "../styles/mfa-verification.css"; // External CSS file
+import '../styles/mfa-verification.css'; // External CSS file
 
 function MFAVerification() {
-
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
+  const isForgotPassword = searchParams.get('from') === 'forgot-password';
+  const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
   const [access, setAccess] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const email =
-    localStorage.getItem("email") || "";
+  const email = localStorage.getItem('email') || '';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    try {
-      const response = await axios.post(`${baseUrl}/admin/google-verify/${email}`, {
-        otp
-      });
 
-      if(response.data.success) {
-        if(response.data.data.token) {
+    try {
+      let response;
+
+      if (isForgotPassword) {
+        // Forgot Password flow
+        response = await axios.post(`${baseUrl}/admin/sendOtp`, {
+          email,
+          otp,
+        });
+
+        if (response.data.success) {
+          navigate('/mobile-verification-page');
+        } else {
+          setError(
+            response.data.message || 'Google Authenticator verification failed.'
+          );
+        }
+      } else {
+        response = await axios.post(`${baseUrl}/admin/google-verify/${email}`, {
+          otp,
+        });
+
+        if (response.data.success) {
+          if (response.data.data.token) {
             console.log(response.data);
-            localStorage.setItem("token", response.data.data.token);
-            localStorage.setItem("userEmail", email);
-            localStorage.setItem("userType", response.data.data.type); //can be user/search/admin/power admin
-            localStorage.setItem("appGroup", response.data.data.appType);
-            localStorage.setItem("name", response.data.data.name);
+            localStorage.setItem('token', response.data.data.token);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userType', response.data.data.type); //can be user/search/admin/power admin
+            localStorage.setItem('appGroup', response.data.data.appType);
+            localStorage.setItem('name', response.data.data.name);
             const userAccess = response.data.data.access || [];
 
-            localStorage.setItem("access", userAccess);
-            if(response.data.data.type === 'power') {
+            localStorage.setItem('access', userAccess);
+            if (response.data.data.type === 'power') {
               navigate('/power-admin');
-            } else if(response.data.data.type === 'search') {
+            } else if (response.data.data.type === 'search') {
               navigate('/public-member-search');
+            } else if (isForgotPassword) {
+              navigate('/mobile-verification-page', { state: { email } });
             } else {
               navigate('/dashboard', { state: { email } });
             }
-            
+          }
         }
       }
-
-    } catch(err) {
-      console.log('Error verifying OTP: ',err);
-      const errorMessage = err.response?.data?.message || err.message || "Something went wrong. Please try again.";
+    } catch (err) {
+      console.log('Error verifying OTP: ', err);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        'Something went wrong. Please try again.';
       setError(errorMessage);
     }
   };
@@ -62,16 +82,22 @@ function MFAVerification() {
       <div className="card">
         {/* Circular Background with Lock Icon */}
         <div className="lock-container">
-          <img src="/authenticator-icon.png" alt="Google Authenticator Icon" className="authenticator-image" />
+          <img
+            src="/authenticator-icon.png"
+            alt="Google Authenticator Icon"
+            className="authenticator-image"
+          />
         </div>
-
 
         {/* Title */}
         <h2 className="title">Verify with your Google Authenticator</h2>
 
         {/* User Email */}
         <p className="email">
-          <span className="email-icon"><IoIosContact/></span>{email}
+          <span className="email-icon">
+            <IoIosContact />
+          </span>
+          {email}
         </p>
 
         {/* Instruction Text */}
@@ -81,12 +107,14 @@ function MFAVerification() {
 
         {/* Input Field */}
         <form onSubmit={handleSubmit}>
-          <label className="input-label" style={{textAlign: 'center'}}>Enter code</label>
+          <label className="input-label" style={{ textAlign: 'center' }}>
+            Enter code
+          </label>
           <div className="input-container">
             <input
               type="text"
               placeholder="Enter OTP"
-              style={{textAlign: 'center', width: '150px', padding: '15px'}}
+              style={{ textAlign: 'center', width: '150px', padding: '15px' }}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               required
@@ -102,7 +130,11 @@ function MFAVerification() {
         </form>
 
         {/* Back to Sign In */}
-        <a href='/'><p className="back-link" style={{textAlign: 'center'}}>Back to sign in</p></a>
+        <a href="/">
+          <p className="back-link" style={{ textAlign: 'center' }}>
+            Back to sign in
+          </p>
+        </a>
       </div>
     </div>
   );

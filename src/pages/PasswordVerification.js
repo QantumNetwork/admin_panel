@@ -95,7 +95,7 @@ const PasswordVerification = () => {
         <button className="verify-button" onClick={handleVerify}>VERIFY</button>
 
         <div className="bottom-links">
-          <a href="#">Forgot password?</a>
+          <a href="/verify-mfa?from=forgot-password">Forgot password?</a>
           <a href="/">Back to sign in</a>
         </div>
       </div>

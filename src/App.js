@@ -37,6 +37,8 @@ import { setupRefreshLock, clearRefreshLock } from './utils/api';
 import Reporting from "./pages/Reporting";
 import 'react-toastify/dist/ReactToastify.css';
 import ForcedAppUpdates from "./pages/ForcedAppUpdates";
+import MobileVerificationPage from "./pages/MobileVerificationPage";
+import CreateNewPassword from "./pages/CreateNewPassword";
 
 
 function App() {
@@ -103,6 +105,8 @@ function App() {
         <Route path="/transaction-history" element={<TransactionHistory />} />
         <Route path="/status-credits" element={<StatusCredits />} />
         <Route path="/forced-app-updates" element={<ForcedAppUpdates />} />
+        <Route path="/mobile-verification-page" element={<MobileVerificationPage />} />
+        <Route path="/create-new-password" element={<CreateNewPassword />} />
       </Routes>
       
     </Router>

@@ -1,0 +1,383 @@
+/* ==============================
+   Main Page
+   ============================== */
+
+.mvp-container {
+    min-height: 100vh;
+    width: 100%;
+
+    background-color: #e9e9e9;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding-top: 80px;
+}
+
+
+/* ==============================
+   S2W Logo
+   ============================== */
+
+.mvp-container .mvp-logo {
+    width: 180px;
+    height: auto;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin-bottom: 50px;
+}
+
+
+/* ==============================
+   Main Card
+   ============================== */
+
+.mvp-card {
+    position: relative;
+
+    width: 360px;
+    min-height: 347px;
+
+    background-color: #ffffff;
+
+    border-radius: 4px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 65px 40px 25px;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   Circular Icon
+   ============================== */
+
+.mvp-icon-container {
+    position: absolute;
+
+    top: -40px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 80px;
+    height: 80px;
+
+    border-radius: 50%;
+
+    background-color: #eeeeee;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Icon inside circle */
+
+.mvp-icon-container .mvp-authenticator-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+}
+
+
+/* ==============================
+   Title
+   ============================== */
+
+.mvp-title {
+    margin: 0 0 12px;
+
+    font-size: 18px;
+    line-height: 22px;
+
+    font-weight: 700;
+
+    color: #123f7b;
+
+    text-align: center;
+}
+
+
+/* ==============================
+   Instruction
+   ============================== */
+
+.mvp-instruction {
+    margin: 0 0 25px;
+
+    font-size: 12px;
+    line-height: 17px;
+
+    font-weight: 400;
+
+    color: #0c0a0a;
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+
+/* ==============================
+   Enter Code Label
+   ============================== */
+
+.mvp-input-label {
+    display: block;
+
+    width: 100%;
+
+    margin-bottom: 10px;
+
+    font-size: 11px;
+    line-height: 15px;
+
+    font-weight: 400;
+
+    color: #0c0a0a;
+
+    text-align: left;
+}
+
+
+/* ==============================
+   OTP Container
+   ============================== */
+
+.mvp-otp-container {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 19px;
+}
+
+
+/* ==============================
+   Individual OTP Box
+   ============================== */
+
+.mvp-otp-box {
+    width: 46px;
+    height: 36px;
+
+    padding: 0;
+
+    border: none;
+    border-bottom: 2px solid #5b9bd5;
+
+    border-radius: 0;
+
+    background-color: #fafafa;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    font-size: 18px;
+    font-weight: 500;
+
+    color: #333333;
+}
+
+
+/* OTP box when focused */
+
+.mvp-otp-box:focus {
+    border-bottom: 2px solid #4d94d1;
+
+    background-color: #ffffff;
+}
+
+
+/* ==============================
+   Error Message
+   ============================== */
+
+.mvp-error-text {
+    width: 100%;
+
+    margin: -10px 0 10px;
+
+    font-size: 11px;
+    line-height: 15px;
+
+    color: #d9534f;
+
+    text-align: center;
+}
+
+
+/* ==============================
+   Verify Button
+   ============================== */
+
+.mvp-verify-button {
+    width: 222px;
+    height: 32px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 18px;
+
+    background-color: #559bd3;
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    line-height: 32px;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    display: block;
+
+    margin: 0 auto;
+
+    outline: none;
+}
+
+
+/* Button hover */
+
+.mvp-verify-button:hover {
+    background-color: #4a91ca;
+}
+
+
+/* Button focus */
+
+.mvp-verify-button:focus {
+    outline: none;
+}
+
+
+/* ==============================
+   Back To Sign In
+   ============================== */
+
+.mvp-back-link {
+    display: block;
+
+    margin-top: 19px;
+
+    font-size: 12px;
+    line-height: 16px;
+
+    font-weight: 400;
+
+    color: #0c0a0a;
+
+    /* text-align: center; */
+
+    text-decoration: none;
+}
+
+
+/* Back link hover */
+
+.mvp-back-link:hover {
+    color: #12d9f3;
+
+    text-decoration: none;
+}
+
+
+/* ==============================
+   Responsive - Tablet
+   ============================== */
+
+@media (max-width: 600px) {
+
+    .mvp-container {
+        padding-top: 35px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .mvp-container .mvp-logo {
+        width: 130px;
+
+        margin-bottom: 58px;
+    }
+
+    .mvp-card {
+        width: 100%;
+        max-width: 360px;
+
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+
+/* ==============================
+   Responsive - Small Mobile
+   ============================== */
+
+@media (max-width: 400px) {
+
+    .mvp-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .mvp-container .mvp-logo {
+        width: 125px;
+
+        margin-bottom: 55px;
+    }
+
+    .mvp-card {
+        max-width: 350px;
+
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+    .mvp-title {
+        font-size: 17px;
+    }
+
+    .mvp-instruction {
+        font-size: 11px;
+
+        white-space: normal;
+    }
+
+    .mvp-otp-container {
+        gap: 9px;
+    }
+
+    .mvp-otp-box {
+        width: 44px;
+        height: 35px;
+    }
+
+    .mvp-verify-button {
+        width: 210px;
+    }
+}
