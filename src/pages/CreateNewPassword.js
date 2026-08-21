@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
+import {
+  IoEyeOutline,
+  IoEyeOffOutline,
+  IoCheckmarkCircle,
+} from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -38,40 +42,35 @@ function CreateNewPassword() {
   const canUpdatePassword = isPasswordValid && passwordsMatch;
 
   const handleUpdatePassword = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await axios.post(
-      `${baseUrl}/admin/setNewPassword`,
-      {
+    try {
+      const response = await axios.post(`${baseUrl}/admin/setNewPassword`, {
         email,
         password,
         confirmPassword,
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      } else {
+        toast.error(response.data.message || 'Failed to update password.');
       }
-    );
+    } catch (err) {
+      console.log('Error updating password:', err);
 
-    if (response.data.success) {
-      toast.success(response.data.message);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        'Something went wrong. Please try again.';
 
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-    } else {
-      toast.error(
-        response.data.message || 'Failed to update password.'
-      );
+      toast.error(errorMessage);
     }
-  } catch (err) {
-    console.log('Error updating password:', err);
-
-    const errorMessage =
-      err.response?.data?.message ||
-      err.message ||
-      'Something went wrong. Please try again.';
-
-    toast.error(errorMessage);
-  }
-};
+  };
 
   const handleCancel = () => {
     navigate('/password-verification');
@@ -180,10 +179,33 @@ function CreateNewPassword() {
               Your password must include:
             </p>
 
-            <p>At least 8 characters</p>
-            <p>At least 1 number</p>
-            <p>Upper and lowercase letters</p>
-            <p>At least one special character</p>
+            <div className="cnp-requirement-row">
+              <span>At least 8 characters</span>
+              {passwordRules.length && (
+                <IoCheckmarkCircle className="cnp-requirement-check" />
+              )}
+            </div>
+
+            <div className="cnp-requirement-row">
+              <span>At least 1 number</span>
+              {passwordRules.number && (
+                <IoCheckmarkCircle className="cnp-requirement-check" />
+              )}
+            </div>
+
+            <div className="cnp-requirement-row">
+              <span>Upper and lowercase letters</span>
+              {passwordRules.upperLower && (
+                <IoCheckmarkCircle className="cnp-requirement-check" />
+              )}
+            </div>
+
+            <div className="cnp-requirement-row">
+              <span>At least one special character</span>
+              {passwordRules.special && (
+                <IoCheckmarkCircle className="cnp-requirement-check" />
+              )}
+            </div>
           </div>
 
           {/* Confirm Password */}
