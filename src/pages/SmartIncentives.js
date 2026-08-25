@@ -1515,7 +1515,7 @@ const SmartIncentives = () => {
                       ) : (
                         <tr>
                           <td colSpan="8" className="no-data">
-                            No members found
+                            No incentives found
                           </td>
                         </tr>
                       )}

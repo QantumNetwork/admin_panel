@@ -1243,7 +1243,7 @@ const DigitalSmall = () => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming'  || selectedVenue === 'Hogan'  || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic') && (
+        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming'  || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
