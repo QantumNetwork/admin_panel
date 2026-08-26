@@ -58,6 +58,7 @@ const MembershipPage = () => {
         name: 'Social Member 1 Year',
         price: '$5',
         proRata: false,
+        isDisplay: false,
         renewalDate: '',
         expiryEarlyBirdRenewalDate: '',
         earlyBirdStartDate: '',
@@ -69,6 +70,7 @@ const MembershipPage = () => {
         name: 'Social Member 3 Years',
         price: '$10',
         proRata: false,
+        isDisplay: false,
         renewalDate: '',
         expiryEarlyBirdRenewalDate: '',
         earlyBirdStartDate: '',
@@ -162,6 +164,7 @@ const MembershipPage = () => {
             name: level.membershipName,
             price: `$${level.price}`,
             proRata: level.proRata,
+            isDisplay: level.isDisplay ?? false,
             renewalDate: level.renewalDate?.split('T')[0] || '',
 
             expiryEarlyBirdRenewalDate:
@@ -247,6 +250,7 @@ const MembershipPage = () => {
       name: '',
       price: '',
       proRata: false,
+      isDisplay: false,
       renewalDate: '',
       expiryEarlyBirdRenewalDate: '',
       earlyBirdStartDate: '',
@@ -290,6 +294,10 @@ const MembershipPage = () => {
               ? calculateDaysRemaining(row.renewalDate)
               : 0,
           };
+
+          if (selectedVenue === 'Mannum') {
+            levelObject.isDisplay = row.isDisplay;
+          }
 
           if (row._id) {
             levelObject._id = row._id; // <-- Attach only if exists
@@ -677,6 +685,18 @@ const MembershipPage = () => {
                     >
                       Price
                     </th>
+                    {selectedVenue === 'Mannum' && (
+                      <th
+                        style={{
+                          textAlign: 'center',
+                          padding: '10px',
+                          borderBottom: '1px solid #ddd',
+                          width: '25%',
+                        }}
+                      >
+                        Display in app
+                      </th>
+                    )}
                     <th
                       style={{
                         textAlign: 'left',
@@ -731,7 +751,30 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      <td style={{ padding: '6px', paddingBottom: '1px'}}>
+                      {selectedVenue === 'Mannum' && (
+                        <td
+                          style={{
+                            padding: '6px',
+                            paddingBottom: '1px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={row.isDisplay}
+                            onChange={(e) =>
+                              updateMembershipRow(
+                                row.id,
+                                'isDisplay',
+                                e.target.checked
+                              )
+                            }
+                            onClick={() => setSelectedRowId(row.id)}
+                            style={{ accentColor: '#002977' }}
+                          />
+                        </td>
+                      )}
+                      <td style={{ padding: '6px', paddingBottom: '1px' }}>
                         <div
                           style={{
                             display: 'flex',
