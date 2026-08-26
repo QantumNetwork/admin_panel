@@ -145,6 +145,9 @@ const AIChatPage = () => {
     const isEDP = selectedVenue === 'EDP';
     const isMosaic = selectedVenue === 'Mosaic';
     const isBob = selectedVenue === 'Bob';
+    const isWonthaggi = selectedVenue === 'Wonthaggi';
+    const isSOT = selectedVenue === 'Sense';
+    const isMannum = selectedVenue === 'Mannum';
 
     const endpoint = isQantumOrMaxGaming
       ? 'https://qantumdemoaireportingviperapi.gentlehill-ca974cf4.australiaeast.azurecontainerapps.io/api/airesponse'
@@ -178,7 +181,13 @@ const AIChatPage = () => {
                                   ? 'https://mosaichotelviperapi.whitebush-141b5257.australiaeast.azurecontainerapps.io/api/airesponse'
                                   : isBob
                                     ? 'https://bobsbulkboozeviperapi.icydune-145d42ab.australiaeast.azurecontainerapps.io/api/airesponse'
-                                    : null;
+                                    : isWonthaggi
+                                      ? 'https://wonthaggicountryclubviperapi.happystone-82db7873.australiaeast.azurecontainerapps.io/api/airesponse'
+                                      : isSOT
+                                        ? 'https://sensoftasteviperapi.blackisland-4d6cc168.australiaeast.azurecontainerapps.io/api/airesponse'
+                                        : isMannum
+                                          ? 'https://mannumclubviperapi.bravepebble-efe42685.australiaeast.azurecontainerapps.io/api/airesponse'
+                                          : null
 
     return endpoint;
   };
