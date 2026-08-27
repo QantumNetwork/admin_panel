@@ -678,12 +678,12 @@ const SmartIncentives = () => {
               >
                 Market to Members
               </button>
-              <button
+              {/* <button
                 className="displays-btn"
                 onClick={() => handleNavigation('/displays')}
               >
                 Displays
-              </button>
+              </button> */}
             </>
           ) : (
             <>
@@ -703,14 +703,14 @@ const SmartIncentives = () => {
                   Market to Members
                 </button>
               )}
-              {access.includes('displays') && (
+              {/* {access.includes('displays') && (
                 <button
                   className="displays-btn"
                   onClick={() => handleNavigation('/displays')}
                 >
                   Displays
                 </button>
-              )}
+              )} */}
             </>
           )}
 
