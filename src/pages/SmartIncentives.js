@@ -301,7 +301,8 @@ const SmartIncentives = () => {
 
       const payload = {
         offerType: selectedIncentive,
-        deliveryMethod: selectedIncentive === 'Kiosk' ? 'Kiosk' : 'Scratch & Win',
+        deliveryMethod:
+          selectedIncentive === 'Kiosk' ? 'Kiosk' : 'Scratch & Win',
         ...(selectedIncentive === 'Kiosk' && { promotionName }),
         audience: isEveryone ? ['everyone'] : selectedAudiences,
         triggerType: selectedTrigger,
@@ -1397,7 +1398,10 @@ const SmartIncentives = () => {
             <div className="loading">Loading...</div>
           ) : (
             <>
-              <table className="members-table-si" style={{ marginTop: '160px' }}>
+              <table
+                className="members-table-si"
+                style={{ marginTop: '160px' }}
+              >
                 <thead>
                   <tr>
                     <th>Date Created</th>

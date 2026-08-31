@@ -111,6 +111,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Mannum') return '#4D5E7B';
         if (selectedVenue === 'Hogan') return '#45d4e1ff';
         if (selectedVenue === 'Ace') return '#dedadabd';
+        if (selectedVenue === 'Ace') return '#549891';
       case 'Staff Pre 3Mth':
         if (selectedVenue === 'Sense') return '#e1ae68';
         return '#FF0000';
@@ -142,6 +143,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Central') return '#602373';
         if (selectedVenue === 'Brisbane') return '#376cc3ff';
         if (selectedVenue === 'Flinders') return '#462919';
+        if (selectedVenue === 'Mannum') return 'rgb(65, 116, 198)';
       case 'Commodore':
         if (selectedVenue === 'Manly') return '#B0B0B0';
         if (selectedVenue === 'Bluewater') return '#333333';
@@ -205,9 +207,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       case 'Club Connect':
         return '#c19e14dd';
       case 'Local Legends':
-        return '#61791b';        
-      case 'Member':
-        if (selectedVenue === 'Mannum') return '#376cc3ff';
+        return '#61791b';                
       case 'Testing':
         if (selectedVenue === 'Mannum') return '#079502';
         if (selectedVenue === 'Mosaic') return '#073868';
@@ -816,7 +816,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
                           ? previewContent
                               .replace(
                                 /<li>/g,
-                                `<li style="position: relative; padding-left: 20px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
+                                `<li style="position: relative; padding-left: 17px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
                                   selectedLevel
                                 )}; color: white; font-size: 8px;">✓</span>`
                               )
@@ -827,7 +827,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
                           : content
                               .replace(
                                 /<li>/g,
-                                `<li style="position: relative; padding-left: 20px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
+                                `<li style="position: relative; padding-left: 17px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
                                   selectedLevel
                                 )}; color: white; font-size: 8px;">✓</span>`
                               )

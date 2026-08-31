@@ -172,11 +172,6 @@ const MarketToMembers = () => {
     },
   ];
 
-  const SELECT_ALL_OPTION = {
-    value: '__ALL__',
-    label: 'Select all',
-  };
-
   const booleanOptions = [
     { value: 'True', label: 'True' },
     { value: 'False', label: 'False' },
@@ -246,52 +241,51 @@ const MarketToMembers = () => {
       if (newApiCallFields.includes(row.field) && filterValueOptions[row.id]) {
         if (row.value && row.value.length > 0) {
           // Convert both string options and { value, label } options
-    // into a string for filtering/rendering.
-    const getOptionText = (option) =>
-      typeof option === 'object' && option !== null
-        ? option.label
-        : option;
+          // into a string for filtering/rendering.
+          const getOptionText = (option) =>
+            typeof option === 'object' && option !== null
+              ? option.label
+              : option;
 
-    if (row.operator === 'Contains') {
-      // For Contains: substring match anywhere in the string
-      newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
-        (option) => {
-          const optionText = getOptionText(option);
+          if (row.operator === 'Contains') {
+            // For Contains: substring match anywhere in the string
+            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+              (option) => {
+                const optionText = getOptionText(option);
 
-          return optionText
-            ?.toString()
-            .toLowerCase()
-            .includes(row.value.toLowerCase());
+                return optionText
+                  ?.toString()
+                  .toLowerCase()
+                  .includes(row.value.toLowerCase());
+              }
+            );
+          } else if (row.operator === 'Exactly Matches') {
+            // For Exactly Matches: match from the beginning of the string
+            newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
+              (option) => {
+                const optionText = getOptionText(option);
+
+                return (
+                  optionText
+                    ?.toString()
+                    .toLowerCase()
+                    .indexOf(row.value.toLowerCase()) === 0
+                );
+              }
+            );
+          } else {
+            newFilteredOptions[row.id] = filterValueOptions[row.id].map(
+              (option) =>
+                typeof option === 'object' && option !== null
+                  ? option.label
+                  : option
+            );
+          }
+        } else {
+          // If no input, don't show any options
+          newFilteredOptions[row.id] = [];
         }
-      );
-
-    } else if (row.operator === 'Exactly Matches') {
-      // For Exactly Matches: match from the beginning of the string
-      newFilteredOptions[row.id] = filterValueOptions[row.id].filter(
-        (option) => {
-          const optionText = getOptionText(option);
-
-          return optionText
-            ?.toString()
-            .toLowerCase()
-            .indexOf(row.value.toLowerCase()) === 0;
-        }
-      );
-
-    } else {
-      newFilteredOptions[row.id] =
-        filterValueOptions[row.id].map((option) =>
-          typeof option === 'object' && option !== null
-            ? option.label
-            : option
-        );
-    }
-
-  } else {
-    // If no input, don't show any options
-    newFilteredOptions[row.id] = [];
-  }
-}
+      }
     });
 
     setFilteredOptions(newFilteredOptions);
@@ -488,8 +482,8 @@ const MarketToMembers = () => {
                     field: fieldName,
                     operator: matchOperator,
                     value: multiSelectFields.includes(fieldName)
-  ? (filter.market || [])
-  : filter.market || '',
+                      ? filter.market || []
+                      : filter.market || '',
                     type: filter.type || 'none', // Store the filter type (none, OR, NOT)
                     options: [],
                   };
@@ -1281,20 +1275,20 @@ const MarketToMembers = () => {
     fieldRequestRef.current[id] = requestId;
 
     // Clear data belonging to the previous field
-  setFilterValueOptions((prev) => ({
-    ...prev,
-    [id]: [],
-  }));
+    setFilterValueOptions((prev) => ({
+      ...prev,
+      [id]: [],
+    }));
 
-  setFilteredOptions((prev) => ({
-    ...prev,
-    [id]: [],
-  }));
+    setFilteredOptions((prev) => ({
+      ...prev,
+      [id]: [],
+    }));
 
-  setShowSuggestions((prev) => ({
-    ...prev,
-    [id]: false,
-  }));
+    setShowSuggestions((prev) => ({
+      ...prev,
+      [id]: false,
+    }));
     let defaultOperator = 'Contains';
 
     if (dateFields.includes(field)) {
@@ -1413,8 +1407,8 @@ const MarketToMembers = () => {
 
         if (Array.isArray(data)) {
           if (requestId !== fieldRequestRef.current[id]) {
-    return;
-}
+            return;
+          }
           // Update the options for this specific filter row
           setFilterValueOptions((prev) => ({
             ...prev,
@@ -1438,27 +1432,37 @@ const MarketToMembers = () => {
 
   // Handle value change for a specific filter row
   const handleValueChange = async (id, value) => {
+    const row = filterRows.find((r) => r.id === id);
+    // MultiSelect values are already complete selections.
+    // Do NOT clear/re-fetch the options when selecting an item.
+    if (row && multiSelectFields.includes(row.field)) {
+      setFilterRows((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, value } : r))
+      );
+
+      return;
+    }
     const requestId = (fieldRequestRef.current[id] || 0) + 1;
 
-fieldRequestRef.current[id] = requestId;
+    fieldRequestRef.current[id] = requestId;
 
-// Clear suggestions from the previous search immediately
-setFilteredOptions((prev) => ({
-  ...prev,
-  [id]: [],
-}));
+    // Clear suggestions from the previous search immediately
+    setFilteredOptions((prev) => ({
+      ...prev,
+      [id]: [],
+    }));
 
-setFilterValueOptions((prev) => ({
-  ...prev,
-  [id]: [],
-}));
-//     console.log('Selected value:', value); // 👈 ADD THIS
-//     console.log(
-//     "Field:",
-//     filterRows.find((r) => r.id === id)?.field,
-//     "Selected value:",
-//     value
-// );
+    setFilterValueOptions((prev) => ({
+      ...prev,
+      [id]: [],
+    }));
+    //     console.log('Selected value:', value); // 👈 ADD THIS
+    //     console.log(
+    //     "Field:",
+    //     filterRows.find((r) => r.id === id)?.field,
+    //     "Selected value:",
+    //     value
+    // );
 
     const updatedRows = filterRows.map((row) => {
       if (row.id === id) {
@@ -1468,11 +1472,8 @@ setFilterValueOptions((prev) => ({
     });
     setFilterRows(updatedRows);
 
-    const row = updatedRows.find((r) => r.id === id);
-    if (!row) return;
-    if (multiSelectFields.includes(row.field)) {
-      return;
-    }
+    const updatedRow = updatedRows.find((r) => r.id === id);
+    if (!updatedRow) return;
 
     if (dateFields.includes(row.field)) {
       return; // skip API & suggestions
@@ -1517,8 +1518,8 @@ setFilterValueOptions((prev) => ({
 
       if (Array.isArray(data)) {
         if (requestId !== fieldRequestRef.current[id]) {
-    return;
-}
+          return;
+        }
         if (multiSelectFields.includes(row.field)) {
           setFilterValueOptions((prev) => ({
             ...prev,
@@ -2379,23 +2380,26 @@ setFilterValueOptions((prev) => ({
                         />
                       ) : multiSelectFields.includes(filterRows[0].field) ? (
                         <>
-                            {console.log("filterValueOptions[1] =", filterValueOptions[1])}
+                          {console.log(
+                            'filterValueOptions[1] =',
+                            filterValueOptions[1]
+                          )}
 
-                        <MultiSelect
-                          value={filterRows[0].value}
-                          options={filterValueOptions[1] || []}
-                          optionLabel="label"
-                          onChange={(e) => handleValueChange(1, e.value)}
-                          filter
-                          showSelectAll
-                          maxSelectedLabels={0}
-                          selectedItemsLabel="{0} selected"
-                          placeholder="Select item(s)"
-                          style={{
-                            width: '140px',
-                          }}
-                          appendTo={document.body}
-                        />
+                          <MultiSelect
+                            value={filterRows[0].value}
+                            options={filterValueOptions[1] || []}
+                            optionLabel="label"
+                            onChange={(e) => handleValueChange(1, e.value)}
+                            filter
+                            showSelectAll
+                            maxSelectedLabels={0}
+                            selectedItemsLabel="{0} selected"
+                            placeholder="Select item(s)"
+                            style={{
+                              width: '140px',
+                            }}
+                            appendTo={document.body}
+                          />
                         </>
                       ) : (
                         <input
@@ -2430,7 +2434,9 @@ setFilterValueOptions((prev) => ({
                                   handleSuggestionToggle(1, false);
                                 }}
                               >
-                                {typeof option === 'object' ? option.label : option}
+                                {typeof option === 'object'
+                                  ? option.label
+                                  : option}
                               </div>
                             ))}
                           </div>
@@ -2533,7 +2539,7 @@ setFilterValueOptions((prev) => ({
                               onChange={(e) =>
                                 handleValueChange(row.id, e.target.value)
                               }
-                              onKeyDown={(e) => e.preventDefault()} 
+                              onKeyDown={(e) => e.preventDefault()}
                             />
                           ) : booleanFields.includes(row.field) ? (
                             <Select
@@ -2609,7 +2615,9 @@ setFilterValueOptions((prev) => ({
                                         handleSuggestionToggle(row.id, false);
                                       }}
                                     >
-                                      {typeof option === 'object' ? option.label : option}
+                                      {typeof option === 'object'
+                                        ? option.label
+                                        : option}
                                     </div>
                                   )
                                 )}

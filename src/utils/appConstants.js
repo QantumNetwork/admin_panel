@@ -233,6 +233,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Silver', label: 'Silver' },
       { value: 'Gold', label: 'Gold' },
       { value: 'Testing', label: 'Testing' },
+      { value: 'Staff', label: 'Staff' },
       { value: 'Cancelled', label: 'Cancelled' },
       { value: 'Loyalty Member', label: 'Loyalty Member' },
     ]

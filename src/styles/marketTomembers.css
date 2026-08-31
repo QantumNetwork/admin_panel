@@ -182,7 +182,7 @@ body,
 }
 
 .p-multiselect-items-wrapper {
-    max-height: 450px !important;   /* default is around 200-250px */
+    max-height: 350px !important;   /* default is around 200-250px */
 }
 
 .p-multiselect-item {
