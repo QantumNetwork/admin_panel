@@ -213,8 +213,8 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Mosaic') return '#073868';
       case 'Cancelled':
         return '#ff0000';
-      case 'Perpetuity':
-        if (selectedVenue === 'Mannum') return '#D4AF37';
+      // case 'Perpetuity':
+      //   if (selectedVenue === 'Mannum') return '#D4AF37';
       case 'Test':
         return '#ff0000';
       case 'Locals':

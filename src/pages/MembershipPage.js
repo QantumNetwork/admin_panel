@@ -295,7 +295,7 @@ const MembershipPage = () => {
               : 0,
           };
 
-          if (selectedVenue === 'Mannum') {
+          if (selectedVenue === 'Mannum' || selectedVenue === 'Manly') {
             levelObject.isDisplay = row.isDisplay;
           }
 
@@ -685,7 +685,7 @@ const MembershipPage = () => {
                     >
                       Price
                     </th>
-                    {selectedVenue === 'Mannum' && (
+                    {(selectedVenue === 'Mannum' || selectedVenue === 'Manly') && (
                       <th
                         style={{
                           textAlign: 'center',
@@ -751,7 +751,7 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      {selectedVenue === 'Mannum' && (
+                      {(selectedVenue === 'Mannum' || selectedVenue === 'Manly') && (
                         <td
                           style={{
                             padding: '6px',

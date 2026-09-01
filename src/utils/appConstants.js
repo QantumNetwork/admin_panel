@@ -226,7 +226,7 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Testing', label: 'Testing' },
       { value: 'Cancelled', label: 'Cancelled' },
       { value: 'Staff', label: 'Staff' },
-      { value: 'Perpetuity', label: 'Perpetuity' },
+      // { value: 'Perpetuity', label: 'Perpetuity' },
     ],
     Mosaic: [
       { value: 'Bronze', label: 'Bronze' },
