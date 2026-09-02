@@ -99,7 +99,7 @@ const ForcedAppUpdates = () => {
   useEffect(() => {
   const fetchAppVersions = async () => {
     // We currently only support Ace Rewards
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum') {
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum' && selectedVenue !=='Bob') {
       return;
     }
 
@@ -168,7 +168,7 @@ const ForcedAppUpdates = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum') {
+    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum' && selectedVenue !=='Bob') {
       toast.error(
         'App version updates unavailable on this account'
       );
