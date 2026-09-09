@@ -402,8 +402,7 @@ const SpecialOffers = () => {
             setUploadedImage(offerToSelect.image || null);
             console.log('img- ', uploadedImage);
 
-            setSelectedVoucherType(offerToSelect.voucherType || 'standard');
-            setVoucherTypeFromAPI(offerToSelect.voucherType);
+            setVoucherTypeFromAPI(offerToSelect.voucherType || 'standard');
             setRatingLevelFromAPI(offerToSelect.ratingLevel);
             setExpiryFromAPI(offerToSelect.expiry);
             setValidDaysFromAPI(offerToSelect.validDaysOfWeek);
@@ -458,13 +457,7 @@ const SpecialOffers = () => {
       }
     };
     fetchOffers();
-  }, [
-    activeTab,
-    deleteSuccess,
-    activeOfferFilter,
-    selectedVenue,
-    token,
-  ]); 
+  }, [activeTab, deleteSuccess, activeOfferFilter, selectedVenue, token]);
 
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -553,14 +546,6 @@ const SpecialOffers = () => {
   const setVoucherTypeFromAPI = (voucherType) => {
     if (!voucherType) return;
 
-    const voucherTypeMap = {
-      birthday: 'type1',
-      new: 'type2',
-      standard: 'type3',
-      club: 'type4',
-    };
-
-    const selectValue = voucherTypeMap[voucherType] || '';
     const newVoucherType =
       voucherType === 'birthday'
         ? 'birthdayOffer'
@@ -569,15 +554,6 @@ const SpecialOffers = () => {
           : voucherType === 'standard'
             ? 'standard'
             : 'club';
-
-    // Update the select element value
-    const selectElement = document.querySelector(
-      '.target-market-panel select:first-of-type'
-    );
-
-    if (selectElement) {
-      selectElement.value = selectValue;
-    }
 
     // Update the React state
     setSelectedVoucherType(newVoucherType);
@@ -1076,7 +1052,7 @@ const SpecialOffers = () => {
 
     // Set the voucher type to the one from the offer
     const voucherType = offer.voucherType || 'standard';
-    setSelectedVoucherType(voucherType);
+    setVoucherTypeFromAPI(voucherType);
 
     // Always set the trigger value regardless of voucher type
     setTriggerValue(offer.triggerValue?.toString() || '');
@@ -1091,28 +1067,6 @@ const SpecialOffers = () => {
     setOfferProceedDate(
       offer.offerProceedDate ? offer.offerProceedDate.split('T')[0] : ''
     );
-
-    // Map the voucher type to select value
-    const voucherTypeSelectValue =
-      {
-        birthday: 'type1',
-        new: 'type2',
-        standard: 'type3',
-        club: 'type4',
-      }[voucherType] || 'type3';
-
-    // Set select elements directly - for immediate UI update
-    setTimeout(() => {
-      // Set voucher type select
-      const voucherTypeSelect = document.querySelector(
-        '.target-market-panel select:first-of-type'
-      );
-      if (voucherTypeSelect) {
-        voucherTypeSelect.value = voucherTypeSelectValue;
-        const event = new Event('change', { bubbles: true });
-        voucherTypeSelect.dispatchEvent(event);
-      }
-    }, 100);
 
     // Set the audience from the offer
     setRatingLevelFromAPI(offer.ratingLevel);
@@ -1305,13 +1259,17 @@ const SpecialOffers = () => {
     console.log('Current selected offer ID:', currentId);
 
     // Get voucher type value
-    let voucherTypeValue = '';
-    const voucherTypeSelect = document.querySelector(
-      '.target-market-panel select:first-of-type'
-    );
-    if (voucherTypeSelect) {
-      voucherTypeValue = voucherTypeSelect.value;
-    }
+    // Get voucher type value from React state
+    const voucherTypeValue =
+      selectedVoucherType === 'birthdayOffer'
+        ? 'type1'
+        : selectedVoucherType === 'newSignUp'
+          ? 'type2'
+          : selectedVoucherType === 'standard'
+            ? 'type3'
+            : selectedVoucherType === 'club'
+              ? 'type4'
+              : '';
 
     // Create form values object with all current form state
     const formValues = {
@@ -1783,13 +1741,13 @@ const SpecialOffers = () => {
       const data = await response.json();
       console.log('API Response:', data);
 
-      if(data?.success) {
+      if (data?.success) {
         toast.success('Offer submitted successfully!', {
-        containerId: 'offerActions',
-      });
+          containerId: 'offerActions',
+        });
       } else {
         toast.error(data.message, {
-        containerId: 'offerActions',
+          containerId: 'offerActions',
         });
       }
 
@@ -2285,13 +2243,6 @@ const SpecialOffers = () => {
     );
   };
 
-  // Update trigger value when selected offer changes
-  useEffect(() => {
-    if (selectedOffer) {
-      setTriggerValue(selectedOffer.triggerValue?.toString() || '');
-    }
-  }, [selectedOffer?._id]); // Only run when selected offer ID changes
-
   useEffect(() => {
     console.log('addMode updated to:', addMode);
   }, [addMode]);
@@ -2312,6 +2263,8 @@ const SpecialOffers = () => {
     // time and re-apply a now-stale isAddingNew/addMode value.
     ignoreArtGalleryRestoreRef.current = true;
 
+    const id = location.state.formValues?.id;
+
     // Check if we're coming back from Art Gallery with an image
     if (location.state?.selectedImageFromGallery) {
       const imageUrl = location.state.selectedImageFromGallery;
@@ -2331,7 +2284,6 @@ const SpecialOffers = () => {
         );
 
         const {
-          id,
           headingText: savedHeading,
           descriptionText: savedDescription,
           voucherTypeValue,
@@ -2359,9 +2311,9 @@ const SpecialOffers = () => {
         // Preserve the current offer selection when returning from Art Gallery
         if (id) {
           // If we have an ID in formValues, try to find the offer in our offers array
-          const existingOffer = filteredOffers.find(
-            (offer) => offer._id === id
-          );
+          const existingOffer =
+            filteredOffers.find((offer) => offer._id === id) ||
+            offersRef.current.find((offer) => offer._id === id);
 
           if (existingOffer && !addModeRef.current) {
             // Update the found offer with the new image
@@ -2424,24 +2376,32 @@ const SpecialOffers = () => {
           if (savedCurrentPostPill) setCurrentPostPill(savedCurrentPostPill);
           // Set select elements - moved into the same setTimeout to ensure order
           // Set voucher type select
+          // Restore voucher type through React state
           if (voucherTypeValue) {
-            const voucherTypeSelect = document.querySelector(
-              '.target-market-panel select:first-of-type'
+            setSelectedVoucherType(
+              voucherTypeValue === 'type1'
+                ? 'birthdayOffer'
+                : voucherTypeValue === 'type2'
+                  ? 'newSignUp'
+                  : voucherTypeValue === 'type3'
+                    ? 'standard'
+                    : 'club'
             );
-            if (voucherTypeSelect) {
-              voucherTypeSelect.value = voucherTypeValue;
-              // Trigger change event
-              const event = new Event('change', { bubbles: true });
-              voucherTypeSelect.dispatchEvent(event);
-            }
           }
         }, 0);
       }
 
-      // Clear location state to avoid reapplying when component re-renders
-      // (ignoreArtGalleryRestoreRef was already set at the top of this
-      // effect, before any state updates were made)
-      navigate(location.pathname, { replace: true, state: {} });
+      // Only clear the Art Gallery state after the selected offer has
+      // actually been restored. The offers API may still be loading.
+      const canClearArtGalleryState =
+        !id || offersRef.current.some((offer) => offer._id === id);
+
+      if (canClearArtGalleryState) {
+        navigate(location.pathname, { replace: true, state: {} });
+      } else {
+        // Allow restoration to run again after the offers are loaded.
+        ignoreArtGalleryRestoreRef.current = false;
+      }
     }
     // Intentionally depends only on location.state: addMode/offers are read
     // via refs (addModeRef/offersRef) or closure. Including addMode or
@@ -2449,7 +2409,7 @@ const SpecialOffers = () => {
     // updates (e.g. a refetch changing the offers array reference) while
     // location.state hadn't been cleared yet, re-applying a stale
     // isAddingNew value and flipping addMode unexpectedly.
-  }, [location.state]);
+  }, [location.state, offers]);
 
   useEffect(() => {
     const wrapperEl = audienceWrapperRef.current;
@@ -2808,7 +2768,15 @@ const SpecialOffers = () => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater' || selectedVenue === 'Mannum') && (
+        {(selectedVenue === 'Ace' ||
+          selectedVenue === 'Manly' ||
+          selectedVenue === 'Qantum' ||
+          selectedVenue === 'MaxGaming' ||
+          selectedVenue === 'EDP' ||
+          selectedVenue === 'Flinders' ||
+          selectedVenue === 'Mosaic' ||
+          selectedVenue === 'Bluewater' ||
+          selectedVenue === 'Mannum') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
@@ -2870,21 +2838,23 @@ const SpecialOffers = () => {
               }`}
               onClick={() => {
                 setActiveTab('live');
+                setActiveOfferFilter('ALL');
+  setCurrentPostPill('ALL');
                 setSelectedOffer(null);
                 updateAddMode(false);
-                setHeadingText('');
-                setDescriptionText('');
-                setUploadedImage(null);
-                setTriggerValue('');
-                setHeadingError('');
-                setDescriptionError('');
-                setImageError('');
-                setDateError('');
-                setTimeError('');
-                setExpiryDaysError('');
-                setTriggerValueError('');
-                setBonusPoints('null');
-                setShowBonusWhenRedeemed(false);
+                // setHeadingText('');
+                // setDescriptionText('');
+                // setUploadedImage(null);
+                // setTriggerValue('');
+                // setHeadingError('');
+                // setDescriptionError('');
+                // setImageError('');
+                // setDateError('');
+                // setTimeError('');
+                // setExpiryDaysError('');
+                // setTriggerValueError('');
+                // setBonusPoints('null');
+                // setShowBonusWhenRedeemed(false);
               }}
             >
               Live Offers
@@ -2897,19 +2867,19 @@ const SpecialOffers = () => {
                 setActiveTab('expired');
                 setSelectedOffer(null);
                 updateAddMode(false);
-                setHeadingText('');
-                setDescriptionText('');
-                setUploadedImage(null);
-                setTriggerValue('');
-                setHeadingError('');
-                setDescriptionError('');
-                setImageError('');
-                setDateError('');
-                setTimeError('');
-                setExpiryDaysError('');
-                setTriggerValueError('');
-                setBonusPoints('null');
-                setShowBonusWhenRedeemed(false);
+                // setHeadingText('');
+                // setDescriptionText('');
+                // setUploadedImage(null);
+                // setTriggerValue('');
+                // setHeadingError('');
+                // setDescriptionError('');
+                // setImageError('');
+                // setDateError('');
+                // setTimeError('');
+                // setExpiryDaysError('');
+                // setTriggerValueError('');
+                // setBonusPoints('null');
+                // setShowBonusWhenRedeemed(false);
               }}
             >
               Expired Offers
@@ -3373,6 +3343,17 @@ const SpecialOffers = () => {
                     <div className="select-wrapper">
                       <select
                         defaultValue=""
+                        value={
+                          selectedVoucherType === 'birthdayOffer'
+                            ? 'type1'
+                            : selectedVoucherType === 'newSignUp'
+                              ? 'type2'
+                              : selectedVoucherType === 'standard'
+                                ? 'type3'
+                                : selectedVoucherType === 'club'
+                                  ? 'type4'
+                                  : ''
+                        }
                         onChange={handleVoucherTypeChange}
                       >
                         <option value="" disabled>
@@ -3660,7 +3641,9 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
+                            <span
+                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
+                            >
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -3959,7 +3942,10 @@ const SpecialOffers = () => {
                           <strong>Valid on follow Time</strong>
                         </label>
                         <div className="time-options">
-                          <div className="radio-group" style={{marginBottom: '0px'}}>
+                          <div
+                            className="radio-group"
+                            style={{ marginBottom: '0px' }}
+                          >
                             <input
                               type="radio"
                               id="allTimes"
@@ -4042,7 +4028,9 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
+                            <span
+                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
+                            >
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -4153,7 +4141,9 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
+                            <span
+                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
+                            >
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (
@@ -4329,7 +4319,9 @@ const SpecialOffers = () => {
                                 marginBottom: '3px',
                               }}
                             />
-                            <span style={{ fontSize: '14px', textWrap: 'nowrap' }}>
+                            <span
+                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
+                            >
                               Add Bonus Points when redeemed
                             </span>
                             {showBonusWhenRedeemed && (

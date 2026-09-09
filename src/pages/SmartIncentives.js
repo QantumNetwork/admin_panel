@@ -73,6 +73,13 @@ const SmartIncentives = () => {
   const [loading, setLoading] = useState(true);
   const [venues, setVenues] = useState([]);
 
+  const UPLOAD_TARGETED_LIST = 'upload-targeted-list';
+  const [isUploadTargetedList, setIsUploadTargetedList] = useState(false);
+  const [targetedListFile, setTargetedListFile] = useState(null);
+  const [targetedListRows, setTargetedListRows] = useState([]);
+  const [targetedListStep, setTargetedListStep] = useState('upload');
+  const targetedListInputRef = useRef(null);
+
   const [activeTab, setActiveTab] = useState('createIncentive'); // 'createIncentive' or 'activeCampaigns'
 
   const location = useLocation();
@@ -101,6 +108,11 @@ const SmartIncentives = () => {
 
     setShowAudienceDropdown(false);
     setShowTriggerDropdown(false);
+
+    setIsUploadTargetedList(false);
+    setTargetedListFile(null);
+    setTargetedListRows([]);
+    setTargetedListStep('upload');
   };
 
   const isActive = (path) => {
@@ -162,17 +174,9 @@ const SmartIncentives = () => {
 
   const toggleAudienceDropdown = (e) => {
     e.stopPropagation(); // Prevent event from bubbling up
-    console.log(
-      'toggleAudienceDropdown called, current state:',
-      showAudienceDropdown
-    );
-    if (!isEveryone) {
-      setShowTriggerDropdown(false); // Close trigger dropdown if open
-      setShowAudienceDropdown((open) => {
-        console.log('Setting showAudienceDropdown to:', !open);
-        return !open;
-      });
-    }
+    setShowTriggerDropdown(false);
+
+    setShowAudienceDropdown((open) => !open);
   };
 
   const toggleTriggerDropdown = (e) => {
@@ -189,10 +193,26 @@ const SmartIncentives = () => {
   };
 
   const handleAudienceChange = (value) => {
+    if (value === UPLOAD_TARGETED_LIST) {
+      setIsUploadTargetedList(true);
+      setIsEveryone(false);
+      setSelectedAudiences([]);
+      setShowAudienceDropdown(false);
+      setTargetedListFile(null);
+      setTargetedListRows([]);
+      setTargetedListStep('upload');
+      return;
+    }
+
+    setIsUploadTargetedList(false);
+    setTargetedListFile(null);
+    setTargetedListRows([]);
+    setTargetedListStep('upload');
     // normal multi‑select toggle
     setSelectedAudiences((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
+    setIsEveryone(false);
   };
 
   const handleTriggerChange = (value) => {
@@ -216,6 +236,10 @@ const SmartIncentives = () => {
     setIsEveryone(checked);
 
     if (checked) {
+      setIsUploadTargetedList(false);
+      setTargetedListFile(null);
+      setTargetedListRows([]);
+      setTargetedListStep('upload');
       // Select all audience options when "Everyone" is checked
       setSelectedAudiences(audienceOptions.map((option) => option.value));
     } else {
@@ -261,6 +285,88 @@ const SmartIncentives = () => {
         toast.error('Please select a smart incentive');
         return;
       }
+
+      // Qantum targeted-list flow uses the CSV API.
+      const isQantumTargetedList =
+        selectedVenue === 'Qantum' &&
+        isUploadTargetedList &&
+        targetedListStep === 'target';
+
+      /*
+       * ------------------------------------------------------------
+       * Qantum + Targeted List
+       * POST /smart-incentive/csv
+       * ------------------------------------------------------------
+       */
+      if (isQantumTargetedList) {
+        if (!targetedListFile) {
+          toast.error('Please select a target file');
+          return;
+        }
+
+        if (!tempBenefits) {
+          toast.error('Please enter incentive value');
+          return;
+        }
+
+        if (!unlimitedBudget && !budget) {
+          toast.error('Please enter budget');
+          return;
+        }
+
+        if (!scheduleStart || !scheduleEnd) {
+          toast.error('Please select start and end dates');
+          return;
+        }
+
+        setPublishing(true);
+
+        const formData = new FormData();
+
+        formData.append('audienceFile', targetedListFile);
+        formData.append('offerType', selectedIncentive);
+        formData.append(
+          'deliveryMethod',
+          selectedIncentive === 'Kiosk' ? 'Kiosk' : 'Scratch & Win'
+        );
+        formData.append('incentiveValue', String(Number(tempBenefits)));
+        formData.append('unlimitedBudget', String(unlimitedBudget));
+        formData.append('startDate', scheduleStart);
+        formData.append('endDate', scheduleEnd);
+
+        // API expects budget as a form-data field.
+        // When unlimitedBudget is true, send 0 just like the normal API payload.
+        formData.append(
+          'budget',
+          unlimitedBudget ? '0' : String(Number(budget))
+        );
+
+        const response = await axios.post(
+          'https://betaapi.s2w.com.au/smart-incentive/csv',
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log('Qantum CSV incentive response:', response.data);
+
+        toast.success(
+          response?.data?.message || 'Smart incentive created successfully'
+        );
+
+        setActiveTab('activeCampaigns');
+        return;
+      }
+
+      /*
+       * ------------------------------------------------------------
+       * Existing flow
+       * POST /smart-incentive/create
+       * ------------------------------------------------------------
+       */
 
       if (!timePeriod) {
         toast.error('Please select trigger time period');
@@ -499,9 +605,19 @@ const SmartIncentives = () => {
     try {
       setLoading(true);
 
+      // Find the incentive in the currently displayed table data
+    const incentive = tableData.find(
+      (item) => item._id === incentiveId
+    );
+
+    // Add audienceMode only when it exists in tableData
+    const audienceModeParam = incentive?.audienceMode === 'csv'
+      ? `&audienceMode=${encodeURIComponent(incentive.audienceMode)}`
+      : '';
+
       // First page
       const firstResponse = await axios.get(
-        `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=1&limit=100`,
+        `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=1&limit=100${audienceModeParam}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -519,7 +635,7 @@ const SmartIncentives = () => {
       for (let page = 2; page <= totalPages; page++) {
         requests.push(
           axios.get(
-            `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=${page}&limit=100`,
+            `https://betaapi.s2w.com.au/smart-incentive/applicable-users/${incentiveId}?page=${page}&limit=100${audienceModeParam}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -962,7 +1078,11 @@ const SmartIncentives = () => {
                 {/* Display Options */}
                 <div className="display-options-panel responsive-panel">
                   <div className="scrollable-content">
-                    <h2>Trigger settings</h2>
+                    <h2>
+                      {isUploadTargetedList && targetedListStep !== 'target'
+                        ? 'Target market'
+                        : 'Trigger settings'}
+                    </h2>
 
                     {selectedIncentive === 'Kiosk' && (
                       <div className="field-block">
@@ -988,169 +1108,627 @@ const SmartIncentives = () => {
                       <label>
                         <strong>Audience</strong>
                       </label>
-                      <div
-                        className="select-wrapper"
-                        style={{
-                          position: 'relative',
-                          display: 'inline-block',
-                          width: '100%',
-                          zIndex: showAudienceDropdown ? 10 : 1,
-                        }}
-                        ref={audienceWrapperRef}
-                      >
-                        <div
-                          className="multiselect-display"
-                          onClick={toggleAudienceDropdown}
-                          style={{
-                            cursor: isEveryone ? 'not-allowed' : 'pointer',
-                            lineHeight: '15px',
-                            padding: '0 10px',
-                            fontSize: '13px',
-                            color: isEveryone ? '#999' : '#666',
-                          }}
-                        >
-                          {isEveryone
-                            ? 'All Selected'
-                            : selectedAudiences.length > 0
-                              ? selectedAudiences.length > 2
-                                ? `${selectedAudiences.length} selected`
-                                : audienceOptions
-                                    .filter((o) =>
-                                      selectedAudiences.includes(o.value)
-                                    )
-                                    .map((o) => o.label)
-                                    .join(', ')
-                              : 'Select from list'}
-                        </div>
 
-                        {showAudienceDropdown && !isEveryone && (
+                      {isUploadTargetedList && targetedListStep === 'target' ? (
+                        <div className="targeted-list-member-count">
+                          {targetedListRows.length.toLocaleString()} members
+                          targeted
+                        </div>
+                      ) : (
+                        <>
                           <div
-                            className="multiselect-options"
+                            className="select-wrapper"
                             style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              right: 0,
-                              background: 'white',
-                              maxHeight: '200px',
-                              overflowY: 'auto',
-                              border: '1px solid #ccc',
-                              borderRadius: '4px',
-                              boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                              zIndex: 1000,
-                              display: showAudienceDropdown ? 'block' : 'none',
+                              position: 'relative',
+                              display: 'inline-block',
+                              width: '100%',
+                              zIndex: showAudienceDropdown ? 10 : 1,
                             }}
+                            ref={audienceWrapperRef}
                           >
-                            {audienceOptions.map((option) => (
+                            <div
+                              className="multiselect-display"
+                              onClick={toggleAudienceDropdown}
+                              style={{
+                                cursor: 'pointer',
+                                lineHeight: '15px',
+                                padding: '0 10px',
+                                fontSize: '13px',
+                                color: isEveryone
+                                  ? '#999'
+                                  : isUploadTargetedList
+                                    ? '#5396d1'
+                                    : '#666',
+                              }}
+                            >
+                              {isEveryone
+                                ? 'All Selected'
+                                : isUploadTargetedList
+                                  ? 'Upload targeted list'
+                                  : selectedAudiences.length > 0
+                                    ? selectedAudiences.length > 2
+                                      ? `${selectedAudiences.length} selected`
+                                      : audienceOptions
+                                          .filter((o) =>
+                                            selectedAudiences.includes(o.value)
+                                          )
+                                          .map((o) => o.label)
+                                          .join(', ')
+                                    : 'Select from list'}
+                            </div>
+
+                            {showAudienceDropdown && (
                               <div
-                                key={option.value}
-                                className="day-item"
+                                className="multiselect-options"
                                 style={{
-                                  padding: '5px 10px',
+                                  position: 'absolute',
+                                  top: '100%',
+                                  left: 0,
+                                  right: 0,
+                                  background: 'white',
+                                  maxHeight: '200px',
+                                  overflowY: 'auto',
+                                  border: '1px solid #ccc',
+                                  borderRadius: '4px',
+                                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                                  zIndex: 1000,
+                                  display: showAudienceDropdown
+                                    ? 'block'
+                                    : 'none',
                                 }}
                               >
-                                <input
-                                  type="checkbox"
-                                  id={`aud-${option.value}`}
-                                  checked={selectedAudiences.includes(
-                                    option.value
-                                  )}
-                                  onChange={() =>
-                                    handleAudienceChange(option.value)
+                                <div
+                                  key={UPLOAD_TARGETED_LIST}
+                                  className={`day-item targeted-list-audience-option ${
+                                    isUploadTargetedList ? 'selected' : ''
+                                  }`}
+                                  onClick={() =>
+                                    handleAudienceChange(UPLOAD_TARGETED_LIST)
                                   }
-                                />
-                                <label
-                                  htmlFor={`aud-${option.value}`}
-                                  style={{ marginLeft: '6px' }}
                                 >
-                                  {option.label}
-                                </label>
+                                  <span>Upload targeted list</span>
+                                </div>
+                                {audienceOptions.map((option) => (
+                                  <div
+                                    key={option.value}
+                                    className="day-item"
+                                    style={{
+                                      padding: '5px 10px',
+                                    }}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id={`aud-${option.value}`}
+                                      checked={
+                                        !isUploadTargetedList &&
+                                        selectedAudiences.includes(option.value)
+                                      }
+                                      onChange={() =>
+                                        handleAudienceChange(option.value)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`aud-${option.value}`}
+                                      style={{ marginLeft: '6px' }}
+                                    >
+                                      {option.label}
+                                    </label>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div
-                        className="day-item"
-                        style={{ marginTop: '10px', marginLeft: '5px' }}
-                      >
-                        <input
-                          type="checkbox"
-                          id="aud-everyone"
-                          checked={isEveryone}
-                          onChange={handleEveryoneChange}
-                        />
-                        <label htmlFor="aud-everyone">Everyone</label>
-                      </div>
+                          <div
+                            className="day-item"
+                            style={{ marginTop: '10px', marginLeft: '5px' }}
+                          >
+                            <input
+                              type="checkbox"
+                              id="aud-everyone"
+                              checked={isEveryone}
+                              onChange={handleEveryoneChange}
+                            />
+                            <label htmlFor="aud-everyone">Everyone</label>
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    {/* Trigger by */}
-                    <div
-                      className="form-group inline-form-group"
-                      style={{ marginBottom: '20px' }}
-                    >
-                      <label>
-                        <strong>Trigger by</strong>
-                      </label>
+                    {isUploadTargetedList ? (
                       <div
-                        className="select-wrapper"
-                        style={{
-                          position: 'relative',
-                          display: 'inline-block',
-                          width: '100%',
-                        }}
-                        ref={triggerWrapperRef}
+                        className={`targeted-list-market ${
+                          targetedListStep === 'target' ? 'confirmed' : ''
+                        }`}
                       >
-                        <div
-                          className="multiselect-display"
-                          onClick={toggleTriggerDropdown}
-                          style={{
-                            cursor: 'pointer',
-                            lineHeight: '15px',
-                            padding: '0 10px',
-                            fontSize: '13px',
-                            color: '#666',
-                          }}
-                        >
-                          {selectedTrigger
-                            ? triggerOptions.find(
-                                (o) => o.value === selectedTrigger
-                              )?.label
-                            : 'Select from list'}
-                        </div>
+                        {targetedListStep !== 'target' && (
+                          <div className="targeted-list-steps">
+                            <div className="targeted-list-step active">
+                              <span>1</span>
+                              <span>Upload</span>
+                            </div>
 
-                        {showTriggerDropdown && (
-                          <div
-                            className="multiselect-options"
-                            style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              right: 0,
-                              background: 'white',
-                              maxHeight: '200px',
-                              overflowY: 'auto',
-                              border: '1px solid #ccc',
-                              borderRadius: '4px',
-                              // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                              zIndex: 1000,
-                              display: showTriggerDropdown ? 'block' : 'none',
-                            }}
-                          >
-                            {triggerOptions.map((option) => (
-                              <div
-                                key={option.value}
-                                className="day-item"
-                                style={{
-                                  padding: '8px 10px',
-                                  cursor: 'pointer',
+                            <div className="targeted-list-step-line" />
+
+                            <div
+                              className={`targeted-list-step ${
+                                targetedListStep === 'review' ? 'active' : ''
+                              }`}
+                            >
+                              <span>2</span>
+                              <span>Review</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {targetedListStep === 'upload' ? (
+                          <>
+                            <div
+                              className="targeted-list-upload-box"
+                              onClick={() =>
+                                targetedListInputRef.current?.click()
+                              }
+                            >
+                              <h3>Upload Your File</h3>
+
+                              <p>
+                                Upload an Excel or CSV file to import your data.
+                              </p>
+
+                              <img
+                                src="/page.png"
+                                alt="Upload file"
+                                className="targeted-list-file-icon"
+                              />
+
+                              <div className="targeted-list-browse-text">
+                                Drag a file here or <span>browse</span> for a
+                                file to upload.
+                              </div>
+
+                              <input
+                                ref={targetedListInputRef}
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                style={{ display: 'none' }}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+
+                                  if (!file) return;
+
+                                  const reader = new FileReader();
+
+                                  reader.onload = (event) => {
+                                    try {
+                                      const data = new Uint8Array(
+                                        event.target.result
+                                      );
+
+                                      const workbook = XLSX.read(data, {
+                                        type: 'array',
+                                      });
+
+                                      const worksheet =
+                                        workbook.Sheets[workbook.SheetNames[0]];
+
+                                      const rows = XLSX.utils.sheet_to_json(
+                                        worksheet,
+                                        { defval: '' }
+                                      );
+
+                                      if (!rows.length) {
+                                        toast.error(
+                                          'The uploaded file contains no data'
+                                        );
+                                        return;
+                                      }
+
+                                      setTargetedListFile(file);
+                                      setTargetedListRows(rows);
+                                      // setTargetedListStep('review');
+                                    } catch (error) {
+                                      console.error(error);
+                                      toast.error(
+                                        'Unable to read the uploaded file'
+                                      );
+                                    }
+                                  };
+
+                                  reader.readAsArrayBuffer(file);
                                 }}
+                              />
+                            </div>
+
+                            <button
+                              type="button"
+                              className="targeted-list-template-btn"
+                              onClick={() => {
+                                const worksheet = XLSX.utils.json_to_sheet([
+                                  {
+                                    'Member ID': '',
+                                  },
+                                ]);
+
+                                const workbook = XLSX.utils.book_new();
+
+                                XLSX.utils.book_append_sheet(
+                                  workbook,
+                                  worksheet,
+                                  'Targeted List'
+                                );
+
+                                XLSX.writeFile(
+                                  workbook,
+                                  'targeted-list-template.xlsx'
+                                );
+                              }}
+                            >
+                              ↓ &nbsp;Download template
+                            </button>
+
+                            <div className="targeted-list-actions">
+                              <button
+                                type="button"
+                                className="targeted-list-cancel-btn"
                                 onClick={() => {
-                                  handleTriggerChange(option.value);
-                                  setShowTriggerDropdown(false);
+                                  setIsUploadTargetedList(false);
+                                  setTargetedListFile(null);
+                                  setTargetedListRows([]);
+                                  setTargetedListStep('upload');
                                 }}
                               >
-                                {/* <input
+                                CANCEL
+                              </button>
+
+                              <button
+                                type="button"
+                                className="targeted-list-upload-btn"
+                                // disabled={!targetedListFile}
+                                onClick={() => {
+                                  if (!targetedListFile) {
+                                    toast.error('Please select a file');
+                                    return;
+                                  }
+
+                                  setTargetedListStep('review');
+                                }}
+                              >
+                                UPLOAD
+                              </button>
+                            </div>
+                          </>
+                        ) : targetedListStep === 'review' ? (
+                          <>
+                            <div className="targeted-list-review">
+                              <h3>Review Target File</h3>
+
+                              <p className="targeted-list-review-subtitle">
+                                Review your uploaded file before using it for
+                                targeting.
+                              </p>
+
+                              <div className="targeted-list-success">
+                                <span className="targeted-list-success-icon">
+                                  ✓
+                                </span>
+                                <span>File uploaded successfully</span>
+                              </div>
+
+                              <div className="targeted-list-file-row">
+                                <div className="targeted-list-file-info">
+                                  <img
+                                    src="/page.png"
+                                    alt="File"
+                                    className="targeted-list-review-file-icon"
+                                  />
+
+                                  <span>{targetedListFile?.name}</span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  className="targeted-list-view-file-btn"
+                                  onClick={() => {
+                                    if (targetedListFile) {
+                                      const url =
+                                        URL.createObjectURL(targetedListFile);
+                                      window.open(url, '_blank');
+                                    }
+                                  }}
+                                >
+                                  View File
+                                </button>
+                              </div>
+
+                              <div className="targeted-list-record-count">
+                                {targetedListRows.length.toLocaleString()}
+                              </div>
+
+                              <p className="targeted-list-ready-text">
+                                Your file is ready to use for targeting.
+                              </p>
+                            </div>
+
+                            <div className="targeted-list-actions targeted-list-review-actions">
+                              <button
+                                type="button"
+                                className="targeted-list-cancel-btn"
+                                onClick={() => {
+                                  setTargetedListFile(null);
+                                  setTargetedListRows([]);
+                                  setTargetedListStep('upload');
+
+                                  if (targetedListInputRef.current) {
+                                    targetedListInputRef.current.value = '';
+                                  }
+                                }}
+                              >
+                                UPLOAD A DIFFERENT FILE
+                              </button>
+
+                              <button
+                                type="button"
+                                className="targeted-list-upload-btn"
+                                onClick={() => {
+                                  setTargetedListStep('target');
+                                }}
+                              >
+                                USE THIS FILE
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="targeted-list-final">
+                              <div className="targeted-list-final-card">
+                                <h3>Target File</h3>
+                                <div className="targeted-list-final-file-row">
+                                  <div className="targeted-list-file-info">
+                                    <img
+                                      src="/page.png"
+                                      alt="File"
+                                      className="targeted-list-review-file-icon"
+                                    />
+
+                                    <span>{targetedListFile?.name}</span>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    className="targeted-list-view-file-btn"
+                                    onClick={() => {
+                                      if (targetedListFile) {
+                                        const url =
+                                          URL.createObjectURL(targetedListFile);
+                                        window.open(url, '_blank');
+                                      }
+                                    }}
+                                  >
+                                    View File
+                                  </button>
+                                </div>
+
+                                <div className="targeted-list-record-count">
+                                  {targetedListRows.length.toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Points to Award */}
+                            <div
+                              className="flex-row targeted-list-final-points"
+                              style={{ marginBottom: '30px' }}
+                            >
+                              <label
+                                className="field-label"
+                                style={{
+                                  textWrap: 'nowrap',
+                                  marginRight: '50px',
+                                }}
+                              >
+                                Points to Award
+                              </label>
+
+                              <input
+                                type="text"
+                                value={tempBenefits}
+                                onChange={(e) =>
+                                  setTempBenefits(e.target.value)
+                                }
+                                className="text-input-trigger"
+                                placeholder="20,000"
+                                style={{ width: '80px' }}
+                              />
+
+                              <div style={{ fontSize: '12px' }}>
+                                Points&nbsp;&nbsp;
+                                <strong>$ Value = ${pointsDollarValue}</strong>
+                              </div>
+                            </div>
+
+                            {/* Budget */}
+                            <div>
+                              <label className="day-item">
+                                <input
+                                  type="checkbox"
+                                  checked={unlimitedBudget}
+                                  onChange={(e) =>
+                                    setUnlimitedBudget(e.target.checked)
+                                  }
+                                />
+                                <span>No budget</span>
+                              </label>
+                            </div>
+
+                            <div
+                              className="flex-row"
+                              style={{
+                                marginBottom: '30px',
+                                visibility: unlimitedBudget
+                                  ? 'hidden'
+                                  : 'visible',
+                              }}
+                            >
+                              <label
+                                className="field-label"
+                                style={{
+                                  textWrap: 'nowrap',
+                                  marginRight: '20px',
+                                }}
+                              >
+                                Set budget
+                              </label>
+
+                              <div className="flex-row">
+                                <input
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={budget}
+                                  disabled={unlimitedBudget}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    if (/^\d*$/.test(value)) {
+                                      setBudget(value);
+                                    }
+                                  }}
+                                  className="text-input-trigger"
+                                  style={{
+                                    width: '80px',
+                                    marginRight: '10px',
+                                    opacity: unlimitedBudget ? 0.5 : 1,
+                                  }}
+                                />
+
+                                <div
+                                  style={{
+                                    fontSize: '12px',
+                                    marginLeft: '5px',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  <strong>
+                                    $ Value = ${budgetDollarValue}
+                                  </strong>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Start & End incentive */}
+                            <div className="flex-row">
+                              <label
+                                className="field-label"
+                                style={{
+                                  textWrap: 'nowrap',
+                                  marginRight: '90px',
+                                }}
+                              >
+                                Start & End incentive
+                              </label>
+
+                              <div className="schedule-row-si">
+                                <div className="date-field">
+                                  <label className="date-label">
+                                    START DATE
+                                  </label>
+
+                                  <input
+                                    type="date"
+                                    value={scheduleStart}
+                                    onChange={(e) =>
+                                      setScheduleStart(e.target.value)
+                                    }
+                                    className="date-input"
+                                  />
+                                </div>
+
+                                <div className="date-field">
+                                  <label className="date-label">END DATE</label>
+
+                                  <input
+                                    type="date"
+                                    value={scheduleEnd}
+                                    onChange={(e) =>
+                                      setScheduleEnd(e.target.value)
+                                    }
+                                    className="date-input"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        {/* Trigger by */}
+                        <div
+                          className="form-group inline-form-group"
+                          style={{ marginBottom: '20px' }}
+                        >
+                          <label>
+                            <strong>Trigger by</strong>
+                          </label>
+                          <div
+                            className="select-wrapper"
+                            style={{
+                              position: 'relative',
+                              display: 'inline-block',
+                              width: '100%',
+                            }}
+                            ref={triggerWrapperRef}
+                          >
+                            <div
+                              className="multiselect-display"
+                              onClick={toggleTriggerDropdown}
+                              style={{
+                                cursor: 'pointer',
+                                lineHeight: '15px',
+                                padding: '0 10px',
+                                fontSize: '13px',
+                                color: '#666',
+                              }}
+                            >
+                              {selectedTrigger
+                                ? triggerOptions.find(
+                                    (o) => o.value === selectedTrigger
+                                  )?.label
+                                : 'Select from list'}
+                            </div>
+
+                            {showTriggerDropdown && (
+                              <div
+                                className="multiselect-options"
+                                style={{
+                                  position: 'absolute',
+                                  top: '100%',
+                                  left: 0,
+                                  right: 0,
+                                  background: 'white',
+                                  maxHeight: '200px',
+                                  overflowY: 'auto',
+                                  border: '1px solid #ccc',
+                                  borderRadius: '4px',
+                                  // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                                  zIndex: 1000,
+                                  display: showTriggerDropdown
+                                    ? 'block'
+                                    : 'none',
+                                }}
+                              >
+                                {triggerOptions.map((option) => (
+                                  <div
+                                    key={option.value}
+                                    className="day-item"
+                                    style={{
+                                      padding: '8px 10px',
+                                      cursor: 'pointer',
+                                    }}
+                                    onClick={() => {
+                                      handleTriggerChange(option.value);
+                                      setShowTriggerDropdown(false);
+                                    }}
+                                  >
+                                    {/* <input
                                   type="radio"
                                   name="triggerType"
                                   checked={selectedTrigger === option.value}
@@ -1158,182 +1736,193 @@ const SmartIncentives = () => {
                                     handleTriggerChange(option.value)
                                   }
                                 /> */}
-                                <label
-                                  htmlFor={`aud-${option.value}`}
-                                  style={{ marginLeft: '6px' }}
-                                >
-                                  {option.label}
-                                </label>
+                                    <label
+                                      htmlFor={`aud-${option.value}`}
+                                      style={{ marginLeft: '6px' }}
+                                    >
+                                      {option.label}
+                                    </label>
+                                  </div>
+                                ))}
                               </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Trigger value */}
+                        <div className="field-block">
+                          <label
+                            className="field-label"
+                            style={{ marginRight: '45px' }}
+                          >
+                            Trigger value
+                          </label>
+                          <input
+                            type="text"
+                            value={triggerValue}
+                            onChange={(e) => setTriggerValue(e.target.value)}
+                            className="text-input-trigger"
+                          />
+                        </div>
+
+                        {/* Trigger time period */}
+                        <div
+                          className="field-block"
+                          style={{ marginBottom: '40px' }}
+                        >
+                          <label className="field-label">
+                            Trigger time period
+                          </label>
+                          {/* first row: daily + weekly */}
+                          <div className="flex-row" style={{ gap: '10px' }}>
+                            {[
+                              'daily',
+                              'last 7 days',
+                              'last 14 days',
+                              'last 30 days',
+                            ].map((tp) => (
+                              <label
+                                key={tp}
+                                className="radio-label"
+                                style={{ gap: '0px' }}
+                              >
+                                <input
+                                  type="radio"
+                                  name="timePeriod"
+                                  value={getTTPValue(tp)}
+                                  checked={timePeriod === tp}
+                                  onChange={() => setTimePeriod(tp)}
+                                  style={{ accentColor: '#002977' }}
+                                />
+                                <span>
+                                  {tp.charAt(0).toUpperCase() + tp.slice(1)}
+                                </span>
+                              </label>
                             ))}
                           </div>
-                        )}
-                      </div>
-                    </div>
+                        </div>
 
-                    {/* Trigger value */}
-                    <div className="field-block">
-                      <label
-                        className="field-label"
-                        style={{ marginRight: '45px' }}
-                      >
-                        Trigger value
-                      </label>
-                      <input
-                        type="text"
-                        value={triggerValue}
-                        onChange={(e) => setTriggerValue(e.target.value)}
-                        className="text-input-trigger"
-                      />
-                    </div>
-
-                    {/* Trigger time period */}
-                    <div
-                      className="field-block"
-                      style={{ marginBottom: '40px' }}
-                    >
-                      <label className="field-label">Trigger time period</label>
-                      {/* first row: daily + weekly */}
-                      <div className="flex-row" style={{ gap: '10px' }}>
-                        {[
-                          'daily',
-                          'last 7 days',
-                          'last 14 days',
-                          'last 30 days',
-                        ].map((tp) => (
-                          <label
-                            key={tp}
-                            className="radio-label"
-                            style={{ gap: '0px' }}
-                          >
-                            <input
-                              type="radio"
-                              name="timePeriod"
-                              value={getTTPValue(tp)}
-                              checked={timePeriod === tp}
-                              onChange={() => setTimePeriod(tp)}
-                              style={{ accentColor: '#002977' }}
-                            />
-                            <span>
-                              {tp.charAt(0).toUpperCase() + tp.slice(1)}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Points bonus value */}
-                    <div className="flex-row" style={{ marginBottom: '40px' }}>
-                      <label
-                        className="field-label"
-                        style={{ textWrap: 'nowrap', marginRight: '50px' }}
-                      >
-                        Points to Award
-                      </label>
-
-                      <input
-                        type="text"
-                        value={tempBenefits}
-                        onChange={(e) => setTempBenefits(e.target.value)}
-                        className="text-input-trigger"
-                        placeholder="20,000"
-                        style={{ width: '80px' }}
-                      />
-
-                      <div style={{ fontSize: '12px' }}>
-                        Points&nbsp;&nbsp;
-                        <strong>$ Value = ${pointsDollarValue}</strong>
-                      </div>
-                    </div>
-
-                    {/* Budget */}
-                    <div>
-                      <label className="day-item">
-                        <input
-                          type="checkbox"
-                          checked={unlimitedBudget}
-                          onChange={(e) => setUnlimitedBudget(e.target.checked)}
-                        />
-                        <span>No budget</span>
-                      </label>
-                    </div>
-
-                    <div
-                      className="flex-row"
-                      style={{
-                        marginBottom: '30px',
-                        visibility: unlimitedBudget ? 'hidden' : 'visible',
-                      }}
-                    >
-                      <label
-                        className="field-label"
-                        style={{ textWrap: 'nowrap', marginRight: '20px' }}
-                      >
-                        Set budget
-                      </label>
-
-                      <div className="flex-row">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={budget}
-                          disabled={unlimitedBudget}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d*$/.test(value)) {
-                              setBudget(value);
-                            }
-                          }}
-                          className="text-input-trigger"
-                          style={{
-                            width: '80px',
-                            marginRight: '10px',
-                            opacity: unlimitedBudget ? 0.5 : 1,
-                          }}
-                        />
+                        {/* Points bonus value */}
                         <div
+                          className="flex-row"
+                          style={{ marginBottom: '40px' }}
+                        >
+                          <label
+                            className="field-label"
+                            style={{ textWrap: 'nowrap', marginRight: '50px' }}
+                          >
+                            Points to Award
+                          </label>
+
+                          <input
+                            type="text"
+                            value={tempBenefits}
+                            onChange={(e) => setTempBenefits(e.target.value)}
+                            className="text-input-trigger"
+                            placeholder="20,000"
+                            style={{ width: '80px' }}
+                          />
+
+                          <div style={{ fontSize: '12px' }}>
+                            Points&nbsp;&nbsp;
+                            <strong>$ Value = ${pointsDollarValue}</strong>
+                          </div>
+                        </div>
+
+                        {/* Budget */}
+                        <div>
+                          <label className="day-item">
+                            <input
+                              type="checkbox"
+                              checked={unlimitedBudget}
+                              onChange={(e) =>
+                                setUnlimitedBudget(e.target.checked)
+                              }
+                            />
+                            <span>No budget</span>
+                          </label>
+                        </div>
+
+                        <div
+                          className="flex-row"
                           style={{
-                            fontSize: '12px',
-                            marginLeft: '5px',
-                            whiteSpace: 'nowrap',
+                            marginBottom: '30px',
+                            visibility: unlimitedBudget ? 'hidden' : 'visible',
                           }}
                         >
-                          <strong>$ Value = ${budgetDollarValue}</strong>
-                        </div>
-                      </div>
-                    </div>
+                          <label
+                            className="field-label"
+                            style={{ textWrap: 'nowrap', marginRight: '20px' }}
+                          >
+                            Set budget
+                          </label>
 
-                    {/* Start & End incentive */}
-                    <div className="flex-row">
-                      <label
-                        className="field-label"
-                        style={{ textWrap: 'nowrap', marginRight: '90px' }}
-                      >
-                        Start & End incentive
-                      </label>
-
-                      <div className="schedule-row-si">
-                        <div className="date-field">
-                          <label className="date-label">START DATE</label>
-                          <input
-                            type="date"
-                            value={scheduleStart}
-                            onChange={(e) => setScheduleStart(e.target.value)}
-                            className="date-input"
-                          />
+                          <div className="flex-row">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={budget}
+                              disabled={unlimitedBudget}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                  setBudget(value);
+                                }
+                              }}
+                              className="text-input-trigger"
+                              style={{
+                                width: '80px',
+                                marginRight: '10px',
+                                opacity: unlimitedBudget ? 0.5 : 1,
+                              }}
+                            />
+                            <div
+                              style={{
+                                fontSize: '12px',
+                                marginLeft: '5px',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              <strong>$ Value = ${budgetDollarValue}</strong>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="date-field">
-                          <label className="date-label">END DATE</label>
-                          <input
-                            type="date"
-                            value={scheduleEnd}
-                            onChange={(e) => setScheduleEnd(e.target.value)}
-                            className="date-input"
-                          />
+                        {/* Start & End incentive */}
+                        <div className="flex-row">
+                          <label
+                            className="field-label"
+                            style={{ textWrap: 'nowrap', marginRight: '90px' }}
+                          >
+                            Start & End incentive
+                          </label>
+
+                          <div className="schedule-row-si">
+                            <div className="date-field">
+                              <label className="date-label">START DATE</label>
+                              <input
+                                type="date"
+                                value={scheduleStart}
+                                onChange={(e) =>
+                                  setScheduleStart(e.target.value)
+                                }
+                                className="date-input"
+                              />
+                            </div>
+
+                            <div className="date-field">
+                              <label className="date-label">END DATE</label>
+                              <input
+                                type="date"
+                                value={scheduleEnd}
+                                onChange={(e) => setScheduleEnd(e.target.value)}
+                                className="date-input"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </>
@@ -1450,7 +2039,21 @@ const SmartIncentives = () => {
                             <td>{formatTimePeriod(data.timePeriod) || '-'}</td>
                             <td>{data.incentiveValue || '-'}</td>
                             <td>
-                              {data.applicableUserCount ? (
+                              {data.audienceMode === 'csv' ? (
+                                <span
+                                  onClick={() =>
+                                    handleExportApplicableUsers(data._id)
+                                  }
+                                  style={{
+                                    color: '#002977',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {data.csvProcessedUsers}
+                                </span>
+                              ) : data.applicableUserCount ? (
                                 <span
                                   onClick={() =>
                                     handleExportApplicableUsers(data._id)

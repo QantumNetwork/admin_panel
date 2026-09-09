@@ -1,30 +1,30 @@
 .live-smart-incentives {
-    position: absolute;
-    top: 185px;
-    left: 73.4%;
-    width: 26%;
-    height: 500px;
-    background: #F2F2F2;
-    padding: 13px;
-    box-sizing: border-box;
-    overflow: auto;
+  position: absolute;
+  top: 185px;
+  left: 73.4%;
+  width: 26%;
+  height: 500px;
+  background: #f2f2f2;
+  padding: 13px;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .live-smart-incentives h2 {
-    margin: 0 0 20px 0;
-    font-size: 14px;
-    text-align: center;
-    color: #333;
-    font-weight: 600;
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
 }
 
 .members-table-container-si {
-    padding: 20px;
-    /* background-color: #f8f9fa; */
-    min-height: 400px;
-    margin-left: 15%;
-    margin-top: 1%;
-  }
+  padding: 20px;
+  /* background-color: #f8f9fa; */
+  min-height: 400px;
+  margin-left: 15%;
+  margin-top: 1%;
+}
 
 .members-table-si {
   width: 100%;
@@ -91,129 +91,129 @@
 
 /* Incentives Grid */
 .incentives-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .incentive-card {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .incentive-image-container {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f8f8f8;
-    border-radius: 8px;
-    flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .incentive-img {
-    max-width: 80%;
-    max-height: 80%;
-    object-fit: contain;
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
 }
 
 .incentive-details {
-    flex: 1;
+  flex: 1;
 }
 
 .incentive-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .incentive-header h3 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
 }
 
 .status {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
 }
 
 .status.active {
-    background-color: #e0f7e9;
-    color: #0d8a4a;
+  background-color: #e0f7e9;
+  color: #0d8a4a;
 }
 
 .status.expired {
-    background-color: #fce7e7;
-    color: #d32f2f;
+  background-color: #fce7e7;
+  color: #d32f2f;
 }
 
 .status.scheduled {
-    background-color: #e3f2fd;
-    color: #1976d2;
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 
 .status.draft {
-    background-color: #f5f5f5;
-    color: #757575;
+  background-color: #f5f5f5;
+  color: #757575;
 }
 
 .incentive-description {
-    margin: 0;
-    font-size: 12px;
-    color: #666;
-    line-height: 1.5;
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
 }
 
 /* Incentive Options Styles */
 .incentive-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .incentive-option {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .incentive-option:hover {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 .incentive-radio {
-    margin-right: 15px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+  margin-right: 15px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 .incentive-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .incentive-image img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 
 /* Dropdown styles */
@@ -269,66 +269,66 @@
 
 /* ── GLOBAL FIELD BLOCK & LABEL ───────────────────────────────────────── */
 .field-block {
-    margin-bottom: 15px;      /* spacing below each field */
-  }
-  
-  .field-label {
-    /* display: flex; */
-    font-size: 14px;        /* 14px */
-    font-weight: bold;
-    color: #333;
-    margin-right: 15px;
-  }
-  
-  /* ── FLEX ROWS ─────────────────────────────────────────────────────────── */
-  .flex-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-  }
-  
-  /* for specifically centering items (like number + \"Days\") */
-  .align-center {
-    align-items: baseline;
-  }
-  
-  /* ── RADIOS ───────────────────────────────────────────────────────────── */
-  .radio-label {
-    display: flex;
-    align-items: center;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-  
-  .radio-label input {
-    margin: 0;                  /* remove default margin */
-  }
-  
-  .radio-label span {
-    margin-left: 0.25rem;
-  }
-  
-  /* ── SCHEDULE ROW ──────────────────────────────────────────────────────── */
-  .schedule-row-si {
-    display: flex;
-    gap: 2rem;
-    margin-top: 0.75rem;
-  }
-  
-  .date-field {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .date-label {
-    font-size: 0.75rem;         /* 12px */
-    color: #666;
-    margin-bottom: 0.25rem;
-  }
-  
-  /* ── INPUTS & SELECTS ─────────────────────────────────────────────────── */
-  /* .text-input,
+  margin-bottom: 15px; /* spacing below each field */
+}
+
+.field-label {
+  /* display: flex; */
+  font-size: 14px; /* 14px */
+  font-weight: bold;
+  color: #333;
+  margin-right: 15px;
+}
+
+/* ── FLEX ROWS ─────────────────────────────────────────────────────────── */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+/* for specifically centering items (like number + \"Days\") */
+.align-center {
+  align-items: baseline;
+}
+
+/* ── RADIOS ───────────────────────────────────────────────────────────── */
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.radio-label input {
+  margin: 0; /* remove default margin */
+}
+
+.radio-label span {
+  margin-left: 0.25rem;
+}
+
+/* ── SCHEDULE ROW ──────────────────────────────────────────────────────── */
+.schedule-row-si {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.75rem;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-label {
+  font-size: 0.75rem; /* 12px */
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+/* ── INPUTS & SELECTS ─────────────────────────────────────────────────── */
+/* .text-input,
   .select-input,
   .date-input,
   .small-number-input {
@@ -337,72 +337,76 @@
     border-radius: 4px;
     padding: 0.5rem 0.75rem;
   } */
-  
-  .date-input {
-    width: 80px;
-  }
-  
-  .small-number-input {
-    width: 4rem;
-    text-align: right;
-  }
-  
-  .unit-label {
-    font-size: 0.875rem;
-  }
 
-  /* ── TWO‑COLUMN FLEX FOR FIRST ROW ─────────────────────────────────────── */
+.date-input {
+  width: 80px;
+}
+
+.small-number-input {
+  width: 4rem;
+  text-align: right;
+}
+
+.unit-label {
+  font-size: 0.875rem;
+}
+
+/* ── TWO‑COLUMN FLEX FOR FIRST ROW ─────────────────────────────────────── */
 .two‑column {
-    gap: 2rem;
-  }
-  .field-cell {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* ── SCHEDULE ROW ALWAYS VISIBLE ─────────────────────────────────────── */
-  .schedule-row-si {
-    display: flex;
-    gap: 5px;
-    margin-top: 0.75rem;
-  }
-  .date-field { flex: 1; display: flex; flex-direction: column; }
-  .date-label {
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 0.25rem;
-  }
+  gap: 2rem;
+}
+.field-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-  .two-column {
-    display: flex;
-    gap: 2rem;
-  }
-  
-  .field-cell {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+/* ── SCHEDULE ROW ALWAYS VISIBLE ─────────────────────────────────────── */
+.schedule-row-si {
+  display: flex;
+  gap: 5px;
+  margin-top: 0.75rem;
+}
+.date-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.date-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
 
-  /* make the label + radios align horizontally */
+.two-column {
+  display: flex;
+  gap: 2rem;
+}
+
+.field-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* make the label + radios align horizontally */
 .align-center {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  
-  /* remove the default bottom‑margin on that one inline label */
-  .inline-label {
-    margin-bottom: 0;
-    margin-right: 1rem;
-  }
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-  .text-input-trigger {
-    width: 30%;
-  }
+/* remove the default bottom‑margin on that one inline label */
+.inline-label {
+  margin-bottom: 0;
+  margin-right: 1rem;
+}
 
-  .smart-incentive-select {
+.text-input-trigger {
+  width: 30%;
+}
+
+.smart-incentive-select {
   width: 100%;
   height: 32px;
   border: none;
@@ -410,36 +414,441 @@
   color: #666;
   font-size: 13px;
 }
-  
-@media (max-width: 1475px) {
-    .members-table-si {
-        table-layout: auto;
-        width: 100%;
-    }
 
-    .members-table-si th,
-    .members-table-si td {
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-        padding: 8px 6px;
-        font-size: 12px;
-    }
-    .action-btn-endsi {
-      white-space: normal;
-      word-break: normal;
-      overflow-wrap: normal;
-    }
-    .members-table-container-si {
-      padding: 10px;
-      padding-top: 20px;
-      padding-left: 20px;
-      padding-bottom: 20px;
-    }
+/* =========================================================
+   TARGETED LIST AUDIENCE
+   ========================================================= */
+
+.targeted-list-audience-option {
+  border-bottom: 1px solid #eeeeee;
+  cursor: pointer;
+  color: #666;
+  padding: 6px 10px !important;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: normal;
 }
-  
-  
 
-  
-  
-  
+.targeted-list-audience-option span {
+  font-size: 12px;
+}
+
+.targeted-list-audience-option:hover {
+  background-color: #f5f5f5;
+}
+
+.targeted-list-audience-option.selected {
+  color: #5396d1;
+  font-weight: 600;
+}
+
+/* =========================================================
+   TARGETED LIST MARKET
+   ========================================================= */
+
+.targeted-list-market {
+  width: 100%;
+  margin-top: 80px;
+}
+
+.targeted-list-market.confirmed {
+  width: 100%;
+  margin-top: 30px;
+}
+
+/* =========================================================
+   STEPS
+   ========================================================= */
+
+.targeted-list-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.targeted-list-step {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #5396d1;
+}
+
+.targeted-list-step span:first-child {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #5396d1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.targeted-list-step.active span:first-child {
+  background: #5396d1;
+  color: white;
+}
+
+.targeted-list-step-line {
+  width: 42px;
+  height: 1px;
+  background: #9fc7e8;
+  margin: 0 7px;
+}
+
+/* =========================================================
+   UPLOAD BOX
+   ========================================================= */
+
+.targeted-list-upload-box {
+  border: 1px dashed #002977;
+  border-radius: 8px;
+  min-height: 155px;
+  padding: 12px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  text-align: center;
+}
+
+
+.targeted-list-upload-box h3 {
+  margin: 0 0 7px 0;
+  font-size: 16px;
+  color: #002977;
+}
+
+.targeted-list-upload-box p {
+  margin: 0 0 10px 0;
+  font-size: 9px;
+  color: #888;
+}
+
+.targeted-list-file-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.targeted-list-browse-text {
+  font-size: 10px;
+  color: #777;
+}
+
+.targeted-list-browse-text span {
+  color: #5396d1;
+  font-weight: 600;
+}
+
+/* =========================================================
+   DOWNLOAD TEMPLATE
+   ========================================================= */
+
+.targeted-list-template-btn {
+  display: block;
+  margin: 10px auto 0 auto;
+
+  border: none;
+  background: transparent;
+
+  color: #5396d1;
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.targeted-list-template-btn:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.targeted-list-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.targeted-list-cancel-btn,
+.targeted-list-upload-btn {
+  min-width: 85px;
+  height: 35px;
+
+  border-radius: 20px;
+  padding: 0 18px;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.targeted-list-cancel-btn {
+  background: white;
+  border: 1px solid #5396d1;
+  color: #5396d1;
+}
+
+.targeted-list-cancel-btn:hover {
+  background: #f5f9fc;
+}
+
+.targeted-list-upload-btn {
+  background: #5396d1;
+  border: 1px solid #5396d1;
+  color: white;
+}
+
+.targeted-list-upload-btn:hover {
+  background: #002977;
+  border-color: #002977;
+}
+
+/* .targeted-list-upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} */
+
+/* =========================================================
+   REVIEW
+   ========================================================= */
+
+/* =========================================================
+   REVIEW TARGET FILE
+   ========================================================= */
+
+.targeted-list-review {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 15px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.targeted-list-review h3 {
+  margin: 0 0 5px 0;
+  color: #002977;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.targeted-list-review-subtitle {
+  margin: 0 0 7px 0 !important;
+  color: #888;
+  font-size: 10px;
+}
+
+.targeted-list-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  color: #4caf50;
+  font-size: 10px;
+  font-weight: 500;
+
+  margin-bottom: 8px;
+}
+
+.targeted-list-success-icon {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #4caf50;
+  color: white;
+
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.targeted-list-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  margin-bottom: 7px;
+}
+
+.targeted-list-file-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.targeted-list-review-file-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.targeted-list-file-info span {
+  font-size: 9px;
+  color: #777;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.targeted-list-view-file-btn {
+  border: none;
+  background: transparent;
+
+  color: #5396d1;
+  font-size: 8px;
+
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.targeted-list-view-file-btn:hover {
+  text-decoration: underline;
+}
+
+.targeted-list-record-count {
+  width: 100%;
+
+  background: #002f87;
+  color: white;
+
+  border-radius: 7px;
+
+  padding: 4px 0;
+
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.05;
+
+  box-sizing: border-box;
+}
+
+.targeted-list-ready-text {
+  margin: 7px 0 0 0 !important;
+  color: #999;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   REVIEW ACTION BUTTONS
+   ========================================================= */
+
+.targeted-list-review-actions {
+  margin-top: 28px;
+  gap: 10px;
+}
+
+.targeted-list-review-actions
+.targeted-list-cancel-btn {
+  min-width: 160px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.targeted-list-review-actions
+.targeted-list-upload-btn {
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   FINAL TARGET FILE
+   ========================================================= */
+
+.targeted-list-final {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.targeted-list-final-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.targeted-list-final-card h3 {
+  text-align: center;
+  margin:auto;
+  margin-bottom: 10px;
+  color: #002f87;
+}
+
+.targeted-list-final-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 7px;
+}
+
+.targeted-list-final .targeted-list-record-count {
+  width: 100%;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.targeted-list-member-count {
+  padding: 0 10px;
+  font-size: 13px;
+  line-height: 15px;
+  color: #666;
+  box-sizing: border-box;
+}
+
+.targeted-list-final-points {
+  margin-top: 30px;
+}
+
+@media (max-width: 1475px) {
+  .members-table-si {
+    table-layout: auto;
+    width: 100%;
+  }
+
+  .members-table-si th,
+  .members-table-si td {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .action-btn-endsi {
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+  .members-table-container-si {
+    padding: 10px;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+  }
+}

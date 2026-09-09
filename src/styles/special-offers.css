@@ -967,22 +967,22 @@ body.is-scrolling .special-offers-page {
   background: transparent;
   display: grid;
   grid-template-columns: repeat(4, max-content);
-  gap: 8px;
+  gap: 4px;
 }
 
 /* Pill base */
 .filter-pill {
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 18px;
   border: 1px solid white; /* subtle border */
   background: transparent;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: white; 
   cursor: pointer;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  min-width: 64px;
+  min-width: 60px;
   display: inline-flex;
 }
 
