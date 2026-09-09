@@ -286,19 +286,18 @@ const SmartIncentives = () => {
         return;
       }
 
-      // Qantum targeted-list flow uses the CSV API.
-      const isQantumTargetedList =
-        selectedVenue === 'Qantum' &&
+      // targeted-list flow uses the CSV API.
+      const isTargetedList =
         isUploadTargetedList &&
         targetedListStep === 'target';
 
       /*
        * ------------------------------------------------------------
-       * Qantum + Targeted List
+       * Targeted List
        * POST /smart-incentive/csv
        * ------------------------------------------------------------
        */
-      if (isQantumTargetedList) {
+      if (isTargetedList) {
         if (!targetedListFile) {
           toast.error('Please select a target file');
           return;
@@ -351,7 +350,7 @@ const SmartIncentives = () => {
           }
         );
 
-        console.log('Qantum CSV incentive response:', response.data);
+        console.log('CSV incentive response:', response.data);
 
         toast.success(
           response?.data?.message || 'Smart incentive created successfully'
