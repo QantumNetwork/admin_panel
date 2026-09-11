@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { uploadFileToS3 } from '../s3/config';
 import { logout } from '../utils/auth';
 import { trackMenuAccess, handleLogout } from '../utils/api';
+import * as XLSX from 'xlsx';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaChartPie } from 'react-icons/fa6';
 import 'react-toastify/dist/ReactToastify.css';
@@ -193,6 +194,14 @@ const SpecialOffers = () => {
 
   const [showDetails, setShowDetails] = useState(false);
 
+  const UPLOAD_TARGETED_LIST = 'upload-targeted-list';
+  const [isUploadTargetedList, setIsUploadTargetedList] = useState(false);
+  const [targetedListFile, setTargetedListFile] = useState(null);
+  const [targetedListRows, setTargetedListRows] = useState([]);
+  const [targetedListStep, setTargetedListStep] = useState('upload');
+  const targetedListInputRef = useRef(null);
+  const [csvProcessedUsers, setCsvProcessedUsers] = useState(0);
+
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
 
@@ -213,10 +222,9 @@ const SpecialOffers = () => {
     );
   });
 
-  const toggleAudienceDropdown = () => {
-    if (!isEveryone) {
-      setShowAudienceDropdown((open) => !open);
-    }
+  const toggleAudienceDropdown = (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    setShowAudienceDropdown((open) => !open);
   };
 
   const toggleMembershipDropdown = () => {
@@ -224,10 +232,26 @@ const SpecialOffers = () => {
   };
 
   const handleAudienceChange = (value) => {
+    if (value === UPLOAD_TARGETED_LIST) {
+      setIsUploadTargetedList(true);
+      setIsEveryone(false);
+      setSelectedAudiences([]);
+      setShowAudienceDropdown(false);
+      setTargetedListFile(null);
+      setTargetedListRows([]);
+      setTargetedListStep('upload');
+      return;
+    }
+
+    setIsUploadTargetedList(false);
+    setTargetedListFile(null);
+    setTargetedListRows([]);
+    setTargetedListStep('upload');
     // normal multi‑select toggle
     setSelectedAudiences((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
+    setIsEveryone(false);
   };
 
   const handleMembershipChange = (value) => {
@@ -242,6 +266,10 @@ const SpecialOffers = () => {
     setIsEveryone(checked);
 
     if (checked) {
+      setIsUploadTargetedList(false);
+      setTargetedListFile(null);
+      setTargetedListRows([]);
+      setTargetedListStep('upload');
       // Select all audience options when "Everyone" is checked
       setSelectedAudiences(audienceOptions.map((option) => option.value));
     } else {
@@ -350,6 +378,7 @@ const SpecialOffers = () => {
             setSelectedOffer(null);
             setHeadingText('');
             setDescriptionText('');
+            setCsvProcessedUsers(0);
             setUploadedImage(null);
             setSelectedAudiences([]);
             setIsEveryone(false); // Reset the everyone state
@@ -399,6 +428,7 @@ const SpecialOffers = () => {
             console.log('Selected Offer:', offerToSelect);
             setHeadingText(offerToSelect.header || '');
             setDescriptionText(offerToSelect.description || '');
+            setCsvProcessedUsers(Number(offerToSelect.csvProcessedUsers) || 0);
             setUploadedImage(offerToSelect.image || null);
             console.log('img- ', uploadedImage);
 
@@ -439,6 +469,7 @@ const SpecialOffers = () => {
           setSelectedOffer(null);
           setHeadingText('');
           setDescriptionText('');
+          setCsvProcessedUsers(0);
           setUploadedImage(null);
           setTriggerValue('');
           setSelectedAudiences([]);
@@ -566,6 +597,21 @@ const SpecialOffers = () => {
       setIsEveryone(false);
       return;
     }
+
+    // Targeted list offer
+    if (ratingLevel.length === 1 && ratingLevel[0] === 'csv') {
+      setIsUploadTargetedList(true);
+      setTargetedListStep('target');
+      setSelectedAudiences([]);
+      setIsEveryone(false);
+      return;
+    }
+
+    // Normal audience → make sure targeted-list mode is OFF
+    setIsUploadTargetedList(false);
+    setTargetedListStep('upload');
+    setTargetedListFile(null);
+    setTargetedListRows([]);
 
     // Map each returned LABEL (e.g. 'Staff', 'Gold') back to your value
     const mapLabelToValue = audienceOptions.reduce((m, o) => {
@@ -1047,6 +1093,7 @@ const SpecialOffers = () => {
     // Make sure to set heading and description directly from the offer
     setHeadingText(offer.header || '');
     setDescriptionText(offer.description || '');
+    setCsvProcessedUsers(Number(offer.csvProcessedUsers) || 0);
     setUploadedImage(offer.image || null);
     console.log('img- ', uploadedImage);
 
@@ -1143,6 +1190,10 @@ const SpecialOffers = () => {
 
   // Handle add new offer button click
   const handleAddNewOffer = () => {
+    setIsUploadTargetedList(false);
+    setTargetedListFile(null);
+    setTargetedListRows([]);
+    setTargetedListStep('upload');
     // Set selectedOffer to null to disconnect from any existing offer data
     setSelectedOffer(null);
 
@@ -1296,6 +1347,10 @@ const SpecialOffers = () => {
       bonusPoints,
       showDetails,
       currentPostPill,
+      isUploadTargetedList,
+      targetedListStep,
+      targetedListRows,
+      targetedListFile,
     };
 
     console.log('Sending form values to Art Gallery:', formValues);
@@ -1728,6 +1783,92 @@ const SpecialOffers = () => {
 
       console.log('Request Body:', requestBody);
 
+      if (isUploadTargetedList && targetedListStep === 'target') {
+        if (voucherTypeValue !== 'standard') {
+          toast.error(
+            'Upload targeted list is available only for Standard vouchers',
+            {
+              containerId: 'offerActions',
+            }
+          );
+          return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('audienceFile', targetedListFile);
+        formData.append('header', headingText);
+        formData.append('description', descriptionText);
+        formData.append(
+          'points',
+          showBonusWhenRedeemed &&
+            bonusPoints !== '' &&
+            !isNaN(Number(bonusPoints))
+            ? String(bonusPoints)
+            : 'null'
+        );
+        formData.append('triggerValue', triggerValue);
+        formData.append('oneTimeUse', String(oneTimeUse));
+        formData.append('expiry', JSON.stringify(requestBody.expiry));
+
+        formData.append(
+          'validDaysOfWeek',
+          JSON.stringify(requestBody.validDaysOfWeek)
+        );
+
+        formData.append('validTime', JSON.stringify(requestBody.validTime));
+        formData.append('image', imageData);
+
+        const appearsValue =
+          currentPostPill === 'ALL' ? 'all' : currentPostPill;
+
+        formData.append('appears', appearsValue);
+
+        const csvResponse = await fetch(`${baseUrl}/offer/csv`, {
+          method: 'POST',
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: formData,
+        });
+
+        const csvData = await csvResponse.json();
+
+        if (csvData?.success) {
+          toast.success('Offer submitted successfully!', {
+            containerId: 'offerActions',
+          });
+          updateAddMode(false);
+          setShowDetails(false);
+          setSelectedOffer(null);
+          setUploadedImage(null);
+          // Prevent Art Gallery restoration after creation
+          ignoreArtGalleryRestoreRef.current = true;
+
+          // 🔴 ALSO clear any Art Gallery state
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+
+          setDeleteSuccess((prevState) => !prevState);
+
+          // Add a delay before refreshing the page
+          setTimeout(() => {
+            navigate('/special-offers', { replace: true });
+          }, 1500); // 1.5 seconds delay
+          return;
+        } else {
+          toast.error(
+            csvData?.message || 'Failed to submit targeted list offer',
+            {
+              containerId: 'offerActions',
+            }
+          );
+          return;
+        }
+      }
       // Make the POST request to the new API endpoint
       const response = await fetch(`${baseUrl}/offer/create`, {
         method: 'POST',
@@ -2241,6 +2382,17 @@ const SpecialOffers = () => {
             ? 'standard'
             : 'club'
     );
+
+    // Targeted list upload is supported only for standard vouchers.
+    if (selectedValue !== 'type3' && isUploadTargetedList) {
+      setIsUploadTargetedList(false);
+      setTargetedListFile(null);
+      setTargetedListRows([]);
+      setTargetedListStep('upload');
+
+      setIsEveryone(true);
+      setSelectedAudiences(audienceOptions.map((option) => option.value));
+    }
   };
 
   useEffect(() => {
@@ -2306,6 +2458,10 @@ const SpecialOffers = () => {
           bonusPoints: savedBonusPoints,
           showDetails: savedShowDetails,
           currentPostPill: savedCurrentPostPill,
+          isUploadTargetedList: savedIsUploadTargetedList,
+          targetedListStep: savedTargetedListStep,
+          targetedListRows: savedTargetedListRows,
+          targetedListFile: savedTargetedListFile,
         } = location.state.formValues;
 
         // Preserve the current offer selection when returning from Art Gallery
@@ -2374,6 +2530,12 @@ const SpecialOffers = () => {
             setBonusPoints(savedBonusPoints);
           if (savedShowDetails) setShowDetails(savedShowDetails);
           if (savedCurrentPostPill) setCurrentPostPill(savedCurrentPostPill);
+          if (savedIsUploadTargetedList !== undefined)
+            setIsUploadTargetedList(savedIsUploadTargetedList);
+
+          if (savedTargetedListStep) setTargetedListStep(savedTargetedListStep);
+          if (savedTargetedListRows) setTargetedListRows(savedTargetedListRows);
+          if (savedTargetedListFile) setTargetedListFile(savedTargetedListFile);
           // Set select elements - moved into the same setTimeout to ensure order
           // Set voucher type select
           // Restore voucher type through React state
@@ -2839,7 +3001,7 @@ const SpecialOffers = () => {
               onClick={() => {
                 setActiveTab('live');
                 setActiveOfferFilter('ALL');
-  setCurrentPostPill('ALL');
+                setCurrentPostPill('ALL');
                 setSelectedOffer(null);
                 updateAddMode(false);
                 // setHeadingText('');
@@ -3371,415 +3533,1269 @@ const SpecialOffers = () => {
                     <label>
                       <strong>Audience</strong>
                     </label>
-                    <div
-                      className="select-wrapper"
-                      style={{ position: 'relative', zIndex: 1000 }}
-                      ref={audienceWrapperRef}
-                    >
-                      <div
-                        className="multiselect-display"
-                        onClick={toggleAudienceDropdown}
-                        style={{
-                          cursor: isEveryone ? 'not-allowed' : 'pointer',
-                          lineHeight: '35px',
-                          padding: '0 10px',
-                          fontSize: '13px',
-                          color: isEveryone ? '#999' : '#666',
-                        }}
-                      >
-                        {isEveryone
-                          ? 'All Selected'
-                          : selectedAudiences.length > 0
-                            ? selectedAudiences.length > 2
-                              ? `${selectedAudiences.length} selected`
-                              : audienceOptions
-                                  .filter((o) =>
-                                    selectedAudiences.includes(o.value)
-                                  )
-                                  .map((o) => o.label)
-                                  .join(', ')
-                            : 'Select from list'}
+
+                    {isUploadTargetedList && targetedListStep === 'target' ? (
+                      <div className="targeted-list-member-count">
+                        {targetedListFile
+                          ? targetedListRows.length.toLocaleString()
+                          : targetedListRows.length
+                            ? targetedListRows.length.toLocaleString()
+                            : csvProcessedUsers.toLocaleString()}{' '}
+                        members targeted
                       </div>
-
-                      {showAudienceDropdown && !isEveryone && (
+                    ) : (
+                      <>
                         <div
-                          className="multiselect-options"
-                          style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            background: 'white',
-                            maxHeight: '200px',
-                            overflowY: 'auto',
-                            border: '1px solid #ccc',
-                            zIndex: 1000,
-                          }}
+                          className="select-wrapper"
+                          style={{ position: 'relative', zIndex: 1000 }}
+                          ref={audienceWrapperRef}
                         >
-                          {audienceOptions.map((option) => (
-                            <div
-                              key={option.value}
-                              className="day-item"
-                              style={{
-                                padding: '5px 10px',
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                id={`aud-${option.value}`}
-                                checked={selectedAudiences.includes(
-                                  option.value
-                                )}
-                                onChange={() =>
-                                  handleAudienceChange(option.value)
-                                }
-                              />
-                              <label
-                                htmlFor={`aud-${option.value}`}
-                                style={{ marginLeft: '6px' }}
-                              >
-                                {option.label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div
-                      className="day-item"
-                      style={{ marginTop: '10px', marginLeft: '5px' }}
-                    >
-                      <input
-                        type="checkbox"
-                        id="aud-everyone"
-                        checked={isEveryone}
-                        onChange={handleEveryoneChange}
-                      />
-                      <label htmlFor="aud-everyone">Everyone</label>
-                    </div>
-                  </div>
-
-                  {selectedVoucherType === 'club' && (
-                    <>
-                      {/* One time use option */}
-                      <div className="day-item">
-                        <input
-                          type="checkbox"
-                          id="oneTimeUse"
-                          name="oneTimeUse"
-                          checked={oneTimeUse}
-                          onChange={() => setOneTimeUse(!oneTimeUse)}
-                        />
-                        <label htmlFor="oneTimeUse">One time use</label>
-                      </div>
-                    </>
-                  )}
-
-                  {(selectedVoucherType === 'club' ||
-                    (selectedVoucherType === 'birthdayOffer' &&
-                      showClubOption)) && (
-                    <div className="form-group inline-form-group">
-                      <label>
-                        <strong>Membership</strong>
-                      </label>
-                      <div
-                        className="select-wrapper"
-                        style={{ position: 'relative' }}
-                        ref={membershipWrapperRef}
-                      >
-                        <div
-                          className="multiselect-display"
-                          onClick={toggleMembershipDropdown}
-                          style={{
-                            cursor: 'pointer',
-                            lineHeight: '35px',
-                            padding: '0 10px',
-                            fontSize: '13px',
-                            color: '#666',
-                          }}
-                        >
-                          {selectedMemberships.length > 0
-                            ? selectedMemberships.length > 1
-                              ? `${selectedMemberships.length} selected`
-                              : membershipPackages
-                                  .filter((o) =>
-                                    selectedMemberships.includes(o._id)
-                                  )
-                                  .map((o) => o.membershipName)
-                                  .join(', ')
-                            : 'Select from list'}
-                        </div>
-
-                        {showMembershipDropdown && (
                           <div
-                            className="multiselect-options"
+                            className="multiselect-display"
+                            onClick={toggleAudienceDropdown}
                             style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              right: 0,
-                              width: '220px',
-                              background: 'white',
-                              maxHeight: '200px',
-                              overflowY: 'auto',
-                              border: '1px solid #ccc',
-                              zIndex: 10,
+                              cursor: 'pointer',
+                              lineHeight: '35px',
+                              padding: '0 10px',
+                              fontSize: '13px',
+                              color: isEveryone ? '#999' : '#666',
                             }}
                           >
-                            {membershipPackages.map((option) => (
-                              <div
-                                key={option._id}
-                                className="day-item"
-                                style={{
-                                  padding: '5px 10px',
+                            {isEveryone
+                              ? 'All Selected'
+                              : isUploadTargetedList
+                                ? 'Upload targeted list'
+                                : selectedAudiences.length > 0
+                                  ? selectedAudiences.length > 2
+                                    ? `${selectedAudiences.length} selected`
+                                    : audienceOptions
+                                        .filter((o) =>
+                                          selectedAudiences.includes(o.value)
+                                        )
+                                        .map((o) => o.label)
+                                        .join(', ')
+                                  : 'Select from list'}
+                          </div>
+
+                          {showAudienceDropdown && (
+                            <div
+                              className="multiselect-options"
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                background: 'white',
+                                maxHeight: '200px',
+                                overflowY: 'auto',
+                                border: '1px solid #ccc',
+                                zIndex: 1000,
+                              }}
+                            >
+                              {selectedVoucherType === 'standard' && (
+                                <div
+                                  key={UPLOAD_TARGETED_LIST}
+                                  className={`day-item targeted-list-audience-option ${
+                                    isUploadTargetedList ? 'selected' : ''
+                                  }`}
+                                  onClick={() =>
+                                    handleAudienceChange(UPLOAD_TARGETED_LIST)
+                                  }
+                                >
+                                  <span>Upload targeted list</span>
+                                </div>
+                              )}
+                              {audienceOptions.map((option) => (
+                                <div
+                                  key={option.value}
+                                  className="day-item"
+                                  style={{
+                                    padding: '5px 10px',
+                                  }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    id={`aud-${option.value}`}
+                                    checked={
+                                      !isUploadTargetedList &&
+                                      selectedAudiences.includes(option.value)
+                                    }
+                                    onChange={() =>
+                                      handleAudienceChange(option.value)
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`aud-${option.value}`}
+                                    style={{ marginLeft: '6px' }}
+                                  >
+                                    {option.label}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div
+                          className="day-item"
+                          style={{ marginTop: '10px', marginLeft: '5px' }}
+                        >
+                          <input
+                            type="checkbox"
+                            id="aud-everyone"
+                            checked={isEveryone}
+                            onChange={handleEveryoneChange}
+                          />
+                          <label htmlFor="aud-everyone">Everyone</label>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {isUploadTargetedList && targetedListStep !== 'target' && (
+                    <div className="targeted-list-market">
+                      {targetedListStep !== 'target' && (
+                        <div className="targeted-list-steps">
+                          <div className="targeted-list-step active">
+                            <span>1</span>
+                            <span>Upload</span>
+                          </div>
+
+                          <div className="targeted-list-step-line" />
+
+                          <div
+                            className={`targeted-list-step ${
+                              targetedListStep === 'review' ? 'active' : ''
+                            }`}
+                          >
+                            <span>2</span>
+                            <span>Review</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {targetedListStep === 'upload' ? (
+                        <>
+                          <div
+                            className="targeted-list-upload-box"
+                            onClick={() =>
+                              targetedListInputRef.current?.click()
+                            }
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => {
+                              e.preventDefault();
+
+                              const file = e.dataTransfer.files?.[0];
+                              if (!file) return;
+
+                              const allowedExtensions = [
+                                '.xlsx',
+                                '.xls',
+                                '.csv',
+                              ];
+                              const fileName = file.name.toLowerCase();
+
+                              if (
+                                !allowedExtensions.some((ext) =>
+                                  fileName.endsWith(ext)
+                                )
+                              ) {
+                                toast.error(
+                                  'Please upload an Excel or CSV file'
+                                );
+                                return;
+                              }
+
+                              const reader = new FileReader();
+
+                              reader.onload = (event) => {
+                                try {
+                                  const data = new Uint8Array(
+                                    event.target.result
+                                  );
+
+                                  const workbook = XLSX.read(data, {
+                                    type: 'array',
+                                  });
+
+                                  const worksheet =
+                                    workbook.Sheets[workbook.SheetNames[0]];
+
+                                  const rows = XLSX.utils.sheet_to_json(
+                                    worksheet,
+                                    { defval: '' }
+                                  );
+
+                                  if (!rows.length) {
+                                    toast.error(
+                                      'The uploaded file contains no data'
+                                    );
+                                    return;
+                                  }
+
+                                  setTargetedListFile(file);
+                                  setTargetedListRows(rows);
+                                  setTargetedListStep('review');
+                                } catch (error) {
+                                  console.error(error);
+                                  toast.error(
+                                    'Unable to read the uploaded file'
+                                  );
+                                }
+                              };
+
+                              reader.readAsArrayBuffer(file);
+                            }}
+                          >
+                            <h3>Upload Your File</h3>
+
+                            <p>
+                              Upload an Excel or CSV file to import your data.
+                            </p>
+
+                            <img
+                              src="/page.png"
+                              alt="Upload file"
+                              className="targeted-list-file-icon"
+                            />
+
+                            <div className="targeted-list-browse-text">
+                              Drag a file here or <span>browse</span> for a file
+                              to upload.
+                            </div>
+
+                            <input
+                              ref={targetedListInputRef}
+                              type="file"
+                              accept=".xlsx,.xls,.csv"
+                              style={{ display: 'none' }}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+
+                                if (!file) return;
+
+                                const reader = new FileReader();
+
+                                reader.onload = (event) => {
+                                  try {
+                                    const data = new Uint8Array(
+                                      event.target.result
+                                    );
+
+                                    const workbook = XLSX.read(data, {
+                                      type: 'array',
+                                    });
+
+                                    const worksheet =
+                                      workbook.Sheets[workbook.SheetNames[0]];
+
+                                    const rows = XLSX.utils.sheet_to_json(
+                                      worksheet,
+                                      { defval: '' }
+                                    );
+
+                                    if (!rows.length) {
+                                      toast.error(
+                                        'The uploaded file contains no data'
+                                      );
+                                      return;
+                                    }
+
+                                    setTargetedListFile(file);
+                                    setTargetedListRows(rows);
+                                    setTargetedListStep('review');
+                                  } catch (error) {
+                                    console.error(error);
+                                    toast.error(
+                                      'Unable to read the uploaded file'
+                                    );
+                                  }
+                                };
+
+                                reader.readAsArrayBuffer(file);
+                              }}
+                            />
+                          </div>
+
+                          {/* <button
+                            type="button"
+                            className="targeted-list-template-btn"
+                            onClick={() => {
+                              const worksheet = XLSX.utils.json_to_sheet([
+                                {
+                                  'Member ID': '',
+                                },
+                              ]);
+
+                              const workbook = XLSX.utils.book_new();
+
+                              XLSX.utils.book_append_sheet(
+                                workbook,
+                                worksheet,
+                                'Targeted List'
+                              );
+
+                              XLSX.writeFile(
+                                workbook,
+                                'targeted-list-template.xlsx'
+                              );
+                            }}
+                          >
+                            ↓ &nbsp;Download template
+                          </button> */}
+
+                          <div className="targeted-list-actions">
+                            <button
+                              type="button"
+                              className="targeted-list-cancel-btn"
+                              onClick={() => {
+                                setIsUploadTargetedList(false);
+                                setTargetedListFile(null);
+                                setTargetedListRows([]);
+                                setTargetedListStep('upload');
+                              }}
+                            >
+                              CANCEL
+                            </button>
+
+                            {/* <button
+                              type="button"
+                              className="targeted-list-upload-btn"
+                              // disabled={!targetedListFile}
+                              onClick={() => {
+                                if (!targetedListFile) {
+                                  toast.error('Please select a file');
+                                  return;
+                                }
+
+                                setTargetedListStep('review');
+                              }}
+                            >
+                              UPLOAD
+                            </button> */}
+                          </div>
+                        </>
+                      ) : targetedListStep === 'review' ? (
+                        <>
+                          <div className="targeted-list-review">
+                            <h3>Review Target File</h3>
+
+                            <p className="targeted-list-review-subtitle">
+                              Review your uploaded file before using it for
+                              targeting.
+                            </p>
+
+                            <div className="targeted-list-success">
+                              <span className="targeted-list-success-icon">
+                                ✓
+                              </span>
+                              <span>File uploaded successfully</span>
+                            </div>
+
+                            <div className="targeted-list-file-row">
+                              <div className="targeted-list-file-info">
+                                <img
+                                  src="/page.png"
+                                  alt="File"
+                                  className="targeted-list-review-file-icon"
+                                />
+
+                                <span>{targetedListFile?.name}</span>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="targeted-list-view-file-btn"
+                                onClick={() => {
+                                  if (targetedListFile) {
+                                    const url =
+                                      URL.createObjectURL(targetedListFile);
+                                    window.open(url, '_blank');
+                                  }
                                 }}
+                              >
+                                View File
+                              </button>
+                            </div>
+
+                            <div className="targeted-list-record-count">
+                              {targetedListRows.length.toLocaleString()}
+                            </div>
+
+                            <p className="targeted-list-ready-text">
+                              Your file is ready to use for targeting.
+                            </p>
+                          </div>
+
+                          <div className="targeted-list-actions targeted-list-review-actions">
+                            <button
+                              type="button"
+                              className="targeted-list-cancel-btn"
+                              onClick={() => {
+                                setTargetedListFile(null);
+                                setTargetedListRows([]);
+                                setTargetedListStep('upload');
+
+                                if (targetedListInputRef.current) {
+                                  targetedListInputRef.current.value = '';
+                                }
+                              }}
+                            >
+                              UPLOAD A DIFFERENT FILE
+                            </button>
+
+                            <button
+                              type="button"
+                              className="targeted-list-upload-btn"
+                              onClick={() => {
+                                setTargetedListStep('target');
+                              }}
+                            >
+                              USE THIS FILE
+                            </button>
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  )}
+
+                  {(!isUploadTargetedList || targetedListStep === 'target') && (
+                    <>
+                      {selectedVoucherType === 'club' && (
+                        <>
+                          {/* One time use option */}
+                          <div className="day-item">
+                            <input
+                              type="checkbox"
+                              id="oneTimeUse"
+                              name="oneTimeUse"
+                              checked={oneTimeUse}
+                              onChange={() => setOneTimeUse(!oneTimeUse)}
+                            />
+                            <label htmlFor="oneTimeUse">One time use</label>
+                          </div>
+                        </>
+                      )}
+
+                      {(selectedVoucherType === 'club' ||
+                        (selectedVoucherType === 'birthdayOffer' &&
+                          showClubOption)) && (
+                        <div className="form-group inline-form-group">
+                          <label>
+                            <strong>Membership</strong>
+                          </label>
+                          <div
+                            className="select-wrapper"
+                            style={{ position: 'relative' }}
+                            ref={membershipWrapperRef}
+                          >
+                            <div
+                              className="multiselect-display"
+                              onClick={toggleMembershipDropdown}
+                              style={{
+                                cursor: 'pointer',
+                                lineHeight: '35px',
+                                padding: '0 10px',
+                                fontSize: '13px',
+                                color: '#666',
+                              }}
+                            >
+                              {selectedMemberships.length > 0
+                                ? selectedMemberships.length > 1
+                                  ? `${selectedMemberships.length} selected`
+                                  : membershipPackages
+                                      .filter((o) =>
+                                        selectedMemberships.includes(o._id)
+                                      )
+                                      .map((o) => o.membershipName)
+                                      .join(', ')
+                                : 'Select from list'}
+                            </div>
+
+                            {showMembershipDropdown && (
+                              <div
+                                className="multiselect-options"
+                                style={{
+                                  position: 'absolute',
+                                  top: '100%',
+                                  left: 0,
+                                  right: 0,
+                                  width: '220px',
+                                  background: 'white',
+                                  maxHeight: '200px',
+                                  overflowY: 'auto',
+                                  border: '1px solid #ccc',
+                                  zIndex: 10,
+                                }}
+                              >
+                                {membershipPackages.map((option) => (
+                                  <div
+                                    key={option._id}
+                                    className="day-item"
+                                    style={{
+                                      padding: '5px 10px',
+                                    }}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id={`mem-${option._id}`}
+                                      checked={selectedMemberships.includes(
+                                        option._id
+                                      )}
+                                      onChange={() =>
+                                        handleMembershipChange(option._id)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`mem-${option._id}`}
+                                      style={{ marginLeft: '4px' }}
+                                    >
+                                      {option.membershipName}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {selectedVoucherType === 'club' && (
+                        <>
+                          <div
+                            className="form-group inline-form-group"
+                            style={{ marginTop: '10px' }}
+                          >
+                            <label>
+                              <strong>Enter valid expiry date</strong>
+                            </label>
+                            <input
+                              type="date"
+                              value={membershipExpiryDate || ''}
+                              style={{ width: '150px' }}
+                              onChange={(e) =>
+                                setMembershipExpiryDate(e.target.value)
+                              }
+                            />
+                          </div>
+
+                          {/* Joined Before / After */}
+                          <div className="form-group inline-form-group">
+                            <label>
+                              <strong>Valid for members who joined</strong>
+                            </label>
+
+                            <div
+                              className="radio-group"
+                              style={{ marginTop: '10px' }}
+                            >
+                              <input
+                                type="radio"
+                                name="joined"
+                                checked={joined === 'before'}
+                                onChange={() => setJoined('before')}
+                              />
+                              <label>Before</label>
+
+                              <input
+                                type="radio"
+                                name="joined"
+                                checked={joined === 'after'}
+                                onChange={() => setJoined('after')}
+                              />
+                              <label>After</label>
+                            </div>
+                          </div>
+
+                          {/* Process Date */}
+                          <div className="form-group inline-form-group">
+                            <label>
+                              <strong>
+                                Offer is to be processed on this date
+                              </strong>
+                            </label>
+
+                            <input
+                              type="date"
+                              style={{ width: '120px' }}
+                              value={offerProceedDate || ''}
+                              onChange={(e) =>
+                                setOfferProceedDate(e.target.value)
+                              }
+                            />
+                          </div>
+
+                          <small>
+                            The offer is created on this date and only members
+                            who meet this criteria on this date will receive the
+                            offer.
+                          </small>
+
+                          {/* Bonus points toggle */}
+                          <div className="form-row bonus-points-row">
+                            <div className="bonus-points-container">
+                              <div
+                                className="bonus-points-toggle"
+                                style={{ marginTop: '20px' }}
                               >
                                 <input
                                   type="checkbox"
-                                  id={`mem-${option._id}`}
-                                  checked={selectedMemberships.includes(
-                                    option._id
-                                  )}
-                                  onChange={() =>
-                                    handleMembershipChange(option._id)
-                                  }
-                                />
-                                <label
-                                  htmlFor={`mem-${option._id}`}
-                                  style={{ marginLeft: '4px' }}
-                                >
-                                  {option.membershipName}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {selectedVoucherType === 'club' && (
-                    <>
-                      <div
-                        className="form-group inline-form-group"
-                        style={{ marginTop: '10px' }}
-                      >
-                        <label>
-                          <strong>Enter valid expiry date</strong>
-                        </label>
-                        <input
-                          type="date"
-                          value={membershipExpiryDate || ''}
-                          style={{ width: '150px' }}
-                          onChange={(e) =>
-                            setMembershipExpiryDate(e.target.value)
-                          }
-                        />
-                      </div>
-
-                      {/* Joined Before / After */}
-                      <div className="form-group inline-form-group">
-                        <label>
-                          <strong>Valid for members who joined</strong>
-                        </label>
-
-                        <div
-                          className="radio-group"
-                          style={{ marginTop: '10px' }}
-                        >
-                          <input
-                            type="radio"
-                            name="joined"
-                            checked={joined === 'before'}
-                            onChange={() => setJoined('before')}
-                          />
-                          <label>Before</label>
-
-                          <input
-                            type="radio"
-                            name="joined"
-                            checked={joined === 'after'}
-                            onChange={() => setJoined('after')}
-                          />
-                          <label>After</label>
-                        </div>
-                      </div>
-
-                      {/* Process Date */}
-                      <div className="form-group inline-form-group">
-                        <label>
-                          <strong>Offer is to be processed on this date</strong>
-                        </label>
-
-                        <input
-                          type="date"
-                          style={{ width: '120px' }}
-                          value={offerProceedDate || ''}
-                          onChange={(e) => setOfferProceedDate(e.target.value)}
-                        />
-                      </div>
-
-                      <small>
-                        The offer is created on this date and only members who
-                        meet this criteria on this date will receive the offer.
-                      </small>
-
-                      {/* Bonus points toggle */}
-                      <div className="form-row bonus-points-row">
-                        <div className="bonus-points-container">
-                          <div
-                            className="bonus-points-toggle"
-                            style={{ marginTop: '20px' }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={showBonusWhenRedeemed}
-                              onChange={(e) =>
-                                setShowBonusWhenRedeemed(e.target.checked)
-                              }
-                              style={{
-                                accentColor: '#002977',
-                                marginBottom: '3px',
-                              }}
-                            />
-                            <span
-                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
-                            >
-                              Add Bonus Points when redeemed
-                            </span>
-                            {showBonusWhenRedeemed && (
-                              <div className="bonus-points-input">
-                                <input
-                                  type="number"
-                                  value={bonusPoints}
-                                  style={{
-                                    height: '8px',
-                                    width: '70px',
-                                    marginTop: '5px',
-                                  }}
+                                  checked={showBonusWhenRedeemed}
                                   onChange={(e) =>
-                                    setBonusPoints(e.target.value)
+                                    setShowBonusWhenRedeemed(e.target.checked)
                                   }
+                                  style={{
+                                    accentColor: '#002977',
+                                    marginBottom: '3px',
+                                  }}
                                 />
-                                <span>Points</span>
+                                <span
+                                  style={{
+                                    fontSize: '14px',
+                                    textWrap: 'nowrap',
+                                  }}
+                                >
+                                  Add Bonus Points when redeemed
+                                </span>
+                                {showBonusWhenRedeemed && (
+                                  <div className="bonus-points-input">
+                                    <input
+                                      type="number"
+                                      value={bonusPoints}
+                                      style={{
+                                        height: '8px',
+                                        width: '70px',
+                                        marginTop: '5px',
+                                      }}
+                                      onChange={(e) =>
+                                        setBonusPoints(e.target.value)
+                                      }
+                                    />
+                                    <span>Points</span>
+                                  </div>
+                                )}{' '}
                               </div>
-                            )}{' '}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className="form-group inline-form-group"
-                        style={{ marginTop: '50px' }}
-                      >
-                        <label>
-                          <strong>Enter trigger value</strong>
-                        </label>
-                        <div style={{ marginBottom: '0' }}>
-                          <input
-                            type="text"
-                            className="trigger-input"
-                            placeholder=""
-                            value={triggerValue}
-                            onChange={(e) => setTriggerValue(e.target.value)}
-                            style={{ height: '25px' }}
-                          />
-                        </div>
-                        {triggerValueError && (
-                          <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                              marginLeft: '20px',
-                              width: '100%',
-                            }}
-                          >
-                            {triggerValueError}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {selectedVoucherType === 'standard' && (
-                    <>
-                      {/* One time use option */}
-                      <div className="day-item">
-                        <input
-                          type="checkbox"
-                          id="oneTimeUse"
-                          name="oneTimeUse"
-                          checked={oneTimeUse}
-                          onChange={() => setOneTimeUse(!oneTimeUse)}
-                        />
-                        <label htmlFor="oneTimeUse">One time use</label>
-                      </div>
-
-                      <div className="form-group expiry-section">
-                        <label>
-                          <strong>Expiry</strong>
-                        </label>
-                        <div className="expiry-options">
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '20px',
-                            }}
-                          >
-                            <div className="radio-group" style={{ margin: 0 }}>
-                              <input
-                                type="radio"
-                                id="never"
-                                name="expiry"
-                                value="never"
-                                checked={expiryType === 'never'}
-                                onChange={() => handleExpiryChange('never')}
-                              />
-                              <label htmlFor="never">Never</label>
                             </div>
+                          </div>
 
-                            <div className="expiry-row" style={{ margin: 0 }}>
-                              <input
-                                type="radio"
-                                id="expiresIn"
-                                name="expiry"
-                                value="expiresIn"
-                                checked={expiryType === 'expiresIn'}
-                                onChange={() => handleExpiryChange('expiresIn')}
-                              />
-                              <label
-                                htmlFor="expiresIn"
-                                style={{
-                                  whiteSpace: 'nowrap',
-                                  marginRight: '5px',
-                                }}
-                              >
-                                Expires in
-                              </label>
+                          <div
+                            className="form-group inline-form-group"
+                            style={{ marginTop: '50px' }}
+                          >
+                            <label>
+                              <strong>Enter trigger value</strong>
+                            </label>
+                            <div style={{ marginBottom: '0' }}>
                               <input
                                 type="text"
+                                className="trigger-input"
                                 placeholder=""
-                                className="days-input"
-                                value={expiryDays}
-                                onChange={(e) => setExpiryDays(e.target.value)}
+                                value={triggerValue}
+                                onChange={(e) =>
+                                  setTriggerValue(e.target.value)
+                                }
+                                style={{ height: '25px' }}
                               />
-                              <span>days</span>
+                            </div>
+                            {triggerValueError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                  marginLeft: '20px',
+                                  width: '100%',
+                                }}
+                              >
+                                {triggerValueError}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {selectedVoucherType === 'standard' && (
+                        <>
+                          {/* One time use option */}
+                          <div className="day-item">
+                            <input
+                              type="checkbox"
+                              id="oneTimeUse"
+                              name="oneTimeUse"
+                              checked={oneTimeUse}
+                              onChange={() => setOneTimeUse(!oneTimeUse)}
+                            />
+                            <label htmlFor="oneTimeUse">One time use</label>
+                          </div>
+
+                          <div className="form-group expiry-section">
+                            <label>
+                              <strong>Expiry</strong>
+                            </label>
+                            <div className="expiry-options">
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '20px',
+                                }}
+                              >
+                                <div
+                                  className="radio-group"
+                                  style={{ margin: 0 }}
+                                >
+                                  <input
+                                    type="radio"
+                                    id="never"
+                                    name="expiry"
+                                    value="never"
+                                    checked={expiryType === 'never'}
+                                    onChange={() => handleExpiryChange('never')}
+                                  />
+                                  <label htmlFor="never">Never</label>
+                                </div>
+
+                                <div
+                                  className="expiry-row"
+                                  style={{ margin: 0 }}
+                                >
+                                  <input
+                                    type="radio"
+                                    id="expiresIn"
+                                    name="expiry"
+                                    value="expiresIn"
+                                    checked={expiryType === 'expiresIn'}
+                                    onChange={() =>
+                                      handleExpiryChange('expiresIn')
+                                    }
+                                  />
+                                  <label
+                                    htmlFor="expiresIn"
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      marginRight: '5px',
+                                    }}
+                                  >
+                                    Expires in
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    className="days-input"
+                                    value={expiryDays}
+                                    onChange={(e) =>
+                                      setExpiryDays(e.target.value)
+                                    }
+                                  />
+                                  <span>days</span>
+                                </div>
+                              </div>
+                              {expiryDaysError && (
+                                <div
+                                  className="error-message"
+                                  style={{
+                                    color: 'red',
+                                    fontSize: '12px',
+                                    marginTop: '5px',
+                                  }}
+                                >
+                                  {expiryDaysError}
+                                </div>
+                              )}
+
+                              <div className="expiry-row dates-row">
+                                <div className="validFrom-label">
+                                  <input
+                                    type="radio"
+                                    id="validFrom"
+                                    name="expiry"
+                                    value="validFrom"
+                                    checked={expiryType === 'validFrom'}
+                                    onChange={() =>
+                                      handleExpiryChange('validFrom')
+                                    }
+                                  />
+                                  <label htmlFor="validFrom">Valid from</label>
+                                </div>
+                                <div className="time-input-fields">
+                                  <div className="time-field">
+                                    <label>START DATE</label>
+                                    <input
+                                      type="date"
+                                      className="time-input"
+                                      value={startDate}
+                                      onChange={(e) =>
+                                        handleDateChange(
+                                          'start',
+                                          e.target.value
+                                        )
+                                      }
+                                      onClick={(e) => {
+                                        // Ensure expiry type is set to validFrom when clicking on date input
+                                        if (expiryType !== 'validFrom') {
+                                          setExpiryType('validFrom');
+
+                                          // Also select the validFrom radio
+                                          const validFromRadio =
+                                            document.getElementById(
+                                              'validFrom'
+                                            );
+                                          if (validFromRadio) {
+                                            validFromRadio.checked = true;
+                                          }
+                                        }
+                                      }}
+                                      disabled={expiryType !== 'validFrom'}
+                                    />
+                                  </div>
+                                  <div className="time-field">
+                                    <label>END DATE</label>
+                                    <input
+                                      type="date"
+                                      className="time-input"
+                                      value={endDate}
+                                      onChange={(e) =>
+                                        handleDateChange('end', e.target.value)
+                                      }
+                                      onClick={(e) => {
+                                        // Ensure expiry type is set to validFrom when clicking on date input
+                                        if (expiryType !== 'validFrom') {
+                                          setExpiryType('validFrom');
+
+                                          // Also select the validFrom radio
+                                          const validFromRadio =
+                                            document.getElementById(
+                                              'validFrom'
+                                            );
+                                          if (validFromRadio) {
+                                            validFromRadio.checked = true;
+                                          }
+                                        }
+                                      }}
+                                      disabled={expiryType !== 'validFrom'}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              {dateError && (
+                                <div
+                                  className="error-message"
+                                  style={{
+                                    color: 'red',
+                                    fontSize: '12px',
+                                    marginTop: '5px',
+                                  }}
+                                >
+                                  {dateError}
+                                </div>
+                              )}
                             </div>
                           </div>
-                          {expiryDaysError && (
-                            <div
-                              className="error-message"
+
+                          <div className="form-group days-section">
+                            <label>
+                              <strong>Valid on Days of the Week</strong>
+                            </label>
+                            <div className="days-options">
+                              <div className="days-selector">
+                                <div className="day-item">
+                                  <input
+                                    type="checkbox"
+                                    id="everyday"
+                                    name="everyday"
+                                    checked={validDays.everyday}
+                                    onChange={() => handleDayChange('everyday')}
+                                  />
+                                  <label
+                                    htmlFor="everyday"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDayChange('everyday');
+                                    }}
+                                  >
+                                    Everyday
+                                  </label>
+                                </div>
+                                {[
+                                  'Mon',
+                                  'Tue',
+                                  'Wed',
+                                  'Thu',
+                                  'Fri',
+                                  'Sat',
+                                  'Sun',
+                                ].map((day) => (
+                                  <div key={day} className="day-item">
+                                    <input
+                                      type="checkbox"
+                                      id={day.toLowerCase()}
+                                      name={day.toLowerCase()}
+                                      checked={validDays[day.toLowerCase()]}
+                                      onChange={() =>
+                                        handleDayChange(day.toLowerCase())
+                                      }
+                                      disabled={validDays.everyday}
+                                    />
+                                    <label
+                                      htmlFor={day.toLowerCase()}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        if (!validDays.everyday) {
+                                          handleDayChange(day.toLowerCase());
+                                        }
+                                      }}
+                                      style={{
+                                        opacity: validDays.everyday ? 0.5 : 1,
+                                      }}
+                                    >
+                                      {day}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            {validDaysError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                }}
+                              >
+                                {validDaysError}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="form-group time-section">
+                            <label>
+                              <strong>Valid on follow Time</strong>
+                            </label>
+                            <div className="time-options">
+                              <div
+                                className="radio-group"
+                                style={{ marginBottom: '0px' }}
+                              >
+                                <input
+                                  type="radio"
+                                  id="allTimes"
+                                  name="time"
+                                  value="allTimes"
+                                  checked={timeValid.allTimes}
+                                  onChange={() => handleTimeChange('allTimes')}
+                                />
+                                <label htmlFor="allTimes">All times</label>
+                              </div>
+                              <div className="time-inputs inline-form-group">
+                                <div className="time-input-row">
+                                  <input
+                                    type="radio"
+                                    id="onlyBetween"
+                                    name="time"
+                                    value="onlyBetween"
+                                    checked={!timeValid.allTimes}
+                                    onChange={() =>
+                                      handleTimeChange('onlyBetween')
+                                    }
+                                  />
+                                  <label htmlFor="onlyBetween">
+                                    Only between
+                                  </label>
+                                </div>
+                                <div className="time-input-fields">
+                                  <div className="time-field">
+                                    <label>START TIME</label>
+                                    <input
+                                      type="time"
+                                      className="time-input"
+                                      value={timeValid.start}
+                                      onChange={(e) =>
+                                        handleTimeInputChange(
+                                          'start',
+                                          e.target.value
+                                        )
+                                      }
+                                      disabled={timeValid.allTimes}
+                                    />
+                                  </div>
+                                  <div className="time-field">
+                                    <label>END TIME</label>
+                                    <input
+                                      type="time"
+                                      className="time-input"
+                                      value={timeValid.end}
+                                      onChange={(e) =>
+                                        handleTimeInputChange(
+                                          'end',
+                                          e.target.value
+                                        )
+                                      }
+                                      disabled={timeValid.allTimes}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {timeError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                }}
+                              >
+                                {timeError}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Bonus points toggle */}
+                          <div className="form-row bonus-points-row">
+                            <div className="bonus-points-container">
+                              <div className="bonus-points-toggle">
+                                <input
+                                  type="checkbox"
+                                  checked={showBonusWhenRedeemed}
+                                  onChange={(e) =>
+                                    setShowBonusWhenRedeemed(e.target.checked)
+                                  }
+                                  style={{
+                                    accentColor: '#002977',
+                                    marginBottom: '3px',
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    fontSize: '14px',
+                                    textWrap: 'nowrap',
+                                  }}
+                                >
+                                  Add Bonus Points when redeemed
+                                </span>
+                                {showBonusWhenRedeemed && (
+                                  <div className="bonus-points-input">
+                                    <input
+                                      type="number"
+                                      value={bonusPoints}
+                                      style={{
+                                        height: '8px',
+                                        width: '70px',
+                                        marginTop: '5px',
+                                      }}
+                                      onChange={(e) =>
+                                        setBonusPoints(e.target.value)
+                                      }
+                                    />
+                                    <span style={{ fontSize: '14px' }}>
+                                      Points
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="form-group inline-form-group">
+                            <label
                               style={{
-                                color: 'red',
-                                fontSize: '12px',
-                                marginTop: '5px',
+                                whiteSpace: 'nowrap',
+                                marginRight: '8px',
                               }}
                             >
-                              {expiryDaysError}
+                              <strong>Enter trigger value</strong>
+                            </label>
+                            <div style={{ marginTop: '5px' }}>
+                              <input
+                                type="text"
+                                className="trigger-input"
+                                placeholder=""
+                                value={triggerValue}
+                                onChange={(e) =>
+                                  setTriggerValue(e.target.value)
+                                }
+                                style={{ height: '25px' }}
+                              />
                             </div>
-                          )}
+                            {triggerValueError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                  marginLeft: '20px',
+                                  width: '100%',
+                                }}
+                              >
+                                {triggerValueError}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {selectedVoucherType === 'birthdayOffer' && (
+                        <>
+                          <div style={{ marginTop: '50px' }}>
+                            <p
+                              style={{
+                                fontWeight: 'bold',
+                                marginBottom: '10px',
+                                textAlign: 'center',
+                              }}
+                            >
+                              PLEASE NOTE
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '13px',
+                                color: '#666',
+                                marginBottom: '15px',
+                                textAlign: 'center',
+                              }}
+                            >
+                              Birthday offers will appear in the member's
+                              account on <br />
+                              the 1st day of the member's birth month.
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '13px',
+                                color: '#666',
+                                marginBottom: '30px',
+                                textAlign: 'center',
+                              }}
+                            >
+                              The vouchers will automatically remove themselves{' '}
+                              <br />
+                              at the end of that month.
+                            </p>
+                          </div>
+
+                          {/* Bonus points toggle */}
+                          <div className="form-row bonus-points-row">
+                            <div className="bonus-points-container">
+                              <div className="bonus-points-toggle">
+                                <input
+                                  type="checkbox"
+                                  checked={showBonusWhenRedeemed}
+                                  onChange={(e) =>
+                                    setShowBonusWhenRedeemed(e.target.checked)
+                                  }
+                                  style={{
+                                    accentColor: '#002977',
+                                    marginBottom: '3px',
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    fontSize: '14px',
+                                    textWrap: 'nowrap',
+                                  }}
+                                >
+                                  Add Bonus Points when redeemed
+                                </span>
+                                {showBonusWhenRedeemed && (
+                                  <div className="bonus-points-input">
+                                    <input
+                                      type="number"
+                                      value={bonusPoints}
+                                      style={{
+                                        height: '8px',
+                                        width: '70px',
+                                        marginTop: '5px',
+                                      }}
+                                      onChange={(e) =>
+                                        setBonusPoints(e.target.value)
+                                      }
+                                    />
+                                    <span>Points</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* {showBonusWhenRedeemed && (
+                        <div className="bonus-points-input">
+                          <input
+                            type="number"
+                            value={bonusPoints}
+                            onChange={(e) => setBonusPoints(e.target.value)}
+                          />
+                          <span>Points</span>
+                        </div>
+                      )} */}
+                            </div>
+                          </div>
+
+                          <div
+                            className="form-group inline-form-group"
+                            style={{ marginTop: '80px' }}
+                          >
+                            <label>
+                              <strong>Enter trigger value</strong>
+                            </label>
+                            <div style={{ marginBottom: '0' }}>
+                              <input
+                                type="text"
+                                className="trigger-input"
+                                placeholder=""
+                                value={triggerValue}
+                                onChange={(e) =>
+                                  setTriggerValue(e.target.value)
+                                }
+                                style={{ height: '25px' }}
+                              />
+                            </div>
+                            {triggerValueError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                  marginLeft: '20px',
+                                  width: '100%',
+                                }}
+                              >
+                                {triggerValueError}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {selectedVoucherType === 'newSignUp' && (
+                        <>
+                          <div className="form-group expiry-section">
+                            <label>
+                              <strong>Expiry</strong>
+                            </label>
+                            <div className="expiry-options">
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '20px',
+                                }}
+                              >
+                                <div
+                                  className="radio-group"
+                                  style={{ margin: 0 }}
+                                >
+                                  <input
+                                    type="radio"
+                                    id="never"
+                                    name="expiry"
+                                    value="never"
+                                    checked={expiryType === 'never'}
+                                    onChange={() => handleExpiryChange('never')}
+                                  />
+                                  <label htmlFor="never">Never</label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
                           <div className="expiry-row dates-row">
                             <div className="validFrom-label">
@@ -3803,20 +4819,6 @@ const SpecialOffers = () => {
                                   onChange={(e) =>
                                     handleDateChange('start', e.target.value)
                                   }
-                                  onClick={(e) => {
-                                    // Ensure expiry type is set to validFrom when clicking on date input
-                                    if (expiryType !== 'validFrom') {
-                                      setExpiryType('validFrom');
-
-                                      // Also select the validFrom radio
-                                      const validFromRadio =
-                                        document.getElementById('validFrom');
-                                      if (validFromRadio) {
-                                        validFromRadio.checked = true;
-                                      }
-                                    }
-                                  }}
-                                  disabled={expiryType !== 'validFrom'}
                                 />
                               </div>
                               <div className="time-field">
@@ -3828,344 +4830,78 @@ const SpecialOffers = () => {
                                   onChange={(e) =>
                                     handleDateChange('end', e.target.value)
                                   }
-                                  onClick={(e) => {
-                                    // Ensure expiry type is set to validFrom when clicking on date input
-                                    if (expiryType !== 'validFrom') {
-                                      setExpiryType('validFrom');
-
-                                      // Also select the validFrom radio
-                                      const validFromRadio =
-                                        document.getElementById('validFrom');
-                                      if (validFromRadio) {
-                                        validFromRadio.checked = true;
-                                      }
-                                    }
-                                  }}
-                                  disabled={expiryType !== 'validFrom'}
                                 />
                               </div>
                             </div>
                           </div>
-                          {dateError && (
-                            <div
-                              className="error-message"
+
+                          <div style={{ marginTop: '40px' }}>
+                            <p
                               style={{
-                                color: 'red',
-                                fontSize: '12px',
-                                marginTop: '5px',
+                                fontWeight: 'bold',
+                                marginBottom: '10px',
+                                textAlign: 'center',
                               }}
                             >
-                              {dateError}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                              PLEASE NOTE
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '13px',
+                                color: '#666',
+                                marginBottom: '30px',
+                                textAlign: 'center',
+                              }}
+                            >
+                              Any new member will receive this offer on signing
+                              up <br />
+                              for the 1st time.
+                            </p>
+                          </div>
 
-                      <div className="form-group days-section">
-                        <label>
-                          <strong>Valid on Days of the Week</strong>
-                        </label>
-                        <div className="days-options">
-                          <div className="days-selector">
-                            <div className="day-item">
-                              <input
-                                type="checkbox"
-                                id="everyday"
-                                name="everyday"
-                                checked={validDays.everyday}
-                                onChange={() => handleDayChange('everyday')}
-                              />
-                              <label
-                                htmlFor="everyday"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handleDayChange('everyday');
-                                }}
-                              >
-                                Everyday
-                              </label>
-                            </div>
-                            {[
-                              'Mon',
-                              'Tue',
-                              'Wed',
-                              'Thu',
-                              'Fri',
-                              'Sat',
-                              'Sun',
-                            ].map((day) => (
-                              <div key={day} className="day-item">
+                          {/* Bonus points toggle */}
+                          <div className="form-row bonus-points-row">
+                            <div className="bonus-points-container">
+                              <div className="bonus-points-toggle">
                                 <input
                                   type="checkbox"
-                                  id={day.toLowerCase()}
-                                  name={day.toLowerCase()}
-                                  checked={validDays[day.toLowerCase()]}
-                                  onChange={() =>
-                                    handleDayChange(day.toLowerCase())
+                                  checked={showBonusWhenRedeemed}
+                                  onChange={(e) =>
+                                    setShowBonusWhenRedeemed(e.target.checked)
                                   }
-                                  disabled={validDays.everyday}
-                                />
-                                <label
-                                  htmlFor={day.toLowerCase()}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (!validDays.everyday) {
-                                      handleDayChange(day.toLowerCase());
-                                    }
-                                  }}
                                   style={{
-                                    opacity: validDays.everyday ? 0.5 : 1,
+                                    accentColor: '#002977',
+                                    marginBottom: '3px',
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    fontSize: '14px',
+                                    textWrap: 'nowrap',
                                   }}
                                 >
-                                  {day}
-                                </label>
+                                  Add Bonus Points when redeemed
+                                </span>
+                                {showBonusWhenRedeemed && (
+                                  <div className="bonus-points-input">
+                                    <input
+                                      type="number"
+                                      value={bonusPoints}
+                                      style={{
+                                        height: '8px',
+                                        width: '70px',
+                                        marginTop: '5px',
+                                      }}
+                                      onChange={(e) =>
+                                        setBonusPoints(e.target.value)
+                                      }
+                                    />
+                                    <span>Points</span>
+                                  </div>
+                                )}{' '}
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                        {validDaysError && (
-                          <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                            }}
-                          >
-                            {validDaysError}
-                          </div>
-                        )}
-                      </div>
 
-                      <div className="form-group time-section">
-                        <label>
-                          <strong>Valid on follow Time</strong>
-                        </label>
-                        <div className="time-options">
-                          <div
-                            className="radio-group"
-                            style={{ marginBottom: '0px' }}
-                          >
-                            <input
-                              type="radio"
-                              id="allTimes"
-                              name="time"
-                              value="allTimes"
-                              checked={timeValid.allTimes}
-                              onChange={() => handleTimeChange('allTimes')}
-                            />
-                            <label htmlFor="allTimes">All times</label>
-                          </div>
-                          <div className="time-inputs inline-form-group">
-                            <div className="time-input-row">
-                              <input
-                                type="radio"
-                                id="onlyBetween"
-                                name="time"
-                                value="onlyBetween"
-                                checked={!timeValid.allTimes}
-                                onChange={() => handleTimeChange('onlyBetween')}
-                              />
-                              <label htmlFor="onlyBetween">Only between</label>
-                            </div>
-                            <div className="time-input-fields">
-                              <div className="time-field">
-                                <label>START TIME</label>
-                                <input
-                                  type="time"
-                                  className="time-input"
-                                  value={timeValid.start}
-                                  onChange={(e) =>
-                                    handleTimeInputChange(
-                                      'start',
-                                      e.target.value
-                                    )
-                                  }
-                                  disabled={timeValid.allTimes}
-                                />
-                              </div>
-                              <div className="time-field">
-                                <label>END TIME</label>
-                                <input
-                                  type="time"
-                                  className="time-input"
-                                  value={timeValid.end}
-                                  onChange={(e) =>
-                                    handleTimeInputChange('end', e.target.value)
-                                  }
-                                  disabled={timeValid.allTimes}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {timeError && (
-                          <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                            }}
-                          >
-                            {timeError}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Bonus points toggle */}
-                      <div className="form-row bonus-points-row">
-                        <div className="bonus-points-container">
-                          <div className="bonus-points-toggle">
-                            <input
-                              type="checkbox"
-                              checked={showBonusWhenRedeemed}
-                              onChange={(e) =>
-                                setShowBonusWhenRedeemed(e.target.checked)
-                              }
-                              style={{
-                                accentColor: '#002977',
-                                marginBottom: '3px',
-                              }}
-                            />
-                            <span
-                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
-                            >
-                              Add Bonus Points when redeemed
-                            </span>
-                            {showBonusWhenRedeemed && (
-                              <div className="bonus-points-input">
-                                <input
-                                  type="number"
-                                  value={bonusPoints}
-                                  style={{
-                                    height: '8px',
-                                    width: '70px',
-                                    marginTop: '5px',
-                                  }}
-                                  onChange={(e) =>
-                                    setBonusPoints(e.target.value)
-                                  }
-                                />
-                                <span style={{ fontSize: '14px' }}>Points</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="form-group inline-form-group">
-                        <label
-                          style={{ whiteSpace: 'nowrap', marginRight: '8px' }}
-                        >
-                          <strong>Enter trigger value</strong>
-                        </label>
-                        <div style={{ marginTop: '5px' }}>
-                          <input
-                            type="text"
-                            className="trigger-input"
-                            placeholder=""
-                            value={triggerValue}
-                            onChange={(e) => setTriggerValue(e.target.value)}
-                            style={{ height: '25px' }}
-                          />
-                        </div>
-                        {triggerValueError && (
-                          <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                              marginLeft: '20px',
-                              width: '100%',
-                            }}
-                          >
-                            {triggerValueError}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {selectedVoucherType === 'birthdayOffer' && (
-                    <>
-                      <div style={{ marginTop: '50px' }}>
-                        <p
-                          style={{
-                            fontWeight: 'bold',
-                            marginBottom: '10px',
-                            textAlign: 'center',
-                          }}
-                        >
-                          PLEASE NOTE
-                        </p>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            color: '#666',
-                            marginBottom: '15px',
-                            textAlign: 'center',
-                          }}
-                        >
-                          Birthday offers will appear in the member's account on{' '}
-                          <br />
-                          the 1st day of the member's birth month.
-                        </p>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            color: '#666',
-                            marginBottom: '30px',
-                            textAlign: 'center',
-                          }}
-                        >
-                          The vouchers will automatically remove themselves{' '}
-                          <br />
-                          at the end of that month.
-                        </p>
-                      </div>
-
-                      {/* Bonus points toggle */}
-                      <div className="form-row bonus-points-row">
-                        <div className="bonus-points-container">
-                          <div className="bonus-points-toggle">
-                            <input
-                              type="checkbox"
-                              checked={showBonusWhenRedeemed}
-                              onChange={(e) =>
-                                setShowBonusWhenRedeemed(e.target.checked)
-                              }
-                              style={{
-                                accentColor: '#002977',
-                                marginBottom: '3px',
-                              }}
-                            />
-                            <span
-                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
-                            >
-                              Add Bonus Points when redeemed
-                            </span>
-                            {showBonusWhenRedeemed && (
-                              <div className="bonus-points-input">
-                                <input
-                                  type="number"
-                                  value={bonusPoints}
-                                  style={{
-                                    height: '8px',
-                                    width: '70px',
-                                    marginTop: '5px',
-                                  }}
-                                  onChange={(e) =>
-                                    setBonusPoints(e.target.value)
-                                  }
-                                />
-                                <span>Points</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* {showBonusWhenRedeemed && (
+                              {/* {showBonusWhenRedeemed && (
                         <div className="bonus-points-input">
                           <input
                             type="number"
@@ -4175,219 +4911,45 @@ const SpecialOffers = () => {
                           <span>Points</span>
                         </div>
                       )} */}
-                        </div>
-                      </div>
-
-                      <div
-                        className="form-group inline-form-group"
-                        style={{ marginTop: '80px' }}
-                      >
-                        <label>
-                          <strong>Enter trigger value</strong>
-                        </label>
-                        <div style={{ marginBottom: '0' }}>
-                          <input
-                            type="text"
-                            className="trigger-input"
-                            placeholder=""
-                            value={triggerValue}
-                            onChange={(e) => setTriggerValue(e.target.value)}
-                            style={{ height: '25px' }}
-                          />
-                        </div>
-                        {triggerValueError && (
-                          <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                              marginLeft: '20px',
-                              width: '100%',
-                            }}
-                          >
-                            {triggerValueError}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {selectedVoucherType === 'newSignUp' && (
-                    <>
-                      <div className="form-group expiry-section">
-                        <label>
-                          <strong>Expiry</strong>
-                        </label>
-                        <div className="expiry-options">
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '20px',
-                            }}
-                          >
-                            <div className="radio-group" style={{ margin: 0 }}>
-                              <input
-                                type="radio"
-                                id="never"
-                                name="expiry"
-                                value="never"
-                                checked={expiryType === 'never'}
-                                onChange={() => handleExpiryChange('never')}
-                              />
-                              <label htmlFor="never">Never</label>
                             </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className="expiry-row dates-row">
-                        <div className="validFrom-label">
-                          <input
-                            type="radio"
-                            id="validFrom"
-                            name="expiry"
-                            value="validFrom"
-                            checked={expiryType === 'validFrom'}
-                            onChange={() => handleExpiryChange('validFrom')}
-                          />
-                          <label htmlFor="validFrom">Valid from</label>
-                        </div>
-                        <div className="time-input-fields">
-                          <div className="time-field">
-                            <label>START DATE</label>
-                            <input
-                              type="date"
-                              className="time-input"
-                              value={startDate}
-                              onChange={(e) =>
-                                handleDateChange('start', e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="time-field">
-                            <label>END DATE</label>
-                            <input
-                              type="date"
-                              className="time-input"
-                              value={endDate}
-                              onChange={(e) =>
-                                handleDateChange('end', e.target.value)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ marginTop: '40px' }}>
-                        <p
-                          style={{
-                            fontWeight: 'bold',
-                            marginBottom: '10px',
-                            textAlign: 'center',
-                          }}
-                        >
-                          PLEASE NOTE
-                        </p>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            color: '#666',
-                            marginBottom: '30px',
-                            textAlign: 'center',
-                          }}
-                        >
-                          Any new member will receive this offer on signing up{' '}
-                          <br />
-                          for the 1st time.
-                        </p>
-                      </div>
-
-                      {/* Bonus points toggle */}
-                      <div className="form-row bonus-points-row">
-                        <div className="bonus-points-container">
-                          <div className="bonus-points-toggle">
-                            <input
-                              type="checkbox"
-                              checked={showBonusWhenRedeemed}
-                              onChange={(e) =>
-                                setShowBonusWhenRedeemed(e.target.checked)
-                              }
-                              style={{
-                                accentColor: '#002977',
-                                marginBottom: '3px',
-                              }}
-                            />
-                            <span
-                              style={{ fontSize: '14px', textWrap: 'nowrap' }}
-                            >
-                              Add Bonus Points when redeemed
-                            </span>
-                            {showBonusWhenRedeemed && (
-                              <div className="bonus-points-input">
-                                <input
-                                  type="number"
-                                  value={bonusPoints}
-                                  style={{
-                                    height: '8px',
-                                    width: '70px',
-                                    marginTop: '5px',
-                                  }}
-                                  onChange={(e) =>
-                                    setBonusPoints(e.target.value)
-                                  }
-                                />
-                                <span>Points</span>
-                              </div>
-                            )}{' '}
-                          </div>
-
-                          {/* {showBonusWhenRedeemed && (
-                        <div className="bonus-points-input">
-                          <input
-                            type="number"
-                            value={bonusPoints}
-                            onChange={(e) => setBonusPoints(e.target.value)}
-                          />
-                          <span>Points</span>
-                        </div>
-                      )} */}
-                        </div>
-                      </div>
-
-                      <div
-                        className="form-group inline-form-group"
-                        style={{ marginTop: '80px' }}
-                      >
-                        <label>
-                          <strong>Enter trigger value</strong>
-                        </label>
-                        <div style={{ marginBottom: '0' }}>
-                          <input
-                            type="text"
-                            className="trigger-input"
-                            placeholder=""
-                            value={triggerValue}
-                            onChange={(e) => setTriggerValue(e.target.value)}
-                            style={{ height: '25px' }}
-                          />
-                        </div>
-                        {triggerValueError && (
                           <div
-                            className="error-message"
-                            style={{
-                              color: 'red',
-                              fontSize: '12px',
-                              marginTop: '5px',
-                              marginLeft: '20px',
-                              width: '100%',
-                            }}
+                            className="form-group inline-form-group"
+                            style={{ marginTop: '80px' }}
                           >
-                            {triggerValueError}
+                            <label>
+                              <strong>Enter trigger value</strong>
+                            </label>
+                            <div style={{ marginBottom: '0' }}>
+                              <input
+                                type="text"
+                                className="trigger-input"
+                                placeholder=""
+                                value={triggerValue}
+                                onChange={(e) =>
+                                  setTriggerValue(e.target.value)
+                                }
+                                style={{ height: '25px' }}
+                              />
+                            </div>
+                            {triggerValueError && (
+                              <div
+                                className="error-message"
+                                style={{
+                                  color: 'red',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                  marginLeft: '20px',
+                                  width: '100%',
+                                }}
+                              >
+                                {triggerValueError}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
+                        </>
+                      )}
                     </>
                   )}
                 </div>

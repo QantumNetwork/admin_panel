@@ -288,8 +288,7 @@ const SmartIncentives = () => {
 
       // targeted-list flow uses the CSV API.
       const isTargetedList =
-        isUploadTargetedList &&
-        targetedListStep === 'target';
+        isUploadTargetedList && targetedListStep === 'target';
 
       /*
        * ------------------------------------------------------------
@@ -605,14 +604,13 @@ const SmartIncentives = () => {
       setLoading(true);
 
       // Find the incentive in the currently displayed table data
-    const incentive = tableData.find(
-      (item) => item._id === incentiveId
-    );
+      const incentive = tableData.find((item) => item._id === incentiveId);
 
-    // Add audienceMode only when it exists in tableData
-    const audienceModeParam = incentive?.audienceMode === 'csv'
-      ? `&audienceMode=${encodeURIComponent(incentive.audienceMode)}`
-      : '';
+      // Add audienceMode only when it exists in tableData
+      const audienceModeParam =
+        incentive?.audienceMode === 'csv'
+          ? `&audienceMode=${encodeURIComponent(incentive.audienceMode)}`
+          : '';
 
       // First page
       const firstResponse = await axios.get(
@@ -1266,6 +1264,73 @@ const SmartIncentives = () => {
                               onClick={() =>
                                 targetedListInputRef.current?.click()
                               }
+                              onDragOver={(e) => e.preventDefault()}
+                              onDrop={(e) => {
+                                e.preventDefault();
+
+                                const file = e.dataTransfer.files?.[0];
+                                if (!file) return;
+
+                                const allowedExtensions = [
+                                  '.xlsx',
+                                  '.xls',
+                                  '.csv',
+                                ];
+                                const fileName = file.name.toLowerCase();
+
+                                if (
+                                  !allowedExtensions.some((ext) =>
+                                    fileName.endsWith(ext)
+                                  )
+                                ) {
+                                  toast.error(
+                                    'Please upload an Excel or CSV file'
+                                  );
+                                  return;
+                                }
+
+                                const reader = new FileReader();
+
+                                reader.onload = (event) => {
+                                  try {
+                                    const data = new Uint8Array(
+                                      event.target.result
+                                    );
+
+                                    const workbook = XLSX.read(data, {
+                                      type: 'array',
+                                    });
+
+                                    const worksheet =
+                                      workbook.Sheets[workbook.SheetNames[0]];
+
+                                    const rows = XLSX.utils.sheet_to_json(
+                                      worksheet,
+                                      { defval: '' }
+                                    );
+
+                                    if (!rows.length) {
+                                      toast.error(
+                                        'The uploaded file contains no data'
+                                      );
+                                      return;
+                                    }
+
+                                    setTargetedListFile(file);
+                                    setTargetedListRows(rows);
+
+                                    // Go directly to Review after drag & drop
+                                    setTargetedListStep('review');
+                                  } catch (error) {
+                                    console.error(error);
+                                    toast.error(
+                                      'Unable to read the uploaded file'
+                                    );
+                                  }
+                                };
+
+                                reader.readAsArrayBuffer(file);
+                              }}
                             >
                               <h3>Upload Your File</h3>
 
@@ -1323,7 +1388,7 @@ const SmartIncentives = () => {
 
                                       setTargetedListFile(file);
                                       setTargetedListRows(rows);
-                                      // setTargetedListStep('review');
+                                      setTargetedListStep('review');
                                     } catch (error) {
                                       console.error(error);
                                       toast.error(
@@ -1337,7 +1402,7 @@ const SmartIncentives = () => {
                               />
                             </div>
 
-                            <button
+                            {/* <button
                               type="button"
                               className="targeted-list-template-btn"
                               onClick={() => {
@@ -1362,7 +1427,7 @@ const SmartIncentives = () => {
                               }}
                             >
                               ↓ &nbsp;Download template
-                            </button>
+                            </button> */}
 
                             <div className="targeted-list-actions">
                               <button
@@ -1378,7 +1443,7 @@ const SmartIncentives = () => {
                                 CANCEL
                               </button>
 
-                              <button
+                              {/* <button
                                 type="button"
                                 className="targeted-list-upload-btn"
                                 // disabled={!targetedListFile}
@@ -1392,7 +1457,7 @@ const SmartIncentives = () => {
                                 }}
                               >
                                 UPLOAD
-                              </button>
+                              </button> */}
                             </div>
                           </>
                         ) : targetedListStep === 'review' ? (
