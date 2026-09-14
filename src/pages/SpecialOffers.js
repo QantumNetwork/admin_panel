@@ -2253,6 +2253,30 @@ const SpecialOffers = () => {
         requestBody.points = 'null';
       }
 
+      requestBody.fileName = '';
+      requestBody.csv = '';
+
+      if (isUploadTargetedList && targetedListStep === 'target') {
+        requestBody.ratingLevel = ['csv'];
+
+        if (targetedListFile) {
+          const csvBase64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+              const result = reader.result || '';
+              resolve(result.split(',')[1] || '');
+            };
+
+            reader.onerror = reject;
+            reader.readAsDataURL(targetedListFile);
+          });
+
+          requestBody.fileName = targetedListFile.name;
+          requestBody.csv = csvBase64;
+        }
+      }
+
       // Make the PUT request
       const response = await fetch(
         `${baseUrl}/offer/update?offerId=${selectedOffer._id}`,
@@ -2270,7 +2294,53 @@ const SpecialOffers = () => {
       console.log('API Response:', data);
       if (response.ok && data.success) {
         // clear any previous toasts, then show a fresh one (will auto-close via your <ToastContainer autoClose={3000} />)
-        // show a single, auto-closing toast (no duplicates, no manual dismiss)
+        // show a single, auto-closing toast (no duplicates, no manual dismiss)// Poll the backend for targeted CSV processing to complete.
+        // Poll the backend for targeted CSV processing to complete.
+        if (
+          voucherTypeValue === 'standard' &&
+          isUploadTargetedList &&
+          targetedListStep === 'target'
+        ) {
+          const maxAttempts = 30;
+          const pollInterval = 2000;
+
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+            const pollResponse = await fetch(`${baseUrl}/offer/all`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: token ? `Bearer ${token}` : '',
+              },
+            });
+
+            const pollData = await pollResponse.json();
+
+            if (pollResponse.ok && pollData.success) {
+              const updatedOffer = pollData.data?.liveData?.find(
+                (offer) => offer._id === selectedOffer._id
+              );
+
+              if (updatedOffer) {
+                console.log('CSV processing status:', {
+                  status: updatedOffer.processingStatus,
+                  csvProcessedUsers: updatedOffer.csvProcessedUsers,
+                });
+
+                if (updatedOffer.processingStatus === 'completed') {
+                  data.data = updatedOffer;
+
+                  setCsvProcessedUsers(
+                    Number(updatedOffer.csvProcessedUsers) || 0
+                  );
+
+                  break;
+                }
+              }
+            }
+          }
+        }
         const id = toast.success(
           data.message || 'Offer updated successfully!',
           {
@@ -3534,35 +3604,34 @@ const SpecialOffers = () => {
                       <strong>Audience</strong>
                     </label>
 
-                    {isUploadTargetedList && targetedListStep === 'target' ? (
-                      <div className="targeted-list-member-count">
-                        {targetedListFile
-                          ? targetedListRows.length.toLocaleString()
-                          : targetedListRows.length
-                            ? targetedListRows.length.toLocaleString()
-                            : csvProcessedUsers.toLocaleString()}{' '}
-                        members targeted
-                      </div>
-                    ) : (
-                      <>
+                    <>
+                      <div
+                        className="select-wrapper"
+                        style={{ position: 'relative', zIndex: 1000 }}
+                        ref={audienceWrapperRef}
+                      >
                         <div
-                          className="select-wrapper"
-                          style={{ position: 'relative', zIndex: 1000 }}
-                          ref={audienceWrapperRef}
+                          className="multiselect-display"
+                          onClick={toggleAudienceDropdown}
+                          style={{
+                            cursor: 'pointer',
+                            lineHeight: '35px',
+                            padding: '0 10px',
+                            fontSize: '13px',
+                            color: isEveryone ? '#999' : '#666',
+                          }}
                         >
-                          <div
-                            className="multiselect-display"
-                            onClick={toggleAudienceDropdown}
-                            style={{
-                              cursor: 'pointer',
-                              lineHeight: '35px',
-                              padding: '0 10px',
-                              fontSize: '13px',
-                              color: isEveryone ? '#999' : '#666',
-                            }}
-                          >
-                            {isEveryone
-                              ? 'All Selected'
+                          {isEveryone
+                            ? 'All Selected'
+                            : isUploadTargetedList &&
+                                targetedListStep === 'target'
+                              ? `${
+                                  targetedListFile
+                                    ? targetedListRows.length.toLocaleString()
+                                    : targetedListRows.length
+                                      ? targetedListRows.length.toLocaleString()
+                                      : csvProcessedUsers.toLocaleString()
+                                } members targeted`
                               : isUploadTargetedList
                                 ? 'Upload targeted list'
                                 : selectedAudiences.length > 0
@@ -3575,80 +3644,79 @@ const SpecialOffers = () => {
                                         .map((o) => o.label)
                                         .join(', ')
                                   : 'Select from list'}
-                          </div>
+                        </div>
 
-                          {showAudienceDropdown && (
-                            <div
-                              className="multiselect-options"
-                              style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                background: 'white',
-                                maxHeight: '200px',
-                                overflowY: 'auto',
-                                border: '1px solid #ccc',
-                                zIndex: 1000,
-                              }}
-                            >
-                              {selectedVoucherType === 'standard' && (
-                                <div
-                                  key={UPLOAD_TARGETED_LIST}
-                                  className={`day-item targeted-list-audience-option ${
-                                    isUploadTargetedList ? 'selected' : ''
-                                  }`}
-                                  onClick={() =>
-                                    handleAudienceChange(UPLOAD_TARGETED_LIST)
+                        {showAudienceDropdown && (
+                          <div
+                            className="multiselect-options"
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              background: 'white',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              border: '1px solid #ccc',
+                              zIndex: 1000,
+                            }}
+                          >
+                            {selectedVoucherType === 'standard' && (
+                              <div
+                                key={UPLOAD_TARGETED_LIST}
+                                className={`day-item targeted-list-audience-option ${
+                                  isUploadTargetedList ? 'selected' : ''
+                                }`}
+                                onClick={() =>
+                                  handleAudienceChange(UPLOAD_TARGETED_LIST)
+                                }
+                              >
+                                <span>Upload targeted list</span>
+                              </div>
+                            )}
+                            {audienceOptions.map((option) => (
+                              <div
+                                key={option.value}
+                                className="day-item"
+                                style={{
+                                  padding: '5px 10px',
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`aud-${option.value}`}
+                                  checked={
+                                    !isUploadTargetedList &&
+                                    selectedAudiences.includes(option.value)
                                   }
+                                  onChange={() =>
+                                    handleAudienceChange(option.value)
+                                  }
+                                />
+                                <label
+                                  htmlFor={`aud-${option.value}`}
+                                  style={{ marginLeft: '6px' }}
                                 >
-                                  <span>Upload targeted list</span>
-                                </div>
-                              )}
-                              {audienceOptions.map((option) => (
-                                <div
-                                  key={option.value}
-                                  className="day-item"
-                                  style={{
-                                    padding: '5px 10px',
-                                  }}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    id={`aud-${option.value}`}
-                                    checked={
-                                      !isUploadTargetedList &&
-                                      selectedAudiences.includes(option.value)
-                                    }
-                                    onChange={() =>
-                                      handleAudienceChange(option.value)
-                                    }
-                                  />
-                                  <label
-                                    htmlFor={`aud-${option.value}`}
-                                    style={{ marginLeft: '6px' }}
-                                  >
-                                    {option.label}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div
-                          className="day-item"
-                          style={{ marginTop: '10px', marginLeft: '5px' }}
-                        >
-                          <input
-                            type="checkbox"
-                            id="aud-everyone"
-                            checked={isEveryone}
-                            onChange={handleEveryoneChange}
-                          />
-                          <label htmlFor="aud-everyone">Everyone</label>
-                        </div>
-                      </>
-                    )}
+                                  {option.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className="day-item"
+                        style={{ marginTop: '10px', marginLeft: '5px' }}
+                      >
+                        <input
+                          type="checkbox"
+                          id="aud-everyone"
+                          checked={isEveryone}
+                          onChange={handleEveryoneChange}
+                        />
+                        <label htmlFor="aud-everyone">Everyone</label>
+                      </div>
+                    </>
                   </div>
 
                   {isUploadTargetedList && targetedListStep !== 'target' && (
