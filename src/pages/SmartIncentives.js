@@ -58,7 +58,7 @@ const SmartIncentives = () => {
   const [limit, setLimit] = useState(10);
 
   const [budget, setBudget] = useState('');
-  const [unlimitedBudget, setUnlimitedBudget] = useState(false);
+  const [unlimitedBudget, setUnlimitedBudget] = useState(true);
   const [publishing, setPublishing] = useState(false);
 
   const access = localStorage.getItem('access');
@@ -101,7 +101,7 @@ const SmartIncentives = () => {
     setTempBenefits('');
 
     setBudget('');
-    setUnlimitedBudget(false);
+    setUnlimitedBudget(true);
 
     setScheduleStart('');
     setScheduleEnd('');
