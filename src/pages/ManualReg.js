@@ -79,6 +79,7 @@ const ManualReg = () => {
     nameOnCard: '',
     country: 'Australia',
     region: null,
+    isDisable: false,
   });
 
   const [clientSecret, setClientSecret] = useState(null);
@@ -92,6 +93,7 @@ const ManualReg = () => {
   const appType = searchParams.get('appType');
   const isEditMode = searchParams.get('mode') === 'edit';
   const isRenewMode = searchParams.get('mode') === 'renew';
+  const fromMemberSearch = searchParams.get('from') === 'member-search';
   const [isSaving, setIsSaving] = useState(false);
 
   const handleInputChange = (e) => {
@@ -885,6 +887,7 @@ const ManualReg = () => {
 
           membershipLevel: u.packageId || '',
           expiryDate: u.ExpiryDate ? u.ExpiryDate.substring(0, 10) : '',
+          isDisable: u.isDisable || false,
         }));
 
         // 🔒 Edit-only mode
@@ -972,6 +975,19 @@ const ManualReg = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
+      const disableResponse = await axios.put(
+  `${baseUrl}/user/disable?Id=${formData.Id}`,
+  {
+    isDisable: formData.isDisable,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // 'Content-Type': 'application/json',
+    },
+  }
+);
 
       if (
         res?.status === 200 ||
@@ -1144,12 +1160,12 @@ const ManualReg = () => {
         </button>
         <button
           style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
+          className={`sidebar-btn ${isActive('/manual-reg') && !fromMemberSearch ? 'active' : ''}`}
           onClick={() => navigate('/manual-reg')}
         >
           <HiOutlinePencilSquare
             className={`sidebar-icon ${
-              isActive('/manual-reg') ? '' : 'navy-icon'
+              isActive('/manual-reg') && !fromMemberSearch ? '' : 'navy-icon'
             }`}
           />{' '}
           &nbsp; Manual Registration
@@ -1219,12 +1235,12 @@ const ManualReg = () => {
 
         <button
           style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+          className={`sidebar-btn ${isActive('/member-search') || fromMemberSearch ? 'active' : ''}`}
           onClick={() => navigate('/member-search')}
         >
           <CiSearch
             className={`sidebar-icon ${
-              isActive('/member-search') ? '' : 'navy-icon'
+              isActive('/member-search') || fromMemberSearch ? '' : 'navy-icon'
             }`}
           />{' '}
           &nbsp; Member Search
@@ -1284,7 +1300,7 @@ const ManualReg = () => {
             />
           </div>
 
-          {isRenewMode && (
+          {isRenewMode && fromMemberSearch && (
             <>
               <div className="form-group">
                 <label style={{ fontWeight: 'bold' }}>Membership</label>
@@ -1454,9 +1470,47 @@ const ManualReg = () => {
               </label>
             </div>
           </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: '15px',
+              marginLeft: '0px',
+              fontSize: '12px',
+            }}
+          >
+            <label
+              style={{
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px',
+                cursor: 'pointer',
+              }}
+            >
+              Disable App
+              <input
+                type="checkbox"
+                checked={formData.isDisable}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isDisable: e.target.checked,
+                  }))
+                }
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  cursor: 'pointer',
+                  accentColor: '#002977'
+                }}
+              />
+            </label>
+          </div>
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: (!isEditMode && !isRenewMode) ? '95px' : '50px' }}
+            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '50px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>

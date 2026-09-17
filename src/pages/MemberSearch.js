@@ -186,7 +186,7 @@ const MemberSearch = () => {
 
   const handleEditMember = (member) => {
     navigate(
-      `/manual-reg?user_id=${member._id}&appType=${selectedVenue}&mode=renew`
+      `/manual-reg?user_id=${member._id}&appType=${selectedVenue}&mode=renew&from=member-search`
     );
   };
 
