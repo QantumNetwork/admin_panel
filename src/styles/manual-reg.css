@@ -1,8 +1,8 @@
 /* Ensure all form inputs have consistent styling */
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="date"],
-.form-group input[type="number"],
+.form-group input[type='text'],
+.form-group input[type='email'],
+.form-group input[type='date'],
+.form-group input[type='number'],
 .form-group select.mr-select {
   width: 100%;
   padding: 6px;
@@ -12,30 +12,30 @@
   margin-bottom: 8px;
 }
 
-.form-group input[type="radio"] {
-    accent-color: #002977;
+.form-group input[type='radio'] {
+  accent-color: #002977;
 }
 /* Remove the inline style from the street address input */
-.form-group input[type="text"][name="street"] {
+.form-group input[type='text'][name='street'] {
   margin-bottom: 8px;
 }
 
 .address-grid {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-.city-zip {
-    display: grid;
-    grid-template-columns: 55% 42%; /* 60% for city, 40% for postcode */
-    gap: 10px;
-    width: 100%;
-  }
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
-  .blue-btn {
-    margin-bottom: 0;
-    margin-top: 20px;
+.city-zip {
+  display: grid;
+  grid-template-columns: 55% 42%; /* 60% for city, 40% for postcode */
+  gap: 10px;
+  width: 100%;
+}
+
+.blue-btn {
+  margin-bottom: 0;
+  margin-top: 20px;
   align-items: flex-end;
   display: block;
   width: 150px;
@@ -46,15 +46,15 @@
   color: #fff;
   cursor: pointer;
   font-size: 11px;
-  }
+}
 
-  .save-s1-btn {
+.save-s1-btn {
   margin-top: 0 !important;
 }
-    .cancel-btn {
-    margin-bottom: 0;
-    margin-top: 20px;
-    margin-right: 10px;
+.cancel-btn {
+  margin-bottom: 0;
+  margin-top: 20px;
+  margin-right: 10px;
   align-items: flex-end;
   display: block;
   width: 150px;
@@ -65,51 +65,67 @@
   color: #fff;
   cursor: pointer;
   font-size: 11px;
-  }
+}
 
-    .next-btn {
-    margin-bottom: 0;
-    margin-top: 20px;
+.cancel-btn-from-ms {
+  margin-bottom: 0;
+  /* margin-top: 20px; */
+  margin-right: 10px;
   align-items: flex-end;
   display: block;
   width: 150px;
   height: 36px;
-  background: #5296D1;
+  background: #999999;
   border: none;
   border-radius: 27px;
   color: #fff;
   cursor: pointer;
   font-size: 11px;
-  }
+}
 
-    .payment-btn {
-    margin-bottom: 0;
-    margin-top: 20px;
+.next-btn {
+  margin-bottom: 0;
+  margin-top: 20px;
+  align-items: flex-end;
+  display: block;
+  width: 150px;
+  height: 36px;
+  background: #5296d1;
+  border: none;
+  border-radius: 27px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.payment-btn {
+  margin-bottom: 0;
+  margin-top: 20px;
   align-items: flex-end;
   display: block;
   width: 200px;
   height: 36px;
-  background: #5296D1;
+  background: #5296d1;
   border: none;
   border-radius: 27px;
   color: #fff;
   cursor: pointer;
   font-size: 11px;
-  }
+}
 
-  .payment-white-box {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-top: 15px;
-  }
+.payment-white-box {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 15px;
+}
 
-  .cancel-btn:hover {
-    background-color: #ed2424 !important;
-  }
+.cancel-btn:hover {
+  background-color: #ed2424 !important;
+}
 
-  .cancel-s1:hover {
+.cancel-s1:hover {
   cursor: not-allowed !important;
 }
 
@@ -117,8 +133,8 @@
   background-color: #002977;
 }
 
-  @media (max-width: 768px) {
-    .city-state-zip {
-      grid-template-columns: 1fr;
-    }
+@media (max-width: 768px) {
+  .city-state-zip {
+    grid-template-columns: 1fr;
   }
+}

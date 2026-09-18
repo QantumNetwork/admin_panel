@@ -977,17 +977,17 @@ const ManualReg = () => {
       );
 
       const disableResponse = await axios.put(
-  `${baseUrl}/user/disable?Id=${formData.Id}`,
-  {
-    isDisable: formData.isDisable,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      // 'Content-Type': 'application/json',
-    },
-  }
-);
+        `${baseUrl}/user/disable?Id=${formData.Id}`,
+        {
+          isDisable: formData.isDisable,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // 'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (
         res?.status === 200 ||
@@ -1425,7 +1425,7 @@ const ManualReg = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '2px',
-                  marginLeft: '28px',
+                  marginLeft: '25px',
                 }}
               >
                 <input
@@ -1472,45 +1472,8 @@ const ManualReg = () => {
           </div>
 
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginTop: '15px',
-              marginLeft: '0px',
-              fontSize: '12px',
-            }}
-          >
-            <label
-              style={{
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                cursor: 'pointer',
-              }}
-            >
-              Disable App
-              <input
-                type="checkbox"
-                checked={formData.isDisable}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    isDisable: e.target.checked,
-                  }))
-                }
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                  accentColor: '#002977'
-                }}
-              />
-            </label>
-          </div>
-          <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '50px' }}
+            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '15px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>
@@ -1533,19 +1496,69 @@ const ManualReg = () => {
                 )}
               </>
             ) : (
-              <button
-                className="blue-btn save-s1-btn"
-                onClick={isRenewMode ? handleRenewEdit : handleSaveEdit}
-                disabled={isSaving}
-                style={{
-                  opacity: isSaving ? 0.6 : 1,
-                  cursor: isSaving ? 'not-allowed' : 'pointer',
-                }}
-              >
-                Save
-              </button>
+              <>
+                {fromMemberSearch && isRenewMode && (
+                  <button
+                    className="cancel-btn-from-ms"
+                    onClick={() => navigate('/member-search')}
+                  >
+                    Cancel
+                  </button>
+                )}
+                <button
+                  className="blue-btn save-s1-btn"
+                  onClick={isRenewMode ? handleRenewEdit : handleSaveEdit}
+                  disabled={isSaving}
+                  style={{
+                    opacity: isSaving ? 0.6 : 1,
+                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  Save
+                </button>
+              </>
             )}
           </div>
+
+          {fromMemberSearch && isRenewMode && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginTop: '15px',
+                marginLeft: '0px',
+                fontSize: '12px',
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '25px',
+                  cursor: 'pointer',
+                }}
+              >
+                Disable App
+                <input
+                  type="checkbox"
+                  checked={formData.isDisable}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isDisable: e.target.checked,
+                    }))
+                  }
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    cursor: 'pointer',
+                    accentColor: '#002977',
+                  }}
+                />
+              </label>
+            </div>
+          )}
         </section>
 
         {s2Visible && (
