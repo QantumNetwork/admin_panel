@@ -1520,7 +1520,7 @@ const ManualReg = () => {
             )}
           </div>
 
-          {fromMemberSearch && isRenewMode && (
+          {fromMemberSearch && isRenewMode && (selectedVenue!=='Mannum' && selectedVenue!=='Manly') && (
             <div
               style={{
                 display: 'flex',

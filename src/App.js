@@ -39,6 +39,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ForcedAppUpdates from "./pages/ForcedAppUpdates";
 import MobileVerificationPage from "./pages/MobileVerificationPage";
 import CreateNewPassword from "./pages/CreateNewPassword";
+import SponsorshipsPage from "./pages/SponsorshipsPage";
 
 
 function App() {
@@ -107,6 +108,7 @@ function App() {
         <Route path="/forced-app-updates" element={<ForcedAppUpdates />} />
         <Route path="/mobile-verification-page" element={<MobileVerificationPage />} />
         <Route path="/create-new-password" element={<CreateNewPassword />} />
+        <Route path="/sponsorships-page" element={<SponsorshipsPage />} />
       </Routes>
       
     </Router>

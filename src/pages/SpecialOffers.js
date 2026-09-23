@@ -6,6 +6,7 @@ import { trackMenuAccess, handleLogout } from '../utils/api';
 import * as XLSX from 'xlsx';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { FaChartPie } from 'react-icons/fa6';
+import { LuLoader } from 'react-icons/lu';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
@@ -201,6 +202,7 @@ const SpecialOffers = () => {
   const [targetedListStep, setTargetedListStep] = useState('upload');
   const targetedListInputRef = useRef(null);
   const [csvProcessedUsers, setCsvProcessedUsers] = useState(0);
+  const [processingStatus, setProcessingStatus] = useState('');
 
   const allowedClubVenues = ['Manly', 'Qantum', 'MaxGaming', 'Ace'];
   const showClubOption = allowedClubVenues.includes(selectedVenue);
@@ -1835,6 +1837,51 @@ const SpecialOffers = () => {
         const csvData = await csvResponse.json();
 
         if (csvData?.success) {
+          // Poll the backend for targeted CSV processing to complete.
+          const createdOfferId = csvData.data?._id;
+
+          if (createdOfferId) {
+            const maxAttempts = 30;
+            const pollInterval = 2000;
+
+            setProcessingStatus('processing');
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+              const pollResponse = await fetch(`${baseUrl}/offer/all`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: token ? `Bearer ${token}` : '',
+                },
+              });
+
+              const pollData = await pollResponse.json();
+
+              if (pollResponse.ok && pollData.success) {
+                const updatedOffer = pollData.data?.liveData?.find(
+                  (offer) => offer._id === createdOfferId
+                );
+
+                if (updatedOffer) {
+                  console.log('CSV processing status:', {
+                    status: updatedOffer.processingStatus,
+                    csvProcessedUsers: updatedOffer.csvProcessedUsers,
+                  });
+
+                  if (updatedOffer.processingStatus === 'completed') {
+                    setProcessingStatus('completed');
+                    setCsvProcessedUsers(
+                      Number(updatedOffer.csvProcessedUsers) || 0
+                    );
+
+                    break;
+                  }
+                }
+              }
+            }
+          }
           toast.success('Offer submitted successfully!', {
             containerId: 'offerActions',
           });
@@ -2303,6 +2350,7 @@ const SpecialOffers = () => {
         ) {
           const maxAttempts = 30;
           const pollInterval = 2000;
+          setProcessingStatus('processing');
 
           for (let attempt = 0; attempt < maxAttempts; attempt++) {
             await new Promise((resolve) => setTimeout(resolve, pollInterval));
@@ -2330,6 +2378,7 @@ const SpecialOffers = () => {
 
                 if (updatedOffer.processingStatus === 'completed') {
                   data.data = updatedOffer;
+                  setProcessingStatus('completed');
 
                   setCsvProcessedUsers(
                     Number(updatedOffer.csvProcessedUsers) || 0
@@ -3621,29 +3670,37 @@ const SpecialOffers = () => {
                             color: isEveryone ? '#999' : '#666',
                           }}
                         >
-                          {isEveryone
-                            ? 'All Selected'
-                            : isUploadTargetedList &&
-                                targetedListStep === 'target'
-                              ? `${
-                                  targetedListFile
+                          {isEveryone ? (
+                            'All Selected'
+                          ) : isUploadTargetedList &&
+                            targetedListStep === 'target' ? (
+                            processingStatus === 'processing' ? (
+                              <LuLoader />
+                            ) : (
+                              `${
+                                targetedListFile
+                                  ? targetedListRows.length.toLocaleString()
+                                  : targetedListRows.length
                                     ? targetedListRows.length.toLocaleString()
-                                    : targetedListRows.length
-                                      ? targetedListRows.length.toLocaleString()
-                                      : csvProcessedUsers.toLocaleString()
-                                } members targeted`
-                              : isUploadTargetedList
-                                ? 'Upload targeted list'
-                                : selectedAudiences.length > 0
-                                  ? selectedAudiences.length > 2
-                                    ? `${selectedAudiences.length} selected`
-                                    : audienceOptions
-                                        .filter((o) =>
-                                          selectedAudiences.includes(o.value)
-                                        )
-                                        .map((o) => o.label)
-                                        .join(', ')
-                                  : 'Select from list'}
+                                    : csvProcessedUsers.toLocaleString()
+                              } members targeted`
+                            )
+                          ) : isUploadTargetedList ? (
+                            'Upload targeted list'
+                          ) : selectedAudiences.length > 0 ? (
+                            selectedAudiences.length > 2 ? (
+                              `${selectedAudiences.length} selected`
+                            ) : (
+                              audienceOptions
+                                .filter((o) =>
+                                  selectedAudiences.includes(o.value)
+                                )
+                                .map((o) => o.label)
+                                .join(', ')
+                            )
+                          ) : (
+                            'Select from list'
+                          )}
                         </div>
 
                         {showAudienceDropdown && (

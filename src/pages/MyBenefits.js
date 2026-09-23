@@ -65,6 +65,7 @@ const MyBenefits = () => {
   if (venue === 'Bob' || venue === 'Sense') return 'Valued';
   if (venue === 'Mannum') return 'Member';
   if (venue === 'Mosaic') return 'Bronze';
+  if (venue === 'Qantum') return 'Valued';
   return 'Platinum Black';
 };
 
@@ -816,7 +817,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
                           ? previewContent
                               .replace(
                                 /<li>/g,
-                                `<li style="position: relative; padding-left: 17px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
+                                `<li style="position: relative; padding-left: 16px; padding-right: 9px"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
                                   selectedLevel
                                 )}; color: white; font-size: 8px;">✓</span>`
                               )
@@ -827,7 +828,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
                           : content
                               .replace(
                                 /<li>/g,
-                                `<li style="position: relative; padding-left: 17px;"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
+                                `<li style="position: relative; padding-left: 16px; padding-right: 9px"><span style="position: absolute; left: 0; top: 2px; display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background-color: ${getBulletColor(
                                   selectedLevel
                                 )}; color: white; font-size: 8px;">✓</span>`
                               )

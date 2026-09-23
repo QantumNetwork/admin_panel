@@ -19,6 +19,7 @@ import {
   exportToExcel,
 } from '../utils/appConstants';
 import { FaChartPie } from 'react-icons/fa6';
+import { LuLoader } from 'react-icons/lu';
 import axios from 'axios';
 import '../styles/smart-incentives.css';
 const SmartIncentives = () => {
@@ -79,6 +80,9 @@ const SmartIncentives = () => {
   const [targetedListRows, setTargetedListRows] = useState([]);
   const [targetedListStep, setTargetedListStep] = useState('upload');
   const targetedListInputRef = useRef(null);
+
+  const [processingCsvIncentiveId, setProcessingCsvIncentiveId] =
+    useState(null);
 
   const [activeTab, setActiveTab] = useState('createIncentive'); // 'createIncentive' or 'activeCampaigns'
 
@@ -354,6 +358,64 @@ const SmartIncentives = () => {
         toast.success(
           response?.data?.message || 'Smart incentive created successfully'
         );
+
+        const createdIncentiveId = response?.data?.data?._id;
+
+        setActiveTab('activeCampaigns');
+
+        if (createdIncentiveId) {
+          setProcessingCsvIncentiveId(createdIncentiveId);
+
+          const maxAttempts = 30;
+          const pollInterval = 2000;
+
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+            try {
+              const pollResponse = await axios.get(
+                `${baseUrl}/smart-incentive/all?page=${campaignPage}&limit=${limit}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (pollResponse.data && pollResponse.data.data) {
+                const updatedIncentive = pollResponse.data.data.find(
+                  (incentive) => incentive._id === createdIncentiveId
+                );
+
+                if (updatedIncentive) {
+                  console.log('CSV incentive processing status:', {
+                    status: updatedIncentive.processingStatus,
+                    csvProcessedUsers: updatedIncentive.csvProcessedUsers,
+                  });
+
+                  setCampaignData((prevData) =>
+                    prevData.map((incentive) =>
+                      incentive._id === createdIncentiveId
+                        ? {
+                            ...incentive,
+                            ...updatedIncentive,
+                          }
+                        : incentive
+                    )
+                  );
+
+                  if (updatedIncentive.processingStatus === 'completed') {
+                    break;
+                  }
+                }
+              }
+            } catch (pollError) {
+              console.error('Error polling CSV incentive:', pollError);
+            }
+          }
+
+          setProcessingCsvIncentiveId(null);
+        }
 
         setActiveTab('activeCampaigns');
         return;
@@ -2115,7 +2177,11 @@ const SmartIncentives = () => {
                                     fontWeight: 500,
                                   }}
                                 >
-                                  {data.csvProcessedUsers}
+                                  {processingCsvIncentiveId === data._id ? (
+                                    <LuLoader />
+                                  ) : (
+                                    data.csvProcessedUsers
+                                  )}
                                 </span>
                               ) : data.applicableUserCount ? (
                                 <span

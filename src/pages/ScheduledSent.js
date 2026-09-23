@@ -6,6 +6,7 @@ import { IoIosSend } from 'react-icons/io';
 import { logout } from '../utils/auth';
 import { IoCopyOutline } from 'react-icons/io5';
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
+import { HiCurrencyDollar } from "react-icons/hi2";
 import { FaCheck } from 'react-icons/fa';
 import { useEffect, useState, useCallback } from 'react';
 import { uploadFileToS3 } from '../s3/config';
@@ -528,6 +529,20 @@ const ScheduledSent = () => {
           />
           Scheduled & Sent
         </button>
+
+        <button
+          className={`sidebar-btn ${
+            isActive('/sponsorships-page') ? 'active' : ''
+          }`}
+          onClick={() => handleNavigation('/sponsorships-page')}
+        >
+          <HiCurrencyDollar
+            className={`sidebar-icon ${
+              isActive('/sponsorships-page') ? '' : 'navy-icon'
+            }`}
+          />
+          Sponsorships
+        </button>
       </aside>
 
       <div className="ssent-message-type-filter">
@@ -725,8 +740,8 @@ const ScheduledSent = () => {
                         {message.status === 'scheduled'
                           ? message.market
                           : message.status === 'completed'
-                          ? message.successCount
-                          : null}
+                            ? message.successCount
+                            : null}
                       </div>
 
                       {activeTab === 'completed' ? (

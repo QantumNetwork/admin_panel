@@ -5,6 +5,7 @@ import { IoPushOutline } from 'react-icons/io5';
 import { BiTargetLock } from 'react-icons/bi';
 import { logout } from '../utils/auth';
 import { IoIosSend } from 'react-icons/io';
+import { HiCurrencyDollar } from "react-icons/hi2";
 import axios from 'axios';
 import Select from 'react-select';
 import { MultiSelect } from 'primereact/multiselect';
@@ -1948,6 +1949,20 @@ const MarketToMembers = () => {
             }`}
           />
           Scheduled & Sent
+        </button>
+
+        <button
+          className={`sidebar-btn ${
+            isActive('/sponsorships-page') ? 'active' : ''
+          }`}
+          onClick={() => handleNavigation('/sponsorships-page')}
+        >
+          <HiCurrencyDollar
+            className={`sidebar-icon ${
+              isActive('/sponsorships-page') ? '' : 'navy-icon'
+            }`}
+          />
+          Sponsorships
         </button>
       </aside>
 

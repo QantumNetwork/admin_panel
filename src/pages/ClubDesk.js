@@ -1070,8 +1070,8 @@ const ClubDesk = () => {
             display: 'flex',
             alignItems: 'flex-end',
             gap: '12px',
-            marginLeft: '16.5%',
-            marginTop: '5%',
+            marginLeft: '15%',
+            marginTop: activeTab === 'membersForApproval' ? '5%' : '3%',
             flexWrap: 'nowrap',
           }}
         >
@@ -1225,11 +1225,7 @@ const ClubDesk = () => {
 
       <div
         className="members-table-container"
-        style={
-          activeTab === 'verified' || activeTab === 'membersForApproval'
-            ? { marginTop: '1.5%' }
-            : {}
-        }
+        style={activeTab === 'membersForApproval' ? { marginTop: '1.5%' } : activeTab === 'verified' ? { marginTop: '1%'} : {}}
       >
         {loading ? (
           <div className="loading">Loading...</div>
