@@ -28,6 +28,5 @@ README.md
 /src/logo.svg
 /src/App.test.js
 src/data/countries.json
-src/pages/SponsorshipsPage.js
-src/styles/sponsorships-page.css
+
 

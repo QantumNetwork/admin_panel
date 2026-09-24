@@ -1951,7 +1951,7 @@ const MarketToMembers = () => {
           Scheduled & Sent
         </button>
 
-        {/* <button
+        <button
           className={`sidebar-btn ${
             isActive('/sponsorships-page') ? 'active' : ''
           }`}
@@ -1963,7 +1963,7 @@ const MarketToMembers = () => {
             }`}
           />
           Sponsorships
-        </button> */}
+        </button>
       </aside>
 
       {sendingNow && (

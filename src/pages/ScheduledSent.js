@@ -530,7 +530,7 @@ const ScheduledSent = () => {
           Scheduled & Sent
         </button>
 
-        {/* <button
+        <button
           className={`sidebar-btn ${
             isActive('/sponsorships-page') ? 'active' : ''
           }`}
@@ -542,7 +542,7 @@ const ScheduledSent = () => {
             }`}
           />
           Sponsorships
-        </button> */}
+        </button>
       </aside>
 
       <div className="ssent-message-type-filter">
