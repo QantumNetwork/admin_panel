@@ -1,6 +1,6 @@
 .members-table-container-sp {
   width: 100%;
-  margin-top: 35px;
+  margin-top: 45px;
 }
 
 .sponsorship-controls {
@@ -10,6 +10,14 @@
   z-index: 1000;
 }
 
+.sponsorship-date-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-top: 5px;
+}
+
+
 .sa-filter-buttons-sponsor {
   display: flex;
   gap: 20px;
@@ -18,3 +26,4 @@
 .date-filter {
   margin-top: 15px;
 }
+

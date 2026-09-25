@@ -61,6 +61,8 @@ const SponsorshipsPage = () => {
   const [limit, setLimit] = useState(10);
 
   const [dateFilter, setDateFilter] = useState('mtd');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const currentPage = sponsorshipsPage;
   const currentTotalPages = sponsorshipsTotalPages;
@@ -79,6 +81,7 @@ const SponsorshipsPage = () => {
   const [formData, setFormData] = useState({
     Id: '',
     CompanyName: '',
+    SponsorshipCode: '',
     GivenNames: '',
     Surname: '',
     Email: '',
@@ -148,6 +151,129 @@ const SponsorshipsPage = () => {
       [name]: sanitizedValue,
     }));
   };
+
+  const handleCreateSponsorship = async () => {
+    try {
+      const {
+        CompanyName,
+        GivenNames,
+        Surname,
+        Email,
+        Mobile,
+        Address,
+        Suburb,
+        PostCode,
+      } = formData;
+
+      const payload = {
+        company: CompanyName,
+        firstName: GivenNames,
+        lastName: Surname,
+        phone: Mobile,
+        email: Email,
+        address: `${Address}, ${Suburb}`,
+        pin: PostCode,
+      };
+
+      const response = await axios.post(`${baseUrl}/sponsorship`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      toast.success(
+        response.data?.message || 'Sponsorship created successfully'
+      );
+
+      // Clear form after successful creation
+      setFormData({
+        Id: '',
+        CompanyName: '',
+        GivenNames: '',
+        Surname: '',
+        Email: '',
+        Mobile: '',
+        Address: '',
+        Suburb: '',
+        PostCode: '',
+      });
+    } catch (error) {
+      console.error('Error creating sponsorship:', error);
+
+      toast.error(
+        error.response?.data?.message || 'Failed to create sponsorship'
+      );
+    }
+  };
+
+  const fetchSponsorships = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        page: sponsorshipsPage,
+        limit,
+        filter: dateFilter,
+      };
+
+      // Only send dates for custom filter
+      if (dateFilter === 'custom') {
+        if (startDate) {
+          params.fromDate = startDate;
+        }
+
+        if (endDate) {
+          params.toDate = endDate;
+        }
+      }
+
+      const response = await axios.get(`${baseUrl}/sponsorship`, {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = response.data;
+
+      setSponsorshipsData(responseData?.data || []);
+
+      setSponsorshipsTotalPages(responseData?.pagination?.totalPages || 1);
+    } catch (error) {
+      console.error('Error fetching sponsorships:', error);
+
+      toast.error(
+        error.response?.data?.message || 'Failed to fetch sponsorships'
+      );
+
+      setSponsorshipsData([]);
+      setSponsorshipsTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'currentSponsorships' || !token) {
+      return;
+    }
+
+    // Don't call API until both dates are selected for custom filter
+    if (dateFilter === 'custom' && (!startDate || !endDate)) {
+      return;
+    }
+
+    fetchSponsorships();
+  }, [
+    activeTab,
+    sponsorshipsPage,
+    limit,
+    dateFilter,
+    startDate,
+    endDate,
+    token,
+  ]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -413,27 +539,114 @@ const SponsorshipsPage = () => {
         </div>
 
         {activeTab === 'currentSponsorships' && (
-          <div className="date-filter">
-            <select
-              value={dateFilter}
-              onChange={(e) => {
-                setSponsorshipsPage(1);
-                setDateFilter(e.target.value);
-              }}
-              style={{
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: '1px solid #ccc',
-                backgroundColor: '#F2F2F2',
-                cursor: 'pointer',
-                minWidth: '100px',
-              }}
-            >
-              <option value="today">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="mtd">MTD</option>
-              <option value="custom">Custom</option>
-            </select>
+          <div className="sponsorship-date-row">
+
+            <div className="date-filter">
+              <select
+                value={dateFilter}
+                onChange={(e) => {
+                  setSponsorshipsPage(1);
+                  setDateFilter(e.target.value);
+                }}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid #ccc',
+                  backgroundColor: '#F2F2F2',
+                  cursor: 'pointer',
+                  minWidth: '100px',
+                }}
+              >
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="mtd">MTD</option>
+                <option value="last3months">Last 3 Months</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+
+            {dateFilter === 'custom' && (
+              <div
+                className="custom-date-filters"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  gap: '10px',
+                  marginTop: '5px',
+                }}
+              >
+                {/* START DATE */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      color: '#6b6b6b',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    START DATE
+                  </label>
+
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => {
+                      setSponsorshipsPage(1);
+                      setStartDate(e.target.value);
+                    }}
+                    style={{
+                      padding: '6px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid #cfcfcf',
+                      fontSize: '12px',
+                      width: '130px',
+                    }}
+                  />
+                </div>
+
+                {/* END DATE */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      color: '#6b6b6b',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    END DATE
+                  </label>
+
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => {
+                      setSponsorshipsPage(1);
+                      setEndDate(e.target.value);
+                    }}
+                    style={{
+                      padding: '6px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid #cfcfcf',
+                      fontSize: '12px',
+                      width: '130px',
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -530,6 +743,7 @@ const SponsorshipsPage = () => {
               <button
                 className="blue-btn"
                 style={{ marginTop: '40px', width: '180px' }}
+                onClick={handleCreateSponsorship}
               >
                 Create Sponsorship
               </button>
@@ -545,6 +759,7 @@ const SponsorshipsPage = () => {
                   <thead>
                     <tr>
                       <th>Company Name</th>
+                      <th>Sponsorship Code</th>
                       <th>Contact Name</th>
                       <th>Join Date</th>
                       <th>Phone</th>
@@ -558,10 +773,42 @@ const SponsorshipsPage = () => {
                   </thead>
                   <tbody>
                     {tableData.length > 0 ? (
-                      tableData.map((data, index) => <tr key={index}></tr>)
+                      tableData.map((data, index) => (
+                        <tr key={data._id || index}>
+                          <td>{data.company || '-'}</td>
+                          <td>{data.sponsorshipCode || '-'}</td>
+                          <td>
+                            {data.firstName || data.lastName
+                              ? `${data.firstName || ''} ${data.lastName || ''}`.trim()
+                              : '-'}
+                          </td>
+
+                          <td>
+                            {data.createdAt
+                              ? new Date(data.createdAt).toLocaleDateString()
+                              : '-'}
+                          </td>
+
+                          <td>{data.phone || '-'}</td>
+
+                          <td>{data.email || '-'}</td>
+
+                          <td>
+                            {`${data.address || ''}, ${data.pin || ''}` || '-'}
+                          </td>
+
+                          <td>{data.memberCount || '-'}</td>
+
+                          <td>-</td>
+
+                          <td>-</td>
+
+                          <td>-</td>
+                        </tr>
+                      ))
                     ) : (
                       <tr>
-                        <td colSpan="8" className="no-data">
+                        <td colSpan="11" className="no-data">
                           No sponsorships found
                         </td>
                       </tr>
