@@ -67,6 +67,11 @@ const SponsorshipsPage = () => {
   const currentPage = sponsorshipsPage;
   const currentTotalPages = sponsorshipsTotalPages;
 
+  const [showSponsorshipNumber, setShowSponsorshipNumber] = useState(false);
+  const [sponsorshipCode, setSponsorshipCode] = useState('');
+
+  const [editingSponsorshipId, setEditingSponsorshipId] = useState(null);
+
   // Pagination controls per tab
   const onPrev = () => {
     if (sponsorshipsPage > 1) setSponsorshipsPage((p) => p - 1);
@@ -152,7 +157,32 @@ const SponsorshipsPage = () => {
     }));
   };
 
+  const validateSponsorshipForm = () => {
+    const requiredFields = [
+      { field: 'CompanyName', label: 'Company Name' },
+      { field: 'GivenNames', label: 'First name' },
+      { field: 'Surname', label: 'Last name' },
+      { field: 'Mobile', label: 'Phone' },
+      { field: 'Email', label: 'Email' },
+      { field: 'Address', label: 'Address' },
+      { field: 'Suburb', label: 'City' },
+      { field: 'PostCode', label: 'Postcode' },
+    ];
+
+    for (const { field, label } of requiredFields) {
+      if (!formData[field]?.trim()) {
+        toast.error(`${label} is required`);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleCreateSponsorship = async () => {
+    if (!validateSponsorshipForm()) {
+      return;
+    }
     try {
       const {
         CompanyName,
@@ -182,6 +212,20 @@ const SponsorshipsPage = () => {
         },
       });
 
+      // Get sponsorship number from API response
+      const code = response.data?.sponsorship?.sponsorshipCode;
+
+      if (!code) {
+        toast.error(
+          'Sponsorship created, but sponsorship number was not returned.'
+        );
+        return;
+      }
+
+      // Store sponsorship number and show the number page
+      setSponsorshipCode(code);
+      setShowSponsorshipNumber(true);
+
       toast.success(
         response.data?.message || 'Sponsorship created successfully'
       );
@@ -203,6 +247,135 @@ const SponsorshipsPage = () => {
 
       toast.error(
         error.response?.data?.message || 'Failed to create sponsorship'
+      );
+    }
+  };
+
+  const handleEditSponsorship = async (sponsorshipId) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/sponsorship/${sponsorshipId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const sponsorship = response.data?.sponsorship;
+
+      if (!sponsorship) {
+        toast.error('Sponsorship details not found');
+        return;
+      }
+
+      const fullAddress = (sponsorship.address || '').trim();
+
+      let address = fullAddress;
+      let suburb = '';
+
+      if (fullAddress.includes(',')) {
+        const addressParts = fullAddress.split(',');
+
+        suburb = addressParts.pop()?.trim() || '';
+        address = addressParts.join(',').trim();
+      }
+
+      setFormData({
+        Id: sponsorship._id || '',
+        CompanyName: sponsorship.company || '',
+        SponsorshipCode: sponsorship.sponsorshipCode || '',
+        GivenNames: sponsorship.firstName || '',
+        Surname: sponsorship.lastName || '',
+        Email: sponsorship.email || '',
+        Mobile: sponsorship.phone || '',
+        Address: address,
+        Suburb: suburb,
+        PostCode: sponsorship.pin || '',
+      });
+
+      setEditingSponsorshipId(sponsorship._id);
+      setShowSponsorshipNumber(false);
+      setSponsorshipCode('');
+      setActiveTab('createSponsorship');
+    } catch (error) {
+      console.error('Error fetching sponsorship:', error);
+
+      toast.error(
+        error.response?.data?.message || 'Failed to fetch sponsorship details'
+      );
+    }
+  };
+
+  const handleSaveSponsorship = async () => {
+    if (!validateSponsorshipForm()) {
+      return;
+    }
+    try {
+      const {
+        CompanyName,
+        GivenNames,
+        Surname,
+        Email,
+        Mobile,
+        Address,
+        Suburb,
+        PostCode,
+      } = formData;
+
+      const payload = {
+        company: CompanyName,
+        firstName: GivenNames,
+        lastName: Surname,
+        phone: Mobile,
+        email: Email,
+        address: Suburb ? `${Address}, ${Suburb}` : Address,
+        pin: PostCode,
+      };
+
+      const response = await axios.put(
+        `${baseUrl}/sponsorship/${editingSponsorshipId}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      toast.success(
+        response.data?.message || 'Sponsorship updated successfully'
+      );
+
+      // Exit edit mode
+      setEditingSponsorshipId(null);
+
+      // Go back to Current Sponsorships
+      setActiveTab('currentSponsorships');
+
+      // Hide sponsorship number card if it was visible
+      setShowSponsorshipNumber(false);
+      setSponsorshipCode('');
+
+      // Clear form
+      setFormData({
+        Id: '',
+        CompanyName: '',
+        SponsorshipCode: '',
+        GivenNames: '',
+        Surname: '',
+        Email: '',
+        Mobile: '',
+        Address: '',
+        Suburb: '',
+        PostCode: '',
+      });
+    } catch (error) {
+      console.error('Error updating sponsorship:', error);
+
+      toast.error(
+        error.response?.data?.message || 'Failed to update sponsorship'
       );
     }
   };
@@ -523,16 +696,25 @@ const SponsorshipsPage = () => {
             className={`user-btn ${
               activeTab === 'createSponsorship' ? 'active' : ''
             }`}
-            onClick={() => setActiveTab('createSponsorship')}
+            onClick={() => {
+              setActiveTab('createSponsorship');
+              setShowSponsorshipNumber(false);
+              setSponsorshipCode('');
+            }}
           >
-            Create Sponsorship
+            {editingSponsorshipId ? 'Edit Sponsorship': 'Create Sponsorship'}
           </button>
 
           <button
             className={`user-btn ${
               activeTab === 'currentSponsorships' ? 'active' : ''
             }`}
-            onClick={() => setActiveTab('currentSponsorships')}
+            onClick={() => {
+              setActiveTab('currentSponsorships');
+              setShowSponsorshipNumber(false);
+              setSponsorshipCode('');
+              setEditingSponsorshipId('');
+            }}
           >
             Current Sponsorships
           </button>
@@ -540,7 +722,6 @@ const SponsorshipsPage = () => {
 
         {activeTab === 'currentSponsorships' && (
           <div className="sponsorship-date-row">
-
             <div className="date-filter">
               <select
                 value={dateFilter}
@@ -653,102 +834,129 @@ const SponsorshipsPage = () => {
 
       <div className="content-wrapper-sa" style={{ top: '190px' }}>
         {activeTab === 'createSponsorship' ? (
-          <section className="new-user-sa" style={{ height: '550px' }}>
-            <h2>New Sponsorship Details</h2>
+          <div className="sponsorship-create-container">
+            <section
+              className="new-user-sa sponsorship-form-card"
+              style={{ height: '550px' }}
+            >
+              {editingSponsorshipId ? <h2>Edit Sponsorship Details</h2> : <h2>New Sponsorship Details</h2>}
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold' }}>Company Name</label>
-              <input
-                type="text"
-                name="CompanyName"
-                value={formData.CompanyName}
-                onChange={handleInputChange}
-              />
-            </div>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Company Name</label>
+                <input
+                  type="text"
+                  name="CompanyName"
+                  value={formData.CompanyName}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold' }}>First name</label>
-              <input
-                type="text"
-                name="GivenNames"
-                value={formData.GivenNames}
-                onChange={handleInputChange}
-              />
-            </div>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>First name</label>
+                <input
+                  type="text"
+                  name="GivenNames"
+                  value={formData.GivenNames}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold' }}>Last name</label>
-              <input
-                type="text"
-                name="Surname"
-                value={formData.Surname}
-                onChange={handleInputChange}
-              />
-            </div>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Last name</label>
+                <input
+                  type="text"
+                  name="Surname"
+                  value={formData.Surname}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold' }}>Phone</label>
-              <input
-                type="number"
-                name="Mobile"
-                value={formData.Mobile}
-                onChange={handleInputChange}
-              />
-            </div>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Phone</label>
+                <input
+                  type="number"
+                  name="Mobile"
+                  value={formData.Mobile}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold' }}>Email</label>
-              <input
-                type="email"
-                name="Email"
-                value={formData.Email}
-                onChange={handleInputChange}
-              />
-            </div>
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold' }}>Email</label>
+                <input
+                  type="email"
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-            <div className="form-group">
-              <label style={{ fontWeight: 'bold', marginBottom: '50px' }}>
-                Address
-              </label>
-              <div className="address-grid">
-                <div className="address-row">
-                  <input
-                    type="text"
-                    placeholder="Street Address"
-                    name="Address"
-                    value={formData.Address || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="city-zip">
-                  <input
-                    type="text"
-                    placeholder="City"
-                    name="Suburb"
-                    value={formData.Suburb || ''}
-                    onChange={handleInputChange}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Postcode"
-                    name="PostCode"
-                    value={formData.PostCode || ''}
-                    onChange={handleInputChange}
-                  />
+              <div className="form-group">
+                <label style={{ fontWeight: 'bold', marginBottom: '50px' }}>
+                  Address
+                </label>
+                <div className="address-grid">
+                  <div className="address-row">
+                    <input
+                      type="text"
+                      placeholder="Street Address"
+                      name="Address"
+                      value={formData.Address || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="city-zip">
+                    <input
+                      type="text"
+                      placeholder="City"
+                      name="Suburb"
+                      value={formData.Suburb || ''}
+                      onChange={handleInputChange}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Postcode"
+                      name="PostCode"
+                      value={formData.PostCode || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="d-flex w-100 justify-content-center">
-              <button
-                className="blue-btn"
-                style={{ marginTop: '40px', width: '180px' }}
-                onClick={handleCreateSponsorship}
-              >
-                Create Sponsorship
-              </button>
-            </div>
-          </section>
+              <div className="d-flex w-100 justify-content-center">
+                <button
+                  className="blue-btn"
+                  style={{ marginTop: '40px', width: '180px' }}
+                  onClick={
+                    editingSponsorshipId
+                      ? handleSaveSponsorship
+                      : handleCreateSponsorship
+                  }
+                >
+                  {editingSponsorshipId ? 'Save' : 'Create Sponsorship'}
+                </button>
+              </div>
+            </section>
+            {/* RIGHT - SPONSORSHIP NUMBER */}
+            {showSponsorshipNumber && (
+              <section className="sponsorship-number-card">
+                <h2>Sponsorship Number</h2>
+
+                <div className="sponsorship-number">{sponsorshipCode}</div>
+
+                <p>
+                  Provide this number to the
+                  <br />
+                  Sponsorship and ask them to have
+                  <br />
+                  their Members enter this number into
+                  <br />
+                  the Loyalty App
+                </p>
+              </section>
+            )}
+          </div>
         ) : (
           <div className="members-table-container-sp">
             {loading ? (
@@ -804,6 +1012,31 @@ const SponsorshipsPage = () => {
                           <td>-</td>
 
                           <td>-</td>
+
+                          <td>
+                            <div
+                              style={{
+                                display: 'flex',
+                                gap: '8px',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <button
+                                onClick={() => handleEditSponsorship(data._id)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#002977',
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  fontSize: '12px',
+                                  textWrap: 'nowrap',
+                                }}
+                              >
+                                ✎ Edit
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (

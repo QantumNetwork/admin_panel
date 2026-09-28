@@ -27,3 +27,50 @@
   margin-top: 15px;
 }
 
+.sponsorship-create-container {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.sponsorship-number-card {
+  width: 40%;
+  height: 550px;
+  background: #f1f1f1;
+  border-radius: 6px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  box-sizing: border-box;
+  padding: 14px 20px;
+}
+
+.sponsorship-number-card h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  color: #111;
+}
+
+.sponsorship-number {
+  margin-top: 92px;
+  font-size: 80px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 8px;
+  color: #002977;
+  text-align: center;
+}
+
+.sponsorship-number-card p {
+  margin-top: 82px;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 600;
+  color: #111;
+  text-align: center;
+}
