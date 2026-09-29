@@ -3,6 +3,7 @@ import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { trackMenuAccess, handleLogout } from '../utils/api';
 import { logout } from '../utils/auth';
 import {
   FaRegStar,
@@ -60,7 +61,7 @@ const SponsorshipsPage = () => {
   const [sponsorshipsTotalPages, setSponsorshipsTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const [dateFilter, setDateFilter] = useState('mtd');
+  // const [dateFilter, setDateFilter] = useState('mtd');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -387,19 +388,19 @@ const SponsorshipsPage = () => {
       const params = {
         page: sponsorshipsPage,
         limit,
-        filter: dateFilter,
+        // filter: dateFilter,
       };
 
       // Only send dates for custom filter
-      if (dateFilter === 'custom') {
-        if (startDate) {
-          params.fromDate = startDate;
-        }
+      // if (dateFilter === 'custom') {
+      //   if (startDate) {
+      //     params.fromDate = startDate;
+      //   }
 
-        if (endDate) {
-          params.toDate = endDate;
-        }
-      }
+      //   if (endDate) {
+      //     params.toDate = endDate;
+      //   }
+      // }
 
       const response = await axios.get(`${baseUrl}/sponsorship`, {
         params,
@@ -433,16 +434,16 @@ const SponsorshipsPage = () => {
     }
 
     // Don't call API until both dates are selected for custom filter
-    if (dateFilter === 'custom' && (!startDate || !endDate)) {
-      return;
-    }
+    // if (dateFilter === 'custom' && (!startDate || !endDate)) {
+    //   return;
+    // }
 
     fetchSponsorships();
   }, [
     activeTab,
     sponsorshipsPage,
     limit,
-    dateFilter,
+    // dateFilter,
     startDate,
     endDate,
     token,
@@ -471,6 +472,36 @@ const SponsorshipsPage = () => {
     }
   }, [token]);
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
+    }
+  };
+
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
+      }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
   return (
     <div className="digital-app-container" style={{ height: '1100px' }}>
       <ToastContainer
@@ -494,10 +525,7 @@ const SponsorshipsPage = () => {
         }}
       />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={() => handleNavigation('/dashboard')}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -505,13 +533,13 @@ const SponsorshipsPage = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -527,7 +555,7 @@ const SponsorshipsPage = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -535,7 +563,7 @@ const SponsorshipsPage = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>
@@ -602,7 +630,7 @@ const SponsorshipsPage = () => {
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      navigate('/dashboard');
+                      await handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);
@@ -702,7 +730,7 @@ const SponsorshipsPage = () => {
               setSponsorshipCode('');
             }}
           >
-            {editingSponsorshipId ? 'Edit Sponsorship': 'Create Sponsorship'}
+            {editingSponsorshipId ? 'Edit Sponsorship' : 'Create Sponsorship'}
           </button>
 
           <button
@@ -720,7 +748,7 @@ const SponsorshipsPage = () => {
           </button>
         </div>
 
-        {activeTab === 'currentSponsorships' && (
+        {/* {activeTab === 'currentSponsorships' && (
           <div className="sponsorship-date-row">
             <div className="date-filter">
               <select
@@ -757,7 +785,6 @@ const SponsorshipsPage = () => {
                   marginTop: '5px',
                 }}
               >
-                {/* START DATE */}
                 <div
                   style={{
                     display: 'flex',
@@ -792,7 +819,6 @@ const SponsorshipsPage = () => {
                   />
                 </div>
 
-                {/* END DATE */}
                 <div
                   style={{
                     display: 'flex',
@@ -829,7 +855,7 @@ const SponsorshipsPage = () => {
               </div>
             )}
           </div>
-        )}
+        )} */}
       </div>
 
       <div className="content-wrapper-sa" style={{ top: '190px' }}>
@@ -839,7 +865,11 @@ const SponsorshipsPage = () => {
               className="new-user-sa sponsorship-form-card"
               style={{ height: '550px' }}
             >
-              {editingSponsorshipId ? <h2>Edit Sponsorship Details</h2> : <h2>New Sponsorship Details</h2>}
+              {editingSponsorshipId ? (
+                <h2>Edit Sponsorship Details</h2>
+              ) : (
+                <h2>New Sponsorship Details</h2>
+              )}
 
               <div className="form-group">
                 <label style={{ fontWeight: 'bold' }}>Company Name</label>
@@ -969,7 +999,7 @@ const SponsorshipsPage = () => {
                       <th>Company Name</th>
                       <th>Sponsorship Code</th>
                       <th>Contact Name</th>
-                      <th>Join Date</th>
+                      <th>Created</th>
                       <th>Phone</th>
                       <th>Email</th>
                       <th>Address</th>

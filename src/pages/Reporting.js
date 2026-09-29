@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import { trackMenuAccess, handleLogout } from '../utils/api';
 import {
   FaBullhorn,
   FaGift,
@@ -96,7 +97,7 @@ const Reporting = () => {
         localStorage.removeItem('selectedVenue');
         localStorage.setItem('selectedVenue', newVenue);
 
-        navigate('/dashboard');
+        await handleLock();
       }
     } catch (error) {
       console.error('Error updating token:', error);
@@ -238,6 +239,36 @@ const Reporting = () => {
     }
   };
 
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
+    }
+  };
+
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
+      }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <ToastContainer
@@ -262,7 +293,7 @@ const Reporting = () => {
       />
       {/* Header */}
       <header className="dashboard-header">
-        <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
 
@@ -271,13 +302,13 @@ const Reporting = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => navigate('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => navigate('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -293,7 +324,7 @@ const Reporting = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => navigate('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -301,7 +332,7 @@ const Reporting = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => navigate('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>
@@ -414,7 +445,15 @@ const Reporting = () => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater' || selectedVenue === 'Mannum') && (
+        {(selectedVenue === 'Ace' ||
+          selectedVenue === 'Manly' ||
+          selectedVenue === 'Qantum' ||
+          selectedVenue === 'MaxGaming' ||
+          selectedVenue === 'EDP' ||
+          selectedVenue === 'Flinders' ||
+          selectedVenue === 'Mosaic' ||
+          selectedVenue === 'Bluewater' ||
+          selectedVenue === 'Mannum') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''

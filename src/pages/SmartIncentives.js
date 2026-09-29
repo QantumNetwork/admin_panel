@@ -3,6 +3,7 @@ import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { trackMenuAccess, handleLogout } from '../utils/api';
 import { logout } from '../utils/auth';
 import {
   FaRegStar,
@@ -810,6 +811,37 @@ const SmartIncentives = () => {
       setLoading(false);
     }
   };
+
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
+    }
+  };
+
+  const handleLock = async () => {
+    try {
+      const result = await handleLogout();
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        toast.error(
+          result.message || 'Failed to remove lock. Please try again.'
+        );
+      }
+    } catch (error) {
+      console.error('Error in handleLock:', error);
+      toast.error(error.message || 'Failed to remove lock. Please try again.');
+    }
+  };
+
   return (
     <div className="digital-app-container" style={{ height: '1100px' }}>
       <ToastContainer
@@ -833,10 +865,7 @@ const SmartIncentives = () => {
         }}
       />
       <header className="app-header">
-        <div
-          className="s2w-logo"
-          onClick={() => handleNavigation('/dashboard')}
-        >
+        <div className="s2w-logo" onClick={async () => await handleLock()}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
         </div>
         <div className="header-buttons">
@@ -844,13 +873,13 @@ const SmartIncentives = () => {
             <>
               <button
                 className="digital-app-btn"
-                onClick={() => handleNavigation('/digital-app')}
+                onClick={() => handleCardClick('digital', '/digital-app')}
               >
                 Digital App
               </button>
               <button
                 className="market-to-members-btn"
-                onClick={() => handleNavigation('/market-to-members')}
+                onClick={() => handleCardClick('m2m', '/market-to-members')}
               >
                 Market to Members
               </button>
@@ -866,7 +895,7 @@ const SmartIncentives = () => {
               {access.includes('digital') && (
                 <button
                   className="digital-app-btn"
-                  onClick={() => handleNavigation('/digital-app')}
+                  onClick={() => handleCardClick('digital', '/digital-app')}
                 >
                   Digital App
                 </button>
@@ -874,7 +903,7 @@ const SmartIncentives = () => {
               {access.includes('m2m') && (
                 <button
                   className="market-to-members-btn"
-                  onClick={() => handleNavigation('/market-to-members')}
+                  onClick={() => handleCardClick('m2m', '/market-to-members')}
                 >
                   Market to Members
                 </button>
@@ -949,7 +978,7 @@ const SmartIncentives = () => {
                       localStorage.removeItem('selectedVenue');
                       localStorage.setItem('selectedVenue', selectedValue);
 
-                      navigate('/dashboard');
+                      await handleLock();
                     }
                   } catch (error) {
                     console.error('Error updating venue:', error);
