@@ -5,3 +5,42 @@
     margin-left: 15%;
     margin-top: 1%;
   }
+
+  .management-payment-type {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.management-payment-label {
+    color: inherit;
+}
+
+.management-payment-type:hover .management-payment-label {
+    color: #002977;
+}
+
+.management-payment-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 190px;
+    max-width: 260px;
+    padding: 8px 10px;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: #333;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    z-index: 1000;
+}
+
+.management-payment-type:hover .management-payment-tooltip {
+    display: block;
+}

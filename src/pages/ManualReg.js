@@ -43,6 +43,8 @@ const ManualReg = () => {
   const [showManualPayment, setShowManualPayment] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
 
+  const [managementReason, setManagementReason] = useState('');
+
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
   const [venues, setVenues] = useState([]);
@@ -245,6 +247,8 @@ const ManualReg = () => {
     setVerifyPayload(null);
     setShowConfirmMembership(false);
     setShowManualPayment(false);
+    setSelectedPaymentMethod('cash');
+    setManagementReason('');
 
     // Reset section visibility
     setS1Visible(true);
@@ -283,9 +287,15 @@ const ManualReg = () => {
 
   const handleCancelManualPayment = () => {
     setShowManualPayment(false);
+    setManagementReason('');
   };
 
   const handleConfirmManualPayment = async () => {
+    if (selectedPaymentMethod === 'management' && !managementReason.trim()) {
+      toast.error('Please enter a reason for Management approved payment');
+      return;
+    }
+
     const selectedPkg = membershipPackages.find(
       (pkg) => pkg._id === formData.membershipLevel
     );
@@ -307,6 +317,9 @@ const ManualReg = () => {
           : selectedPkg?.calculatedPrice * 100 || 0,
       currency: 'aud',
       paymentType: selectedPaymentMethod,
+      ...(selectedPaymentMethod === 'management' && {
+        managementReason: managementReason.trim(),
+      }),
       packageId: selectedPkg?._id,
       packageName: selectedPkg?.membershipName,
     };
@@ -1473,7 +1486,7 @@ const ManualReg = () => {
 
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '15px' }}
+            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '20px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>
@@ -1520,45 +1533,48 @@ const ManualReg = () => {
             )}
           </div>
 
-          {fromMemberSearch && isRenewMode && (selectedVenue!=='Mannum' && selectedVenue!=='Manly') && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginTop: '15px',
-                marginLeft: '0px',
-                fontSize: '12px',
-              }}
-            >
-              <label
+          {fromMemberSearch &&
+            isRenewMode &&
+            selectedVenue !== 'Mannum' &&
+            selectedVenue !== 'Manly' && (
+              <div
                 style={{
-                  fontWeight: 'bold',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '25px',
-                  cursor: 'pointer',
+                  marginTop: '15px',
+                  marginLeft: '0px',
+                  fontSize: '12px',
                 }}
               >
-                Disable App
-                <input
-                  type="checkbox"
-                  checked={formData.isDisable}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      isDisable: e.target.checked,
-                    }))
-                  }
+                <label
                   style={{
-                    width: '16px',
-                    height: '16px',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '25px',
                     cursor: 'pointer',
-                    accentColor: '#002977',
                   }}
-                />
-              </label>
-            </div>
-          )}
+                >
+                  Disable App
+                  <input
+                    type="checkbox"
+                    checked={formData.isDisable}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        isDisable: e.target.checked,
+                      }))
+                    }
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      cursor: 'pointer',
+                      accentColor: '#002977',
+                    }}
+                  />
+                </label>
+              </div>
+            )}
         </section>
 
         {s2Visible && (
@@ -2005,13 +2021,33 @@ const ManualReg = () => {
                         />
                         Management approved
                       </label>
+
+                      {selectedPaymentMethod === 'management' && (
+                        <textarea
+                          value={managementReason}
+                          onChange={(e) => setManagementReason(e.target.value)}
+                          placeholder="You must enter a reason..."
+                          required
+                          rows={3}
+                          style={{
+                            width: '100%',
+                            padding: '10px',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                            boxSizing: 'border-box',
+                            resize: 'vertical',
+                            fontSize: '12px',
+                            marginTop: '20px',
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                   <div
                     style={{
                       display: 'flex',
                       gap: '15px',
-                      marginTop: '320px',
+                      marginTop: selectedPaymentMethod === 'management' ? '230px' : '325px',
                       justifyContent: 'center',
                     }}
                   >
@@ -2033,15 +2069,24 @@ const ManualReg = () => {
                     </button>
                     <button
                       onClick={handleConfirmManualPayment}
+                      disabled={
+                        selectedPaymentMethod === 'management' &&
+                        !managementReason.trim()
+                      }
                       style={{
                         padding: '12px 40px',
-                        backgroundColor: '#4a90e2',
+                        backgroundColor:
+                          '#4a90e2',
                         color: 'white',
                         border: 'none',
                         borderRadius: '25px',
                         fontSize: '15px',
                         fontWeight: '500',
-                        cursor: 'pointer',
+                        cursor:
+                          selectedPaymentMethod === 'management' &&
+                          !managementReason.trim()
+                            ? 'not-allowed'
+                            : 'pointer',
                         minWidth: '120px',
                       }}
                     >

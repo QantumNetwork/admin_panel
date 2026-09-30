@@ -249,6 +249,11 @@ const PaymentReporting = () => {
   const getFullName = (user) =>
     `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
 
+//   const getStaffUserName = (member) => {
+//   const staffUser = member.staffUser || {};
+//   return `${staffUser.GivenNames || ''} ${staffUser.Surname || ''}`.trim();
+// };
+
   // Pagination controls per tab
   const onPrev = () => {
     if (activeTab === 'approvedPayments') {
@@ -417,6 +422,8 @@ const PaymentReporting = () => {
           'Membership',
           'Payment Type',
           'Amount Paid',
+          'Staff User',
+          'Comment',
         ]);
 
         // CSV DATA
@@ -432,6 +439,8 @@ const PaymentReporting = () => {
             member.packageName || '',
             fetchPaymentType(member.paymentType) || '',
             member.amountPaid || 0,
+            member.paymentType === 'management' ? getFullName(member) : '',
+    member.paymentType === 'management' ? member.managementReason || '' : '',
           ]);
         });
       }
@@ -1229,7 +1238,29 @@ const PaymentReporting = () => {
                         <td>{member.Mobile || member.mobile || '-'}</td>
                         <td>{member.Email || member.email || '-'}</td>
                         <td>{member.packageName || '-'}</td>
-                        <td>{fetchPaymentType(member.paymentType) || '-'}</td>
+                        <td>
+  {member.paymentType === 'management' ? (
+    <div className="management-payment-type">
+      <span className="management-payment-label">
+        {fetchPaymentType(member.paymentType) || '-'}
+      </span>
+
+      <div className="management-payment-tooltip">
+        <div>
+          <strong>Staff Name:</strong>{' '}
+          {getFullName(member) || '-'}
+        </div>
+
+        <div>
+          <strong>Comment:</strong>{' '}
+          {member.managementReason || '-'}
+        </div>
+      </div>
+    </div>
+  ) : (
+    fetchPaymentType(member.paymentType) || '-'
+  )}
+</td>
                         <td>{'$' + member.amountPaid || '-'}</td>
                       </tr>
                     ))}
