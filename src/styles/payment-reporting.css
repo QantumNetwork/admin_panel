@@ -4,12 +4,14 @@
     min-height: 400px;
     margin-left: 15%;
     margin-top: 1%;
+    overflow: visible;
   }
 
   .management-payment-type {
     position: relative;
     display: inline-block;
-    cursor: pointer;
+    cursor: pointer !important;
+    z-index: 1001;
 }
 
 .management-payment-label {
@@ -23,24 +25,67 @@
 .management-payment-tooltip {
     display: none;
     position: absolute;
+
     top: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    min-width: 190px;
+
+    width: 260px;
     max-width: 260px;
+    box-sizing: border-box;
+
     padding: 8px 10px;
+
     background: #ffffff;
     border: 1px solid #ccc;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
     color: #333;
     font-size: 11px;
     line-height: 1.4;
     text-align: left;
+
     white-space: normal;
-    z-index: 1000;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    z-index: 9999;
+}
+
+.management-payment-type,
+.management-payment-tooltip {
+    overflow: visible;
+}
+
+.members-table-container-pr,
+.members-table,
+.members-table tbody,
+.members-table tr,
+.members-table td {
+    overflow: visible !important;
 }
 
 .management-payment-type:hover .management-payment-tooltip {
     display: block;
+}
+
+.members-table td {
+    position: relative;
+    z-index: 0;
+}
+
+.members-table td:has(.management-payment-type:hover) {
+    z-index: 9999;
+}
+
+.management-payment-type:hover {
+    position: relative;
+    z-index: 10000;
+}
+
+.management-payment-tooltip {
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+    z-index: 10001 !important;
 }

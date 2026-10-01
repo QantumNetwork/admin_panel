@@ -295,7 +295,7 @@ const MembershipPage = () => {
               : 0,
           };
 
-          if (selectedVenue === 'Mannum' || selectedVenue === 'Manly') {
+          if (selectedVenue === 'Mannum' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'StarReward') {
             levelObject.isDisplay = row.isDisplay;
           }
 
@@ -685,7 +685,7 @@ const MembershipPage = () => {
                     >
                       Price
                     </th>
-                    {(selectedVenue === 'Mannum' || selectedVenue === 'Manly') && (
+                    {(selectedVenue === 'Mannum' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'StarReward') && (
                       <th
                         style={{
                           textAlign: 'center',
@@ -751,7 +751,7 @@ const MembershipPage = () => {
                           }}
                         />
                       </td>
-                      {(selectedVenue === 'Mannum' || selectedVenue === 'Manly') && (
+                      {(selectedVenue === 'Mannum' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'StarReward') && (
                         <td
                           style={{
                             padding: '6px',

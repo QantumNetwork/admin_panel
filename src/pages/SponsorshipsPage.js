@@ -1004,9 +1004,9 @@ const SponsorshipsPage = () => {
                       <th>Email</th>
                       <th>Address</th>
                       <th># Members</th>
-                      <th>Food Sales</th>
+                      {/* <th>Food Sales</th>
                       <th>Beverage Sales</th>
-                      <th>Gaming T/O</th>
+                      <th>Gaming T/O</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -1037,11 +1037,11 @@ const SponsorshipsPage = () => {
 
                           <td>{data.memberCount || '-'}</td>
 
-                          <td>-</td>
+                          {/* <td>-</td>
 
                           <td>-</td>
 
-                          <td>-</td>
+                          <td>-</td> */}
 
                           <td>
                             <div

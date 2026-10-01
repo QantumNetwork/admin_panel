@@ -39,6 +39,11 @@ const Renewals = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showManualPayment, setShowManualPayment] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
+
+  const [managementReason, setManagementReason] = useState('');
+  const firstName = localStorage.getItem('firstName');
+  const lastName = localStorage.getItem('lastName');
+
   const appGroup = localStorage.getItem('appGroup');
 
   const userType = localStorage.getItem('userType') || 'admin';
@@ -165,8 +170,8 @@ const Renewals = () => {
         selectedVenue === 'MaxGaming'
           ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MAX
           : selectedVenue === 'Mannum'
-          ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MANNUM
-          : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
+            ? process.env.REACT_APP_STRIPE_ACCOUNT_ID_MANNUM
+            : process.env.REACT_APP_STRIPE_ACCOUNT_ID,
     });
   }, [selectedVenue]);
 
@@ -318,6 +323,8 @@ const Renewals = () => {
     setShowConfirmMembership(false);
     setShowManualPayment(false);
 
+    setManagementReason('');
+
     // Reset section visibility
     setS1Visible(true);
     setS2Visible(false);
@@ -355,9 +362,15 @@ const Renewals = () => {
 
   const handleCancelManualPayment = () => {
     setShowManualPayment(false);
+    setManagementReason('');
   };
 
   const handleConfirmManualPayment = async () => {
+    if (selectedPaymentMethod === 'management' && !managementReason.trim()) {
+      toast.error('Please enter a reason for Management approved payment');
+      return;
+    }
+
     const selectedPkg = membershipPackages.find(
       (pkg) => pkg._id === formData.membershipLevel
     );
@@ -379,6 +392,10 @@ const Renewals = () => {
           : selectedPkg?.calculatedPrice * 100 || 0,
       currency: 'aud',
       paymentType: selectedPaymentMethod,
+      ...(selectedPaymentMethod === 'management' && {
+        managementReason: managementReason.trim(),
+        management_Approver: `${firstName || ''} ${lastName || ''}`.trim(),
+      }),
       packageId: selectedPkg?._id,
       packageName: selectedPkg?.membershipName,
       ...(member === 'renewal' && { renewType: 'renew' }),
@@ -1549,7 +1566,8 @@ const Renewals = () => {
                     background: 'white',
                     padding: '25px',
                     borderRadius: '10px',
-                    marginTop: '160px',
+                    marginTop: '158px',
+                    marginLeft: '25px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     textAlign: 'center',
                   }}
@@ -1620,7 +1638,7 @@ const Renewals = () => {
               <div
                 className="d-flex w-100 justify-content-center"
                 style={{
-                  marginTop: !showConfirmMembership ? '430px' : '70px',
+                  marginTop: !showConfirmMembership ? '420px' : '75px',
                 }}
               >
                 {editing2 ? (
@@ -1817,7 +1835,7 @@ const Renewals = () => {
 
                     <div
                       className="d-flex w-100 justify-content-center"
-                      style={{ marginTop: '2px' }}
+                      style={{ marginTop: '28px' }}
                     >
                       <button
                         className="payment-btn"
@@ -1951,13 +1969,38 @@ const Renewals = () => {
                           />
                           Management approved
                         </label>
+
+                        {selectedPaymentMethod === 'management' && (
+                          <textarea
+                            value={managementReason}
+                            onChange={(e) =>
+                              setManagementReason(e.target.value)
+                            }
+                            placeholder="You must enter a reason..."
+                            required
+                            rows={3}
+                            style={{
+                              width: '100%',
+                              padding: '10px',
+                              border: '1px solid #ddd',
+                              borderRadius: '4px',
+                              boxSizing: 'border-box',
+                              resize: 'vertical',
+                              fontSize: '12px',
+                              marginTop: '20px',
+                            }}
+                          />
+                        )}
                       </div>
                     </div>
                     <div
                       style={{
                         display: 'flex',
                         gap: '15px',
-                        marginTop: '320px',
+                        marginTop:
+                          selectedPaymentMethod !== 'management'
+                            ? '347px'
+                            : '250px',
                         justifyContent: 'center',
                       }}
                     >
@@ -1979,6 +2022,10 @@ const Renewals = () => {
                       </button>
                       <button
                         onClick={handleConfirmManualPayment}
+                        disabled={
+                          selectedPaymentMethod === 'management' &&
+                          !managementReason.trim()
+                        }
                         style={{
                           padding: '12px 40px',
                           backgroundColor: '#4a90e2',
@@ -1987,7 +2034,11 @@ const Renewals = () => {
                           borderRadius: '25px',
                           fontSize: '15px',
                           fontWeight: '500',
-                          cursor: 'pointer',
+                          cursor:
+                            selectedPaymentMethod === 'management' &&
+                            !managementReason.trim()
+                              ? 'not-allowed'
+                              : 'pointer',
                           minWidth: '120px',
                         }}
                       >

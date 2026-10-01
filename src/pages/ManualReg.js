@@ -44,6 +44,8 @@ const ManualReg = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash');
 
   const [managementReason, setManagementReason] = useState('');
+  const firstName = localStorage.getItem('firstName');
+  const lastName = localStorage.getItem('lastName');
 
   // API functions
   const [activeTab, setActiveTab] = useState('membersForApproval');
@@ -319,6 +321,7 @@ const ManualReg = () => {
       paymentType: selectedPaymentMethod,
       ...(selectedPaymentMethod === 'management' && {
         managementReason: managementReason.trim(),
+        management_Approver: `${firstName || ''} ${lastName || ''}`.trim(),
       }),
       packageId: selectedPkg?._id,
       packageName: selectedPkg?.membershipName,
@@ -2047,7 +2050,10 @@ const ManualReg = () => {
                     style={{
                       display: 'flex',
                       gap: '15px',
-                      marginTop: selectedPaymentMethod === 'management' ? '230px' : '325px',
+                      marginTop:
+                        selectedPaymentMethod === 'management'
+                          ? '230px'
+                          : '325px',
                       justifyContent: 'center',
                     }}
                   >
@@ -2075,8 +2081,7 @@ const ManualReg = () => {
                       }
                       style={{
                         padding: '12px 40px',
-                        backgroundColor:
-                          '#4a90e2',
+                        backgroundColor: '#4a90e2',
                         color: 'white',
                         border: 'none',
                         borderRadius: '25px',

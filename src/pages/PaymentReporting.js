@@ -249,11 +249,6 @@ const PaymentReporting = () => {
   const getFullName = (user) =>
     `${user.GivenNames || ''} ${user.Surname || ''}`.trim();
 
-//   const getStaffUserName = (member) => {
-//   const staffUser = member.staffUser || {};
-//   return `${staffUser.GivenNames || ''} ${staffUser.Surname || ''}`.trim();
-// };
-
   // Pagination controls per tab
   const onPrev = () => {
     if (activeTab === 'approvedPayments') {
@@ -439,8 +434,12 @@ const PaymentReporting = () => {
             member.packageName || '',
             fetchPaymentType(member.paymentType) || '',
             member.amountPaid || 0,
-            member.paymentType === 'management' ? getFullName(member) : '',
-    member.paymentType === 'management' ? member.managementReason || '' : '',
+            member.paymentType === 'management'
+              ? member.management_Approver
+              : '',
+            member.paymentType === 'management'
+              ? member.managementReason || ''
+              : '',
           ]);
         });
       }
@@ -1017,7 +1016,7 @@ const PaymentReporting = () => {
             cursor: 'pointer',
             minWidth: '140px',
             fontWeight: '500',
-            marginLeft: dateFilter === 'custom' ? '150px' : '200px'
+            marginLeft: dateFilter === 'custom' ? '150px' : '200px',
           }}
         >
           Export as CSV
@@ -1239,28 +1238,28 @@ const PaymentReporting = () => {
                         <td>{member.Email || member.email || '-'}</td>
                         <td>{member.packageName || '-'}</td>
                         <td>
-  {member.paymentType === 'management' ? (
-    <div className="management-payment-type">
-      <span className="management-payment-label">
-        {fetchPaymentType(member.paymentType) || '-'}
-      </span>
+                          {member.paymentType === 'management' ? (
+                            <div className="management-payment-type">
+                              <span className="management-payment-label">
+                                {fetchPaymentType(member.paymentType) || '-'}
+                              </span>
 
-      <div className="management-payment-tooltip">
-        <div>
-          <strong>Staff Name:</strong>{' '}
-          {getFullName(member) || '-'}
-        </div>
+                              <div className="management-payment-tooltip">
+                                <div>
+                                  <strong>Staff Name:</strong>{' '}
+                                  {member.management_Approver || '-'}
+                                </div>
 
-        <div>
-          <strong>Comment:</strong>{' '}
-          {member.managementReason || '-'}
-        </div>
-      </div>
-    </div>
-  ) : (
-    fetchPaymentType(member.paymentType) || '-'
-  )}
-</td>
+                                <div>
+                                  <strong>Comment:</strong>{' '}
+                                  {member.managementReason || '-'}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            fetchPaymentType(member.paymentType) || '-'
+                          )}
+                        </td>
                         <td>{'$' + member.amountPaid || '-'}</td>
                       </tr>
                     ))}
