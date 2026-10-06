@@ -161,6 +161,13 @@ const ManualReg = () => {
     });
   }, [selectedVenue]);
 
+  const isClubApp =
+    selectedVenue === 'Qantum' ||
+    selectedVenue === 'Ace' ||
+    selectedVenue === 'Manly' ||
+    selectedVenue === 'MaxGaming' ||
+    selectedVenue === 'Mannum';
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -539,7 +546,7 @@ const ManualReg = () => {
 
   useEffect(() => {
     const fetchMembershipPackages = async () => {
-      if (!selectedVenue || !userTimeZone) return;
+      if (!selectedVenue || !userTimeZone || !isClubApp) return;
 
       let url = `${baseUrl}/club-package/club?appType=${selectedVenue}&timezone=${encodeURIComponent(
         userTimeZone
@@ -978,9 +985,10 @@ const ManualReg = () => {
         Suburb: formData.Suburb,
         PostCode: formData.PostCode,
         Gender: formData.Gender,
-
-        MembershipCategory: selectedPkg?.membershipName,
-        ExpiryDate: formData.expiryDate,
+        ...(isClubApp && {
+          MembershipCategory: selectedPkg?.membershipName,
+          ExpiryDate: formData.expiryDate,
+        }),
         packageId: selectedPkg?._id,
       };
 
@@ -1158,51 +1166,52 @@ const ManualReg = () => {
       </header>
 
       {/* sidebar */}
-      <aside className="sidebar-sa">
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
-          onClick={() => {
-            resetManualReg();
-            navigate('/approvals');
-          }}
-        >
-          <FaUsersRectangle
-            className={`sidebar-icon ${
-              isActive('/approvals') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Approvals
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/manual-reg') && !fromMemberSearch ? 'active' : ''}`}
-          onClick={() => navigate('/manual-reg')}
-        >
-          <HiOutlinePencilSquare
-            className={`sidebar-icon ${
-              isActive('/manual-reg') && !fromMemberSearch ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Manual Registration
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
-          onClick={() => {
-            resetManualReg();
-            navigate('/club-pkg');
-          }}
-        >
-          <PiListBulletsFill
-            className={`sidebar-icon ${
-              isActive('/club-pkg') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Club Package
-        </button>
+      {isClubApp ? (
+        <aside className="sidebar-sa">
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
+            onClick={() => {
+              resetManualReg();
+              navigate('/approvals');
+            }}
+          >
+            <FaUsersRectangle
+              className={`sidebar-icon ${
+                isActive('/approvals') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Approvals
+          </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/manual-reg') && !fromMemberSearch ? 'active' : ''}`}
+            onClick={() => navigate('/manual-reg')}
+          >
+            <HiOutlinePencilSquare
+              className={`sidebar-icon ${
+                isActive('/manual-reg') && !fromMemberSearch ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Manual Registration
+          </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
+            onClick={() => {
+              resetManualReg();
+              navigate('/club-pkg');
+            }}
+          >
+            <PiListBulletsFill
+              className={`sidebar-icon ${
+                isActive('/club-pkg') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Club Package
+          </button>
 
-        {/* <button
+          {/* <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => {
@@ -1218,63 +1227,96 @@ const ManualReg = () => {
           &nbsp; App Settings
         </button> */}
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${
-            isActive('/payment-reporting') ? 'active' : ''
-          }`}
-          onClick={() => {
-            resetManualReg();
-            navigate('/payment-reporting');
-          }}
-        >
-          <MdVerified
-            className={`sidebar-icon ${
-              isActive('/payment-reporting') ? '' : 'navy-icon'
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${
+              isActive('/payment-reporting') ? 'active' : ''
             }`}
-          />{' '}
-          &nbsp; Payment Reporting
-        </button>
+            onClick={() => {
+              resetManualReg();
+              navigate('/payment-reporting');
+            }}
+          >
+            <MdVerified
+              className={`sidebar-icon ${
+                isActive('/payment-reporting') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Payment Reporting
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
-          onClick={() => navigate('/renewals')}
-        >
-          <MdRefresh
-            className={`sidebar-icon ${
-              isActive('/renewals') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Renewals
-        </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+            onClick={() => navigate('/renewals')}
+          >
+            <MdRefresh
+              className={`sidebar-icon ${
+                isActive('/renewals') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Renewals
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/member-search') || fromMemberSearch ? 'active' : ''}`}
-          onClick={() => navigate('/member-search')}
-        >
-          <CiSearch
-            className={`sidebar-icon ${
-              isActive('/member-search') || fromMemberSearch ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Member Search
-        </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/member-search') || fromMemberSearch ? 'active' : ''}`}
+            onClick={() => navigate('/member-search')}
+          >
+            <CiSearch
+              className={`sidebar-icon ${
+                isActive('/member-search') || fromMemberSearch
+                  ? ''
+                  : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Member Search
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
-          onClick={() => navigate('/transaction-history')}
-        >
-          <MdHistory
-            className={`sidebar-icon ${
-              isActive('/transaction-history') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Transaction History
-        </button>
-      </aside>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+            onClick={() => navigate('/transaction-history')}
+          >
+            <MdHistory
+              className={`sidebar-icon ${
+                isActive('/transaction-history') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Transaction History
+          </button>
+        </aside>
+      ) : (
+        <aside className="sidebar-sa">
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/member-search') || fromMemberSearch ? 'active' : ''}`}
+            onClick={() => navigate('/member-search')}
+          >
+            <CiSearch
+              className={`sidebar-icon ${
+                isActive('/member-search') || fromMemberSearch
+                  ? ''
+                  : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Member Search
+          </button>
+
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+            onClick={() => navigate('/transaction-history')}
+          >
+            <MdHistory
+              className={`sidebar-icon ${
+                isActive('/transaction-history') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Transaction History
+          </button>
+        </aside>
+      )}
 
       <div className="content-wrapper-sa" style={{ top: '120px' }}>
         <section className="new-user-sa" style={{ height: '610px' }}>
@@ -1316,7 +1358,7 @@ const ManualReg = () => {
             />
           </div>
 
-          {isRenewMode && fromMemberSearch && (
+          {isRenewMode && fromMemberSearch && isClubApp && (
             <>
               <div className="form-group">
                 <label style={{ fontWeight: 'bold' }}>Membership</label>

@@ -136,27 +136,27 @@ const Dashboard = () => {
     initializeVenueToken();
   }, []); // Empty dependency array to run only on mount
 
-const handleCardClick = async (accessItem, navigateTo) => {
-  try {
-    const result = await trackMenuAccess(accessItem);
-    // Only navigate if the API call was successful
-    if (result.success && navigateTo) {
-      navigate(navigateTo, { state: { email } });
+  const handleCardClick = async (accessItem, navigateTo) => {
+    try {
+      const result = await trackMenuAccess(accessItem);
+      // Only navigate if the API call was successful
+      if (result.success && navigateTo) {
+        navigate(navigateTo, { state: { email } });
+      }
+      // No need for else if here since trackMenuAccess already shows the error toast
+    } catch (error) {
+      console.error('Error in handleCardClick:', error);
+      // Error toast is already shown by trackMenuAccess
     }
-    // No need for else if here since trackMenuAccess already shows the error toast
-  } catch (error) {
-    console.error('Error in handleCardClick:', error);
-    // Error toast is already shown by trackMenuAccess
-  }
-};
+  };
 
   return (
     <div className="dashboard-container">
-      <ToastContainer 
-              position="top-center"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
@@ -164,12 +164,14 @@ const handleCardClick = async (accessItem, navigateTo) => {
         pauseOnHover
         theme="light"
         transition={Slide}
-        style={{ zIndex: 9999, 
+        style={{
+          zIndex: 9999,
           marginTop: '90px',
           fontSize: '14px',
           minWidth: '300px',
-          textAlign: 'center' }}
-            />
+          textAlign: 'center',
+        }}
+      />
       {/* Header */}
       <header className="dashboard-header">
         <div className="s2w-logo">
@@ -320,7 +322,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 className="dashboard-card"
                 style={{ gridArea: 'digital-app' }}
                 onClick={() => handleCardClick('digital', '/digital-app')}
-
               >
                 <img
                   src="/digital-app.png"
@@ -354,7 +355,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 className="dashboard-card"
                 style={{ gridArea: 'ai-reporting' }}
                 onClick={() => navigate('/chat', { state: { email } })}
-
               >
                 <img
                   src="/ai-reporting.png"
@@ -363,16 +363,33 @@ const handleCardClick = async (accessItem, navigateTo) => {
                 />
               </div>
 
-              {(selectedVenue === 'Qantum' || selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'MaxGaming' || selectedVenue === 'Mannum') && (
+              {selectedVenue === 'Qantum' ||
+              selectedVenue === 'Ace' ||
+              selectedVenue === 'Manly' ||
+              selectedVenue === 'MaxGaming' ||
+              selectedVenue === 'Mannum' ? (
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}
                   onClick={() => navigate('/approvals', { state: { email } })}
-
                 >
                   <img
                     src="/club-desk.png"
                     alt="Club Desk"
+                    className="card-image"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'club-desk', width: '85%', marginLeft: '8%' }}
+                  onClick={() =>
+                    navigate('/member-search', { state: { email } })
+                  }
+                >
+                  <img
+                    src="/members.png"
+                    alt="Members"
                     className="card-image"
                   />
                 </div>
@@ -386,7 +403,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   className="dashboard-card"
                   style={{ gridArea: 'digital-app' }}
                   onClick={() => handleCardClick('digital', '/digital-app')}
-
                 >
                   <img
                     src="/digital-app.png"
@@ -400,7 +416,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   className="dashboard-card"
                   style={{ gridArea: 'market-members' }}
                   onClick={() => handleCardClick('m2m', '/market-to-members')}
-
                 >
                   <img
                     src="/m2m.png"
@@ -427,7 +442,6 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   className="dashboard-card"
                   style={{ gridArea: 'ai-reporting' }}
                   onClick={() => navigate('/chat', { state: { email } })}
-
                 >
                   <img
                     src="/ai-reporting.png"
@@ -442,11 +456,26 @@ const handleCardClick = async (accessItem, navigateTo) => {
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}
                   onClick={() => navigate('/approvals', { state: { email } })}
-
                 >
                   <img
                     src="/club-desk.png"
                     alt="Club Desk"
+                    className="card-image"
+                  />
+                </div>
+              )}
+
+              {access.includes('members') && (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'club-desk', width: '85%', marginLeft: '8%' }}
+                  onClick={() =>
+                    navigate('/member-search', { state: { email } })
+                  }
+                >
+                  <img
+                    src="/members.png"
+                    alt="Members"
                     className="card-image"
                   />
                 </div>

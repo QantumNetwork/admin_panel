@@ -101,7 +101,7 @@
   justify-content: center;
   grid-template-areas:
     "digital-app market-members ai-reporting"
-    "club-desk club-desk club-desk";
+    "club-desk . .";
 }
 
 /* Add this: for non-admin limited-access users */

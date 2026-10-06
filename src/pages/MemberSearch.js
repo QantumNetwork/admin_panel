@@ -53,6 +53,13 @@ const MemberSearch = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [memberId, setMemberId] = useState('');
 
+  const isClubApp =
+    selectedVenue === 'Qantum' ||
+    selectedVenue === 'Ace' ||
+    selectedVenue === 'Manly' ||
+    selectedVenue === 'MaxGaming' ||
+    selectedVenue === 'Mannum';
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -316,46 +323,74 @@ const MemberSearch = () => {
         </div>
       </header>
 
-      {/* sidebar */}
-      <aside className="sidebar-sa">
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
-          onClick={() => navigate('/approvals')}
-        >
-          <FaUsersRectangle
-            className={`sidebar-icon ${
-              isActive('/approvals') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Approvals
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
-          onClick={() => navigate('/manual-reg')}
-        >
-          <HiOutlinePencilSquare
-            className={`sidebar-icon ${
-              isActive('/manual-reg') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Manual Registration
-        </button>
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
-          onClick={() => navigate('/club-pkg')}
-        >
-          <PiListBulletsFill
-            className={`sidebar-icon ${
-              isActive('/club-pkg') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Club Package
-        </button>
+      {!isClubApp ? (
+        <aside className="sidebar-sa">
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+            onClick={() => navigate('/member-search')}
+          >
+            <CiSearch
+              className={`sidebar-icon ${
+                isActive('/member-search') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Member Search
+          </button>
 
-        {/* <button
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+            onClick={() => navigate('/transaction-history')}
+          >
+            <MdHistory
+              className={`sidebar-icon ${
+                isActive('/transaction-history') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Transaction History
+          </button>
+        </aside>
+      ) : (
+        <aside className="sidebar-sa">
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/approvals') ? 'active' : ''}`}
+            onClick={() => navigate('/approvals')}
+          >
+            <FaUsersRectangle
+              className={`sidebar-icon ${
+                isActive('/approvals') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Approvals
+          </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/manual-reg') ? 'active' : ''}`}
+            onClick={() => navigate('/manual-reg')}
+          >
+            <HiOutlinePencilSquare
+              className={`sidebar-icon ${
+                isActive('/manual-reg') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Manual Registration
+          </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/club-pkg') ? 'active' : ''}`}
+            onClick={() => navigate('/club-pkg')}
+          >
+            <PiListBulletsFill
+              className={`sidebar-icon ${
+                isActive('/club-pkg') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Club Package
+          </button>
+
+          {/* <button
           style={{ fontSize: '12px' }}
           className={`sidebar-btn ${isActive('/app-settings') ? 'active' : ''}`}
           onClick={() => navigate('/app-settings')}
@@ -368,60 +403,61 @@ const MemberSearch = () => {
           &nbsp; App Settings
         </button> */}
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${
-            isActive('/payment-reporting') ? 'active' : ''
-          }`}
-          onClick={() => navigate('/payment-reporting')}
-        >
-          <MdVerified
-            className={`sidebar-icon ${
-              isActive('/payment-reporting') ? '' : 'navy-icon'
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${
+              isActive('/payment-reporting') ? 'active' : ''
             }`}
-          />{' '}
-          &nbsp; Payment Reporting
-        </button>
+            onClick={() => navigate('/payment-reporting')}
+          >
+            <MdVerified
+              className={`sidebar-icon ${
+                isActive('/payment-reporting') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Payment Reporting
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
-          onClick={() => navigate('/renewals')}
-        >
-          <MdRefresh
-            className={`sidebar-icon ${
-              isActive('/renewals') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Renewals
-        </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/renewals') ? 'active' : ''}`}
+            onClick={() => navigate('/renewals')}
+          >
+            <MdRefresh
+              className={`sidebar-icon ${
+                isActive('/renewals') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Renewals
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
-          onClick={() => navigate('/member-search')}
-        >
-          <CiSearch
-            className={`sidebar-icon ${
-              isActive('/member-search') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Member Search
-        </button>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/member-search') ? 'active' : ''}`}
+            onClick={() => navigate('/member-search')}
+          >
+            <CiSearch
+              className={`sidebar-icon ${
+                isActive('/member-search') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Member Search
+          </button>
 
-        <button
-          style={{ fontSize: '12px' }}
-          className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
-          onClick={() => navigate('/transaction-history')}
-        >
-          <MdHistory
-            className={`sidebar-icon ${
-              isActive('/transaction-history') ? '' : 'navy-icon'
-            }`}
-          />{' '}
-          &nbsp; Transaction History
-        </button>
-      </aside>
+          <button
+            style={{ fontSize: '12px' }}
+            className={`sidebar-btn ${isActive('/transaction-history') ? 'active' : ''}`}
+            onClick={() => navigate('/transaction-history')}
+          >
+            <MdHistory
+              className={`sidebar-icon ${
+                isActive('/transaction-history') ? '' : 'navy-icon'
+              }`}
+            />{' '}
+            &nbsp; Transaction History
+          </button>
+        </aside>
+      )}
 
       <div className="content-area">
         {/* Search panel placed above the table */}
@@ -603,7 +639,7 @@ const MemberSearch = () => {
                           }
 
                           // Case 1: Active membership
-                          if (expiry && expiry >= today) {
+                          if ((expiry && expiry >= today) || !isClubApp) {
                             return null; // nothing if mobile exists
                           }
 
