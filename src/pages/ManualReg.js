@@ -1560,8 +1560,7 @@ const ManualReg = () => {
 
           {fromMemberSearch &&
             isRenewMode &&
-            selectedVenue !== 'Mannum' &&
-            selectedVenue !== 'Manly' && (
+            (
               <div className="form-group disable-app-row">
                 <label className="disable-app-label">Disable App</label>
                 <div className="disable-app-control">
