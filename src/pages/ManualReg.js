@@ -1467,71 +1467,51 @@ const ManualReg = () => {
             />
           </div>
 
-          <div className="form-group">
-            <div
-              style={{
-                display: 'flex',
-                gap: '5px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <label style={{ fontWeight: 'bold', minWidth: '62px' }}>
-                Gender
-              </label>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '2px',
-                  marginLeft: '25px',
-                }}
-              >
+          <div className="form-group gender-form-group">
+            <label style={{ fontWeight: 'bold' }}>Gender</label>
+
+            <div className="gender-options">
+              <label className="gender-option">
                 <input
                   type="radio"
                   name="Gender"
                   value="M"
                   checked={formData.Gender === 'M'}
                   onChange={handleInputChange}
-                  style={{ accentColor: '#002977' }}
                   {...disableIf(editing1)}
                 />
-                Male
+                <span>Male</span>
               </label>
-              <label
-                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
-              >
+
+              <label className="gender-option">
                 <input
                   type="radio"
                   name="Gender"
                   value="F"
                   checked={formData.Gender === 'F'}
                   onChange={handleInputChange}
-                  style={{ accentColor: '#002977' }}
                   {...disableIf(editing1)}
                 />
-                Female
+                <span>Female</span>
               </label>
 
-              <label
-                style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
-              >
+              <label className="gender-option">
                 <input
                   type="radio"
                   name="Gender"
                   value="U"
                   checked={formData.Gender === 'U'}
                   onChange={handleInputChange}
-                  style={{ accentColor: '#002977' }}
                   {...disableIf(editing1)}
                 />
-                Non-binary
+                <span>Non-binary</span>
               </label>
             </div>
           </div>
 
           <div
             className="d-flex w-100 justify-content-center"
-            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '20px' }}
+            style={{ marginTop: !isEditMode && !isRenewMode ? '95px' : '10px' }}
           >
             {!isEditMode && !isRenewMode ? (
               <>
@@ -1582,25 +1562,9 @@ const ManualReg = () => {
             isRenewMode &&
             selectedVenue !== 'Mannum' &&
             selectedVenue !== 'Manly' && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginTop: '15px',
-                  marginLeft: '0px',
-                  fontSize: '12px',
-                }}
-              >
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '25px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Disable App
+              <div className="form-group disable-app-row">
+                <label className="disable-app-label">Disable App</label>
+                <div className="disable-app-control">
                   <input
                     type="checkbox"
                     checked={formData.isDisable}
@@ -1610,14 +1574,8 @@ const ManualReg = () => {
                         isDisable: e.target.checked,
                       }))
                     }
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      cursor: 'pointer',
-                      accentColor: '#002977',
-                    }}
                   />
-                </label>
+                </div>
               </div>
             )}
         </section>

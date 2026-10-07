@@ -13,8 +13,51 @@
 }
 
 .form-group input[type='radio'] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 14px;
   accent-color: #002977;
 }
+
+.gender-form-group {
+  width: 100%;
+}
+
+.gender-form-group > label {
+  margin: 0;
+}
+
+.gender-options {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.gender-option {
+  display: flex !important;
+  align-items: center;
+  width: auto !important;
+  flex: 0 0 auto;
+  gap: 4px;
+  margin: 0 !important;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.gender-option input[type='radio'] {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 14px;
+  accent-color: #002977;
+}
+
 /* Remove the inline style from the street address input */
 .form-group input[type='text'][name='street'] {
   margin-bottom: 8px;
@@ -119,6 +162,38 @@
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-top: 15px;
+}
+
+.disable-app-row {
+  width: 100%;
+  margin-top: 15px;
+  font-size: 12px;
+}
+
+.disable-app-row > .disable-app-label {
+  margin: 0;
+}
+
+.disable-app-label {
+  font-weight: bold !important;
+}
+
+.disable-app-control {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.disable-app-control input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 16px;
+  cursor: pointer;
+  accent-color: #002977;
 }
 
 .cancel-btn:hover {
