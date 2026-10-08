@@ -2280,7 +2280,7 @@ const SmartIncentives = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="8" className="no-data">
+                          <td colSpan="8" className="no-data" style={{textAlign: 'right'}}>
                             No incentives found
                           </td>
                         </tr>

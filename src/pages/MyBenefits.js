@@ -653,7 +653,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater' || selectedVenue === 'Mannum') && (
+        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater' || selectedVenue === 'Mannum' || selectedVenue === 'StarReward') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''

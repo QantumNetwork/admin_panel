@@ -3057,7 +3057,7 @@ const SpecialOffers = () => {
           selectedVenue === 'Flinders' ||
           selectedVenue === 'Mosaic' ||
           selectedVenue === 'Bluewater' ||
-          selectedVenue === 'Mannum') && (
+          selectedVenue === 'Mannum' || selectedVenue === 'StarReward') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
@@ -4308,7 +4308,7 @@ const SpecialOffers = () => {
                             <label>
                               <strong>Enter trigger value</strong>
                             </label>
-                            <div style={{ marginBottom: '0' }}>
+                            <div style={{ marginTop: '0' }}>
                               <input
                                 type="text"
                                 className="trigger-input"
@@ -4860,7 +4860,7 @@ const SpecialOffers = () => {
                             <label>
                               <strong>Enter trigger value</strong>
                             </label>
-                            <div style={{ marginBottom: '0' }}>
+                            <div style={{ marginTop: '4px' }}>
                               <input
                                 type="text"
                                 className="trigger-input"
@@ -5046,7 +5046,7 @@ const SpecialOffers = () => {
                             <label>
                               <strong>Enter trigger value</strong>
                             </label>
-                            <div style={{ marginBottom: '0' }}>
+                            <div style={{ marginTop: '4px' }}>
                               <input
                                 type="text"
                                 className="trigger-input"

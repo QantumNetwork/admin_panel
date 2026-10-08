@@ -1043,13 +1043,26 @@ border: 1px solid #22ade3;
 .bonus-points-toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
+}
+
+.bonus-points-toggle > input[type="checkbox"] {
+  flex: 0 0 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 4px 0 0 !important;
+}
+
+.bonus-points-toggle > span {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .bonus-points-input {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  margin-left: 2px;
 }
 
 .bonus-points-input input {

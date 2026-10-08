@@ -453,7 +453,7 @@ const Reporting = () => {
           selectedVenue === 'Flinders' ||
           selectedVenue === 'Mosaic' ||
           selectedVenue === 'Bluewater' ||
-          selectedVenue === 'Mannum') && (
+          selectedVenue === 'Mannum' || selectedVenue === 'StarReward') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
