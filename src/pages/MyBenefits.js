@@ -66,6 +66,7 @@ const MyBenefits = () => {
   if (venue === 'Mannum') return 'Member';
   if (venue === 'Mosaic') return 'Bronze';
   if (venue === 'Qantum') return 'Valued';
+  if (venue === 'TeaGarden') return 'Staff';
   return 'Platinum Black';
 };
 
@@ -113,6 +114,7 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
         if (selectedVenue === 'Hogan') return '#45d4e1ff';
         if (selectedVenue === 'Ace') return '#dedadabd';
         if (selectedVenue === 'Ace') return '#549891';
+        if (selectedVenue === 'TeaGarden') return '#86A194';
       case 'Staff Pre 3Mth':
         if (selectedVenue === 'Sense') return '#e1ae68';
         return '#FF0000';
@@ -217,7 +219,8 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
       // case 'Perpetuity':
       //   if (selectedVenue === 'Mannum') return '#D4AF37';
       case 'Test':
-        return '#ff0000';
+        if (selectedVenue === 'Flinders') return '#ff0000';
+        if (selectedVenue === 'TeaGarden') return '#6D9AA7';
       case 'Locals':
         return '#717B50';
       default:

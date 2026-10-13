@@ -21,7 +21,8 @@ export const getAppType = (appType) => {
     Bob: "Bob's Bulk Booze",
     Sense: 'Sense Of Taste',
     Mannum: 'Mannum Club',
-    Mosaic: 'Mosaic Hotel'
+    Mosaic: 'Mosaic Hotel',
+    TeaGarden: 'Tea Gardens'
   };
 
   return appTypeMap[appType] || appType;
@@ -49,7 +50,8 @@ export const getIconVenue = (appType) => {
     EDP: '/edp.png',
     Bob: '/bob.png',
     Mannum: '/mannum.png',
-    Mosaic: '/mosaic.png'
+    Mosaic: '/mosaic.png',
+    TeaGarden: '/tea-gardens.png'
   };
 
   return appIconMap[appType] || appType;
@@ -236,6 +238,13 @@ export const getAudienceOptions = (venueName) => {
       { value: 'Staff', label: 'Staff' },
       { value: 'Cancelled', label: 'Cancelled' },
       { value: 'Loyalty Member', label: 'Loyalty Member' },
+    ],
+    TeaGarden: [
+      { value: 'Staff', label: 'Staff' },
+      { value: 'Test', label: 'Test' },
+      { value: 'Silver', label: 'Silver' },
+      { value: 'Platinum', label: 'Platinum' },
+      { value: 'Gold', label: 'Gold' },
     ]
   };
 

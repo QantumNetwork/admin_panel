@@ -103,6 +103,8 @@ const PowerAdmin = () => {
         return 'Mannum';
       case 'Mosaic Hotel':
         return 'Mosaic';
+      case 'Tea Gardens':
+        return 'TeaGarden';
       default:
         return appName;
     }
@@ -131,6 +133,7 @@ const PowerAdmin = () => {
     'Sense Of Taste',
     'Mannum Club',
     'Mosaic Hotel',
+    'Tea Gardens',
   ];
 
   const handleAddGroup = (index) => {
@@ -323,6 +326,9 @@ const PowerAdmin = () => {
               break;
             case 'Mosaic':
               appDisplayNames.push("Mosaic Hotel");
+              break;
+            case 'TeaGarden':
+              appDisplayNames.push("Tea Gardens");
               break;
             default:
               appDisplayNames.push(app);
