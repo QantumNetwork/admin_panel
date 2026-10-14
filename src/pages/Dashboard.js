@@ -367,7 +367,8 @@ const Dashboard = () => {
               selectedVenue === 'Ace' ||
               selectedVenue === 'Manly' ||
               selectedVenue === 'MaxGaming' ||
-              selectedVenue === 'Mannum' ? (
+              selectedVenue === 'Mannum' ||
+              selectedVenue === 'TeaGarden' ? (
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'club-desk' }}

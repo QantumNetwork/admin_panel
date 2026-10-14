@@ -291,6 +291,17 @@ const SmartIncentives = () => {
         return;
       }
 
+      // Validate the targeted-list upload flow before normal validations.
+    if (isUploadTargetedList && targetedListStep === 'upload') {
+      toast.error('Please upload a file');
+      return;
+    }
+
+    if (isUploadTargetedList && targetedListStep === 'review') {
+      toast.error('Please select Use this File first');
+      return;
+    }
+
       // targeted-list flow uses the CSV API.
       const isTargetedList =
         isUploadTargetedList && targetedListStep === 'target';

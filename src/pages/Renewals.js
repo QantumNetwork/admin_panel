@@ -71,7 +71,8 @@ const Renewals = () => {
     selectedVenue === 'Ace' ||
     selectedVenue === 'Manly' ||
     selectedVenue === 'MaxGaming' ||
-    selectedVenue === 'Mannum';
+    selectedVenue === 'Mannum' ||
+    selectedVenue === 'TeaGarden';
 
   const [userTimeZone, setUserTimeZone] = useState('');
 

@@ -115,7 +115,7 @@ function CreateNewPassword() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
                 className="cnp-password-input"
               />
 
@@ -216,7 +216,7 @@ function CreateNewPassword() {
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value.replace(/\s/g, ''))}
                 className="cnp-password-input"
               />
 

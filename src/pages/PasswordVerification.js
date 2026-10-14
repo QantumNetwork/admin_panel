@@ -82,7 +82,7 @@ const PasswordVerification = () => {
     className="password-input"
     placeholder="Enter your password"
     value={password}
-    onChange={(e) => setPassword(e.target.value)}
+    onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
     autoComplete="new-password" // Prevents autofill issues
   />
   <span className="eye-icon" onClick={togglePasswordVisibility}>

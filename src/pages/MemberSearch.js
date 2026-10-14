@@ -58,7 +58,8 @@ const MemberSearch = () => {
     selectedVenue === 'Ace' ||
     selectedVenue === 'Manly' ||
     selectedVenue === 'MaxGaming' ||
-    selectedVenue === 'Mannum';
+    selectedVenue === 'Mannum' ||
+    selectedVenue === 'TeaGarden';
 
   useEffect(() => {
     const fetchVenues = async () => {
