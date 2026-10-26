@@ -187,7 +187,7 @@ const AIChatPage = () => {
                                         ? 'https://sensoftasteviperapi.blackisland-4d6cc168.australiaeast.azurecontainerapps.io/api/airesponse'
                                         : isMannum
                                           ? 'https://mannumclubviperapi.bravepebble-efe42685.australiaeast.azurecontainerapps.io/api/airesponse'
-                                          : null
+                                          : null;
 
     return endpoint;
   };
@@ -229,8 +229,8 @@ const AIChatPage = () => {
         else if (data.type === 'graph') assistantMsg.fileType = 'graph';
         else if (data.type === 'export') assistantMsg.fileType = 'excel';
         if (!isInitialization) {
-  setChatHistory([...historyToSend, assistantMsg]);
-}
+          setChatHistory([...historyToSend, assistantMsg]);
+        }
       } else {
         toast.error('AI failed to respond.');
       }
@@ -243,38 +243,36 @@ const AIChatPage = () => {
 
       if (isInitialization) {
         setInitialLoading(false);
-    }
+      }
     }
   };
 
   useEffect(() => {
     const shouldSendInitialPrompt =
-        chatHistory.length === 1 &&
-        chatHistory[0].role === "user";
+      chatHistory.length === 1 && chatHistory[0].role === 'user';
 
     if (shouldSendInitialPrompt) {
-        setInitialLoading(true);
-        sendToAI(chatHistory);
-        return;
+      setInitialLoading(true);
+      sendToAI(chatHistory);
+      return;
     }
 
     if (chatHistory.length === 0) {
-        setInitialLoading(true);
+      setInitialLoading(true);
 
-        sendToAI(
-            [
-                {
-                    role: "user",
-                    content: "Hi",
-                },
-            ],
-            true
-        );
+      sendToAI(
+        [
+          {
+            role: 'user',
+            content: 'Hi',
+          },
+        ],
+        true
+      );
 
-        return;
+      return;
     }
-
-}, []);
+  }, []);
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -535,13 +533,13 @@ const AIChatPage = () => {
   // };
 
   if (initialLoading) {
-  return (
-    <div className="ai-chat-loading">
-      <div className="loader" />
-      <p>Firing up your AI assistant...</p>
-    </div>
-  );
-}
+    return (
+      <div className="ai-chat-loading">
+        <div className="loader" />
+        <p>Firing up your AI assistant...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="digital-app-container">
@@ -701,6 +699,14 @@ const AIChatPage = () => {
               {tb.title}
             </button>
           ))}
+
+          <button
+            type="button"
+            className="traditional-reporting-btn"
+            onClick={() => navigate('/power-bi')}
+          >
+            Traditional Reporting
+          </button>
         </div>
 
         <div className="ai-main-area-chat">

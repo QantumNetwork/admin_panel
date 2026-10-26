@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { FaUsersRectangle } from 'react-icons/fa6';
+import { TbConnection } from 'react-icons/tb';
 import { HiOutlinePencilSquare } from 'react-icons/hi2';
 import { TiCreditCard } from 'react-icons/ti';
 import { PiListBulletsFill } from 'react-icons/pi';
@@ -544,6 +545,17 @@ const AppSettings = () => {
                 className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
               />
               &nbsp; Forced App Updates
+            </button>
+
+            <button
+              style={{ fontSize: '12px' }}
+              className={`sidebar-btn ${isActive('/bi-connections') ? 'active' : ''}`}
+              onClick={() => navigate('/bi-connections')}
+            >
+              <TbConnection
+                className={`sidebar-icon ${isActive('/bi-connections') ? '' : 'navy-icon'}`}
+              />
+              &nbsp; BI Connections
             </button>
           </>
         )}

@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
 import { BsMenuButtonFill } from 'react-icons/bs';
+import { TbConnection } from 'react-icons/tb';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { handleLogout } from '../utils/api';
 import { getAppType, getIconVenue } from '../utils/appConstants';
@@ -52,6 +53,9 @@ const StandardAdmin = () => {
     company: '',
     access: [],
   });
+
+  const [securityLevels, setSecurityLevels] = useState([]);
+  const [reportingSecurityLevel, setReportingSecurityLevel] = useState('');
 
   const [errors, setErrors] = useState({});
 
@@ -117,6 +121,7 @@ const StandardAdmin = () => {
         access: [],
       });
       setCurrentUserId(null);
+      setReportingSecurityLevel('');
     }
   }, [activeTab]);
 
@@ -192,25 +197,42 @@ const StandardAdmin = () => {
     }
   };
 
-  // Dummy data for edit users
-  // const dummyUsers = [
-  //   {
-  //     name: 'David Ohlson',
-  //     username: 'david@star.com.au',
-  //     connected: 'Star Rewards',
-  //   },
-  //   {
-  //     name: 'Michael Murray',
-  //     username: 'murray@star.com.au',
-  //     connected: 'Star Rewards',
-  //   },
-  //   { name: 'Sarah Lee', username: 'sarah@hotel.com', connected: 'Star Hotel' },
-  //   {
-  //     name: 'John Doe',
-  //     username: 'john@tavern.com',
-  //     connected: 'Runcorn Tavern',
-  //   },
-  // ];
+  useEffect(() => {
+    const fetchSecurityLevels = async () => {
+      if (!token) return;
+
+      try {
+        const response = await axios.get(
+          'https://betaapi.s2w.com.au/security',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data?.success === true) {
+          const config = response.data.data;
+
+          const options = [
+            { label: 'Full Access', value: config?.All || '' },
+            { label: 'Gaming Only', value: config?.Gaming || '' },
+            { label: 'POS Only', value: config?.POS || '' },
+          ].filter((option) => option.value);
+
+          setSecurityLevels(options);
+        }
+      } catch (error) {
+        console.error(
+          'Error fetching security levels:',
+          error.response?.data || error.message
+        );
+        toast.error('Failed to fetch reporting security levels.');
+      }
+    };
+
+    fetchSecurityLevels();
+  }, [token]);
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -395,6 +417,10 @@ const StandardAdmin = () => {
           access: userData.access || [],
         });
 
+        if(userData.securityValue) {
+          setReportingSecurityLevel(userData.securityValue);
+        }
+
         // Set the selected venue based on user's appType
         if (userData.appType) {
           setSelectedVenue(userData.appType);
@@ -409,16 +435,34 @@ const StandardAdmin = () => {
     }
   };
 
+  const modifyPayloadKey = (label) => {
+    switch(label) {
+      case 'Full Access':
+        return 'All';
+      case 'Gaming Only':
+        return 'Gaming';
+      case 'POS Only':
+        return 'POS';
+      default:
+        return label;
+    }
+  }
+
   const handleActivate = async () => {
     if (!validateForm()) {
       return;
     }
 
     try {
+      const selectedSecurityLevel = securityLevels.find(
+        (level) => level.value === reportingSecurityLevel
+      );
       const userData = {
         ...formData,
         appType: selectedVenue,
         type: 'user',
+        securityName: modifyPayloadKey(selectedSecurityLevel?.label) || '',
+        securityValue: selectedSecurityLevel?.value || '',
       };
 
       // Show loading state
@@ -492,6 +536,7 @@ const StandardAdmin = () => {
         // setSelectedVenue('');
         setCurrentUserId(null);
         setErrors({});
+        setReportingSecurityLevel('');
 
         // Dismiss loading toast
         toast.dismiss(toastId);
@@ -752,6 +797,17 @@ const StandardAdmin = () => {
           />
           &nbsp; Forced App Updates
         </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/bi-connections') ? 'active' : ''}`}
+          onClick={() => navigate('/bi-connections')}
+        >
+          <TbConnection
+            className={`sidebar-icon ${isActive('/bi-connections') ? '' : 'navy-icon'}`}
+          />
+          &nbsp; BI Connections
+        </button>
       </aside>
 
       <div className="sa-filter-buttons">
@@ -856,6 +912,55 @@ const StandardAdmin = () => {
                   <FaExclamationCircle size={12} /> {errors.company}
                 </span>
               )}
+
+              <div
+                className="form-group reporting-security-group"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  marginTop: 'auto',
+                  paddingTop: '12px',
+                }}
+              >
+                <label
+                  htmlFor="reporting-security-level"
+                  style={{
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                    margin: 0,
+                  }}
+                >
+                  Reporting Security Level
+                </label>
+
+                <select
+                  id="reporting-security-level"
+                  value={reportingSecurityLevel}
+                  onChange={(e) => setReportingSecurityLevel(e.target.value)}
+                  style={{
+                    width: '135px',
+                    minWidth: '135px',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: '#fff',
+                    color: '#666',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="">Select from list</option>
+
+                  {securityLevels.map((level) => (
+                    <option key={level.label} value={level.value}>
+                      {level.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </section>
             <section className="access-sa">
               <h2>Access</h2>

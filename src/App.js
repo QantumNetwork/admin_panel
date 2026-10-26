@@ -40,6 +40,8 @@ import ForcedAppUpdates from "./pages/ForcedAppUpdates";
 import MobileVerificationPage from "./pages/MobileVerificationPage";
 import CreateNewPassword from "./pages/CreateNewPassword";
 import SponsorshipsPage from "./pages/SponsorshipsPage";
+import BIConnections from "./pages/BIConnections";
+import PowerBIDashboard from "./pages/PowerBIDashboard";
 
 
 function App() {
@@ -109,6 +111,8 @@ function App() {
         <Route path="/mobile-verification-page" element={<MobileVerificationPage />} />
         <Route path="/create-new-password" element={<CreateNewPassword />} />
         <Route path="/sponsorships-page" element={<SponsorshipsPage />} />
+        <Route path="/bi-connections" element={<BIConnections />} />
+        <Route path="/power-bi" element={<PowerBIDashboard venueID={"MHBC"} />} />
       </Routes>
       
     </Router>

@@ -4,6 +4,7 @@ import { BsMenuButtonFill } from 'react-icons/bs';
 import { TiCreditCard } from 'react-icons/ti';
 import { IoDownloadOutline, IoSettingsOutline } from 'react-icons/io5';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { TbConnection } from 'react-icons/tb';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { logout } from '../utils/auth';
@@ -97,55 +98,63 @@ const ForcedAppUpdates = () => {
   };
 
   useEffect(() => {
-  const fetchAppVersions = async () => {
-    // We currently only support Ace Rewards
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum' && selectedVenue !=='Bob') {
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `${baseUrl}/app-versions/${selectedVenue}/latest`
-      );
-
-      if (response.data?.success && response.data?.data) {
-        const { android, ios } = response.data.data;
-
-        // Populate iOS fields
-        setIOSVersion(ios?.latest_version || '');
-        setIOSBuild(
-          ios?.latest_build !== undefined
-            ? String(ios.latest_build)
-            : ''
-        );
-
-        // Populate Android fields
-        setAndroidVersion(android?.latest_version || '');
-        setAndroidBuild(
-          android?.latest_build !== undefined
-            ? String(android.latest_build)
-            : ''
-        );
-
-        // Both platforms currently use the same force_update value
-        if (android?.force_update || ios?.force_update) {
-          setSelectedMessage('force-fau');
-        } else {
-          setSelectedMessage('later-fau');
-        }
+    const fetchAppVersions = async () => {
+      // We currently only support Ace Rewards
+      if (
+        selectedVenue !== 'Ace' &&
+        selectedVenue !== 'Qantum' &&
+        selectedVenue !== 'Manly' &&
+        selectedVenue !== 'MaxGaming' &&
+        selectedVenue !== 'StarReward' &&
+        selectedVenue !== 'EDP' &&
+        selectedVenue !== 'Mosaic' &&
+        selectedVenue !== 'Mannum' &&
+        selectedVenue !== 'Bob'
+      ) {
+        return;
       }
-    } catch (error) {
-      console.error('Error fetching app versions:', error);
 
-      // toast.error(
-      //   error.response?.data?.message ||
-      //   'Failed to fetch current app versions.'
-      // );
-    }
-  };
+      try {
+        const response = await axios.get(
+          `${baseUrl}/app-versions/${selectedVenue}/latest`
+        );
 
-  fetchAppVersions();
-}, [selectedVenue, baseUrl]);
+        if (response.data?.success && response.data?.data) {
+          const { android, ios } = response.data.data;
+
+          // Populate iOS fields
+          setIOSVersion(ios?.latest_version || '');
+          setIOSBuild(
+            ios?.latest_build !== undefined ? String(ios.latest_build) : ''
+          );
+
+          // Populate Android fields
+          setAndroidVersion(android?.latest_version || '');
+          setAndroidBuild(
+            android?.latest_build !== undefined
+              ? String(android.latest_build)
+              : ''
+          );
+
+          // Both platforms currently use the same force_update value
+          if (android?.force_update || ios?.force_update) {
+            setSelectedMessage('force-fau');
+          } else {
+            setSelectedMessage('later-fau');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching app versions:', error);
+
+        // toast.error(
+        //   error.response?.data?.message ||
+        //   'Failed to fetch current app versions.'
+        // );
+      }
+    };
+
+    fetchAppVersions();
+  }, [selectedVenue, baseUrl]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -168,10 +177,18 @@ const ForcedAppUpdates = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (selectedVenue !== 'Ace' && selectedVenue !=='Qantum'  && selectedVenue !=='Manly' && selectedVenue !=='MaxGaming' && selectedVenue !=='StarReward' && selectedVenue !=='EDP' && selectedVenue !=='Mosaic' && selectedVenue !=='Mannum' && selectedVenue !=='Bob') {
-      toast.error(
-        'App version updates unavailable on this account'
-      );
+    if (
+      selectedVenue !== 'Ace' &&
+      selectedVenue !== 'Qantum' &&
+      selectedVenue !== 'Manly' &&
+      selectedVenue !== 'MaxGaming' &&
+      selectedVenue !== 'StarReward' &&
+      selectedVenue !== 'EDP' &&
+      selectedVenue !== 'Mosaic' &&
+      selectedVenue !== 'Mannum' &&
+      selectedVenue !== 'Bob'
+    ) {
+      toast.error('App version updates unavailable on this account');
       return;
     }
 
@@ -404,6 +421,17 @@ const ForcedAppUpdates = () => {
             className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
           />
           &nbsp; Forced App Updates
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/bi-connections') ? 'active' : ''}`}
+          onClick={() => navigate('/bi-connections')}
+        >
+          <TbConnection
+            className={`sidebar-icon ${isActive('/bi-connections') ? '' : 'navy-icon'}`}
+          />
+          &nbsp; BI Connections
         </button>
       </aside>
 

@@ -10,6 +10,7 @@ import { FaUser } from 'react-icons/fa';
 import { BsMenuButtonFill } from 'react-icons/bs';
 import { TiCreditCard } from 'react-icons/ti';
 import { FaMobileScreenButton } from 'react-icons/fa6';
+import { TbConnection } from 'react-icons/tb';
 import { IoDownloadOutline } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -574,6 +575,17 @@ const AIButtons = () => {
             className={`sidebar-icon ${isActive('/forced-app-updates') ? '' : 'navy-icon'}`}
           />
           &nbsp; Forced App Updates
+        </button>
+
+        <button
+          style={{ fontSize: '12px' }}
+          className={`sidebar-btn ${isActive('/bi-connections') ? 'active' : ''}`}
+          onClick={() => navigate('/bi-connections')}
+        >
+          <TbConnection
+            className={`sidebar-icon ${isActive('/bi-connections') ? '' : 'navy-icon'}`}
+          />
+          &nbsp; BI Connections
         </button>
       </aside>
 
