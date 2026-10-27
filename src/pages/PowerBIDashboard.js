@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/ai-chat.css';
+import '../styles/power-bi.css';
 
 const QANTUM_ORIGIN = 'https://qantumbi.com';
 
 export default function PowerBIDashboard({ venueId }) {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  
+
   const navigate = useNavigate();
   const iframeRef = useRef(null);
   const requestRef = useRef(null);
@@ -82,7 +83,7 @@ export default function PowerBIDashboard({ venueId }) {
   }, [venueId]);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div className="power-bi-page">
       <header className="app-header-ai">
         <div className="s2w-logo" onClick={() => navigate('/dashboard')}>
           <img src="/s2w-logo.png" alt="S2W Logo" />
@@ -98,7 +99,16 @@ export default function PowerBIDashboard({ venueId }) {
           </button>
         </div>
       </header>
-      <p>{status}</p>
+      {status !== 'Connected' && (
+        <div
+          className="power-bi-status-loader"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="power-bi-status-spinner" />
+          <span>{status}</span>
+        </div>
+      )}
 
       <iframe
         key={venueId}
@@ -112,8 +122,9 @@ export default function PowerBIDashboard({ venueId }) {
           );
         }}
         style={{
+          display: 'block',
           width: '100%',
-          height: '80vh',
+          height: 'calc(100vh - 90px)',
           border: 'none',
         }}
         allow="fullscreen"

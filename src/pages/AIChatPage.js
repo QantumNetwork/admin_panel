@@ -700,13 +700,15 @@ const AIChatPage = () => {
             </button>
           ))}
 
-          <button
-            type="button"
-            className="traditional-reporting-btn"
-            onClick={() => navigate('/power-bi')}
-          >
-            Traditional Reporting
-          </button>
+          {selectedVenue === 'Manly' && (
+            <button
+              type="button"
+              className="traditional-reporting-btn"
+              onClick={() => navigate('/power-bi')}
+            >
+              Traditional Reporting
+            </button>
+          )}
         </div>
 
         <div className="ai-main-area-chat">

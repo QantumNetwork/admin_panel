@@ -1,0 +1,62 @@
+
+/* Full-width Power BI page */
+.power-bi-page {
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Rectangular status loader at the top-right of the viewport */
+.power-bi-status-loader {
+  position: fixed;
+  top: 12px;
+  right: 175px;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 18px;
+  min-width: 190px;
+  min-height: 44px;
+  box-sizing: border-box;
+
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(12, 40, 91, 0.15);
+
+  color: #0c285b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.power-bi-status-spinner {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  border: 2px solid #dce5f5;
+  border-top-color: #0c285b;
+  border-radius: 50%;
+  animation: power-bi-status-spin 0.75s linear infinite;
+}
+
+@keyframes power-bi-status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .power-bi-status-loader {
+    top: 8px;
+    right: 8px;
+    min-width: 0;
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+}
