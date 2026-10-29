@@ -359,7 +359,7 @@ const AIChatPage = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_history: newChat,
+          chat_history: chatHistory,
           prompt: trimmed,
           username: username,
         }),
