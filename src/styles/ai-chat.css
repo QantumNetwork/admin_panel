@@ -456,8 +456,44 @@
   transform: scale(1.1);
 }
 
+
+.switch-ai-reporting-btn {
+  position: absolute;
+  top: 30px;
+  left: 62%;
+  width: 12%;
+  height: 46px;
+  border: 3px solid #002977;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  color: #002977;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 2px 4px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.switch-ai-reporting-btn small {
+  font-size: 9px;
+  font-weight: normal;
+  line-height: 1.1;
+}
+
+.switch-ai-reporting-btn:hover {
+  border-color: #558df7;
+  color: #558df7;
+}
+
+
 @media screen and (max-width: 1420px) {
-  .exit-btn {
+  /* .exit-btn {
       position: absolute;
       top: 30px;
       left: 56%;
@@ -472,7 +508,7 @@
       transition: all 0.3s ease;
       opacity: 1;
       font-weight: bold;
-  }
+  } */
 
   .viper-logo {
       margin-left: 26%;

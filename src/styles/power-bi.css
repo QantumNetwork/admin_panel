@@ -13,7 +13,7 @@
 .power-bi-status-loader {
   position: fixed;
   top: 12px;
-  right: 175px;
+  left: 250px;
   z-index: 10000;
 
   display: flex;

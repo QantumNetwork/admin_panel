@@ -1,7 +1,7 @@
 .exit-btn {
     position: absolute;
     top: 30px;
-    left: 62%;
+    left: 82%;
     width: 10%;
     height: 46px;
     border: 3px solid #002977;
@@ -195,7 +195,7 @@
 }
 
 @media screen and (max-width: 1420px) {
-    .exit-btn {
+    /* .exit-btn {
         position: absolute;
         top: 30px;
         left: 56%;
@@ -210,7 +210,7 @@
         transition: all 0.3s ease;
         opacity: 1;
         font-weight: bold;
-    }
+    } */
 
     .viper-logo {
         margin-left: 26%;

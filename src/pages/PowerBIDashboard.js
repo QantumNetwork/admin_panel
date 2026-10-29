@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { startAIWarmup } from '../utils/aiReportingWarmup';
 import axios from 'axios';
 import '../styles/ai-chat.css';
 import '../styles/power-bi.css';
@@ -13,6 +14,8 @@ export default function PowerBIDashboard({ venueId }) {
   const iframeRef = useRef(null);
   const requestRef = useRef(null);
   const [status, setStatus] = useState('Connecting...');
+
+  const [aiWarmupReady, setAiWarmupReady] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -82,6 +85,28 @@ export default function PowerBIDashboard({ venueId }) {
     };
   }, [venueId]);
 
+  useEffect(() => {
+    let active = true;
+
+    const venue = localStorage.getItem('selectedVenue') || '';
+    const username = localStorage.getItem('name') || 'user';
+
+    if (!venue) {
+      setAiWarmupReady(true);
+      return;
+    }
+
+    startAIWarmup(venue, username).finally(() => {
+      if (active) {
+        setAiWarmupReady(true);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="power-bi-page">
       <header className="app-header-ai">
@@ -92,6 +117,29 @@ export default function PowerBIDashboard({ venueId }) {
         <div className="viper-logo">
           <img src="/viper-icon.png" alt="Viper Logo" />
         </div>
+
+        <button
+          className="switch-ai-reporting-btn"
+          onClick={() => navigate('/chat')}
+          disabled={!aiWarmupReady}
+          aria-busy={!aiWarmupReady}
+          title={
+            aiWarmupReady
+              ? 'Switch to AI Reporting'
+              : 'Preparing AI Reporting...'
+          }
+        >
+          {!aiWarmupReady && (
+            <span className="power-bi-status-spinner" aria-hidden="true" />
+          )}
+          <span>
+            {aiWarmupReady
+              ? 'Switch to AI Reporting'
+              : 'Preparing AI Reporting...'}
+          </span>
+
+          {aiWarmupReady && <small>Just ask a question</small>}
+        </button>
 
         <div className="header-btn">
           <button className="exit-btn" onClick={() => navigate('/dashboard')}>

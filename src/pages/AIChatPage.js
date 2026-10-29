@@ -9,6 +9,12 @@ import { MdMicOff } from 'react-icons/md';
 import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import { handleLogout } from '../utils/api';
 import { toast, ToastContainer, Slide } from 'react-toastify';
+import {
+  getAIWarmup,
+  startAIWarmup,
+  clearAIWarmup,
+  getAIWarmupResult,
+} from '../utils/aiReportingWarmup';
 import { getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/ai-chat.css';
@@ -228,7 +234,9 @@ const AIChatPage = () => {
         else if (data.type === 'excel') assistantMsg.fileType = 'excel';
         else if (data.type === 'graph') assistantMsg.fileType = 'graph';
         else if (data.type === 'export') assistantMsg.fileType = 'excel';
-        if (!isInitialization) {
+        if (isInitialization) {
+          setChatHistory(data.chat_history);
+        } else {
           setChatHistory([...historyToSend, assistantMsg]);
         }
       } else {
@@ -248,30 +256,78 @@ const AIChatPage = () => {
   };
 
   useEffect(() => {
-    const shouldSendInitialPrompt =
-      chatHistory.length === 1 && chatHistory[0].role === 'user';
+    let active = true;
 
-    if (shouldSendInitialPrompt) {
+    const initializeChat = async () => {
+      // Preserve existing behavior when history is passed through navigation.
+      if (safeHistory.length > 0) {
+        setInitialLoading(false);
+        return;
+      }
+
+      const venue = localStorage.getItem('selectedVenue') || '';
+      const currentUsername = localStorage.getItem('name') || 'user';
+
+      const cachedResult = getAIWarmupResult(venue, currentUsername);
+
+      if (cachedResult) {
+        // The response is already available; don't show the loading screen.
+        setChatHistory(cachedResult.chat_history);
+        setInitialLoading(false);
+        // clearAIWarmup(venue, currentUsername);
+        return;
+      }
+
       setInitialLoading(true);
-      sendToAI(chatHistory);
-      return;
-    }
 
-    if (chatHistory.length === 0) {
-      setInitialLoading(true);
+      try {
+        // Reuse the warm-up started on the Power BI page.
+        // If the user opened AI Chat directly, start it here instead.
+        const warmup =
+          getAIWarmup(venue, currentUsername) ||
+          startAIWarmup(venue, currentUsername);
 
-      sendToAI(
-        [
-          {
-            role: 'user',
-            content: 'Hi',
-          },
-        ],
-        true
-      );
+        const data = await warmup;
 
-      return;
-    }
+        if (!active) return;
+
+        if (data?.success && Array.isArray(data.chat_history)) {
+          const history = [...data.chat_history];
+          const assistantMsg = history[history.length - 1];
+
+          if (assistantMsg?.role === 'assistant') {
+            if (data.type === 'pdf') assistantMsg.fileType = 'pdf';
+            else if (data.type === 'excel') assistantMsg.fileType = 'excel';
+            else if (data.type === 'graph') assistantMsg.fileType = 'graph';
+            else if (data.type === 'export') assistantMsg.fileType = 'excel';
+          }
+
+          setChatHistory(history);
+        } else {
+          // Keep the existing initialization behavior as a fallback.
+          await sendToAI([{ role: 'user', content: 'Hi' }], true);
+        }
+      } catch (error) {
+        console.error('AI chat initialization failed:', error);
+
+        if (active) {
+          // Fall back to the existing initialization request.
+          await sendToAI([{ role: 'user', content: 'Hi' }], true);
+        }
+      } finally {
+        clearAIWarmup(venue, currentUsername);
+
+        if (active) {
+          setInitialLoading(false);
+        }
+      }
+    };
+
+    initializeChat();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -571,7 +627,7 @@ const AIChatPage = () => {
           <img src="/viper-icon.png" alt="Viper Logo" />
         </div>
         <div className="header-btn">
-          {userType === 'admin' && (
+          {/* {userType === 'admin' && (
             <div
               style={{
                 position: 'absolute',
@@ -648,14 +704,20 @@ const AIChatPage = () => {
                           {getAppType(app)}
                         </option>
                       ))
-                  )}
-                {userType === 'user' && (
+                  )} */}
+          {/* {userType === 'user' && (
                   <option value={appGroup}>{getAppType(appGroup)}</option>
                 )}
-              </select>
-            </div>
-          )}
+              </select> */}
+          {/* </div> */}
+          {/* )} */}
 
+          <button
+            className="switch-ai-reporting-btn"
+            onClick={() => navigate('/power-bi')}
+          >
+            <span>Switch back to BI</span>
+          </button>
           <button
             className="exit-btn"
             onClick={() => handleNavigation('/dashboard')}
@@ -700,7 +762,7 @@ const AIChatPage = () => {
             </button>
           ))}
 
-          {selectedVenue === 'Manly' && (
+          {/* {selectedVenue === 'Manly' && (
             <button
               type="button"
               className="traditional-reporting-btn"
@@ -708,7 +770,7 @@ const AIChatPage = () => {
             >
               Traditional Reporting
             </button>
-          )}
+          )} */}
         </div>
 
         <div className="ai-main-area-chat">

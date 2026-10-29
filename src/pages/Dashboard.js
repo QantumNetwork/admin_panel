@@ -354,7 +354,7 @@ const Dashboard = () => {
               <div
                 className="dashboard-card"
                 style={{ gridArea: 'ai-reporting' }}
-                onClick={() => navigate('/chat', { state: { email } })}
+                onClick={() => navigate('/power-bi', { state: { email } })}
               >
                 <img
                   src="/ai-reporting.png"
@@ -383,7 +383,11 @@ const Dashboard = () => {
               ) : (
                 <div
                   className="dashboard-card"
-                  style={{ gridArea: 'club-desk', width: '85%', marginLeft: '8%' }}
+                  style={{
+                    gridArea: 'club-desk',
+                    width: '85%',
+                    marginLeft: '8%',
+                  }}
                   onClick={() =>
                     navigate('/member-search', { state: { email } })
                   }
@@ -442,7 +446,7 @@ const Dashboard = () => {
                 <div
                   className="dashboard-card"
                   style={{ gridArea: 'ai-reporting' }}
-                  onClick={() => navigate('/chat', { state: { email } })}
+                  onClick={() => navigate('/power-bi', { state: { email } })}
                 >
                   <img
                     src="/ai-reporting.png"
@@ -469,7 +473,11 @@ const Dashboard = () => {
               {access.includes('members') && (
                 <div
                   className="dashboard-card"
-                  style={{ gridArea: 'club-desk', width: '85%', marginLeft: '8%' }}
+                  style={{
+                    gridArea: 'club-desk',
+                    width: '85%',
+                    marginLeft: '8%',
+                  }}
                   onClick={() =>
                     navigate('/member-search', { state: { email } })
                   }
