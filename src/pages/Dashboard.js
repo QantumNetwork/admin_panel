@@ -351,17 +351,31 @@ const Dashboard = () => {
                   className="card-image"
                 />
               </div> */}
-              <div
-                className="dashboard-card"
-                style={{ gridArea: 'ai-reporting' }}
-                onClick={() => navigate('/power-bi', { state: { email } })}
-              >
-                <img
-                  src="/ai-reporting.png"
-                  alt="AI Reporting"
-                  className="card-image"
-                />
-              </div>
+              {selectedVenue === 'Manly' ? (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'ai-reporting' }}
+                  onClick={() => navigate('/power-bi', { state: { email } })}
+                >
+                  <img
+                    src="/ai-reporting.png"
+                    alt="AI Reporting"
+                    className="card-image"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="dashboard-card"
+                  style={{ gridArea: 'ai-reporting' }}
+                  onClick={() => navigate('/chat', { state: { email } })}
+                >
+                  <img
+                    src="/ai-reporting.png"
+                    alt="AI Reporting"
+                    className="card-image"
+                  />
+                </div>
+              )}
 
               {selectedVenue === 'Qantum' ||
               selectedVenue === 'Ace' ||

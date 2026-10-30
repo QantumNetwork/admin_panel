@@ -315,7 +315,6 @@ const AIChatPage = () => {
           await sendToAI([{ role: 'user', content: 'Hi' }], true);
         }
       } finally {
-        clearAIWarmup(venue, currentUsername);
 
         if (active) {
           setInitialLoading(false);
@@ -712,12 +711,15 @@ const AIChatPage = () => {
           {/* </div> */}
           {/* )} */}
 
-          <button
-            className="switch-ai-reporting-btn"
-            onClick={() => navigate('/power-bi')}
-          >
-            <span>Switch back to BI</span>
-          </button>
+          {selectedVenue === 'Manly' && (
+            <button
+              className="switch-ai-reporting-btn"
+              onClick={() => navigate('/power-bi')}
+            >
+              <span>Switch back to BI</span>
+            </button>
+          )}
+
           <button
             className="exit-btn"
             onClick={() => handleNavigation('/dashboard')}
