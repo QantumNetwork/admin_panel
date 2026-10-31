@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, act } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadImage } from '../s3/config';
 import { logout } from '../utils/auth';
 import { trackMenuAccess, handleLogout } from '../utils/api';
 import * as XLSX from 'xlsx';
@@ -1373,13 +1373,14 @@ const SpecialOffers = () => {
 
   // Handle image upload
   const handleImageUpload = async (e) => {
+    console.log('1. handleImageUpload triggered');
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0];
-        const s3Url = await uploadFileToS3(file);
-        console.log(s3Url);
+        console.log('2. Calling uploadImage:', file.name);
+        const s3Url = await uploadImage(file);
+        console.log('3. Upload completed:', s3Url);
         setUploadedImage(s3Url);
-        console.log('img- ', uploadedImage);
 
         // Update selectedOffer's image if we have one, regardless of addMode
         if (selectedOffer) {

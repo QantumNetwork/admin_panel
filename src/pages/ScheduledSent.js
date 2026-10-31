@@ -9,7 +9,6 @@ import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 import { HiCurrencyDollar } from "react-icons/hi2";
 import { FaCheck } from 'react-icons/fa';
 import { useEffect, useState, useCallback } from 'react';
-import { uploadFileToS3 } from '../s3/config';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { trackMenuAccess, handleLogout } from '../utils/api';
 import { getAppType } from '../utils/appConstants';

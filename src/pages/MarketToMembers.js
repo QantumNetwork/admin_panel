@@ -10,7 +10,7 @@ import axios from 'axios';
 import Select from 'react-select';
 import { MultiSelect } from 'primereact/multiselect';
 import { useState, useEffect, useRef } from 'react';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadImage } from '../s3/config';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { trackMenuAccess, handleLogout } from '../utils/api';
@@ -739,9 +739,8 @@ const MarketToMembers = () => {
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0];
-        const s3Url = await uploadFileToS3(file);
-        console.log(s3Url);
-        setImage(s3Url);
+        const imageUrl = await uploadImage(file);
+        setImage(imageUrl);
       } catch (error) {
         console.error('Error uploading image to S3:', error);
         toast.error('Failed to upload image. Please try again.');

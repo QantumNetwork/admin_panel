@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadImage } from '../s3/config';
 import {
   FaBullhorn,
   FaGift,
@@ -179,28 +179,24 @@ const DigitalApp = () => {
   const [isVenueInitialized, setIsVenueInitialized] = useState(false);
 
   useEffect(() => {
-    if (
-      selectedVenue !== 'EDP' ||
-      isVenueInitialized ||
-      !venueOptions.length
-    )
+    if (selectedVenue !== 'EDP' || isVenueInitialized || !venueOptions.length)
       return;
 
     const allSelected =
       (venue.length === venueOptions.length &&
-      venueOptions.every((opt) => venue.includes(opt.value))) || 
+        venueOptions.every((opt) => venue.includes(opt.value))) ||
       venue.length === 0;
 
     setIsAllVenue(allSelected);
     setIsVenueInitialized(true);
-  }, [venueOptions,venue,selectedVenue]);
+  }, [venueOptions, venue, selectedVenue]);
 
   useEffect(() => {
-  if (selectedVenue !== 'EDP') return;
+    if (selectedVenue !== 'EDP') return;
 
-  setIsVenueInitialized(false);
-  setIsAllVenue(false);
-}, [advertImages, activeImageIndex, selectedVenue]);
+    setIsVenueInitialized(false);
+    setIsAllVenue(false);
+  }, [advertImages, activeImageIndex, selectedVenue]);
 
   // Helper to convert audience (array of strings) into ReactSelect option objects
   // Uses case-insensitive matching.
@@ -724,12 +720,12 @@ const DigitalApp = () => {
   };
 
   const handleImageChange = async (e) => {
+    console.log('1. img upload started');
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0];
-        const s3Url = await uploadFileToS3(file);
-        console.log(s3Url);
-        setSelectedImage(s3Url);
+        const imageUrl = await uploadImage(file);
+        setSelectedImage(imageUrl);
       } catch (error) {
         console.error('Error uploading image to S3:', error);
         toast.error('Failed to upload image. Please try again.');
@@ -1032,19 +1028,17 @@ const DigitalApp = () => {
       fetchVenues();
     }
   }, [token]);
-const parsePromotionText = (rawText) => {
-  if (!rawText) return '';
+  const parsePromotionText = (rawText) => {
+    if (!rawText) return '';
 
-  // If backend already returns HTML, use it directly
-  if (/<[a-z][\s\S]*>/i.test(rawText)) {
-    return rawText;
-  }
+    // If backend already returns HTML, use it directly
+    if (/<[a-z][\s\S]*>/i.test(rawText)) {
+      return rawText;
+    }
 
-  // Convert new lines to HTML line breaks
-  return rawText
-    .replace(/\r\n/g, '\n')
-    .replace(/\n/g, '<br />');
-};
+    // Convert new lines to HTML line breaks
+    return rawText.replace(/\r\n/g, '\n').replace(/\n/g, '<br />');
+  };
 
   const handleCardClick = async (accessItem, navigateTo) => {
     try {
@@ -1291,7 +1285,16 @@ const parsePromotionText = (rawText) => {
           />
           Special Offers
         </button>
-        {(selectedVenue === 'Ace' || selectedVenue === 'Manly' || selectedVenue === 'Qantum' || selectedVenue === 'MaxGaming' || selectedVenue === 'EDP' || selectedVenue === 'Flinders' || selectedVenue === 'Mosaic' || selectedVenue === 'Bluewater' || selectedVenue === 'Mannum' || selectedVenue === 'StarReward') && (
+        {(selectedVenue === 'Ace' ||
+          selectedVenue === 'Manly' ||
+          selectedVenue === 'Qantum' ||
+          selectedVenue === 'MaxGaming' ||
+          selectedVenue === 'EDP' ||
+          selectedVenue === 'Flinders' ||
+          selectedVenue === 'Mosaic' ||
+          selectedVenue === 'Bluewater' ||
+          selectedVenue === 'Mannum' ||
+          selectedVenue === 'StarReward') && (
           <button
             className={`sidebar-btn ${
               isActive('/smart-incentives') ? 'active' : ''
@@ -1773,10 +1776,12 @@ const parsePromotionText = (rawText) => {
             }}
           >
             {console.log(
-  "Rendering Editor section",
-  "isAddingNew:", isAddingNew,
-  "isEditing:", isEditing
-)}
+              'Rendering Editor section',
+              'isAddingNew:',
+              isAddingNew,
+              'isEditing:',
+              isEditing
+            )}
             {isAddingNew || isEditing ? (
               <Editor
                 apiKey="w4ovbh419s7ro991pcvugbe4jg7r7h7xq33ai8n5mdsk1yqu"
@@ -1802,9 +1807,9 @@ const parsePromotionText = (rawText) => {
                         { type: blobInfo.blob().type }
                       );
 
-                      const s3Url = await uploadFileToS3(file);
+                      const imageUrl = await uploadImage(file);
 
-                      return s3Url; // IMPORTANT
+                      return imageUrl;
                     } catch (error) {
                       console.error(error);
                       throw new Error('Image upload failed');

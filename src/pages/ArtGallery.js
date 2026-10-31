@@ -17,7 +17,7 @@ import { toast, ToastContainer, Slide } from 'react-toastify';
 import { getAppType } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { uploadFileToS3, uploadImageToS3 } from '../s3/config';
+import { uploadImage as uploadImageToAPI } from '../s3/config';
 
 const ArtGallery = () => {
   const location = useLocation();
@@ -339,7 +339,9 @@ const ArtGallery = () => {
       });
 
       // 4️⃣ Upload to S3
-      const s3Url = await uploadImageToS3(editedFile);
+      const s3Url = await uploadImageToAPI(editedFile, 'edited');
+      console.log('edited art gallery img url - ', s3Url);
+      
 
       // 5️⃣ Save new image in state
       setImage(s3Url);
@@ -418,7 +420,8 @@ const ArtGallery = () => {
 
       // Upload all files in parallel
       const uploadPromises = selectedFiles.map(async (file) => {
-        const imageUrl = await uploadFileToS3(file);
+        console.log('1. img upload started');
+        const imageUrl = await uploadImageToAPI(file);
         console.log('Uploaded Image URL:', imageUrl);
 
         const response = await uploadImage(token, imageUrl, imageSize);

@@ -17,7 +17,6 @@ import axios from 'axios';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import { getAppType, getAudienceOptions } from '../utils/appConstants';
 import 'react-toastify/dist/ReactToastify.css';
-import { uploadFileToS3 } from '../s3/config';
 
 const MyBenefits = () => {
   const [showDropdown, setShowDropdown] = useState(false);

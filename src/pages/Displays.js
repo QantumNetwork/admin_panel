@@ -4,7 +4,7 @@ import { logout } from '../utils/auth';
 import { BsDisplayFill } from 'react-icons/bs';
 import { RiRectangleFill } from 'react-icons/ri';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadImage } from '../s3/config';
 import {
   FaCheck,
   FaCloudUploadAlt,
@@ -165,9 +165,8 @@ const Displays = () => {
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0];
-        const s3Url = await uploadFileToS3(file);
-        console.log(s3Url);
-        setSelectedImage(s3Url);
+        const imageUrl = await uploadImage(file);
+        setSelectedImage(imageUrl);
       } catch (error) {
         console.error('Error uploading image to S3:', error);
         toast.error('Failed to upload image. Please try again.');

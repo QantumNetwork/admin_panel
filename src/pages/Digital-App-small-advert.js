@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { uploadFileToS3 } from '../s3/config';
+import { uploadImage } from '../s3/config';
 import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { trackMenuAccess, handleLogout } from '../utils/api';
@@ -671,10 +671,8 @@ const DigitalSmall = () => {
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0];
-        const s3Url = await uploadFileToS3(file);
-        console.log(s3Url);
-        // When editing an existing post, update only the selectedImage state for the active post.
-        setSelectedImage(s3Url);
+        const imageUrl = await uploadImage(file);
+        setSelectedImage(imageUrl);
       } catch (error) {
         console.error('Error uploading image to S3:', error);
         toast.error('Failed to upload image. Please try again.');
@@ -1746,9 +1744,9 @@ const DigitalSmall = () => {
                         { type: blobInfo.blob().type }
                       );
 
-                      const s3Url = await uploadFileToS3(file);
+                      const imageUrl = await uploadImage(file);
 
-                      return s3Url; // IMPORTANT
+                      return imageUrl;
                     } catch (error) {
                       console.error(error);
                       throw new Error('Image upload failed');
