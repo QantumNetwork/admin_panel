@@ -254,6 +254,7 @@ const StandardAdmin = () => {
   // Handle access checkboxes
   const handleAccessChange = (e) => {
     const { name, checked } = e.target;
+
     setFormData((prev) => {
       const access = [...prev.access];
       if (checked) {
@@ -264,6 +265,14 @@ const StandardAdmin = () => {
           access.splice(index, 1);
         }
       }
+
+    // Remove powerBi when Viper is unchecked
+    if (name === 'ai-reporting' && !checked) {
+      const powerBiIndex = access.indexOf('powerBi');
+      if (powerBiIndex > -1) {
+        access.splice(powerBiIndex, 1);
+      }
+    }
       return { ...prev, access };
     });
 
@@ -417,7 +426,7 @@ const StandardAdmin = () => {
           access: userData.access || [],
         });
 
-        if(userData.securityValue) {
+        if (userData.securityValue) {
           setReportingSecurityLevel(userData.securityValue);
         }
 
@@ -436,7 +445,7 @@ const StandardAdmin = () => {
   };
 
   const modifyPayloadKey = (label) => {
-    switch(label) {
+    switch (label) {
       case 'Full Access':
         return 'All';
       case 'Gaming Only':
@@ -446,7 +455,7 @@ const StandardAdmin = () => {
       default:
         return label;
     }
-  }
+  };
 
   const handleActivate = async () => {
     if (!validateForm()) {
@@ -1000,6 +1009,20 @@ const StandardAdmin = () => {
                   onChange={handleAccessChange}
                 />
               </div>
+              {formData.access.includes('ai-reporting') && (
+                <div className="add-ai-option">
+                  <label htmlFor="powerBi" style={{ margin: 0 }}>
+                    Add AI
+                  </label>
+                  <input
+                    type="checkbox"
+                    name="powerBi"
+                    checked={formData.access.includes('powerBi')}
+                    onChange={handleAccessChange}
+                    style={{accentColor: '#002977'}}
+                  />
+                </div>
+              )}
 
               <div className="access-item">
                 <img src="/club-desk.png" alt="Club Desk" />

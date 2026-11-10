@@ -248,3 +248,27 @@
   z-index: 999;
 }
 
+.access-sa {
+    position: relative;
+}
+
+.access-sa .add-ai-option {
+    position: absolute;
+    right: 20px;
+    top: 62.4%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.access-sa .add-ai-option label {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 14px;
+    color: #000;
+}
+
+.access-sa .add-ai-option input {
+    margin: 0;
+}

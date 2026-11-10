@@ -17,6 +17,8 @@ export default function PowerBIDashboard({ venueId }) {
 
   const [aiWarmupReady, setAiWarmupReady] = useState(false);
 
+  const access = localStorage.getItem('access');
+
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
@@ -118,28 +120,30 @@ export default function PowerBIDashboard({ venueId }) {
           <img src="/viper-icon.png" alt="Viper Logo" />
         </div>
 
-        <button
-          className="switch-ai-reporting-btn"
-          onClick={() => navigate('/chat')}
-          disabled={!aiWarmupReady}
-          aria-busy={!aiWarmupReady}
-          title={
-            aiWarmupReady
-              ? 'Switch to AI Reporting'
-              : 'Preparing AI Reporting...'
-          }
-        >
-          {!aiWarmupReady && (
-            <span className="power-bi-status-spinner" aria-hidden="true" />
-          )}
-          <span>
-            {aiWarmupReady
-              ? 'Switch to AI Reporting'
-              : 'Preparing AI Reporting...'}
-          </span>
+        {access.includes('powerBi') && (
+          <button
+            className="switch-ai-reporting-btn"
+            onClick={() => navigate('/chat')}
+            disabled={!aiWarmupReady}
+            aria-busy={!aiWarmupReady}
+            title={
+              aiWarmupReady
+                ? 'Switch to AI Reporting'
+                : 'Preparing AI Reporting...'
+            }
+          >
+            {!aiWarmupReady && (
+              <span className="power-bi-status-spinner" aria-hidden="true" />
+            )}
+            <span>
+              {aiWarmupReady
+                ? 'Switch to AI Reporting'
+                : 'Preparing AI Reporting...'}
+            </span>
 
-          {aiWarmupReady && <small>Just ask a question</small>}
-        </button>
+            {aiWarmupReady && <small>Just ask a question</small>}
+          </button>
+        )}
 
         <div className="header-btn">
           <button className="exit-btn" onClick={() => navigate('/dashboard')}>
