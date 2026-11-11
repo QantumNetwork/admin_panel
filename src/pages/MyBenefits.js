@@ -77,8 +77,24 @@ const [selectedLevel, setSelectedLevel] = useState(() => {
 
   // Map level to corresponding image path based on venue
   const getLevelImagePath = (level) => {
-    const venue = selectedVenue?.toLowerCase() || '';
-    const levelLower = level.toLowerCase().replace(/\s+/g, '_');
+    let venue = selectedVenue?.toLowerCase() || '';
+    let levelLower = level.toLowerCase().replace(/\s+/g, '_');
+    if (venue === "wonthaggi") {
+      if(levelLower === "corporate") {
+        venue="flinders";
+      } else if(levelLower === "gold_1star" || levelLower === "gold_2star" || levelLower === "gold_3star" || levelLower === "gold_4star" || levelLower === "gold") {
+        levelLower="gold";
+      } else if(levelLower === "platinum_1star" || levelLower === "platinum_2star" || levelLower === "platinum_3star" || levelLower === "platinum_4star" || levelLower === "platinum") {
+        levelLower="platinum";
+      } else if(levelLower === "silver_1star" || levelLower === "silver_2star" || levelLower === "silver_3star" || levelLower === "silver_4star" || levelLower === "silver") {
+        levelLower="silver";
+      } else if(levelLower === "staff") {
+        venue="qantum";
+      } else if(levelLower !== "valued") {
+        venue="flinders"
+        levelLower="test";
+      }
+    }
     return `/${venue}_${levelLower}.png`;
   };
 
